@@ -126,14 +126,14 @@ public class FunctionDefinitionProcessor extends Processor<FunctionDefinition<?>
 
         state.getVariableContext().buildAndRegister("return", functionType._returnType(), functionType._returnMultiplicity(), processorSupport);
 
-        if (functionDefinition instanceof PackageableFunction)
+        if (functionDefinition instanceof PackageableFunction function)
         {
-            RichIterable<? extends Constraint> constraints = ((PackageableFunction)functionDefinition)._preConstraints();
+            RichIterable<? extends Constraint> constraints = function._preConstraints();
             if (constraints.notEmpty())
             {
                 processConstraints(functionDefinition, constraints.toList(), matcher, state, processorSupport);
             }
-            RichIterable<? extends Constraint> postConstraints = ((PackageableFunction)functionDefinition)._postConstraints();
+            RichIterable<? extends Constraint> postConstraints = function._postConstraints();
             if (postConstraints.notEmpty())
             {
                 processConstraints(functionDefinition, postConstraints.toList(), matcher, state, processorSupport);

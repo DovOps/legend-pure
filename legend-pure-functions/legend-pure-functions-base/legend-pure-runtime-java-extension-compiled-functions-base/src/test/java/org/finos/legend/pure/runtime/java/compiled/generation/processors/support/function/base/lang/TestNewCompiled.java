@@ -20,12 +20,13 @@ import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
 import org.finos.legend.pure.m3.tests.function.base.lang.AbstractTestNewAtRuntime;
 import org.finos.legend.pure.runtime.java.compiled.execution.FunctionExecutionCompiledBuilder;
 import org.finos.legend.pure.runtime.java.compiled.factory.JavaModelFactoryRegistryLoader;
-import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestNewCompiled extends AbstractTestNewAtRuntime
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         AbstractPureTestWithCoreCompiled.setUpRuntime(getFunctionExecution(), AbstractTestNewAtRuntime.getCodeStorage(), JavaModelFactoryRegistryLoader.loader());
@@ -43,94 +44,98 @@ public class TestNewCompiled extends AbstractTestNewAtRuntime
     }
 
     @Override
+    @Test
     public void testNewWithInheritenceAndOverriddenAssociationEndWithReverseOneToOneProperty()
     {
-        AbstractPureTestWithCoreCompiled.compileTestSource("fromString.pure", "function test(): Any[*]\n" +
-                "{\n" +
-                "   let car = ^test::FastCar(name='Bugatti', owner= ^test::Owner(firstName='John', lastName='Roe'));\n" +
-                "   print($car.owner.car->size()->toString(), 1);\n" +
-                "   $car;" +
-                "}\n" +
-                "\n" +
-                "Class\n" +
-                "test::Car\n" +
-                "{\n" +
-                "   name : String[1];\n" +
-                "}\n" +
-                "\n" +
-                "Class\n" +
-                "test::FastCar extends test::Car\n" +
-                "{\n" +
-                "   owner : test::Owner[1];\n" +
-                "}" +
-                "\n" +
-                "Class\n" +
-                "test::Owner\n" +
-                "{\n" +
-                "   firstName: String[1];\n" +
-                "   lastName: String[1];\n" +
-                "}\n" +
-                "\n" +
-                "Association test::Car_Owner\n" +
-                "{\n" +
-                "   owner : test::Owner[1];\n" +
-                "   car  : test::Car[1];\n" +
-                "}");
+        AbstractPureTestWithCoreCompiled.compileTestSource("fromString.pure", """
+                function test(): Any[*]
+                {
+                   let car = ^test::FastCar(name='Bugatti', owner= ^test::Owner(firstName='John', lastName='Roe'));
+                   print($car.owner.car->size()->toString(), 1);
+                   $car;\
+                }
+                
+                Class
+                test::Car
+                {
+                   name : String[1];
+                }
+                
+                Class
+                test::FastCar extends test::Car
+                {
+                   owner : test::Owner[1];
+                }
+                Class
+                test::Owner
+                {
+                   firstName: String[1];
+                   lastName: String[1];
+                }
+                
+                Association test::Car_Owner
+                {
+                   owner : test::Owner[1];
+                   car  : test::Car[1];
+                }\
+                """);
         try
         {
             execute("test():Any[*]");
             String result = AbstractPureTestWithCoreCompiled.functionExecution.getConsole().getLine(0);
-            Assert.assertEquals("'0'", result);
+            Assertions.assertEquals("'0'", result);
         }
         catch (Exception e)
         {
-            Assert.fail("Failed to set the reverse properties for a one-to-one association.");
+            Assertions.fail("Failed to set the reverse properties for a one-to-one association.");
         }
     }
 
     @Override
+    @Test
     public void testNewWithInheritenceAndOverriddenAssociationEndWithReverseOneToManyProperty()
     {
-        AbstractPureTestWithCoreCompiled.compileTestSource("fromString.pure", "function test(): Any[*]\n" +
-                "{\n" +
-                "   let car = ^test::FastCar(name='Bugatti', owner= ^test::Owner(firstName='John', lastName='Roe'));\n" +
-                "   print($car.owner.cars->size()->toString(), 1);\n" +
-                "   $car;" +
-                "}\n" +
-                "\n" +
-                "Class\n" +
-                "test::Car\n" +
-                "{\n" +
-                "   name : String[1];\n" +
-                "}\n" +
-                "\n" +
-                "Class\n" +
-                "test::FastCar extends test::Car\n" +
-                "{\n" +
-                "   owner : test::Owner[1];\n" +
-                "}" +
-                "\n" +
-                "Class\n" +
-                "test::Owner\n" +
-                "{\n" +
-                "   firstName: String[1];\n" +
-                "   lastName: String[1];\n" +
-                "}\n" +
-                "\n" +
-                "Association test::Car_Owner\n" +
-                "{\n" +
-                "   owner : test::Owner[1];\n" +
-                "   cars  : test::Car[1..*];\n" +
-                "}");
+        AbstractPureTestWithCoreCompiled.compileTestSource("fromString.pure", """
+                function test(): Any[*]
+                {
+                   let car = ^test::FastCar(name='Bugatti', owner= ^test::Owner(firstName='John', lastName='Roe'));
+                   print($car.owner.cars->size()->toString(), 1);
+                   $car;\
+                }
+                
+                Class
+                test::Car
+                {
+                   name : String[1];
+                }
+                
+                Class
+                test::FastCar extends test::Car
+                {
+                   owner : test::Owner[1];
+                }
+                Class
+                test::Owner
+                {
+                   firstName: String[1];
+                   lastName: String[1];
+                }
+                
+                Association test::Car_Owner
+                {
+                   owner : test::Owner[1];
+                   cars  : test::Car[1..*];
+                }\
+                """);
         try
         {
             execute("test():Any[*]");
             String result = AbstractPureTestWithCoreCompiled.functionExecution.getConsole().getLine(0);
-            Assert.assertEquals("'0'", result);
+            Assertions.assertEquals("'0'", result);
         }
         catch (Exception e)
         {
-            Assert.fail("Failed to set the reverse properties for a one-to-one association.");
+            Assertions.fail("Failed to set the reverse properties for a one-to-one association.");
         }
     }
 }

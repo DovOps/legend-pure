@@ -42,7 +42,7 @@ import org.finos.legend.pure.runtime.java.compiled.generation.processors.IdBuild
 import org.finos.legend.pure.runtime.java.compiled.metadata.ClassCache;
 import org.finos.legend.pure.runtime.java.compiled.metadata.FunctionCache;
 import org.finos.legend.pure.runtime.java.compiled.metadata.MetadataLazy;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -121,7 +121,7 @@ public class PureTestBuilderCompiled extends TestSuite
                 Field tracerField = GlobalTracer.get().getClass().getDeclaredField("isRegistered");
                 tracerField.setAccessible(true);
                 tracerField.set(GlobalTracer.get(), false);
-                Assert.assertFalse(GlobalTracer.isRegistered());
+                Assertions.assertFalse(GlobalTracer.isRegistered());
             }
             catch (Exception ignored)
             {

@@ -68,10 +68,10 @@ public class TypeInferenceContext
         this.processorSupport = processorSupport;
         if (owner != null)
         {
-            RichIterable<? extends org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.type.generics.TypeParameter> typeParameters = (owner instanceof Class) ?
-                    ((Class<?>) owner)._typeParameters() :
-                    ((owner instanceof org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.type.FunctionType) ?
-                            ((org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.type.FunctionType) owner)._typeParameters() :
+            RichIterable<? extends org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.type.generics.TypeParameter> typeParameters = (owner instanceof Class c) ?
+                    c._typeParameters() :
+                    ((owner instanceof org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.type.FunctionType ft) ?
+                            ft._typeParameters() :
                             Lists.immutable.empty());
             typeParameters.forEach(typeParameter ->
             {
@@ -205,9 +205,9 @@ public class TypeInferenceContext
         }
         else
         {
-            String functionName = (this.scope instanceof FunctionExpression) ?
-                    ((FunctionExpression) this.scope)._functionName() :
-                    ((this.scope instanceof Function) ? ((Function<?>) this.scope)._functionName() : null);
+            String functionName = (this.scope instanceof FunctionExpression fe) ?
+                    fe._functionName() :
+                    ((this.scope instanceof Function f) ? f._functionName() : null);
             appendable.append(functionName);
             FunctionType.print(appendable, this.processorSupport.function_getFunctionType(this.scope), this.processorSupport);
         }
@@ -350,10 +350,8 @@ public class TypeInferenceContext
                 register(((GenericTypeOperation) templateGenType)._left(), genericTypeCopy, targetGenericsContext, merge, observer);
             }
 
-            if ((templateGenType instanceof GenericTypeOperation) && (genericTypeCopy instanceof GenericTypeOperation))
+            if ((templateGenType instanceof GenericTypeOperation templateGenTypeOperation) && (genericTypeCopy instanceof GenericTypeOperation genericTypeOperationCopy))
             {
-                GenericTypeOperation templateGenTypeOperation = (GenericTypeOperation) templateGenType;
-                GenericTypeOperation genericTypeOperationCopy = (GenericTypeOperation) genericTypeCopy;
                 if (templateGenTypeOperation._type().getName().equals(genericTypeOperationCopy._type().getName()))
                 {
                     register(templateGenTypeOperation._left(), genericTypeOperationCopy._left(), targetGenericsContext, merge, observer);

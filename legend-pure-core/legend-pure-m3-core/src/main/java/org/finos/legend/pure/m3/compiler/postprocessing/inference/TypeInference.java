@@ -234,10 +234,8 @@ public class TypeInference
                 {
                     CoreInstance fTypR = template._typeArguments().getFirst()._rawType();
                     CoreInstance sTypeR = g._typeArguments().getFirst()._rawType();
-                    if (fTypR instanceof FunctionType && sTypeR instanceof FunctionType)
+                    if (fTypR instanceof FunctionType fType && sTypeR instanceof FunctionType sType)
                     {
-                        FunctionType fType = (FunctionType) fTypR;
-                        FunctionType sType = (FunctionType) sTypeR;
                         resolveTypeParameters(fType._returnType(), sType._returnType(), rtypes, rmultiplicities, types, multiplicities, processorSupport);
                         resolveMultiplicityParameters(fType._returnMultiplicity(), sType._returnMultiplicity(), rmultiplicities, multiplicities);
                         fType._parameters().zip(sType._parameters()).forEach(pair ->

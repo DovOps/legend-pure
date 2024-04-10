@@ -18,20 +18,20 @@ import org.finos.legend.pure.m3.execution.FunctionExecution;
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
 import org.finos.legend.pure.m4.exception.PureCompilationException;
 import org.finos.legend.pure.runtime.java.interpreted.FunctionExecutionInterpreted;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestStaticInstance extends AbstractPureTestWithCoreCompiled
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getFunctionExecution());
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("fromString.pure");
@@ -40,36 +40,42 @@ public class TestStaticInstance extends AbstractPureTestWithCoreCompiled
     @Test
     public void testStaticInstance()
     {
-        compileTestSource("fromString.pure", "Class Person\n" +
-                "{\n" +
-                "   lastName:String[1];\n" +
-                "}\n" +
-                "^Person p (lastName='last')\n" +
-                "function testGet():Nil[0]\n" +
-                "{\n" +
-                "    print(p, 1);\n" +
-                "}\n");
+        compileTestSource("fromString.pure", """
+                Class Person
+                {
+                   lastName:String[1];
+                }
+                ^Person p (lastName='last')
+                function testGet():Nil[0]
+                {
+                    print(p, 1);
+                }
+                """);
         this.execute("testGet():Nil[0]");
-        Assert.assertEquals("p instance Person\n" +
-                "    lastName(Property):\n" +
-                "        last instance String", functionExecution.getConsole().getLine(0));
+        Assertions.assertEquals("""
+                p instance Person
+                    lastName(Property):
+                        last instance String\
+                """, functionExecution.getConsole().getLine(0));
     }
 
 
     @Test
     public void testGetterFromStaticInstance()
     {
-        compileTestSource("fromString.pure", "Class Person\n" +
-                "{\n" +
-                "   lastName:String[1];\n" +
-                "}\n" +
-                "^Person a (lastName='last')\n" +
-                "function testGet():Nil[0]\n" +
-                "{\n" +
-                "    print(a.lastName, 1);\n" +
-                "}\n");
+        compileTestSource("fromString.pure", """
+                Class Person
+                {
+                   lastName:String[1];
+                }
+                ^Person a (lastName='last')
+                function testGet():Nil[0]
+                {
+                    print(a.lastName, 1);
+                }
+                """);
         this.execute("testGet():Nil[0]");
-        Assert.assertEquals("'last'", functionExecution.getConsole().getLine(0));
+        Assertions.assertEquals("'last'", functionExecution.getConsole().getLine(0));
     }
 
     @Test
@@ -77,16 +83,18 @@ public class TestStaticInstance extends AbstractPureTestWithCoreCompiled
     {
         try
         {
-            compileTestSource("fromString.pure", "Class test::Person\n" +
-                    "{\n" +
-                    "   lastName:String[1];\n" +
-                    "}\n" +
-                    "^test::Person p (lastName='last')\n" +
-                    "function testGet():Nil[0]\n" +
-                    "{\n" +
-                    "    print(p.wrongProperty);\n" +
-                    "}");
-            Assert.fail("Expected compilation error");
+            compileTestSource("fromString.pure", """
+                    Class test::Person
+                    {
+                       lastName:String[1];
+                    }
+                    ^test::Person p (lastName='last')
+                    function testGet():Nil[0]
+                    {
+                        print(p.wrongProperty);
+                    }\
+                    """);
+            Assertions.fail("Expected compilation error");
         }
         catch (Exception e)
         {

@@ -36,7 +36,7 @@ import org.finos.legend.pure.m3.tools.GraphPathIterable;
 import org.finos.legend.pure.m3.tools.GraphStatistics;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
 import org.finos.legend.pure.m4.coreinstance.SourceInformation;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 
 import java.util.Formatter;
 import java.util.function.BiConsumer;
@@ -244,7 +244,7 @@ public class CompiledStateIntegrityTestTools
             }
             message.append(" with no source information:\n\t");
             errorMessages.appendString(message, "\n\t");
-            Assert.fail(message.toString());
+            Assertions.fail(message.toString());
         }
     }
 
@@ -262,7 +262,7 @@ public class CompiledStateIntegrityTestTools
                 message.append('s');
             }
             errorMessages.appendString(message, ":\n\t", "\n\t", "");
-            Assert.fail(message.toString());
+            Assertions.fail(message.toString());
         }
     }
 

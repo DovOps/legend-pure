@@ -15,7 +15,7 @@
 package org.finos.legend.pure.m3.tests.function.base.lang;
 
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public abstract class AbstractTestCompare extends AbstractPureTestWithCoreCompiled
 {
@@ -23,12 +23,14 @@ public abstract class AbstractTestCompare extends AbstractPureTestWithCoreCompil
     public void testDecimalLongCompare()
     {
         compileTestSource(
-                "function test():Boolean[1]\n" +
-                        "{\n" +
-                        " assert(compare(9999999999999992d, 9999999999999991) > 0, |'');\n" +
-                        " assert(compare(9999999999999992d, 9999999999999992) == 0, |'');\n" +
-                        " assert(compare(9999999999999992d, 9999999999999993) < 0, |'');\n" +
-                        "}\n");
+                """
+                function test():Boolean[1]
+                {
+                 assert(compare(9999999999999992d, 9999999999999991) > 0, |'');
+                 assert(compare(9999999999999992d, 9999999999999992) == 0, |'');
+                 assert(compare(9999999999999992d, 9999999999999993) < 0, |'');
+                }
+                """);
         this.execute("test():Boolean[1]");
     }
 }

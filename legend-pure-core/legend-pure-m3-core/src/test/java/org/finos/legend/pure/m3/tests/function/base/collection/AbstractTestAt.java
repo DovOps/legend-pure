@@ -16,8 +16,8 @@ package org.finos.legend.pure.m3.tests.function.base.collection;
 
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
 import org.finos.legend.pure.m3.exception.PureExecutionException;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public abstract class AbstractTestAt extends AbstractPureTestWithCoreCompiled
 {
@@ -26,15 +26,17 @@ public abstract class AbstractTestAt extends AbstractPureTestWithCoreCompiled
     {
         try
         {
-            compileTestSource("Class Firm{employees:Employee[*];}\n" +
-                    "Class Employee{lastName:String[1];}\n" +
-                    "function testAt():Nil[0]\n" +
-                    "{\n" +
-                    "   let set = ^Firm(employees=[^Employee(lastName='a'),^Employee(lastName='b')]);\n" +
-                    "   print($set.employees->at(2), 1);\n" +
-                    "}\n");
+            compileTestSource("""
+                    Class Firm{employees:Employee[*];}
+                    Class Employee{lastName:String[1];}
+                    function testAt():Nil[0]
+                    {
+                       let set = ^Firm(employees=[^Employee(lastName='a'),^Employee(lastName='b')]);
+                       print($set.employees->at(2), 1);
+                    }
+                    """);
             this.execute("testAt():Nil[0]");
-            Assert.fail();
+            Assertions.fail();
         }
         catch (Exception e)
         {

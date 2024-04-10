@@ -25,11 +25,11 @@ import org.finos.legend.pure.runtime.java.compiled.CompiledClassloaderStateVerif
 import org.finos.legend.pure.runtime.java.compiled.CompiledMetadataStateVerifier;
 import org.finos.legend.pure.runtime.java.compiled.execution.FunctionExecutionCompiledBuilder;
 import org.finos.legend.pure.runtime.java.compiled.factory.JavaModelFactoryRegistryLoader;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.BeforeAll;
 
 public class TestPureRuntimeAssociationCompiled extends TestPureRuntimeAssociation
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getFunctionExecution(), new CompositeCodeStorage(new ClassLoaderCodeStorage(getCodeRepositories())), JavaModelFactoryRegistryLoader.loader(), getOptions(), getExtra());

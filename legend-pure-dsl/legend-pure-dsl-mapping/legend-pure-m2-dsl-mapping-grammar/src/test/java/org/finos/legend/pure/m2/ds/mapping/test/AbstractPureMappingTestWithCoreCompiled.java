@@ -21,7 +21,7 @@ import org.finos.legend.pure.m3.coreinstance.meta.pure.mapping.SetImplementation
 import org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.PackageableElement;
 import org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.ReferenceUsage;
 import org.finos.legend.pure.m4.coreinstance.SourceInformation;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 
 public class AbstractPureMappingTestWithCoreCompiled extends AbstractPureTestWithCoreCompiled
 {
@@ -34,7 +34,7 @@ public class AbstractPureMappingTestWithCoreCompiled extends AbstractPureTestWit
         typeViewReferenceUsages.forEach(referenceUsage ->
         {
             SourceInformation sourceInformation = referenceUsage._ownerCoreInstance().getSourceInformation();
-            Assert.assertEquals(className, lines[sourceInformation.getLine() - 1].substring(sourceInformation.getColumn() - 1, sourceInformation.getColumn() + className.length() - 1));
+            Assertions.assertEquals(className, lines[sourceInformation.getLine() - 1].substring(sourceInformation.getColumn() - 1, sourceInformation.getColumn() + className.length() - 1));
         });
     }
 }

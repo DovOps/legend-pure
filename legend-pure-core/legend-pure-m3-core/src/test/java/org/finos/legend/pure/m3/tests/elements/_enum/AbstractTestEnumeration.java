@@ -23,13 +23,13 @@ import org.finos.legend.pure.m3.serialization.filesystem.usercodestorage.classpa
 import org.finos.legend.pure.m3.serialization.filesystem.usercodestorage.composite.CompositeCodeStorage;
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
 import org.finos.legend.pure.m4.exception.PureCompilationException;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public abstract class AbstractTestEnumeration extends AbstractPureTestWithCoreCompiled
 {
-    @After
+    @AfterEach
     public void clearRuntime()
     {
         runtime.delete("fromString.pure");
@@ -43,71 +43,79 @@ public abstract class AbstractTestEnumeration extends AbstractPureTestWithCoreCo
     @Test
     public void testEnumeration()
     {
-        compileTestSource("fromString.pure", "Enum BooleanEnum\n" +
-                "{\n" +
-                "   TRUE, FALSE\n" +
-                "}\n" +
-                "function testAssert():Boolean[1]\n" +
-                "{\n" +
-                "    assertEquals('TRUE', BooleanEnum.TRUE->id());\n" +
-                "    assertEquals('FALSE', BooleanEnum.FALSE->id());\n" +
-                "}\n");
+        compileTestSource("fromString.pure", """
+                Enum BooleanEnum
+                {
+                   TRUE, FALSE
+                }
+                function testAssert():Boolean[1]
+                {
+                    assertEquals('TRUE', BooleanEnum.TRUE->id());
+                    assertEquals('FALSE', BooleanEnum.FALSE->id());
+                }
+                """);
         execute("testAssert():Boolean[1]");
     }
 
     @Test
     public void testEnumerationAsFuncParam()
     {
-        compileTestSource("fromString.pure", "Enum BooleanEnum\n" +
-                "{\n" +
-                "   TRUE, FALSE\n" +
-                "}\n" +
-                "function testCall():Boolean[1]\n" +
-                "{\n" +
-                "    other(BooleanEnum.TRUE);\n" +
-                "}\n" +
-                "function other(b:BooleanEnum[1]):Boolean[1]\n" +
-                "{\n" +
-                "   assertEquals('TRUE', $b->id());\n" +
-                "}\n");
+        compileTestSource("fromString.pure", """
+                Enum BooleanEnum
+                {
+                   TRUE, FALSE
+                }
+                function testCall():Boolean[1]
+                {
+                    other(BooleanEnum.TRUE);
+                }
+                function other(b:BooleanEnum[1]):Boolean[1]
+                {
+                   assertEquals('TRUE', $b->id());
+                }
+                """);
         execute("testCall():Boolean[1]");
     }
 
     @Test
     public void testEnumerationVariable()
     {
-        compileTestSource("fromString.pure", "Enum BooleanEnum\n" +
-                "{\n" +
-                "   TRUE, FALSE\n" +
-                "}\n" +
-                "function test():Boolean[1]\n" +
-                "{\n" +
-                "    let a = BooleanEnum.TRUE;\n" +
-                "    assertEquals('BooleanEnum.TRUE', $a->genericType().rawType->at(0)->id()+'.'+$a->id());\n" +
-                "}");
+        compileTestSource("fromString.pure", """
+                Enum BooleanEnum
+                {
+                   TRUE, FALSE
+                }
+                function test():Boolean[1]
+                {
+                    let a = BooleanEnum.TRUE;
+                    assertEquals('BooleanEnum.TRUE', $a->genericType().rawType->at(0)->id()+'.'+$a->id());
+                }\
+                """);
         execute("test():Boolean[1]");
     }
 
     @Test
     public void testEnumerationUsedAsAPropertyType()
     {
-        compileTestSource("fromString.pure", "Enum BooleanEnum\n" +
-                "{\n" +
-                "   TRUE, FALSE\n" +
-                "}\n" +
-                "\n" +
-                "Class MyClass\n" +
-                "{\n" +
-                "   prop : BooleanEnum[1];\n" +
-                "   prop2 : BooleanEnum[*];\n" +
-                "}\n" +
-                "\n" +
-                "function test():Boolean[1]\n" +
-                "{" +
-                "    let test = ^MyClass test(prop = BooleanEnum.TRUE, prop2 = [BooleanEnum.FALSE, BooleanEnum.TRUE]);\n" +
-                "    assertEquals('TRUE', $test.prop->id());\n" +
-                "    assertEquals('FALSE',$test.prop2->at(0)->id());\n" +
-                "}\n");
+        compileTestSource("fromString.pure", """
+                Enum BooleanEnum
+                {
+                   TRUE, FALSE
+                }
+                
+                Class MyClass
+                {
+                   prop : BooleanEnum[1];
+                   prop2 : BooleanEnum[*];
+                }
+                
+                function test():Boolean[1]
+                {\
+                    let test = ^MyClass test(prop = BooleanEnum.TRUE, prop2 = [BooleanEnum.FALSE, BooleanEnum.TRUE]);
+                    assertEquals('TRUE', $test.prop->id());
+                    assertEquals('FALSE',$test.prop2->at(0)->id());
+                }
+                """);
         execute("test():Boolean[1]");
     }
 
@@ -115,12 +123,14 @@ public abstract class AbstractTestEnumeration extends AbstractPureTestWithCoreCo
     public void testInvalidEnumReference()
     {
         compileTestSource("enumDefinition.pure", "Enum test::TestEnum {VAL1, VAL2}");
-        PureCompilationException e = Assert.assertThrows(PureCompilationException.class, () -> compileTestSource(
+        PureCompilationException e = Assertions.assertThrows(PureCompilationException.class, () -> compileTestSource(
                 "enumReference.pure",
-                "function test::test():test::TestEnum[1]\n" +
-                        "{\n" +
-                        "  test::TestEnum.VAL3\n" +
-                        "}\n"));
+                """
+                function test::test():test::TestEnum[1]
+                {
+                  test::TestEnum.VAL3
+                }
+                """));
         assertPureException(PureCompilationException.class, "The enum value 'VAL3' can't be found in the enumeration test::TestEnum", "enumReference.pure", 3, 18, 3, 18, 3, 21, e);
     }
 
@@ -128,15 +138,17 @@ public abstract class AbstractTestEnumeration extends AbstractPureTestWithCoreCo
     public void testInvalidEnumReferenceInQualifiedProperty()
     {
         compileTestSource("enumDefinition.pure", "Enum test::TestEnum {VAL1, VAL2}");
-        PureCompilationException e = Assert.assertThrows(PureCompilationException.class, () -> compileTestSource(
+        PureCompilationException e = Assertions.assertThrows(PureCompilationException.class, () -> compileTestSource(
                 "enumReference.pure",
-            "Class test::TestClass\n" +
-                    "{\n" +
-                    "    test()\n" +
-                    "    {\n" +
-                    "        test::TestEnum.VAL3\n" +
-                    "    }:test::TestEnum[1];\n" +
-                    "}\n"));
+            """
+            Class test::TestClass
+            {
+                test()
+                {
+                    test::TestEnum.VAL3
+                }:test::TestEnum[1];
+            }
+            """));
         assertPureException(PureCompilationException.class, "The enum value 'VAL3' can't be found in the enumeration test::TestEnum", "enumReference.pure", 5, 24, 5, 24, 5, 27, e);
     }
 
@@ -144,15 +156,19 @@ public abstract class AbstractTestEnumeration extends AbstractPureTestWithCoreCo
     public void testEnumerationInCollection()
     {
         compileTestSource("/test/model.pure",
-                "Enum test::Enum1\n" +
-                        "{\n" +
-                        "  A, B, C\n" +
-                        "}\n");
+                """
+                Enum test::Enum1
+                {
+                  A, B, C
+                }
+                """);
         compileTestSource("/test/test.pure",
-                "function test::testFn():Any[*]\n" +
-                        "{\n" +
-                        "  [test::Enum1]\n" +
-                        "}\n");
+                """
+                function test::testFn():Any[*]
+                {
+                  [test::Enum1]
+                }
+                """);
         execute("test::testFn():Any[*]");
     }
 
@@ -160,15 +176,19 @@ public abstract class AbstractTestEnumeration extends AbstractPureTestWithCoreCo
     public void testEnumerationInDoubleCollection()
     {
         compileTestSource("/test/model.pure",
-                "Enum test::Enum1\n" +
-                        "{\n" +
-                        "  A, B, C\n" +
-                        "}\n");
+                """
+                Enum test::Enum1
+                {
+                  A, B, C
+                }
+                """);
         compileTestSource("/test/test.pure",
-                "function test::testFn():Any[*]\n" +
-                        "{\n" +
-                        "  [[test::Enum1]]\n" +
-                        "}\n");
+                """
+                function test::testFn():Any[*]
+                {
+                  [[test::Enum1]]
+                }
+                """);
         execute("test::testFn():Any[*]");
     }
 

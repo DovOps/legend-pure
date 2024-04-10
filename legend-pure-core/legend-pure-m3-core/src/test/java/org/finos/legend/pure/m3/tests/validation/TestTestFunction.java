@@ -16,20 +16,20 @@ package org.finos.legend.pure.m3.tests.validation;
 
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiledPlatform;
 import org.finos.legend.pure.m4.exception.PureCompilationException;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestTestFunction extends AbstractPureTestWithCoreCompiledPlatform
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getExtra());
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("testFile.pure");
@@ -41,11 +41,13 @@ public class TestTestFunction extends AbstractPureTestWithCoreCompiledPlatform
         try
         {
             compileTestSourceM3("testFile.pure",
-                    "function <<test.Test>> testFn(arg:String[1]):Boolean[1]\n" +
-                            "{\n" +
-                            "  assert($arg == 'the quick brown fox', |'')\n" +
-                            "}");
-            Assert.fail("Expected compilation exception");
+                    """
+                    function <<test.Test>> testFn(arg:String[1]):Boolean[1]
+                    {
+                      assert($arg == 'the quick brown fox', |'')
+                    }\
+                    """);
+            Assertions.fail("Expected compilation exception");
         }
         catch (Exception e)
         {
@@ -59,11 +61,13 @@ public class TestTestFunction extends AbstractPureTestWithCoreCompiledPlatform
         try
         {
             compileTestSourceM3("testFile.pure",
-                    "function <<test.BeforePackage>> testFn(arg:String[1]):Boolean[1]\n" +
-                            "{\n" +
-                            "  assert($arg == 'the quick brown fox', |'')\n" +
-                            "}");
-            Assert.fail("Expected compilation exception");
+                    """
+                    function <<test.BeforePackage>> testFn(arg:String[1]):Boolean[1]
+                    {
+                      assert($arg == 'the quick brown fox', |'')
+                    }\
+                    """);
+            Assertions.fail("Expected compilation exception");
         }
         catch (Exception e)
         {
@@ -77,11 +81,13 @@ public class TestTestFunction extends AbstractPureTestWithCoreCompiledPlatform
         try
         {
             compileTestSourceM3("testFile.pure",
-                    "function <<test.AfterPackage>> testFn(arg:String[1]):Boolean[1]\n" +
-                            "{\n" +
-                            "  assert($arg == 'the quick brown fox', |'')\n" +
-                            "}");
-            Assert.fail("Expected compilation exception");
+                    """
+                    function <<test.AfterPackage>> testFn(arg:String[1]):Boolean[1]
+                    {
+                      assert($arg == 'the quick brown fox', |'')
+                    }\
+                    """);
+            Assertions.fail("Expected compilation exception");
         }
         catch (Exception e)
         {
@@ -95,11 +101,13 @@ public class TestTestFunction extends AbstractPureTestWithCoreCompiledPlatform
         try
         {
             compileTestSourceM3("testFile.pure",
-                    "function <<test.ToFix>> testFn(arg:String[1]):Boolean[1]\n" +
-                            "{\n" +
-                            "  assert($arg == 'the quick brown fox', |'')\n" +
-                            "}");
-            Assert.fail("Expected compilation exception");
+                    """
+                    function <<test.ToFix>> testFn(arg:String[1]):Boolean[1]
+                    {
+                      assert($arg == 'the quick brown fox', |'')
+                    }\
+                    """);
+            Assertions.fail("Expected compilation exception");
         }
         catch (Exception e)
         {

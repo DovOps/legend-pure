@@ -55,7 +55,7 @@ public class PathExtensionCompiled implements CompiledExtension
     @Override
     public PureFunction1<Object, Object> getExtraFunctionEvaluation(org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.function.Function<?> func, Bridge bridge, ExecutionSupport es)
     {
-        if (func instanceof Path)
+        if (func instanceof Path path)
         {
             return new PureFunction1<Object, Object>()
             {
@@ -68,7 +68,7 @@ public class PathExtensionCompiled implements CompiledExtension
                 @Override
                 public Object value(Object o, ExecutionSupport es)
                 {
-                    RichIterable<?> result = ((Path<?, ?>) func)._path().injectInto(CompiledSupport.toPureCollection(o), (mutableList, path) ->
+                    RichIterable<?> result = path._path().injectInto(CompiledSupport.toPureCollection(o), (mutableList, path) ->
                     {
                         if (!(path instanceof PropertyPathElement))
                         {
@@ -76,7 +76,7 @@ public class PathExtensionCompiled implements CompiledExtension
                         }
                         return mutableList.flatCollect(instance ->
                         {
-                            MutableList<Object> parameters = ((PropertyPathElement) path)._parameters().collect(o1 -> o1 instanceof InstanceValue ? ((InstanceValue) o1)._values() : null, Lists.mutable.with(instance));
+                            MutableList<Object> parameters = ((PropertyPathElement) path)._parameters().collect(o1 -> o1 instanceof InstanceValue iv ? iv._values() : null, Lists.mutable.with(instance));
                             return CompiledSupport.toPureCollection(Pure.evaluate(es, ((PropertyPathElement) path)._property(), bridge, parameters.toArray()));
                         });
                     });

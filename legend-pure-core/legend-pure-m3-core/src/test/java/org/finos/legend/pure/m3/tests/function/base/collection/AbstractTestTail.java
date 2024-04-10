@@ -15,7 +15,7 @@
 package org.finos.legend.pure.m3.tests.function.base.collection;
 
 import org.finos.legend.pure.m3.tests.function.base.PureExpressionTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public abstract class AbstractTestTail extends PureExpressionTest
 {
@@ -23,10 +23,12 @@ public abstract class AbstractTestTail extends PureExpressionTest
     public void testBasic()
     {
         compileTestSource("fromString.pure",
-                "function test():Boolean[1]\n" +
-                        "{\n" +
-                        "   assert([2,3] == [1,2,3]->tail(), |'');\n" +
-                        "}\n");
+                """
+                function test():Boolean[1]
+                {
+                   assert([2,3] == [1,2,3]->tail(), |'');
+                }
+                """);
         this.execute("test():Boolean[1]");
     }
 
@@ -34,10 +36,12 @@ public abstract class AbstractTestTail extends PureExpressionTest
     public void testEval()
     {
         compileTestSource("fromString.pure",
-                "function test():Boolean[1]\n" +
-                        "{\n" +
-                        "   assert([2,3] == tail_T_MANY__T_MANY_->eval([1,2,3]), |'');\n" +
-                        "}\n");
+                """
+                function test():Boolean[1]
+                {
+                   assert([2,3] == tail_T_MANY__T_MANY_->eval([1,2,3]), |'');
+                }
+                """);
         this.execute("test():Boolean[1]");
     }
 }

@@ -79,8 +79,8 @@ public class SimpleFunctionExpressionUnbind implements MatchRunner<SimpleFunctio
             ValueSpecification secondParam = params.get(1);
             matcher.fullMatch(secondParam, state);
 
-            RichIterable<? extends ValueSpecification> possiblePropertySfeParams = possiblePropertySfe instanceof FunctionExpression ?
-                    ((FunctionExpression) possiblePropertySfe)._parametersValues() : Lists.fixedSize.empty(); //params may have changed after unbinding for the Lambda
+            RichIterable<? extends ValueSpecification> possiblePropertySfeParams = possiblePropertySfe instanceof FunctionExpression fe ?
+                    fe._parametersValues() : Lists.fixedSize.empty(); //params may have changed after unbinding for the Lambda
             ((UnbindState) state).freeProcessedAndValidated(secondParam);
 
             GenericType secondParamGenericType = secondParam._genericType();
@@ -97,10 +97,10 @@ public class SimpleFunctionExpressionUnbind implements MatchRunner<SimpleFunctio
 
             functionExpression._parametersValues(allVars);
 
-            InstanceValue propertyName = possiblePropertySfe instanceof FunctionExpression ? ((FunctionExpression) possiblePropertySfe)._propertyName() : null;
+            InstanceValue propertyName = possiblePropertySfe instanceof FunctionExpression fe ? fe._propertyName() : null;
             if (propertyName == null)
             {
-                InstanceValue qualifiedPropertyName = possiblePropertySfe instanceof FunctionExpression ? ((FunctionExpression) possiblePropertySfe)._qualifiedPropertyName() : null;
+                InstanceValue qualifiedPropertyName = possiblePropertySfe instanceof FunctionExpression fe ? fe._qualifiedPropertyName() : null;
                 functionExpression._qualifiedPropertyName(qualifiedPropertyName);
             }
             else

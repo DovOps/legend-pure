@@ -16,7 +16,7 @@ package org.finos.legend.pure.m2.relational;
 
 import org.finos.legend.pure.m3.tests.RuntimeTestScriptBuilder;
 import org.finos.legend.pure.m3.tests.RuntimeVerifier;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class TestStoreSubstitutionValidator extends AbstractPureRelationalTestWithCoreCompiled
 {
@@ -24,219 +24,225 @@ public class TestStoreSubstitutionValidator extends AbstractPureRelationalTestWi
     private static final String STORE_SOURCE_ID = "store.pure";
     private static final String MAPPING_SOURCE_ID = "mapping.pure";
 
-    private static final String MODEL_CODE = "###Pure\n" +
-            "import a::*;\n" +
-            "\n" +
-            "Class a::Person1\n" +
-            "{\n" +
-            "   personId : Integer[1];\n" +
-            "   personName : String[1];\n" +
-            "   firmId : Integer[1];\n" +
-            "}\n" +
-            "\n" +
-            "Class a::Firm1\n" +
-            "{\n" +
-            "   firmId : Integer[1];\n" +
-            "   firmName : String[1];\n" +
-            "}\n" +
-            "\n" +
-            "Association a::PersonFirm1\n" +
-            "{\n" +
-            "   person1 : Person1[*];\n" +
-            "   firm1 : Firm1[0..1];\n" +
-            "}\n" +
-            "\n" +
-            "Class a::Person2\n" +
-            "{\n" +
-            "   personId : Integer[1];\n" +
-            "   personName : String[1];\n" +
-            "   firmId : Integer[1];\n" +
-            "}\n" +
-            "\n" +
-            "Class a::Firm2\n" +
-            "{\n" +
-            "   firmId : Integer[1];\n" +
-            "   firmName : String[1];\n" +
-            "}\n" +
-            "\n" +
-            "Association a::PersonFirm2\n" +
-            "{\n" +
-            "   person2 : Person2[*];\n" +
-            "   firm2 : Firm2[0..1];\n" +
-            "}\n" +
-            "\n" +
-            "Class a::Person3\n" +
-            "{\n" +
-            "   personId : Integer[1];\n" +
-            "   personName : String[1];\n" +
-            "   firmId : Integer[1];\n" +
-            "}\n" +
-            "\n" +
-            "Class a::Firm3\n" +
-            "{\n" +
-            "   firmId : Integer[1];\n" +
-            "   firmName : String[1];\n" +
-            "}\n" +
-            "\n" +
-            "Association a::PersonFirm3\n" +
-            "{\n" +
-            "   person3 : Person3[*];\n" +
-            "   firm3 : Firm3[0..1];\n" +
-            "}\n" +
-            "\n" +
-            "Class a::Person4\n" +
-            "{\n" +
-            "   personId : Integer[1];\n" +
-            "   personName : String[1];\n" +
-            "   firmId : Integer[1];\n" +
-            "}\n" +
-            "\n" +
-            "Class a::Firm4\n" +
-            "{\n" +
-            "   firmId : Integer[1];\n" +
-            "   firmName : String[1];\n" +
-            "}\n" +
-            "\n" +
-            "Association a::PersonFirm4\n" +
-            "{\n" +
-            "   person4 : Person4[*];\n" +
-            "   firm4 : Firm4[0..1];\n" +
-            "}\n" +
-            "\n" +
-            "Class a::Person5\n" +
-            "{\n" +
-            "   personId : Integer[1];\n" +
-            "   personName : String[1];\n" +
-            "   firmId : Integer[1];\n" +
-            "}\n" +
-            "\n" +
-            "Class a::Firm5\n" +
-            "{\n" +
-            "   firmId : Integer[1];\n" +
-            "   firmName : String[1];\n" +
-            "}\n" +
-            "\n" +
-            "Association a::PersonFirm5\n" +
-            "{\n" +
-            "   person5 : Person5[*];\n" +
-            "   firm5 : Firm5[0..1];\n" +
-            "}\n";
+    private static final String MODEL_CODE = """
+            ###Pure
+            import a::*;
+            
+            Class a::Person1
+            {
+               personId : Integer[1];
+               personName : String[1];
+               firmId : Integer[1];
+            }
+            
+            Class a::Firm1
+            {
+               firmId : Integer[1];
+               firmName : String[1];
+            }
+            
+            Association a::PersonFirm1
+            {
+               person1 : Person1[*];
+               firm1 : Firm1[0..1];
+            }
+            
+            Class a::Person2
+            {
+               personId : Integer[1];
+               personName : String[1];
+               firmId : Integer[1];
+            }
+            
+            Class a::Firm2
+            {
+               firmId : Integer[1];
+               firmName : String[1];
+            }
+            
+            Association a::PersonFirm2
+            {
+               person2 : Person2[*];
+               firm2 : Firm2[0..1];
+            }
+            
+            Class a::Person3
+            {
+               personId : Integer[1];
+               personName : String[1];
+               firmId : Integer[1];
+            }
+            
+            Class a::Firm3
+            {
+               firmId : Integer[1];
+               firmName : String[1];
+            }
+            
+            Association a::PersonFirm3
+            {
+               person3 : Person3[*];
+               firm3 : Firm3[0..1];
+            }
+            
+            Class a::Person4
+            {
+               personId : Integer[1];
+               personName : String[1];
+               firmId : Integer[1];
+            }
+            
+            Class a::Firm4
+            {
+               firmId : Integer[1];
+               firmName : String[1];
+            }
+            
+            Association a::PersonFirm4
+            {
+               person4 : Person4[*];
+               firm4 : Firm4[0..1];
+            }
+            
+            Class a::Person5
+            {
+               personId : Integer[1];
+               personName : String[1];
+               firmId : Integer[1];
+            }
+            
+            Class a::Firm5
+            {
+               firmId : Integer[1];
+               firmName : String[1];
+            }
+            
+            Association a::PersonFirm5
+            {
+               person5 : Person5[*];
+               firm5 : Firm5[0..1];
+            }
+            """;
 
-    private static final String STORE_CODE = "###Relational\n" +
-            "Database a::PersonFirmDatabase1\n" +
-            "(\n" +
-            "   include a::PersonFirmDatabase2\n" +
-            "   include a::PersonFirmDatabase3\n" +
-            "   include a::PersonFirmDatabase4\n" +
-            "   Table PersonTable1(personId INT PRIMARY KEY, personName VARCHAR(20), firmId INT)\n" +
-            "   Table FirmTable1(firmId INT PRIMARY KEY, firmName VARCHAR(20))\n" +
-            "   Join PersonFirm1(PersonTable1.firmId = FirmTable1.firmId)\n" +
-            ")\n" +
-            "\n" +
-            "###Relational\n" +
-            "Database a::PersonFirmDatabase2\n" +
-            "(\n" +
-            "   include a::PersonFirmDatabase3\n" +
-            "   include a::PersonFirmDatabase4\n" +
-            "   Table PersonTable2(personId INT PRIMARY KEY, personName VARCHAR(20), firmId INT)\n" +
-            "   Table FirmTable2(firmId INT PRIMARY KEY, firmName VARCHAR(20))\n" +
-            "   Join PersonFirm2(PersonTable2.firmId = FirmTable2.firmId)\n" +
-            ")\n" +
-            "\n" +
-            "###Relational\n" +
-            "Database a::PersonFirmDatabase3\n" +
-            "(\n" +
-            "   include a::PersonFirmDatabase5\n" +
-            "   Table PersonTable3(personId INT PRIMARY KEY, personName VARCHAR(20), firmId INT)\n" +
-            "   Table FirmTable3(firmId INT PRIMARY KEY, firmName VARCHAR(20))\n" +
-            "   Join PersonFirm3(PersonTable3.firmId = FirmTable3.firmId)\n" +
-            ")\n" +
-            "\n" +
-            "###Relational\n" +
-            "Database a::PersonFirmDatabase4\n" +
-            "(\n" +
-            "   Table PersonTable4(personId INT PRIMARY KEY, personName VARCHAR(20), firmId INT)\n" +
-            "   Table FirmTable4(firmId INT PRIMARY KEY, firmName VARCHAR(20))\n" +
-            "   Join PersonFirm4(PersonTable4.firmId = FirmTable4.firmId)\n" +
-            ")\n" +
-            "\n" +
-            "###Relational\n" +
-            "Database a::PersonFirmDatabase5\n" +
-            "(\n" +
-            "   Table PersonTable5(personId INT PRIMARY KEY, personName VARCHAR(20), firmId INT)\n" +
-            "   Table FirmTable5(firmId INT PRIMARY KEY, firmName VARCHAR(20))\n" +
-            "   Join PersonFirm5(PersonTable5.firmId = FirmTable5.firmId)\n" +
-            ")\n";
+    private static final String STORE_CODE = """
+            ###Relational
+            Database a::PersonFirmDatabase1
+            (
+               include a::PersonFirmDatabase2
+               include a::PersonFirmDatabase3
+               include a::PersonFirmDatabase4
+               Table PersonTable1(personId INT PRIMARY KEY, personName VARCHAR(20), firmId INT)
+               Table FirmTable1(firmId INT PRIMARY KEY, firmName VARCHAR(20))
+               Join PersonFirm1(PersonTable1.firmId = FirmTable1.firmId)
+            )
+            
+            ###Relational
+            Database a::PersonFirmDatabase2
+            (
+               include a::PersonFirmDatabase3
+               include a::PersonFirmDatabase4
+               Table PersonTable2(personId INT PRIMARY KEY, personName VARCHAR(20), firmId INT)
+               Table FirmTable2(firmId INT PRIMARY KEY, firmName VARCHAR(20))
+               Join PersonFirm2(PersonTable2.firmId = FirmTable2.firmId)
+            )
+            
+            ###Relational
+            Database a::PersonFirmDatabase3
+            (
+               include a::PersonFirmDatabase5
+               Table PersonTable3(personId INT PRIMARY KEY, personName VARCHAR(20), firmId INT)
+               Table FirmTable3(firmId INT PRIMARY KEY, firmName VARCHAR(20))
+               Join PersonFirm3(PersonTable3.firmId = FirmTable3.firmId)
+            )
+            
+            ###Relational
+            Database a::PersonFirmDatabase4
+            (
+               Table PersonTable4(personId INT PRIMARY KEY, personName VARCHAR(20), firmId INT)
+               Table FirmTable4(firmId INT PRIMARY KEY, firmName VARCHAR(20))
+               Join PersonFirm4(PersonTable4.firmId = FirmTable4.firmId)
+            )
+            
+            ###Relational
+            Database a::PersonFirmDatabase5
+            (
+               Table PersonTable5(personId INT PRIMARY KEY, personName VARCHAR(20), firmId INT)
+               Table FirmTable5(firmId INT PRIMARY KEY, firmName VARCHAR(20))
+               Join PersonFirm5(PersonTable5.firmId = FirmTable5.firmId)
+            )
+            """;
 
     @Test
     public void testValidNoStoreSubstitution()
     {
-        String mappingCode = "###Mapping\n" +
-                "import a::*;\n" +
-                "\n" +
-                "Mapping a::PersonFirmMapping1\n" +
-                "(  \n" +
-                "   include a::PersonFirmMapping2\n" +
-                "   \n" +
-                "   Person1: Relational\n" +
-                "   {\n" +
-                "      scope([PersonFirmDatabase1]PersonTable1)\n" +
-                "      (\n" +
-                "        personId: personId,\n" +
-                "        personName: personName,\n" +
-                "        firmId: firmId\n" +
-                "      )\n" +
-                "   }\n" +
-                "   \n" +
-                "   Firm1: Relational\n" +
-                "   {\n" +
-                "      scope([PersonFirmDatabase1]FirmTable1)\n" +
-                "      (\n" +
-                "        firmId: firmId,\n" +
-                "        firmName: firmName\n" +
-                "      )\n" +
-                "   }\n" +
-                "   \n" +
-                "   PersonFirm1 : Relational\n" +
-                "   {\n" +
-                "      AssociationMapping\n" +
-                "      (\n" +
-                "         person1: [PersonFirmDatabase1]@PersonFirm1,\n" +
-                "         firm1: [PersonFirmDatabase1]@PersonFirm1\n" +
-                "      )\n" +
-                "   }\n" +
-                ")\n" +
-                "\n" +
-                "Mapping a::PersonFirmMapping2\n" +
-                "(  \n" +
-                "   Person2: Relational\n" +
-                "   {\n" +
-                "      scope([PersonFirmDatabase2]PersonTable2)\n" +
-                "      (\n" +
-                "        personId: personId,\n" +
-                "        personName: personName,\n" +
-                "        firmId: firmId\n" +
-                "      )\n" +
-                "   }\n" +
-                "   \n" +
-                "   Firm2: Relational\n" +
-                "   {\n" +
-                "      scope([PersonFirmDatabase2]FirmTable2)\n" +
-                "      (\n" +
-                "        firmId: firmId,\n" +
-                "        firmName: firmName\n" +
-                "      )\n" +
-                "   }\n" +
-                "   \n" +
-                "   PersonFirm2 : Relational\n" +
-                "   {\n" +
-                "      AssociationMapping\n" +
-                "      (\n" +
-                "         person2: [PersonFirmDatabase2]@PersonFirm2,\n" +
-                "         firm2: [PersonFirmDatabase2]@PersonFirm2\n" +
-                "      )\n" +
-                "   }\n" +
-                ")\n";
+        String mappingCode = """
+                ###Mapping
+                import a::*;
+                
+                Mapping a::PersonFirmMapping1
+                ( \s
+                   include a::PersonFirmMapping2
+                  \s
+                   Person1: Relational
+                   {
+                      scope([PersonFirmDatabase1]PersonTable1)
+                      (
+                        personId: personId,
+                        personName: personName,
+                        firmId: firmId
+                      )
+                   }
+                  \s
+                   Firm1: Relational
+                   {
+                      scope([PersonFirmDatabase1]FirmTable1)
+                      (
+                        firmId: firmId,
+                        firmName: firmName
+                      )
+                   }
+                  \s
+                   PersonFirm1 : Relational
+                   {
+                      AssociationMapping
+                      (
+                         person1: [PersonFirmDatabase1]@PersonFirm1,
+                         firm1: [PersonFirmDatabase1]@PersonFirm1
+                      )
+                   }
+                )
+                
+                Mapping a::PersonFirmMapping2
+                ( \s
+                   Person2: Relational
+                   {
+                      scope([PersonFirmDatabase2]PersonTable2)
+                      (
+                        personId: personId,
+                        personName: personName,
+                        firmId: firmId
+                      )
+                   }
+                  \s
+                   Firm2: Relational
+                   {
+                      scope([PersonFirmDatabase2]FirmTable2)
+                      (
+                        firmId: firmId,
+                        firmName: firmName
+                      )
+                   }
+                  \s
+                   PersonFirm2 : Relational
+                   {
+                      AssociationMapping
+                      (
+                         person2: [PersonFirmDatabase2]@PersonFirm2,
+                         firm2: [PersonFirmDatabase2]@PersonFirm2
+                      )
+                   }
+                )
+                """;
 
         this.verifyValidSubstitution(mappingCode);
     }
@@ -244,105 +250,107 @@ public class TestStoreSubstitutionValidator extends AbstractPureRelationalTestWi
     @Test
     public void testValidDirectStoreSubstitution()
     {
-        String mappingCode = "###Mapping\n" +
-                "import a::*;\n" +
-                "\n" +
-                "Mapping a::PersonFirmMapping1\n" +
-                "(  \n" +
-                "   include a::PersonFirmMapping23[PersonFirmDatabase2->PersonFirmDatabase1, PersonFirmDatabase3->PersonFirmDatabase1]\n" +
-                "   \n" +
-                "   Person1: Relational\n" +
-                "   {\n" +
-                "      scope([PersonFirmDatabase1]PersonTable1)\n" +
-                "      (\n" +
-                "        personId: personId,\n" +
-                "        personName: personName,\n" +
-                "        firmId: firmId\n" +
-                "      )\n" +
-                "   }\n" +
-                "   \n" +
-                "   Firm1: Relational\n" +
-                "   {\n" +
-                "      scope([PersonFirmDatabase1]FirmTable1)\n" +
-                "      (\n" +
-                "        firmId: firmId,\n" +
-                "        firmName: firmName\n" +
-                "      )\n" +
-                "   }\n" +
-                "   \n" +
-                "   PersonFirm1 : Relational\n" +
-                "   {\n" +
-                "      AssociationMapping\n" +
-                "      (\n" +
-                "         person1: [PersonFirmDatabase1]@PersonFirm1,\n" +
-                "         firm1: [PersonFirmDatabase1]@PersonFirm1\n" +
-                "      )\n" +
-                "   }\n" +
-                ")\n" +
-                "\n" +
-                "Mapping a::PersonFirmMapping23\n" +
-                "(  \n" +
-                "   include a::PersonFirmMapping3\n" +
-                "   \n" +
-                "   Person2: Relational\n" +
-                "   {\n" +
-                "      scope([PersonFirmDatabase2]PersonTable2)\n" +
-                "      (\n" +
-                "        personId: personId,\n" +
-                "        personName: personName,\n" +
-                "        firmId: firmId\n" +
-                "      )\n" +
-                "   }\n" +
-                "   \n" +
-                "   Firm2: Relational\n" +
-                "   {\n" +
-                "      scope([PersonFirmDatabase2]FirmTable2)\n" +
-                "      (\n" +
-                "        firmId: firmId,\n" +
-                "        firmName: firmName\n" +
-                "      )\n" +
-                "   }\n" +
-                "   \n" +
-                "   PersonFirm2 : Relational\n" +
-                "   {\n" +
-                "      AssociationMapping\n" +
-                "      (\n" +
-                "         person2: [PersonFirmDatabase2]@PersonFirm2,\n" +
-                "         firm2: [PersonFirmDatabase2]@PersonFirm2\n" +
-                "      )\n" +
-                "   }\n" +
-                "   \n" +
-                "   PersonFirm3 : Relational\n" +
-                "   {\n" +
-                "      AssociationMapping\n" +
-                "      (\n" +
-                "         person3: [PersonFirmDatabase3]@PersonFirm3,\n" +
-                "         firm3: [PersonFirmDatabase3]@PersonFirm3\n" +
-                "      )\n" +
-                "   }\n" +
-                ")\n" +
-                "\n" +
-                "Mapping a::PersonFirmMapping3\n" +
-                "(  \n" +
-                "   Person3: Relational\n" +
-                "   {\n" +
-                "      scope([PersonFirmDatabase3]PersonTable3)\n" +
-                "      (\n" +
-                "        personId: personId,\n" +
-                "        personName: personName,\n" +
-                "        firmId: firmId\n" +
-                "      )\n" +
-                "   }\n" +
-                "   \n" +
-                "   Firm3: Relational\n" +
-                "   {\n" +
-                "      scope([PersonFirmDatabase3]FirmTable3)\n" +
-                "      (\n" +
-                "        firmId: firmId,\n" +
-                "        firmName: firmName\n" +
-                "      )\n" +
-                "   }\n" +
-                ")\n";
+        String mappingCode = """
+                ###Mapping
+                import a::*;
+                
+                Mapping a::PersonFirmMapping1
+                ( \s
+                   include a::PersonFirmMapping23[PersonFirmDatabase2->PersonFirmDatabase1, PersonFirmDatabase3->PersonFirmDatabase1]
+                  \s
+                   Person1: Relational
+                   {
+                      scope([PersonFirmDatabase1]PersonTable1)
+                      (
+                        personId: personId,
+                        personName: personName,
+                        firmId: firmId
+                      )
+                   }
+                  \s
+                   Firm1: Relational
+                   {
+                      scope([PersonFirmDatabase1]FirmTable1)
+                      (
+                        firmId: firmId,
+                        firmName: firmName
+                      )
+                   }
+                  \s
+                   PersonFirm1 : Relational
+                   {
+                      AssociationMapping
+                      (
+                         person1: [PersonFirmDatabase1]@PersonFirm1,
+                         firm1: [PersonFirmDatabase1]@PersonFirm1
+                      )
+                   }
+                )
+                
+                Mapping a::PersonFirmMapping23
+                ( \s
+                   include a::PersonFirmMapping3
+                  \s
+                   Person2: Relational
+                   {
+                      scope([PersonFirmDatabase2]PersonTable2)
+                      (
+                        personId: personId,
+                        personName: personName,
+                        firmId: firmId
+                      )
+                   }
+                  \s
+                   Firm2: Relational
+                   {
+                      scope([PersonFirmDatabase2]FirmTable2)
+                      (
+                        firmId: firmId,
+                        firmName: firmName
+                      )
+                   }
+                  \s
+                   PersonFirm2 : Relational
+                   {
+                      AssociationMapping
+                      (
+                         person2: [PersonFirmDatabase2]@PersonFirm2,
+                         firm2: [PersonFirmDatabase2]@PersonFirm2
+                      )
+                   }
+                  \s
+                   PersonFirm3 : Relational
+                   {
+                      AssociationMapping
+                      (
+                         person3: [PersonFirmDatabase3]@PersonFirm3,
+                         firm3: [PersonFirmDatabase3]@PersonFirm3
+                      )
+                   }
+                )
+                
+                Mapping a::PersonFirmMapping3
+                ( \s
+                   Person3: Relational
+                   {
+                      scope([PersonFirmDatabase3]PersonTable3)
+                      (
+                        personId: personId,
+                        personName: personName,
+                        firmId: firmId
+                      )
+                   }
+                  \s
+                   Firm3: Relational
+                   {
+                      scope([PersonFirmDatabase3]FirmTable3)
+                      (
+                        firmId: firmId,
+                        firmName: firmName
+                      )
+                   }
+                )
+                """;
 
         this.verifyValidSubstitution(mappingCode);
     }
@@ -350,77 +358,79 @@ public class TestStoreSubstitutionValidator extends AbstractPureRelationalTestWi
     @Test
     public void testValidDoubleStoreSubstitution()
     {
-        String mappingCode = "###Mapping\n" +
-                "import a::*;\n" +
-                "\n" +
-                "Mapping a::PersonFirmMapping1\n" +
-                "(  \n" +
-                "   include a::PersonFirmMapping2[PersonFirmDatabase2->PersonFirmDatabase1]\n" +
-                "   \n" +
-                "   Person1: Relational\n" +
-                "   {\n" +
-                "      scope([PersonFirmDatabase1]PersonTable1)\n" +
-                "      (\n" +
-                "        personId: personId,\n" +
-                "        personName: personName,\n" +
-                "        firmId: firmId\n" +
-                "      )\n" +
-                "   }\n" +
-                "   \n" +
-                "   Firm1: Relational\n" +
-                "   {\n" +
-                "      scope([PersonFirmDatabase1]FirmTable1)\n" +
-                "      (\n" +
-                "        firmId: firmId,\n" +
-                "        firmName: firmName\n" +
-                "      )\n" +
-                "   }\n" +
-                "   \n" +
-                "   PersonFirm1 : Relational\n" +
-                "   {\n" +
-                "      AssociationMapping\n" +
-                "      (\n" +
-                "         person1: [PersonFirmDatabase1]@PersonFirm1,\n" +
-                "         firm1: [PersonFirmDatabase1]@PersonFirm1\n" +
-                "      )\n" +
-                "   }\n" +
-                ")\n" +
-                "\n" +
-                "Mapping a::PersonFirmMapping2\n" +
-                "(  \n" +
-                "   include a::PersonFirmMapping3[PersonFirmDatabase3->PersonFirmDatabase2]\n" +
-                ")\n" +
-                "\n" +
-                "Mapping a::PersonFirmMapping3\n" +
-                "( \n" +
-                "   Person3: Relational\n" +
-                "   {\n" +
-                "      scope([PersonFirmDatabase3]PersonTable3)\n" +
-                "      (\n" +
-                "        personId: personId,\n" +
-                "        personName: personName,\n" +
-                "        firmId: firmId\n" +
-                "      )\n" +
-                "   }\n" +
-                "   \n" +
-                "   Firm3: Relational\n" +
-                "   {\n" +
-                "      scope([PersonFirmDatabase3]FirmTable3)\n" +
-                "      (\n" +
-                "        firmId: firmId,\n" +
-                "        firmName: firmName\n" +
-                "      )\n" +
-                "   }\n" +
-                "   \n" +
-                "   PersonFirm3 : Relational\n" +
-                "   {\n" +
-                "      AssociationMapping\n" +
-                "      (\n" +
-                "         person3: [PersonFirmDatabase3]@PersonFirm3,\n" +
-                "         firm3: [PersonFirmDatabase3]@PersonFirm3\n" +
-                "      )\n" +
-                "   }\n" +
-                ")\n";
+        String mappingCode = """
+                ###Mapping
+                import a::*;
+                
+                Mapping a::PersonFirmMapping1
+                ( \s
+                   include a::PersonFirmMapping2[PersonFirmDatabase2->PersonFirmDatabase1]
+                  \s
+                   Person1: Relational
+                   {
+                      scope([PersonFirmDatabase1]PersonTable1)
+                      (
+                        personId: personId,
+                        personName: personName,
+                        firmId: firmId
+                      )
+                   }
+                  \s
+                   Firm1: Relational
+                   {
+                      scope([PersonFirmDatabase1]FirmTable1)
+                      (
+                        firmId: firmId,
+                        firmName: firmName
+                      )
+                   }
+                  \s
+                   PersonFirm1 : Relational
+                   {
+                      AssociationMapping
+                      (
+                         person1: [PersonFirmDatabase1]@PersonFirm1,
+                         firm1: [PersonFirmDatabase1]@PersonFirm1
+                      )
+                   }
+                )
+                
+                Mapping a::PersonFirmMapping2
+                ( \s
+                   include a::PersonFirmMapping3[PersonFirmDatabase3->PersonFirmDatabase2]
+                )
+                
+                Mapping a::PersonFirmMapping3
+                (\s
+                   Person3: Relational
+                   {
+                      scope([PersonFirmDatabase3]PersonTable3)
+                      (
+                        personId: personId,
+                        personName: personName,
+                        firmId: firmId
+                      )
+                   }
+                  \s
+                   Firm3: Relational
+                   {
+                      scope([PersonFirmDatabase3]FirmTable3)
+                      (
+                        firmId: firmId,
+                        firmName: firmName
+                      )
+                   }
+                  \s
+                   PersonFirm3 : Relational
+                   {
+                      AssociationMapping
+                      (
+                         person3: [PersonFirmDatabase3]@PersonFirm3,
+                         firm3: [PersonFirmDatabase3]@PersonFirm3
+                      )
+                   }
+                )
+                """;
 
         this.verifyValidSubstitution(mappingCode);
     }
@@ -428,105 +438,107 @@ public class TestStoreSubstitutionValidator extends AbstractPureRelationalTestWi
     @Test
     public void testValidNestedStoreSubstitution()
     {
-        String mappingCode = "###Mapping\n" +
-                "import a::*;\n" +
-                "\n" +
-                "Mapping a::PersonFirmMapping1\n" +
-                "(  \n" +
-                "   include a::PersonFirmMapping23[PersonFirmDatabase3->PersonFirmDatabase1]\n" +
-                "   \n" +
-                "   Person1: Relational\n" +
-                "   {\n" +
-                "      scope([PersonFirmDatabase1]PersonTable1)\n" +
-                "      (\n" +
-                "        personId: personId,\n" +
-                "        personName: personName,\n" +
-                "        firmId: firmId\n" +
-                "      )\n" +
-                "   }\n" +
-                "   \n" +
-                "   Firm1: Relational\n" +
-                "   {\n" +
-                "      scope([PersonFirmDatabase1]FirmTable1)\n" +
-                "      (\n" +
-                "        firmId: firmId,\n" +
-                "        firmName: firmName\n" +
-                "      )\n" +
-                "   }\n" +
-                "   \n" +
-                "   PersonFirm1 : Relational\n" +
-                "   {\n" +
-                "      AssociationMapping\n" +
-                "      (\n" +
-                "         person1: [PersonFirmDatabase1]@PersonFirm1,\n" +
-                "         firm1: [PersonFirmDatabase1]@PersonFirm1\n" +
-                "      )\n" +
-                "   }\n" +
-                ")\n" +
-                "\n" +
-                "Mapping a::PersonFirmMapping23\n" +
-                "(  \n" +
-                "   include a::PersonFirmMapping3\n" +
-                "   \n" +
-                "   Person2: Relational\n" +
-                "   {\n" +
-                "      scope([PersonFirmDatabase2]PersonTable2)\n" +
-                "      (\n" +
-                "        personId: personId,\n" +
-                "        personName: personName,\n" +
-                "        firmId: firmId\n" +
-                "      )\n" +
-                "   }\n" +
-                "   \n" +
-                "   Firm2: Relational\n" +
-                "   {\n" +
-                "      scope([PersonFirmDatabase2]FirmTable2)\n" +
-                "      (\n" +
-                "        firmId: firmId,\n" +
-                "        firmName: firmName\n" +
-                "      )\n" +
-                "   }\n" +
-                "   \n" +
-                "   PersonFirm2 : Relational\n" +
-                "   {\n" +
-                "      AssociationMapping\n" +
-                "      (\n" +
-                "         person2: [PersonFirmDatabase2]@PersonFirm2,\n" +
-                "         firm2: [PersonFirmDatabase2]@PersonFirm2\n" +
-                "      )\n" +
-                "   }\n" +
-                ")\n" +
-                "\n" +
-                "Mapping a::PersonFirmMapping3\n" +
-                "( \n" +
-                "   Person3: Relational\n" +
-                "   {\n" +
-                "      scope([PersonFirmDatabase3]PersonTable3)\n" +
-                "      (\n" +
-                "        personId: personId,\n" +
-                "        personName: personName,\n" +
-                "        firmId: firmId\n" +
-                "      )\n" +
-                "   }\n" +
-                "   \n" +
-                "   Firm3: Relational\n" +
-                "   {\n" +
-                "      scope([PersonFirmDatabase3]FirmTable3)\n" +
-                "      (\n" +
-                "        firmId: firmId,\n" +
-                "        firmName: firmName\n" +
-                "      )\n" +
-                "   }\n" +
-                "   \n" +
-                "   PersonFirm3 : Relational\n" +
-                "   {\n" +
-                "      AssociationMapping\n" +
-                "      (\n" +
-                "         person3: [PersonFirmDatabase3]@PersonFirm3,\n" +
-                "         firm3: [PersonFirmDatabase3]@PersonFirm3\n" +
-                "      )\n" +
-                "   }\n" +
-                ")\n";
+        String mappingCode = """
+                ###Mapping
+                import a::*;
+                
+                Mapping a::PersonFirmMapping1
+                ( \s
+                   include a::PersonFirmMapping23[PersonFirmDatabase3->PersonFirmDatabase1]
+                  \s
+                   Person1: Relational
+                   {
+                      scope([PersonFirmDatabase1]PersonTable1)
+                      (
+                        personId: personId,
+                        personName: personName,
+                        firmId: firmId
+                      )
+                   }
+                  \s
+                   Firm1: Relational
+                   {
+                      scope([PersonFirmDatabase1]FirmTable1)
+                      (
+                        firmId: firmId,
+                        firmName: firmName
+                      )
+                   }
+                  \s
+                   PersonFirm1 : Relational
+                   {
+                      AssociationMapping
+                      (
+                         person1: [PersonFirmDatabase1]@PersonFirm1,
+                         firm1: [PersonFirmDatabase1]@PersonFirm1
+                      )
+                   }
+                )
+                
+                Mapping a::PersonFirmMapping23
+                ( \s
+                   include a::PersonFirmMapping3
+                  \s
+                   Person2: Relational
+                   {
+                      scope([PersonFirmDatabase2]PersonTable2)
+                      (
+                        personId: personId,
+                        personName: personName,
+                        firmId: firmId
+                      )
+                   }
+                  \s
+                   Firm2: Relational
+                   {
+                      scope([PersonFirmDatabase2]FirmTable2)
+                      (
+                        firmId: firmId,
+                        firmName: firmName
+                      )
+                   }
+                  \s
+                   PersonFirm2 : Relational
+                   {
+                      AssociationMapping
+                      (
+                         person2: [PersonFirmDatabase2]@PersonFirm2,
+                         firm2: [PersonFirmDatabase2]@PersonFirm2
+                      )
+                   }
+                )
+                
+                Mapping a::PersonFirmMapping3
+                (\s
+                   Person3: Relational
+                   {
+                      scope([PersonFirmDatabase3]PersonTable3)
+                      (
+                        personId: personId,
+                        personName: personName,
+                        firmId: firmId
+                      )
+                   }
+                  \s
+                   Firm3: Relational
+                   {
+                      scope([PersonFirmDatabase3]FirmTable3)
+                      (
+                        firmId: firmId,
+                        firmName: firmName
+                      )
+                   }
+                  \s
+                   PersonFirm3 : Relational
+                   {
+                      AssociationMapping
+                      (
+                         person3: [PersonFirmDatabase3]@PersonFirm3,
+                         firm3: [PersonFirmDatabase3]@PersonFirm3
+                      )
+                   }
+                )
+                """;
 
         this.verifyValidSubstitution(mappingCode);
     }
@@ -534,133 +546,135 @@ public class TestStoreSubstitutionValidator extends AbstractPureRelationalTestWi
     @Test
     public void testValidHybridStoreSubstitution()
     {
-        String mappingCode = "###Mapping\n" +
-                "import a::*;\n" +
-                "\n" +
-                "Mapping a::PersonFirmMapping1\n" +
-                "(  \n" +
-                "   include a::PersonFirmMapping234[PersonFirmDatabase2->PersonFirmDatabase1, PersonFirmDatabase3->PersonFirmDatabase1, PersonFirmDatabase4->PersonFirmDatabase1]\n" +
-                "   \n" +
-                "   Person1: Relational\n" +
-                "   {\n" +
-                "      scope([PersonFirmDatabase1]PersonTable1)\n" +
-                "      (\n" +
-                "        personId: personId,\n" +
-                "        personName: personName,\n" +
-                "        firmId: firmId\n" +
-                "      )\n" +
-                "   }\n" +
-                "   \n" +
-                "   Firm1: Relational\n" +
-                "   {\n" +
-                "      scope([PersonFirmDatabase1]FirmTable1)\n" +
-                "      (\n" +
-                "        firmId: firmId,\n" +
-                "        firmName: firmName\n" +
-                "      )\n" +
-                "   }\n" +
-                "   \n" +
-                "   PersonFirm1 : Relational\n" +
-                "   {\n" +
-                "      AssociationMapping\n" +
-                "      (\n" +
-                "         person1: [PersonFirmDatabase1]@PersonFirm1,\n" +
-                "         firm1: [PersonFirmDatabase1]@PersonFirm1\n" +
-                "      )\n" +
-                "   }\n" +
-                ")\n" +
-                "\n" +
-                "Mapping a::PersonFirmMapping234\n" +
-                "(  \n" +
-                "   include a::PersonFirmMapping45[PersonFirmDatabase5->PersonFirmDatabase3]\n" +
-                "   \n" +
-                "   Person2: Relational\n" +
-                "   {\n" +
-                "      scope([PersonFirmDatabase2]PersonTable2)\n" +
-                "      (\n" +
-                "        personId: personId,\n" +
-                "        personName: personName,\n" +
-                "        firmId: firmId\n" +
-                "      )\n" +
-                "   }\n" +
-                "   \n" +
-                "   Firm2: Relational\n" +
-                "   {\n" +
-                "      scope([PersonFirmDatabase2]FirmTable2)\n" +
-                "      (\n" +
-                "        firmId: firmId,\n" +
-                "        firmName: firmName\n" +
-                "      )\n" +
-                "   }\n" +
-                "   \n" +
-                "   PersonFirm2 : Relational\n" +
-                "   {\n" +
-                "      AssociationMapping\n" +
-                "      (\n" +
-                "         person2: [PersonFirmDatabase2]@PersonFirm2,\n" +
-                "         firm2: [PersonFirmDatabase2]@PersonFirm2\n" +
-                "      )\n" +
-                "   }\n" +
-                ")\n" +
-                "\n" +
-                "Mapping a::PersonFirmMapping45\n" +
-                "( \n" +
-                "   Person4: Relational\n" +
-                "   {\n" +
-                "      scope([PersonFirmDatabase4]PersonTable4)\n" +
-                "      (\n" +
-                "        personId: personId,\n" +
-                "        personName: personName,\n" +
-                "        firmId: firmId\n" +
-                "      )\n" +
-                "   }\n" +
-                "   \n" +
-                "   Firm4: Relational\n" +
-                "   {\n" +
-                "      scope([PersonFirmDatabase4]FirmTable4)\n" +
-                "      (\n" +
-                "        firmId: firmId,\n" +
-                "        firmName: firmName\n" +
-                "      )\n" +
-                "   }\n" +
-                "   \n" +
-                "   PersonFirm4 : Relational\n" +
-                "   {\n" +
-                "      AssociationMapping\n" +
-                "      (\n" +
-                "         person4: [PersonFirmDatabase4]@PersonFirm4,\n" +
-                "         firm4: [PersonFirmDatabase4]@PersonFirm4\n" +
-                "      )\n" +
-                "   }\n" +
-                "   \n" +
-                "   Person5: Relational\n" +
-                "   {\n" +
-                "      scope([PersonFirmDatabase5]PersonTable5)\n" +
-                "      (\n" +
-                "        personId: personId,\n" +
-                "        personName: personName,\n" +
-                "        firmId: firmId\n" +
-                "      )\n" +
-                "   }\n" +
-                "   \n" +
-                "   Firm5: Relational\n" +
-                "   {\n" +
-                "      scope([PersonFirmDatabase5]FirmTable5)\n" +
-                "      (\n" +
-                "        firmId: firmId,\n" +
-                "        firmName: firmName\n" +
-                "      )\n" +
-                "   }\n" +
-                "   \n" +
-                "   PersonFirm5 : Relational\n" +
-                "   {\n" +
-                "      AssociationMapping\n" +
-                "      (\n" +
-                "         person5: [PersonFirmDatabase5]@PersonFirm5,\n" +
-                "         firm5: [PersonFirmDatabase5]@PersonFirm5\n" +
-                "      )\n" +
-                "   }\n" +
-                ")\n";
+        String mappingCode = """
+                ###Mapping
+                import a::*;
+                
+                Mapping a::PersonFirmMapping1
+                ( \s
+                   include a::PersonFirmMapping234[PersonFirmDatabase2->PersonFirmDatabase1, PersonFirmDatabase3->PersonFirmDatabase1, PersonFirmDatabase4->PersonFirmDatabase1]
+                  \s
+                   Person1: Relational
+                   {
+                      scope([PersonFirmDatabase1]PersonTable1)
+                      (
+                        personId: personId,
+                        personName: personName,
+                        firmId: firmId
+                      )
+                   }
+                  \s
+                   Firm1: Relational
+                   {
+                      scope([PersonFirmDatabase1]FirmTable1)
+                      (
+                        firmId: firmId,
+                        firmName: firmName
+                      )
+                   }
+                  \s
+                   PersonFirm1 : Relational
+                   {
+                      AssociationMapping
+                      (
+                         person1: [PersonFirmDatabase1]@PersonFirm1,
+                         firm1: [PersonFirmDatabase1]@PersonFirm1
+                      )
+                   }
+                )
+                
+                Mapping a::PersonFirmMapping234
+                ( \s
+                   include a::PersonFirmMapping45[PersonFirmDatabase5->PersonFirmDatabase3]
+                  \s
+                   Person2: Relational
+                   {
+                      scope([PersonFirmDatabase2]PersonTable2)
+                      (
+                        personId: personId,
+                        personName: personName,
+                        firmId: firmId
+                      )
+                   }
+                  \s
+                   Firm2: Relational
+                   {
+                      scope([PersonFirmDatabase2]FirmTable2)
+                      (
+                        firmId: firmId,
+                        firmName: firmName
+                      )
+                   }
+                  \s
+                   PersonFirm2 : Relational
+                   {
+                      AssociationMapping
+                      (
+                         person2: [PersonFirmDatabase2]@PersonFirm2,
+                         firm2: [PersonFirmDatabase2]@PersonFirm2
+                      )
+                   }
+                )
+                
+                Mapping a::PersonFirmMapping45
+                (\s
+                   Person4: Relational
+                   {
+                      scope([PersonFirmDatabase4]PersonTable4)
+                      (
+                        personId: personId,
+                        personName: personName,
+                        firmId: firmId
+                      )
+                   }
+                  \s
+                   Firm4: Relational
+                   {
+                      scope([PersonFirmDatabase4]FirmTable4)
+                      (
+                        firmId: firmId,
+                        firmName: firmName
+                      )
+                   }
+                  \s
+                   PersonFirm4 : Relational
+                   {
+                      AssociationMapping
+                      (
+                         person4: [PersonFirmDatabase4]@PersonFirm4,
+                         firm4: [PersonFirmDatabase4]@PersonFirm4
+                      )
+                   }
+                  \s
+                   Person5: Relational
+                   {
+                      scope([PersonFirmDatabase5]PersonTable5)
+                      (
+                        personId: personId,
+                        personName: personName,
+                        firmId: firmId
+                      )
+                   }
+                  \s
+                   Firm5: Relational
+                   {
+                      scope([PersonFirmDatabase5]FirmTable5)
+                      (
+                        firmId: firmId,
+                        firmName: firmName
+                      )
+                   }
+                  \s
+                   PersonFirm5 : Relational
+                   {
+                      AssociationMapping
+                      (
+                         person5: [PersonFirmDatabase5]@PersonFirm5,
+                         firm5: [PersonFirmDatabase5]@PersonFirm5
+                      )
+                   }
+                )
+                """;
 
         this.verifyValidSubstitution(mappingCode);
     }
@@ -668,133 +682,135 @@ public class TestStoreSubstitutionValidator extends AbstractPureRelationalTestWi
     @Test
     public void testInValidDirectStoreSubstitution()
     {
-        String mappingCode = "###Mapping\n" +
-                "import a::*;\n" +
-                "\n" +
-                "Mapping a::PersonFirmMapping1\n" +
-                "(  \n" +
-                "   include a::PersonFirmMapping234[PersonFirmDatabase5->PersonFirmDatabase1, PersonFirmDatabase3->PersonFirmDatabase1, PersonFirmDatabase4->PersonFirmDatabase1]\n" +
-                "   \n" +
-                "   Person1: Relational\n" +
-                "   {\n" +
-                "      scope([PersonFirmDatabase1]PersonTable1)\n" +
-                "      (\n" +
-                "        personId: personId,\n" +
-                "        personName: personName,\n" +
-                "        firmId: firmId\n" +
-                "      )\n" +
-                "   }\n" +
-                "   \n" +
-                "   Firm1: Relational\n" +
-                "   {\n" +
-                "      scope([PersonFirmDatabase1]FirmTable1)\n" +
-                "      (\n" +
-                "        firmId: firmId,\n" +
-                "        firmName: firmName\n" +
-                "      )\n" +
-                "   }\n" +
-                "   \n" +
-                "   PersonFirm1 : Relational\n" +
-                "   {\n" +
-                "      AssociationMapping\n" +
-                "      (\n" +
-                "         person1: [PersonFirmDatabase1]@PersonFirm1,\n" +
-                "         firm1: [PersonFirmDatabase1]@PersonFirm1\n" +
-                "      )\n" +
-                "   }\n" +
-                ")\n" +
-                "\n" +
-                "Mapping a::PersonFirmMapping234\n" +
-                "(  \n" +
-                "   include a::PersonFirmMapping45[PersonFirmDatabase5->PersonFirmDatabase3]\n" +
-                "   \n" +
-                "   Person2: Relational\n" +
-                "   {\n" +
-                "      scope([PersonFirmDatabase2]PersonTable2)\n" +
-                "      (\n" +
-                "        personId: personId,\n" +
-                "        personName: personName,\n" +
-                "        firmId: firmId\n" +
-                "      )\n" +
-                "   }\n" +
-                "   \n" +
-                "   Firm2: Relational\n" +
-                "   {\n" +
-                "      scope([PersonFirmDatabase2]FirmTable2)\n" +
-                "      (\n" +
-                "        firmId: firmId,\n" +
-                "        firmName: firmName\n" +
-                "      )\n" +
-                "   }\n" +
-                "   \n" +
-                "   PersonFirm2 : Relational\n" +
-                "   {\n" +
-                "      AssociationMapping\n" +
-                "      (\n" +
-                "         person2: [PersonFirmDatabase2]@PersonFirm2,\n" +
-                "         firm2: [PersonFirmDatabase2]@PersonFirm2\n" +
-                "      )\n" +
-                "   }\n" +
-                ")\n" +
-                "\n" +
-                "Mapping a::PersonFirmMapping45\n" +
-                "( \n" +
-                "   Person4: Relational\n" +
-                "   {\n" +
-                "      scope([PersonFirmDatabase4]PersonTable4)\n" +
-                "      (\n" +
-                "        personId: personId,\n" +
-                "        personName: personName,\n" +
-                "        firmId: firmId\n" +
-                "      )\n" +
-                "   }\n" +
-                "   \n" +
-                "   Firm4: Relational\n" +
-                "   {\n" +
-                "      scope([PersonFirmDatabase4]FirmTable4)\n" +
-                "      (\n" +
-                "        firmId: firmId,\n" +
-                "        firmName: firmName\n" +
-                "      )\n" +
-                "   }\n" +
-                "   \n" +
-                "   PersonFirm4 : Relational\n" +
-                "   {\n" +
-                "      AssociationMapping\n" +
-                "      (\n" +
-                "         person4: [PersonFirmDatabase4]@PersonFirm4,\n" +
-                "         firm4: [PersonFirmDatabase4]@PersonFirm4\n" +
-                "      )\n" +
-                "   }\n" +
-                "   \n" +
-                "   Person5: Relational\n" +
-                "   {\n" +
-                "      scope([PersonFirmDatabase5]PersonTable5)\n" +
-                "      (\n" +
-                "        personId: personId,\n" +
-                "        personName: personName,\n" +
-                "        firmId: firmId\n" +
-                "      )\n" +
-                "   }\n" +
-                "   \n" +
-                "   Firm5: Relational\n" +
-                "   {\n" +
-                "      scope([PersonFirmDatabase5]FirmTable5)\n" +
-                "      (\n" +
-                "        firmId: firmId,\n" +
-                "        firmName: firmName\n" +
-                "      )\n" +
-                "   }\n" +
-                "   \n" +
-                "   PersonFirm5 : Relational\n" +
-                "   {\n" +
-                "      AssociationMapping\n" +
-                "      (\n" +
-                "         person5: [PersonFirmDatabase5]@PersonFirm5,\n" +
-                "         firm5: [PersonFirmDatabase5]@PersonFirm5\n" +
-                "      )\n" +
-                "   }\n" +
-                ")\n";
+        String mappingCode = """
+                ###Mapping
+                import a::*;
+                
+                Mapping a::PersonFirmMapping1
+                ( \s
+                   include a::PersonFirmMapping234[PersonFirmDatabase5->PersonFirmDatabase1, PersonFirmDatabase3->PersonFirmDatabase1, PersonFirmDatabase4->PersonFirmDatabase1]
+                  \s
+                   Person1: Relational
+                   {
+                      scope([PersonFirmDatabase1]PersonTable1)
+                      (
+                        personId: personId,
+                        personName: personName,
+                        firmId: firmId
+                      )
+                   }
+                  \s
+                   Firm1: Relational
+                   {
+                      scope([PersonFirmDatabase1]FirmTable1)
+                      (
+                        firmId: firmId,
+                        firmName: firmName
+                      )
+                   }
+                  \s
+                   PersonFirm1 : Relational
+                   {
+                      AssociationMapping
+                      (
+                         person1: [PersonFirmDatabase1]@PersonFirm1,
+                         firm1: [PersonFirmDatabase1]@PersonFirm1
+                      )
+                   }
+                )
+                
+                Mapping a::PersonFirmMapping234
+                ( \s
+                   include a::PersonFirmMapping45[PersonFirmDatabase5->PersonFirmDatabase3]
+                  \s
+                   Person2: Relational
+                   {
+                      scope([PersonFirmDatabase2]PersonTable2)
+                      (
+                        personId: personId,
+                        personName: personName,
+                        firmId: firmId
+                      )
+                   }
+                  \s
+                   Firm2: Relational
+                   {
+                      scope([PersonFirmDatabase2]FirmTable2)
+                      (
+                        firmId: firmId,
+                        firmName: firmName
+                      )
+                   }
+                  \s
+                   PersonFirm2 : Relational
+                   {
+                      AssociationMapping
+                      (
+                         person2: [PersonFirmDatabase2]@PersonFirm2,
+                         firm2: [PersonFirmDatabase2]@PersonFirm2
+                      )
+                   }
+                )
+                
+                Mapping a::PersonFirmMapping45
+                (\s
+                   Person4: Relational
+                   {
+                      scope([PersonFirmDatabase4]PersonTable4)
+                      (
+                        personId: personId,
+                        personName: personName,
+                        firmId: firmId
+                      )
+                   }
+                  \s
+                   Firm4: Relational
+                   {
+                      scope([PersonFirmDatabase4]FirmTable4)
+                      (
+                        firmId: firmId,
+                        firmName: firmName
+                      )
+                   }
+                  \s
+                   PersonFirm4 : Relational
+                   {
+                      AssociationMapping
+                      (
+                         person4: [PersonFirmDatabase4]@PersonFirm4,
+                         firm4: [PersonFirmDatabase4]@PersonFirm4
+                      )
+                   }
+                  \s
+                   Person5: Relational
+                   {
+                      scope([PersonFirmDatabase5]PersonTable5)
+                      (
+                        personId: personId,
+                        personName: personName,
+                        firmId: firmId
+                      )
+                   }
+                  \s
+                   Firm5: Relational
+                   {
+                      scope([PersonFirmDatabase5]FirmTable5)
+                      (
+                        firmId: firmId,
+                        firmName: firmName
+                      )
+                   }
+                  \s
+                   PersonFirm5 : Relational
+                   {
+                      AssociationMapping
+                      (
+                         person5: [PersonFirmDatabase5]@PersonFirm5,
+                         firm5: [PersonFirmDatabase5]@PersonFirm5
+                      )
+                   }
+                )
+                """;
 
         this.verifyInvalidSubstitution(mappingCode);
     }
@@ -802,133 +818,135 @@ public class TestStoreSubstitutionValidator extends AbstractPureRelationalTestWi
     @Test
     public void testInValidDoubleStoreSubstitution()
     {
-        String mappingCode = "###Mapping\n" +
-                "import a::*;\n" +
-                "\n" +
-                "Mapping a::PersonFirmMapping1\n" +
-                "(  \n" +
-                "   include a::PersonFirmMapping234[PersonFirmDatabase2->PersonFirmDatabase1, PersonFirmDatabase5->PersonFirmDatabase1, PersonFirmDatabase4->PersonFirmDatabase1]\n" +
-                "   \n" +
-                "   Person1: Relational\n" +
-                "   {\n" +
-                "      scope([PersonFirmDatabase1]PersonTable1)\n" +
-                "      (\n" +
-                "        personId: personId,\n" +
-                "        personName: personName,\n" +
-                "        firmId: firmId\n" +
-                "      )\n" +
-                "   }\n" +
-                "   \n" +
-                "   Firm1: Relational\n" +
-                "   {\n" +
-                "      scope([PersonFirmDatabase1]FirmTable1)\n" +
-                "      (\n" +
-                "        firmId: firmId,\n" +
-                "        firmName: firmName\n" +
-                "      )\n" +
-                "   }\n" +
-                "   \n" +
-                "   PersonFirm1 : Relational\n" +
-                "   {\n" +
-                "      AssociationMapping\n" +
-                "      (\n" +
-                "         person1: [PersonFirmDatabase1]@PersonFirm1,\n" +
-                "         firm1: [PersonFirmDatabase1]@PersonFirm1\n" +
-                "      )\n" +
-                "   }\n" +
-                ")\n" +
-                "\n" +
-                "Mapping a::PersonFirmMapping234\n" +
-                "(  \n" +
-                "   include a::PersonFirmMapping45[PersonFirmDatabase5->PersonFirmDatabase3]\n" +
-                "   \n" +
-                "   Person2: Relational\n" +
-                "   {\n" +
-                "      scope([PersonFirmDatabase2]PersonTable2)\n" +
-                "      (\n" +
-                "        personId: personId,\n" +
-                "        personName: personName,\n" +
-                "        firmId: firmId\n" +
-                "      )\n" +
-                "   }\n" +
-                "   \n" +
-                "   Firm2: Relational\n" +
-                "   {\n" +
-                "      scope([PersonFirmDatabase2]FirmTable2)\n" +
-                "      (\n" +
-                "        firmId: firmId,\n" +
-                "        firmName: firmName\n" +
-                "      )\n" +
-                "   }\n" +
-                "   \n" +
-                "   PersonFirm2 : Relational\n" +
-                "   {\n" +
-                "      AssociationMapping\n" +
-                "      (\n" +
-                "         person2: [PersonFirmDatabase2]@PersonFirm2,\n" +
-                "         firm2: [PersonFirmDatabase2]@PersonFirm2\n" +
-                "      )\n" +
-                "   }\n" +
-                ")\n" +
-                "\n" +
-                "Mapping a::PersonFirmMapping45\n" +
-                "( \n" +
-                "   Person4: Relational\n" +
-                "   {\n" +
-                "      scope([PersonFirmDatabase4]PersonTable4)\n" +
-                "      (\n" +
-                "        personId: personId,\n" +
-                "        personName: personName,\n" +
-                "        firmId: firmId\n" +
-                "      )\n" +
-                "   }\n" +
-                "   \n" +
-                "   Firm4: Relational\n" +
-                "   {\n" +
-                "      scope([PersonFirmDatabase4]FirmTable4)\n" +
-                "      (\n" +
-                "        firmId: firmId,\n" +
-                "        firmName: firmName\n" +
-                "      )\n" +
-                "   }\n" +
-                "   \n" +
-                "   PersonFirm4 : Relational\n" +
-                "   {\n" +
-                "      AssociationMapping\n" +
-                "      (\n" +
-                "         person4: [PersonFirmDatabase4]@PersonFirm4,\n" +
-                "         firm4: [PersonFirmDatabase4]@PersonFirm4\n" +
-                "      )\n" +
-                "   }\n" +
-                "   \n" +
-                "   Person5: Relational\n" +
-                "   {\n" +
-                "      scope([PersonFirmDatabase5]PersonTable5)\n" +
-                "      (\n" +
-                "        personId: personId,\n" +
-                "        personName: personName,\n" +
-                "        firmId: firmId\n" +
-                "      )\n" +
-                "   }\n" +
-                "   \n" +
-                "   Firm5: Relational\n" +
-                "   {\n" +
-                "      scope([PersonFirmDatabase5]FirmTable5)\n" +
-                "      (\n" +
-                "        firmId: firmId,\n" +
-                "        firmName: firmName\n" +
-                "      )\n" +
-                "   }\n" +
-                "   \n" +
-                "   PersonFirm5 : Relational\n" +
-                "   {\n" +
-                "      AssociationMapping\n" +
-                "      (\n" +
-                "         person5: [PersonFirmDatabase5]@PersonFirm5,\n" +
-                "         firm5: [PersonFirmDatabase5]@PersonFirm5\n" +
-                "      )\n" +
-                "   }\n" +
-                ")\n";
+        String mappingCode = """
+                ###Mapping
+                import a::*;
+                
+                Mapping a::PersonFirmMapping1
+                ( \s
+                   include a::PersonFirmMapping234[PersonFirmDatabase2->PersonFirmDatabase1, PersonFirmDatabase5->PersonFirmDatabase1, PersonFirmDatabase4->PersonFirmDatabase1]
+                  \s
+                   Person1: Relational
+                   {
+                      scope([PersonFirmDatabase1]PersonTable1)
+                      (
+                        personId: personId,
+                        personName: personName,
+                        firmId: firmId
+                      )
+                   }
+                  \s
+                   Firm1: Relational
+                   {
+                      scope([PersonFirmDatabase1]FirmTable1)
+                      (
+                        firmId: firmId,
+                        firmName: firmName
+                      )
+                   }
+                  \s
+                   PersonFirm1 : Relational
+                   {
+                      AssociationMapping
+                      (
+                         person1: [PersonFirmDatabase1]@PersonFirm1,
+                         firm1: [PersonFirmDatabase1]@PersonFirm1
+                      )
+                   }
+                )
+                
+                Mapping a::PersonFirmMapping234
+                ( \s
+                   include a::PersonFirmMapping45[PersonFirmDatabase5->PersonFirmDatabase3]
+                  \s
+                   Person2: Relational
+                   {
+                      scope([PersonFirmDatabase2]PersonTable2)
+                      (
+                        personId: personId,
+                        personName: personName,
+                        firmId: firmId
+                      )
+                   }
+                  \s
+                   Firm2: Relational
+                   {
+                      scope([PersonFirmDatabase2]FirmTable2)
+                      (
+                        firmId: firmId,
+                        firmName: firmName
+                      )
+                   }
+                  \s
+                   PersonFirm2 : Relational
+                   {
+                      AssociationMapping
+                      (
+                         person2: [PersonFirmDatabase2]@PersonFirm2,
+                         firm2: [PersonFirmDatabase2]@PersonFirm2
+                      )
+                   }
+                )
+                
+                Mapping a::PersonFirmMapping45
+                (\s
+                   Person4: Relational
+                   {
+                      scope([PersonFirmDatabase4]PersonTable4)
+                      (
+                        personId: personId,
+                        personName: personName,
+                        firmId: firmId
+                      )
+                   }
+                  \s
+                   Firm4: Relational
+                   {
+                      scope([PersonFirmDatabase4]FirmTable4)
+                      (
+                        firmId: firmId,
+                        firmName: firmName
+                      )
+                   }
+                  \s
+                   PersonFirm4 : Relational
+                   {
+                      AssociationMapping
+                      (
+                         person4: [PersonFirmDatabase4]@PersonFirm4,
+                         firm4: [PersonFirmDatabase4]@PersonFirm4
+                      )
+                   }
+                  \s
+                   Person5: Relational
+                   {
+                      scope([PersonFirmDatabase5]PersonTable5)
+                      (
+                        personId: personId,
+                        personName: personName,
+                        firmId: firmId
+                      )
+                   }
+                  \s
+                   Firm5: Relational
+                   {
+                      scope([PersonFirmDatabase5]FirmTable5)
+                      (
+                        firmId: firmId,
+                        firmName: firmName
+                      )
+                   }
+                  \s
+                   PersonFirm5 : Relational
+                   {
+                      AssociationMapping
+                      (
+                         person5: [PersonFirmDatabase5]@PersonFirm5,
+                         firm5: [PersonFirmDatabase5]@PersonFirm5
+                      )
+                   }
+                )
+                """;
 
         this.verifyInvalidSubstitution(mappingCode);
     }
@@ -936,133 +954,135 @@ public class TestStoreSubstitutionValidator extends AbstractPureRelationalTestWi
     @Test
     public void testInValidNestedStoreSubstitution()
     {
-        String mappingCode = "###Mapping\n" +
-                "import a::*;\n" +
-                "\n" +
-                "Mapping a::PersonFirmMapping1\n" +
-                "(  \n" +
-                "   include a::PersonFirmMapping234[PersonFirmDatabase2->PersonFirmDatabase1, PersonFirmDatabase3->PersonFirmDatabase1, PersonFirmDatabase5->PersonFirmDatabase1]\n" +
-                "   \n" +
-                "   Person1: Relational\n" +
-                "   {\n" +
-                "      scope([PersonFirmDatabase1]PersonTable1)\n" +
-                "      (\n" +
-                "        personId: personId,\n" +
-                "        personName: personName,\n" +
-                "        firmId: firmId\n" +
-                "      )\n" +
-                "   }\n" +
-                "   \n" +
-                "   Firm1: Relational\n" +
-                "   {\n" +
-                "      scope([PersonFirmDatabase1]FirmTable1)\n" +
-                "      (\n" +
-                "        firmId: firmId,\n" +
-                "        firmName: firmName\n" +
-                "      )\n" +
-                "   }\n" +
-                "   \n" +
-                "   PersonFirm1 : Relational\n" +
-                "   {\n" +
-                "      AssociationMapping\n" +
-                "      (\n" +
-                "         person1: [PersonFirmDatabase1]@PersonFirm1,\n" +
-                "         firm1: [PersonFirmDatabase1]@PersonFirm1\n" +
-                "      )\n" +
-                "   }\n" +
-                ")\n" +
-                "\n" +
-                "Mapping a::PersonFirmMapping234\n" +
-                "(  \n" +
-                "   include a::PersonFirmMapping45[PersonFirmDatabase5->PersonFirmDatabase3]\n" +
-                "   \n" +
-                "   Person2: Relational\n" +
-                "   {\n" +
-                "      scope([PersonFirmDatabase2]PersonTable2)\n" +
-                "      (\n" +
-                "        personId: personId,\n" +
-                "        personName: personName,\n" +
-                "        firmId: firmId\n" +
-                "      )\n" +
-                "   }\n" +
-                "   \n" +
-                "   Firm2: Relational\n" +
-                "   {\n" +
-                "      scope([PersonFirmDatabase2]FirmTable2)\n" +
-                "      (\n" +
-                "        firmId: firmId,\n" +
-                "        firmName: firmName\n" +
-                "      )\n" +
-                "   }\n" +
-                "   \n" +
-                "   PersonFirm2 : Relational\n" +
-                "   {\n" +
-                "      AssociationMapping\n" +
-                "      (\n" +
-                "         person2: [PersonFirmDatabase2]@PersonFirm2,\n" +
-                "         firm2: [PersonFirmDatabase2]@PersonFirm2\n" +
-                "      )\n" +
-                "   }\n" +
-                ")\n" +
-                "\n" +
-                "Mapping a::PersonFirmMapping45\n" +
-                "( \n" +
-                "   Person4: Relational\n" +
-                "   {\n" +
-                "      scope([PersonFirmDatabase4]PersonTable4)\n" +
-                "      (\n" +
-                "        personId: personId,\n" +
-                "        personName: personName,\n" +
-                "        firmId: firmId\n" +
-                "      )\n" +
-                "   }\n" +
-                "   \n" +
-                "   Firm4: Relational\n" +
-                "   {\n" +
-                "      scope([PersonFirmDatabase4]FirmTable4)\n" +
-                "      (\n" +
-                "        firmId: firmId,\n" +
-                "        firmName: firmName\n" +
-                "      )\n" +
-                "   }\n" +
-                "   \n" +
-                "   PersonFirm4 : Relational\n" +
-                "   {\n" +
-                "      AssociationMapping\n" +
-                "      (\n" +
-                "         person4: [PersonFirmDatabase4]@PersonFirm4,\n" +
-                "         firm4: [PersonFirmDatabase4]@PersonFirm4\n" +
-                "      )\n" +
-                "   }\n" +
-                "   \n" +
-                "   Person5: Relational\n" +
-                "   {\n" +
-                "      scope([PersonFirmDatabase5]PersonTable5)\n" +
-                "      (\n" +
-                "        personId: personId,\n" +
-                "        personName: personName,\n" +
-                "        firmId: firmId\n" +
-                "      )\n" +
-                "   }\n" +
-                "   \n" +
-                "   Firm5: Relational\n" +
-                "   {\n" +
-                "      scope([PersonFirmDatabase5]FirmTable5)\n" +
-                "      (\n" +
-                "        firmId: firmId,\n" +
-                "        firmName: firmName\n" +
-                "      )\n" +
-                "   }\n" +
-                "   \n" +
-                "   PersonFirm5 : Relational\n" +
-                "   {\n" +
-                "      AssociationMapping\n" +
-                "      (\n" +
-                "         person5: [PersonFirmDatabase5]@PersonFirm5,\n" +
-                "         firm5: [PersonFirmDatabase5]@PersonFirm5\n" +
-                "      )\n" +
-                "   }\n" +
-                ")\n";
+        String mappingCode = """
+                ###Mapping
+                import a::*;
+                
+                Mapping a::PersonFirmMapping1
+                ( \s
+                   include a::PersonFirmMapping234[PersonFirmDatabase2->PersonFirmDatabase1, PersonFirmDatabase3->PersonFirmDatabase1, PersonFirmDatabase5->PersonFirmDatabase1]
+                  \s
+                   Person1: Relational
+                   {
+                      scope([PersonFirmDatabase1]PersonTable1)
+                      (
+                        personId: personId,
+                        personName: personName,
+                        firmId: firmId
+                      )
+                   }
+                  \s
+                   Firm1: Relational
+                   {
+                      scope([PersonFirmDatabase1]FirmTable1)
+                      (
+                        firmId: firmId,
+                        firmName: firmName
+                      )
+                   }
+                  \s
+                   PersonFirm1 : Relational
+                   {
+                      AssociationMapping
+                      (
+                         person1: [PersonFirmDatabase1]@PersonFirm1,
+                         firm1: [PersonFirmDatabase1]@PersonFirm1
+                      )
+                   }
+                )
+                
+                Mapping a::PersonFirmMapping234
+                ( \s
+                   include a::PersonFirmMapping45[PersonFirmDatabase5->PersonFirmDatabase3]
+                  \s
+                   Person2: Relational
+                   {
+                      scope([PersonFirmDatabase2]PersonTable2)
+                      (
+                        personId: personId,
+                        personName: personName,
+                        firmId: firmId
+                      )
+                   }
+                  \s
+                   Firm2: Relational
+                   {
+                      scope([PersonFirmDatabase2]FirmTable2)
+                      (
+                        firmId: firmId,
+                        firmName: firmName
+                      )
+                   }
+                  \s
+                   PersonFirm2 : Relational
+                   {
+                      AssociationMapping
+                      (
+                         person2: [PersonFirmDatabase2]@PersonFirm2,
+                         firm2: [PersonFirmDatabase2]@PersonFirm2
+                      )
+                   }
+                )
+                
+                Mapping a::PersonFirmMapping45
+                (\s
+                   Person4: Relational
+                   {
+                      scope([PersonFirmDatabase4]PersonTable4)
+                      (
+                        personId: personId,
+                        personName: personName,
+                        firmId: firmId
+                      )
+                   }
+                  \s
+                   Firm4: Relational
+                   {
+                      scope([PersonFirmDatabase4]FirmTable4)
+                      (
+                        firmId: firmId,
+                        firmName: firmName
+                      )
+                   }
+                  \s
+                   PersonFirm4 : Relational
+                   {
+                      AssociationMapping
+                      (
+                         person4: [PersonFirmDatabase4]@PersonFirm4,
+                         firm4: [PersonFirmDatabase4]@PersonFirm4
+                      )
+                   }
+                  \s
+                   Person5: Relational
+                   {
+                      scope([PersonFirmDatabase5]PersonTable5)
+                      (
+                        personId: personId,
+                        personName: personName,
+                        firmId: firmId
+                      )
+                   }
+                  \s
+                   Firm5: Relational
+                   {
+                      scope([PersonFirmDatabase5]FirmTable5)
+                      (
+                        firmId: firmId,
+                        firmName: firmName
+                      )
+                   }
+                  \s
+                   PersonFirm5 : Relational
+                   {
+                      AssociationMapping
+                      (
+                         person5: [PersonFirmDatabase5]@PersonFirm5,
+                         firm5: [PersonFirmDatabase5]@PersonFirm5
+                      )
+                   }
+                )
+                """;
 
         this.verifyInvalidSubstitution(mappingCode);
     }

@@ -17,41 +17,45 @@ package org.finos.legend.pure.m3.tests.function.base.runtime;
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
 import org.finos.legend.pure.m3.navigation.valuespecification.ValueSpecification;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 //This Abstract class is never used
-@Ignore
+@Disabled
 public abstract class AbstractTestCurrentUserId extends AbstractPureTestWithCoreCompiled
 {
 
-    @Before
+    @BeforeEach
     public abstract void setup();
 
     @Test
     public void testCurrentUserId()
     {
         compileTestSource(
-                "function test():String[1]\n" +
-                        "{\n" +
-                        "    meta::core::runtime::currentUserId();" +
-                        "}\n");
+                """
+                function test():String[1]
+                {
+                    meta::core::runtime::currentUserId();\
+                }
+                """);
         CoreInstance result = this.execute("test():String[1]");
-        Assert.assertEquals(this.getTestUserId(), ValueSpecification.getValue(result, this.processorSupport).getName());
+        Assertions.assertEquals(this.getTestUserId(), ValueSpecification.getValue(result, this.processorSupport).getName());
     }
 
     @Test
     public void testCurrentUserIdEval()
     {
         compileTestSource(
-                "function test():String[1]\n" +
-                        "{\n" +
-                        "    meta::core::runtime::currentUserId__String_1_->eval();" +
-                        "}\n");
+                """
+                function test():String[1]
+                {
+                    meta::core::runtime::currentUserId__String_1_->eval();\
+                }
+                """);
         CoreInstance result = this.execute("test():String[1]");
-        Assert.assertEquals(this.getTestUserId(), ValueSpecification.getValue(result, this.processorSupport).getName());
+        Assertions.assertEquals(this.getTestUserId(), ValueSpecification.getValue(result, this.processorSupport).getName());
     }
 
     protected String getTestUserId()

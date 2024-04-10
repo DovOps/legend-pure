@@ -15,7 +15,7 @@
 package org.finos.legend.pure.m3.tests.function.base.asserts;
 
 import org.finos.legend.pure.m3.tests.function.base.PureExpressionTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public abstract class AbstractTestAssertJsonStringsEqual extends PureExpressionTest
 {
@@ -29,9 +29,11 @@ public abstract class AbstractTestAssertJsonStringsEqual extends PureExpressionT
     @Test
     public void testSemanticallyDifferentJsonStrings()
     {
-        assertExpressionRaisesPureException("JSON strings don't represent semantically same object \n" +
-                " expected: {\"key\":42,\"anotherKey\":\"foo\"}\n" +
-                " actual: {\"anotherKey\":\"foo\",\"key\": 1}",
+        assertExpressionRaisesPureException("""
+                JSON strings don't represent semantically same object\s
+                 expected: {"key":42,"anotherKey":"foo"}
+                 actual: {"anotherKey":"foo","key": 1}\
+                """,
                 "assert(equalJsonStrings('{\"key\":42,\"anotherKey\":\"foo\"}','{\"anotherKey\":\"foo\",\"key\": 1}'), |'JSON strings don\\'t represent semantically same object \\n expected: {\"key\":42,\"anotherKey\":\"foo\"}\\n actual: {\"anotherKey\":\"foo\",\"key\": 1}')");
     }
 }

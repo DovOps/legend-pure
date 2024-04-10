@@ -18,10 +18,12 @@ import org.finos.legend.pure.m4.transaction.framework.ThreadLocalTransactionCont
 import org.finos.legend.pure.m4.transaction.framework.Transaction;
 import org.finos.legend.pure.m4.transaction.framework.TransactionManager;
 import org.finos.legend.pure.m4.transaction.framework.TransactionStateException;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class TestTransaction
 {
@@ -31,22 +33,22 @@ public class TestTransaction
     public void testStateAfterCommit()
     {
         StubTransaction transaction = this.manager.newTransaction(true);
-        Assert.assertTrue(transaction.isOpen());
-        Assert.assertFalse(transaction.isCommitting());
-        Assert.assertFalse(transaction.isCommitted());
-        Assert.assertFalse(transaction.isRollingBack());
-        Assert.assertFalse(transaction.isRolledBack());
-        Assert.assertFalse(transaction.isInvalid());
-        Assert.assertTrue(this.manager.isRegistered(transaction));
+        Assertions.assertTrue(transaction.isOpen());
+        Assertions.assertFalse(transaction.isCommitting());
+        Assertions.assertFalse(transaction.isCommitted());
+        Assertions.assertFalse(transaction.isRollingBack());
+        Assertions.assertFalse(transaction.isRolledBack());
+        Assertions.assertFalse(transaction.isInvalid());
+        Assertions.assertTrue(this.manager.isRegistered(transaction));
 
         transaction.commit();
-        Assert.assertFalse(transaction.isOpen());
-        Assert.assertFalse(transaction.isCommitting());
-        Assert.assertTrue(transaction.isCommitted());
-        Assert.assertFalse(transaction.isRollingBack());
-        Assert.assertFalse(transaction.isRolledBack());
-        Assert.assertFalse(transaction.isInvalid());
-        Assert.assertFalse(this.manager.isRegistered(transaction));
+        Assertions.assertFalse(transaction.isOpen());
+        Assertions.assertFalse(transaction.isCommitting());
+        Assertions.assertTrue(transaction.isCommitted());
+        Assertions.assertFalse(transaction.isRollingBack());
+        Assertions.assertFalse(transaction.isRolledBack());
+        Assertions.assertFalse(transaction.isInvalid());
+        Assertions.assertFalse(this.manager.isRegistered(transaction));
     }
 
     @Test
@@ -56,92 +58,104 @@ public class TestTransaction
         try
         {
             transaction.commit();
-            Assert.fail("Expected exception");
+            Assertions.fail("Expected exception");
         }
         catch (IllegalStateException e)
         {
-            Assert.assertEquals("Transaction is not committable", e.getMessage());
+            Assertions.assertEquals("Transaction is not committable", e.getMessage());
         }
     }
 
-    @Test(expected = TransactionStateException.class)
+    @Test
     public void testCommitAfterCommit()
     {
-        StubTransaction transaction = this.manager.newTransaction(true);
-        transaction.commit();
-        transaction.commit();
+        assertThrows(TransactionStateException.class, () -> {
+            StubTransaction transaction = this.manager.newTransaction(true);
+            transaction.commit();
+            transaction.commit();
+        });
     }
 
-    @Test(expected = TransactionStateException.class)
+    @Test
     public void testRollbackAfterCommit()
     {
-        StubTransaction transaction = this.manager.newTransaction(true);
-        transaction.commit();
-        transaction.rollback();
+        assertThrows(TransactionStateException.class, () -> {
+            StubTransaction transaction = this.manager.newTransaction(true);
+            transaction.commit();
+            transaction.rollback();
+        });
     }
 
-    @Test(expected = TransactionStateException.class)
+    @Test
     public void testOpenInThreadCurrentThreadAfterCommit()
     {
-        StubTransaction transaction = this.manager.newTransaction(true);
-        transaction.commit();
-        transaction.openInCurrentThread();
+        assertThrows(TransactionStateException.class, () -> {
+            StubTransaction transaction = this.manager.newTransaction(true);
+            transaction.commit();
+            transaction.openInCurrentThread();
+        });
     }
 
     @Test
     public void testStateAfterRollback()
     {
         StubTransaction transaction = this.manager.newTransaction(true);
-        Assert.assertTrue(transaction.isOpen());
-        Assert.assertFalse(transaction.isCommitting());
-        Assert.assertFalse(transaction.isCommitted());
-        Assert.assertFalse(transaction.isRollingBack());
-        Assert.assertFalse(transaction.isRolledBack());
-        Assert.assertFalse(transaction.isInvalid());
-        Assert.assertTrue(this.manager.isRegistered(transaction));
+        Assertions.assertTrue(transaction.isOpen());
+        Assertions.assertFalse(transaction.isCommitting());
+        Assertions.assertFalse(transaction.isCommitted());
+        Assertions.assertFalse(transaction.isRollingBack());
+        Assertions.assertFalse(transaction.isRolledBack());
+        Assertions.assertFalse(transaction.isInvalid());
+        Assertions.assertTrue(this.manager.isRegistered(transaction));
 
         transaction.rollback();
-        Assert.assertFalse(transaction.isOpen());
-        Assert.assertFalse(transaction.isCommitting());
-        Assert.assertFalse(transaction.isCommitted());
-        Assert.assertFalse(transaction.isRollingBack());
-        Assert.assertTrue(transaction.isRolledBack());
-        Assert.assertFalse(transaction.isInvalid());
-        Assert.assertFalse(this.manager.isRegistered(transaction));
+        Assertions.assertFalse(transaction.isOpen());
+        Assertions.assertFalse(transaction.isCommitting());
+        Assertions.assertFalse(transaction.isCommitted());
+        Assertions.assertFalse(transaction.isRollingBack());
+        Assertions.assertTrue(transaction.isRolledBack());
+        Assertions.assertFalse(transaction.isInvalid());
+        Assertions.assertFalse(this.manager.isRegistered(transaction));
     }
 
-    @Test(expected = TransactionStateException.class)
+    @Test
     public void testCommitAfterRollback()
     {
-        StubTransaction transaction = this.manager.newTransaction(true);
-        transaction.rollback();
-        transaction.commit();
+        assertThrows(TransactionStateException.class, () -> {
+            StubTransaction transaction = this.manager.newTransaction(true);
+            transaction.rollback();
+            transaction.commit();
+        });
     }
 
-    @Test(expected = TransactionStateException.class)
+    @Test
     public void testRollbackAfterRollback()
     {
-        StubTransaction transaction = this.manager.newTransaction(true);
-        transaction.rollback();
-        transaction.rollback();
+        assertThrows(TransactionStateException.class, () -> {
+            StubTransaction transaction = this.manager.newTransaction(true);
+            transaction.rollback();
+            transaction.rollback();
+        });
     }
 
-    @Test(expected = TransactionStateException.class)
+    @Test
     public void testOpenInThreadCurrentThreadAfterRollback()
     {
-        StubTransaction transaction = this.manager.newTransaction(true);
-        transaction.rollback();
-        transaction.openInCurrentThread();
+        assertThrows(TransactionStateException.class, () -> {
+            StubTransaction transaction = this.manager.newTransaction(true);
+            transaction.rollback();
+            transaction.openInCurrentThread();
+        });
     }
 
     @Test
     public void testOpenTransactionInCurrentThread() throws Exception
     {
         Transaction transaction = this.manager.newTransaction(true);
-        Assert.assertNull(this.manager.getThreadLocalTransaction());
+        Assertions.assertNull(this.manager.getThreadLocalTransaction());
         try (ThreadLocalTransactionContext ignore = transaction.openInCurrentThread())
         {
-            Assert.assertSame(transaction, this.manager.getThreadLocalTransaction());
+            Assertions.assertSame(transaction, this.manager.getThreadLocalTransaction());
             final StubTransaction[] otherThreadResult = new StubTransaction[1];
             Thread otherThread = new Thread(new Runnable()
             {
@@ -154,16 +168,16 @@ public class TestTransaction
             otherThread.setDaemon(true);
             otherThread.start();
             otherThread.join();
-            Assert.assertNull(otherThreadResult[0]);
+            Assertions.assertNull(otherThreadResult[0]);
         }
-        Assert.assertNull(this.manager.getThreadLocalTransaction());
+        Assertions.assertNull(this.manager.getThreadLocalTransaction());
     }
 
     @Test
     public void testOpenTransactionInOtherThread() throws Exception
     {
         final Transaction transaction = this.manager.newTransaction(true);
-        Assert.assertNull(this.manager.getThreadLocalTransaction());
+        Assertions.assertNull(this.manager.getThreadLocalTransaction());
 
         final AtomicBoolean transactionOpened = new AtomicBoolean(false);
         final AtomicBoolean transactionChecked = new AtomicBoolean(false);
@@ -200,35 +214,35 @@ public class TestTransaction
         otherThread.join();
         currentThreadResults[2] = this.manager.getThreadLocalTransaction();
 
-        Assert.assertNull(otherThreadResults[0]);
-        Assert.assertSame(transaction, otherThreadResults[1]);
-        Assert.assertNull(otherThreadResults[2]);
+        Assertions.assertNull(otherThreadResults[0]);
+        Assertions.assertSame(transaction, otherThreadResults[1]);
+        Assertions.assertNull(otherThreadResults[2]);
 
-        Assert.assertNull(currentThreadResults[0]);
-        Assert.assertNull(currentThreadResults[1]);
-        Assert.assertNull(currentThreadResults[2]);
+        Assertions.assertNull(currentThreadResults[0]);
+        Assertions.assertNull(currentThreadResults[1]);
+        Assertions.assertNull(currentThreadResults[2]);
     }
 
     @Test
     public void testNestedOpenTransactionInCurrentThread() throws Exception
     {
         Transaction transaction = this.manager.newTransaction(true);
-        Assert.assertNull(this.manager.getThreadLocalTransaction());
+        Assertions.assertNull(this.manager.getThreadLocalTransaction());
         try (ThreadLocalTransactionContext ignore1 = transaction.openInCurrentThread())
         {
-            Assert.assertSame(transaction, this.manager.getThreadLocalTransaction());
+            Assertions.assertSame(transaction, this.manager.getThreadLocalTransaction());
             try (ThreadLocalTransactionContext ignore2 = transaction.openInCurrentThread())
             {
-                Assert.assertSame(transaction, this.manager.getThreadLocalTransaction());
+                Assertions.assertSame(transaction, this.manager.getThreadLocalTransaction());
                 try (ThreadLocalTransactionContext ignore3 = transaction.openInCurrentThread())
                 {
-                    Assert.assertSame(transaction, this.manager.getThreadLocalTransaction());
+                    Assertions.assertSame(transaction, this.manager.getThreadLocalTransaction());
                 }
-                Assert.assertSame(transaction, this.manager.getThreadLocalTransaction());
+                Assertions.assertSame(transaction, this.manager.getThreadLocalTransaction());
             }
-            Assert.assertSame(transaction, this.manager.getThreadLocalTransaction());
+            Assertions.assertSame(transaction, this.manager.getThreadLocalTransaction());
         }
-        Assert.assertNull(this.manager.getThreadLocalTransaction());
+        Assertions.assertNull(this.manager.getThreadLocalTransaction());
     }
 
     @Test
@@ -236,64 +250,68 @@ public class TestTransaction
     {
         Transaction transaction1 = this.manager.newTransaction(false);
         Transaction transaction2 = this.manager.newTransaction(false);
-        Assert.assertNull(this.manager.getThreadLocalTransaction());
+        Assertions.assertNull(this.manager.getThreadLocalTransaction());
         openTwoTransactionsInSameThread(transaction1, transaction2);
         openTwoTransactionsInSameThread(transaction2, transaction1);
     }
 
     private void openTwoTransactionsInSameThread(Transaction transaction1, Transaction transaction2)
     {
-        Assert.assertNull(this.manager.getThreadLocalTransaction());
+        Assertions.assertNull(this.manager.getThreadLocalTransaction());
         try (ThreadLocalTransactionContext ignore1 = transaction1.openInCurrentThread())
         {
-            Assert.assertSame(transaction1, this.manager.getThreadLocalTransaction());
+            Assertions.assertSame(transaction1, this.manager.getThreadLocalTransaction());
             try (ThreadLocalTransactionContext ignore2 = transaction2.openInCurrentThread())
             {
-                Assert.fail("Expected exception");
+                Assertions.fail("Expected exception");
             }
             catch (Exception e)
             {
                 // expected
             }
-            Assert.assertSame(transaction1, this.manager.getThreadLocalTransaction());
+            Assertions.assertSame(transaction1, this.manager.getThreadLocalTransaction());
         }
-        Assert.assertNull(this.manager.getThreadLocalTransaction());
+        Assertions.assertNull(this.manager.getThreadLocalTransaction());
     }
 
     @Test
     public void testStateAfterClearingManager()
     {
         StubTransaction transaction = this.manager.newTransaction(true);
-        Assert.assertTrue(transaction.isOpen());
-        Assert.assertFalse(transaction.isCommitting());
-        Assert.assertFalse(transaction.isCommitted());
-        Assert.assertFalse(transaction.isRollingBack());
-        Assert.assertFalse(transaction.isRolledBack());
-        Assert.assertFalse(transaction.isInvalid());
+        Assertions.assertTrue(transaction.isOpen());
+        Assertions.assertFalse(transaction.isCommitting());
+        Assertions.assertFalse(transaction.isCommitted());
+        Assertions.assertFalse(transaction.isRollingBack());
+        Assertions.assertFalse(transaction.isRolledBack());
+        Assertions.assertFalse(transaction.isInvalid());
 
         this.manager.clear();
-        Assert.assertFalse(transaction.isOpen());
-        Assert.assertFalse(transaction.isCommitting());
-        Assert.assertFalse(transaction.isCommitted());
-        Assert.assertFalse(transaction.isRollingBack());
-        Assert.assertFalse(transaction.isRolledBack());
-        Assert.assertTrue(transaction.isInvalid());
+        Assertions.assertFalse(transaction.isOpen());
+        Assertions.assertFalse(transaction.isCommitting());
+        Assertions.assertFalse(transaction.isCommitted());
+        Assertions.assertFalse(transaction.isRollingBack());
+        Assertions.assertFalse(transaction.isRolledBack());
+        Assertions.assertTrue(transaction.isInvalid());
     }
 
-    @Test(expected = TransactionStateException.class)
+    @Test
     public void testCommitAfterClearingManager()
     {
-        StubTransaction transaction = this.manager.newTransaction(true);
-        this.manager.clear();
-        transaction.commit();
+        assertThrows(TransactionStateException.class, () -> {
+            StubTransaction transaction = this.manager.newTransaction(true);
+            this.manager.clear();
+            transaction.commit();
+        });
     }
 
-    @Test(expected = TransactionStateException.class)
+    @Test
     public void testRollbackAfterClearingManager()
     {
-        StubTransaction transaction = this.manager.newTransaction(true);
-        this.manager.clear();
-        transaction.rollback();
+        assertThrows(TransactionStateException.class, () -> {
+            StubTransaction transaction = this.manager.newTransaction(true);
+            this.manager.clear();
+            transaction.rollback();
+        });
     }
 
     private static class StubTransaction extends Transaction

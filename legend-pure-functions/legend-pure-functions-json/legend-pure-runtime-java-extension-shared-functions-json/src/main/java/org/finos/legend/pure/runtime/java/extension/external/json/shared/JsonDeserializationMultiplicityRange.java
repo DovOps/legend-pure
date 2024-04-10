@@ -50,14 +50,13 @@ public class JsonDeserializationMultiplicityRange<T> extends JsonPropertyDeseria
             }
             return Lists.immutable.empty();
         }
-        if (jsonValue instanceof JSONArray)
+        if (jsonValue instanceof JSONArray jsonValues)
         {
-            JSONArray jsonValues = (JSONArray) jsonValue;
             if ((jsonValues.size() < this.lowerBound) || (jsonValues.size() > this.upperBound))
             {
                 throw new PureExecutionException(jsonDeserializationContext.getSourceInformation(), "Expected value(s) of multiplicity " + this.humanReadableMultiplicity + ", found " + jsonValues.size() + " value(s).");
             }
-            return applyConversion((JSONArray) jsonValue, jsonDeserializationContext);
+            return applyConversion(jsonValues, jsonDeserializationContext);
         }
         else
         {

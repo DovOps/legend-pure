@@ -18,237 +18,247 @@ import org.eclipse.collections.impl.factory.Lists;
 import org.finos.legend.pure.m2.relational.AbstractPureRelationalTestWithCoreCompiled;
 import org.finos.legend.pure.m3.tests.RuntimeTestScriptBuilder;
 import org.finos.legend.pure.m3.tests.RuntimeVerifier;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class TestPureRuntimeAggregationAwareMapping extends AbstractPureRelationalTestWithCoreCompiled
 {
     private static final String model =
-            "###Pure\n" +
-                    "Class Sales\n" +
-                    "{\n" +
-                    "   id: Integer[1];\n" +
-                    "   salesDate: FiscalCalendar[1];\n" +
-                    "   revenue: Float[1];\n" +
-                    "}\n" +
-                    "\n" +
-                    "Class FiscalCalendar\n" +
-                    "{\n" +
-                    "   date: Date[1];\n" +
-                    "   fiscalYear: Integer[1];\n" +
-                    "   fiscalMonth: Integer[1];\n" +
-                    "   fiscalQtr: Integer[1];\n" +
-                    "}\n" +
-                    "native function sum(f:Float[*]):Float[1];\n";
+            """
+            ###Pure
+            Class Sales
+            {
+               id: Integer[1];
+               salesDate: FiscalCalendar[1];
+               revenue: Float[1];
+            }
+            
+            Class FiscalCalendar
+            {
+               date: Date[1];
+               fiscalYear: Integer[1];
+               fiscalMonth: Integer[1];
+               fiscalQtr: Integer[1];
+            }
+            native function sum(f:Float[*]):Float[1];
+            """;
 
     private static final String modelWithSalesPersonDimension =
-            "###Pure\n" +
-                    "Class Sales\n" +
-                    "{\n" +
-                    "   id: Integer[1];\n" +
-                    "   salesDate: FiscalCalendar[1];\n" +
-                    "   salesPerson: Person[1];\n" +
-                    "   revenue: Float[1];\n" +
-                    "}\n" +
-                    "Class Person\n" +
-                    "{\n" +
-                    "   lastName: String[1];\n" +
-                    "}\n" +
-                    "\n" +
-                    "Class FiscalCalendar\n" +
-                    "{\n" +
-                    "   date: Date[1];\n" +
-                    "   fiscalYear: Integer[1];\n" +
-                    "   fiscalMonth: Integer[1];\n" +
-                    "   fiscalQtr: Integer[1];\n" +
-                    "}\n" +
-                    "native function sum(f:Float[*]):Float[1];\n";
+            """
+            ###Pure
+            Class Sales
+            {
+               id: Integer[1];
+               salesDate: FiscalCalendar[1];
+               salesPerson: Person[1];
+               revenue: Float[1];
+            }
+            Class Person
+            {
+               lastName: String[1];
+            }
+            
+            Class FiscalCalendar
+            {
+               date: Date[1];
+               fiscalYear: Integer[1];
+               fiscalMonth: Integer[1];
+               fiscalQtr: Integer[1];
+            }
+            native function sum(f:Float[*]):Float[1];
+            """;
 
-    private static final String mapping = "###Relational\n" +
-            "Database db \n" +
-            "(\n" +
-            "   Table sales_base (id INT PRIMARY KEY, sales_date DATE, revenue FLOAT)\n" +
-            "   Table calendar (date DATE PRIMARY KEY, fiscal_year INT, fiscal_qtr INT, fiscal_month INT)\n" +
-            "   \n" +
-            "   Table sales_by_date (sales_date DATE, net_revenue FLOAT)\n" +
-            "   Table sales_by_qtr (sales_qtr_first_date DATE, net_revenue FLOAT)\n" +
-            "   \n" +
-            "   Join sales_calendar (sales_base.sales_date = calendar.date)\n" +
-            "   Join sales_date_calendar (sales_by_date.sales_date = calendar.date)\n" +
-            "   Join sales_qtr_calendar (sales_by_qtr.sales_qtr_first_date = calendar.date)\n" +
-            "\n" +
-            ")\n" +
-            "\n" +
-            "###Mapping\n" +
-            "Mapping map\n" +
-            "(\n" +
-            "   FiscalCalendar [b] : Relational {\n" +
-            "      scope([db]calendar)\n" +
-            "      (\n" +
-            "         date : date,\n" +
-            "         fiscalYear : fiscal_year,\n" +
-            "         fiscalQtr : fiscal_qtr,\n" +
-            "         fiscalMonth : fiscal_month\n" +
-            "      )\n" +
-            "   }\n" +
-            "   \n" +
-            "   Sales [a] : AggregationAware {\n" +
-            "      Views : [\n" +
-            "         (\n" +
-            "            ~modelOperation : {\n" +
-            "               ~canAggregate true,\n" +
-            "               ~groupByFunctions (\n" +
-            "                  $this.salesDate\n" +
-            "               ),\n" +
-            "               ~aggregateValues (\n" +
-            "                  ( ~mapFn: $this.revenue, ~aggregateFn: $mapped->sum() )\n" +
-            "               )\n" +
-            "            },\n" +
-            "            ~aggregateMapping : Relational {\n" +
-            "               scope([db]sales_by_date)\n" +
-            "               (\n" +
-            "                  salesDate [b] : [db]@sales_date_calendar,\n" +
-            "                  revenue : net_revenue\n" +
-            "               )\n" +
-            "            }\n" +
-            "         )\n" +
-            "      ],\n" +
-            "      ~mainMapping : Relational {\n" +
-            "         scope([db]sales_base)\n" +
-            "         (\n" +
-            "            salesDate [b] : [db]@sales_calendar,\n" +
-            "            revenue : revenue\n" +
-            "         )\n" +
-            "      }\n" +
-            "   }\n" +
-            ")";
+    private static final String mapping = """
+            ###Relational
+            Database db\s
+            (
+               Table sales_base (id INT PRIMARY KEY, sales_date DATE, revenue FLOAT)
+               Table calendar (date DATE PRIMARY KEY, fiscal_year INT, fiscal_qtr INT, fiscal_month INT)
+              \s
+               Table sales_by_date (sales_date DATE, net_revenue FLOAT)
+               Table sales_by_qtr (sales_qtr_first_date DATE, net_revenue FLOAT)
+              \s
+               Join sales_calendar (sales_base.sales_date = calendar.date)
+               Join sales_date_calendar (sales_by_date.sales_date = calendar.date)
+               Join sales_qtr_calendar (sales_by_qtr.sales_qtr_first_date = calendar.date)
+            
+            )
+            
+            ###Mapping
+            Mapping map
+            (
+               FiscalCalendar [b] : Relational {
+                  scope([db]calendar)
+                  (
+                     date : date,
+                     fiscalYear : fiscal_year,
+                     fiscalQtr : fiscal_qtr,
+                     fiscalMonth : fiscal_month
+                  )
+               }
+              \s
+               Sales [a] : AggregationAware {
+                  Views : [
+                     (
+                        ~modelOperation : {
+                           ~canAggregate true,
+                           ~groupByFunctions (
+                              $this.salesDate
+                           ),
+                           ~aggregateValues (
+                              ( ~mapFn: $this.revenue, ~aggregateFn: $mapped->sum() )
+                           )
+                        },
+                        ~aggregateMapping : Relational {
+                           scope([db]sales_by_date)
+                           (
+                              salesDate [b] : [db]@sales_date_calendar,
+                              revenue : net_revenue
+                           )
+                        }
+                     )
+                  ],
+                  ~mainMapping : Relational {
+                     scope([db]sales_base)
+                     (
+                        salesDate [b] : [db]@sales_calendar,
+                        revenue : revenue
+                     )
+                  }
+               }
+            )\
+            """;
 
-    private static final String mappingWithSalesPersonDimension = "###Relational\n" +
-            "Database db \n" +
-            "(\n" +
-            "   Table sales_base (id INT PRIMARY KEY, sales_date DATE, revenue FLOAT, personID INT)\n" +
-            "   Table calendar (date DATE PRIMARY KEY, fiscal_year INT, fiscal_qtr INT, fiscal_month INT)\n" +
-            "   Table person(ID INT PRIMARY KEY, last_name VARCHAR(100))\n" +
-            "   \n" +
-            "   Table sales_by_date (sales_date DATE, net_revenue FLOAT)\n" +
-            "   Table sales_by_qtr (sales_qtr_first_date DATE, net_revenue FLOAT)\n" +
-            "   \n" +
-            "   Join sales_calendar (sales_base.sales_date = calendar.date)\n" +
-            "   Join sales_person (sales_base.personID = person.ID)\n" +
-            "   Join sales_date_calendar (sales_by_date.sales_date = calendar.date)\n" +
-            "   Join sales_qtr_calendar (sales_by_qtr.sales_qtr_first_date = calendar.date)\n" +
-            "\n" +
-            ")\n" +
-            "\n" +
-            "###Mapping\n" +
-            "Mapping map\n" +
-            "(\n" +
-            "   FiscalCalendar [b] : Relational {\n" +
-            "      scope([db]calendar)\n" +
-            "      (\n" +
-            "         date : date,\n" +
-            "         fiscalYear : fiscal_year,\n" +
-            "         fiscalQtr : fiscal_qtr,\n" +
-            "         fiscalMonth : fiscal_month\n" +
-            "      )\n" +
-            "   }\n" +
-            "   \n" +
-            "   Person [c] : Relational {\n" +
-            "      scope([db]person)\n" +
-            "      (\n" +
-            "         lastName: last_name\n" +
-            "      )\n" +
-            "   }\n" +
-            "   \n" +
-            "   Sales [a] : AggregationAware {\n" +
-            "      Views : [\n" +
-            "         (\n" +
-            "            ~modelOperation : {\n" +
-            "               ~canAggregate true,\n" +
-            "               ~groupByFunctions (\n" +
-            "                  $this.salesDate\n" +
-            "               ),\n" +
-            "               ~aggregateValues (\n" +
-            "                  ( ~mapFn: $this.revenue, ~aggregateFn: $mapped->sum() )\n" +
-            "               )\n" +
-            "            },\n" +
-            "            ~aggregateMapping : Relational {\n" +
-            "               scope([db]sales_by_date)\n" +
-            "               (\n" +
-            "                  salesDate [b] : [db]@sales_date_calendar,\n" +
-            "                  salesPerson [p] : [db]@sales_date_calendar,\n" +
-            "                  revenue : net_revenue\n" +
-            "               )\n" +
-            "            }\n" +
-            "         )\n" +
-            "      ],\n" +
-            "      ~mainMapping : Relational {\n" +
-            "         scope([db]sales_base)\n" +
-            "         (\n" +
-            "            salesDate [b] : [db]@sales_calendar,\n" +
-            "            revenue : revenue\n" +
-            "         )\n" +
-            "      }\n" +
-            "   }\n" +
-            ")";
+    private static final String mappingWithSalesPersonDimension = """
+            ###Relational
+            Database db\s
+            (
+               Table sales_base (id INT PRIMARY KEY, sales_date DATE, revenue FLOAT, personID INT)
+               Table calendar (date DATE PRIMARY KEY, fiscal_year INT, fiscal_qtr INT, fiscal_month INT)
+               Table person(ID INT PRIMARY KEY, last_name VARCHAR(100))
+              \s
+               Table sales_by_date (sales_date DATE, net_revenue FLOAT)
+               Table sales_by_qtr (sales_qtr_first_date DATE, net_revenue FLOAT)
+              \s
+               Join sales_calendar (sales_base.sales_date = calendar.date)
+               Join sales_person (sales_base.personID = person.ID)
+               Join sales_date_calendar (sales_by_date.sales_date = calendar.date)
+               Join sales_qtr_calendar (sales_by_qtr.sales_qtr_first_date = calendar.date)
+            
+            )
+            
+            ###Mapping
+            Mapping map
+            (
+               FiscalCalendar [b] : Relational {
+                  scope([db]calendar)
+                  (
+                     date : date,
+                     fiscalYear : fiscal_year,
+                     fiscalQtr : fiscal_qtr,
+                     fiscalMonth : fiscal_month
+                  )
+               }
+              \s
+               Person [c] : Relational {
+                  scope([db]person)
+                  (
+                     lastName: last_name
+                  )
+               }
+              \s
+               Sales [a] : AggregationAware {
+                  Views : [
+                     (
+                        ~modelOperation : {
+                           ~canAggregate true,
+                           ~groupByFunctions (
+                              $this.salesDate
+                           ),
+                           ~aggregateValues (
+                              ( ~mapFn: $this.revenue, ~aggregateFn: $mapped->sum() )
+                           )
+                        },
+                        ~aggregateMapping : Relational {
+                           scope([db]sales_by_date)
+                           (
+                              salesDate [b] : [db]@sales_date_calendar,
+                              salesPerson [p] : [db]@sales_date_calendar,
+                              revenue : net_revenue
+                           )
+                        }
+                     )
+                  ],
+                  ~mainMapping : Relational {
+                     scope([db]sales_base)
+                     (
+                        salesDate [b] : [db]@sales_calendar,
+                        revenue : revenue
+                     )
+                  }
+               }
+            )\
+            """;
 
-    private static final String mappingWithFunction = "###Relational\n" +
-            "Database db \n" +
-            "(\n" +
-            "   Table sales_base (id INT PRIMARY KEY, sales_date DATE, revenue FLOAT)\n" +
-            "   Table calendar (date DATE PRIMARY KEY, fiscal_year INT, fiscal_qtr INT, fiscal_month INT)\n" +
-            "   \n" +
-            "   Table sales_by_date (sales_date DATE, net_revenue FLOAT)\n" +
-            "   Table sales_by_qtr (sales_qtr_first_date DATE, net_revenue FLOAT)\n" +
-            "   \n" +
-            "   Join sales_calendar (sales_base.sales_date = calendar.date)\n" +
-            "   Join sales_date_calendar (sales_by_date.sales_date = calendar.date)\n" +
-            "   Join sales_qtr_calendar (sales_by_qtr.sales_qtr_first_date = calendar.date)\n" +
-            "\n" +
-            ")\n" +
-            "\n" +
-            "###Mapping\n" +
-            "Mapping map\n" +
-            "(\n" +
-            "   FiscalCalendar [b] : Relational {\n" +
-            "      scope([db]calendar)\n" +
-            "      (\n" +
-            "         date : date,\n" +
-            "         fiscalYear : fiscal_year,\n" +
-            "         fiscalQtr : fiscal_qtr,\n" +
-            "         fiscalMonth : fiscal_month\n" +
-            "      )\n" +
-            "   }\n" +
-            "   \n" +
-            "   Sales [a] : AggregationAware {\n" +
-            "      Views : [\n" +
-            "         (\n" +
-            "            ~modelOperation : {\n" +
-            "               ~canAggregate true,\n" +
-            "               ~groupByFunctions (\n" +
-            "                  $this.salesDate->myFunction()\n" +
-            "               ),\n" +
-            "               ~aggregateValues (\n" +
-            "                  ( ~mapFn: $this.revenue, ~aggregateFn: $mapped->sum() )\n" +
-            "               )\n" +
-            "            },\n" +
-            "            ~aggregateMapping : Relational {\n" +
-            "               scope([db]sales_by_date)\n" +
-            "               (\n" +
-            "                  salesDate [b] : [db]@sales_date_calendar,\n" +
-            "                  revenue : net_revenue\n" +
-            "               )\n" +
-            "            }\n" +
-            "         )\n" +
-            "      ],\n" +
-            "      ~mainMapping : Relational {\n" +
-            "         scope([db]sales_base)\n" +
-            "         (\n" +
-            "            salesDate [b] : [db]@sales_calendar,\n" +
-            "            revenue : revenue\n" +
-            "         )\n" +
-            "      }\n" +
-            "   }\n" +
-            ")";
+    private static final String mappingWithFunction = """
+            ###Relational
+            Database db\s
+            (
+               Table sales_base (id INT PRIMARY KEY, sales_date DATE, revenue FLOAT)
+               Table calendar (date DATE PRIMARY KEY, fiscal_year INT, fiscal_qtr INT, fiscal_month INT)
+              \s
+               Table sales_by_date (sales_date DATE, net_revenue FLOAT)
+               Table sales_by_qtr (sales_qtr_first_date DATE, net_revenue FLOAT)
+              \s
+               Join sales_calendar (sales_base.sales_date = calendar.date)
+               Join sales_date_calendar (sales_by_date.sales_date = calendar.date)
+               Join sales_qtr_calendar (sales_by_qtr.sales_qtr_first_date = calendar.date)
+            
+            )
+            
+            ###Mapping
+            Mapping map
+            (
+               FiscalCalendar [b] : Relational {
+                  scope([db]calendar)
+                  (
+                     date : date,
+                     fiscalYear : fiscal_year,
+                     fiscalQtr : fiscal_qtr,
+                     fiscalMonth : fiscal_month
+                  )
+               }
+              \s
+               Sales [a] : AggregationAware {
+                  Views : [
+                     (
+                        ~modelOperation : {
+                           ~canAggregate true,
+                           ~groupByFunctions (
+                              $this.salesDate->myFunction()
+                           ),
+                           ~aggregateValues (
+                              ( ~mapFn: $this.revenue, ~aggregateFn: $mapped->sum() )
+                           )
+                        },
+                        ~aggregateMapping : Relational {
+                           scope([db]sales_by_date)
+                           (
+                              salesDate [b] : [db]@sales_date_calendar,
+                              revenue : net_revenue
+                           )
+                        }
+                     )
+                  ],
+                  ~mainMapping : Relational {
+                     scope([db]sales_base)
+                     (
+                        salesDate [b] : [db]@sales_calendar,
+                        revenue : revenue
+                     )
+                  }
+               }
+            )\
+            """;
 
     private static final String function = "function myFunction(d: FiscalCalendar[1]) : FiscalCalendar[1] {$d}";
 

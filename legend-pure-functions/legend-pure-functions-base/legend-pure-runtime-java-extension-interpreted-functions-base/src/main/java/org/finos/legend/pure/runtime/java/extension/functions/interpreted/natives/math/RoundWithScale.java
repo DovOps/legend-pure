@@ -53,7 +53,7 @@ public class RoundWithScale extends NativeFunction
         CoreInstance number = Instance.getValueForMetaPropertyToOneResolved(params.get(0), M3Properties.values, processorSupport);
         CoreInstance scale = Instance.getValueForMetaPropertyToOneResolved(params.get(1), M3Properties.values, processorSupport);
 
-        BigDecimal decimal = number instanceof DecimalCoreInstance ? ((DecimalCoreInstance)number).getValue() : ((FloatCoreInstance)number).getValue();
+        BigDecimal decimal = number instanceof DecimalCoreInstance dci ? dci.getValue() : ((FloatCoreInstance)number).getValue();
         BigDecimal result = decimal.setScale(((IntegerCoreInstance)scale).getValue().intValue(), RoundingMode.HALF_UP);
 
         return NumericUtilities.toPureNumberValueExpression(result, number instanceof DecimalCoreInstance, this.repository, processorSupport);

@@ -21,10 +21,10 @@ import org.finos.legend.pure.m2.ds.mapping.test.AbstractPureMappingTestWithCoreC
 import org.finos.legend.pure.m3.tests.RuntimeTestScriptBuilder;
 import org.finos.legend.pure.m3.tests.RuntimeVerifier;
 import org.finos.legend.pure.m4.exception.PureCompilationException;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestPureRuntimeEnumerationMapping extends AbstractPureMappingTestWithCoreCompiled
 {
@@ -34,38 +34,44 @@ public class TestPureRuntimeEnumerationMapping extends AbstractPureMappingTestWi
     private static final String TEST_ENUMERATION_MAPPING_SOURCE_ID = "testMapping.pure";
 
     private static final ImmutableMap<String, String> TEST_SOURCES = Maps.immutable.with(TEST_ENUM_MODEL_SOURCE_ID,
-            "Enum test::EmployeeType\n" +
-                    "{\n" +
-                    "    CONTRACT,\n" +
-                    "    FULL_TIME\n" +
-                    "}",
+            """
+            Enum test::EmployeeType
+            {
+                CONTRACT,
+                FULL_TIME
+            }\
+            """,
             TEST_ENUMERATION_MAPPING_SOURCE_ID,
-            "###Mapping\n" +
-                    "Mapping test::employeeTestMapping\n" +
-                    "(\n" +
-                    "\n" +
-                    "    test::EmployeeType: EnumerationMapping Foo\n" +
-                    "    {\n" +
-                    "        CONTRACT:  ['FTC', 'FTO'],\n" +
-                    "        FULL_TIME: 'FTE'\n" +
-                    "    }\n" +
-                    ")\n"
+            """
+            ###Mapping
+            Mapping test::employeeTestMapping
+            (
+            
+                test::EmployeeType: EnumerationMapping Foo
+                {
+                    CONTRACT:  ['FTC', 'FTO'],
+                    FULL_TIME: 'FTE'
+                }
+            )
+            """
     );
 
     private static final ImmutableMap<String, String> TEST_SOURCES_WITH_TYPO = Maps.immutable.with(TEST_ENUM_MODEL_SOURCE_ID,
-            "Enum test::EmployeeType\n" +
-                    "{\n" +
-                    "    CONTRCAT,\n" + //This is the TYPO
-                    "    FULL_TIME\n" +
-                    "}");
+            """
+            Enum test::EmployeeType
+            {
+                CONTRCAT,
+                FULL_TIME
+            }\
+            """);
 
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime();
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete(TEST_ENUM_MODEL_SOURCE_ID);
@@ -87,7 +93,7 @@ public class TestPureRuntimeEnumerationMapping extends AbstractPureMappingTestWi
             {
                 runtime.createInMemoryAndCompile(TEST_SOURCES_WITH_TYPO);
                 runtime.compile();
-                Assert.fail("Expected compilation exception on iteration #" + i);
+                Assertions.fail("Expected compilation exception on iteration #" + i);
             }
             catch (Exception e)
             {
@@ -99,7 +105,7 @@ public class TestPureRuntimeEnumerationMapping extends AbstractPureMappingTestWi
             runtime.delete(TEST_ENUM_MODEL_SOURCE_ID);
             runtime.createInMemoryAndCompile(Tuples.pair(TEST_ENUM_MODEL_SOURCE_ID, TEST_SOURCES.get(TEST_ENUM_MODEL_SOURCE_ID)));
             runtime.compile();
-            Assert.assertEquals("Graph size mismatch at iteration #" + i, size, repository.serialize().length);
+            Assertions.assertEquals(size, repository.serialize().length, "Graph size mismatch at iteration #" + i);
         }
     }
 
@@ -115,7 +121,7 @@ public class TestPureRuntimeEnumerationMapping extends AbstractPureMappingTestWi
             try
             {
                 runtime.compile();
-                Assert.fail("Expected compilation exception on iteration #" + i);
+                Assertions.fail("Expected compilation exception on iteration #" + i);
             }
             catch (Exception e)
             {
@@ -124,7 +130,7 @@ public class TestPureRuntimeEnumerationMapping extends AbstractPureMappingTestWi
 
             runtime.createInMemoryAndCompile(Tuples.pair(TEST_ENUM_MODEL_SOURCE_ID, TEST_SOURCES.get(TEST_ENUM_MODEL_SOURCE_ID)));
             runtime.compile();
-            Assert.assertEquals("Graph size mismatch at iteration #" + i, size, repository.serialize().length);
+            Assertions.assertEquals(size, repository.serialize().length, "Graph size mismatch at iteration #" + i);
         }
     }
 
@@ -140,31 +146,33 @@ public class TestPureRuntimeEnumerationMapping extends AbstractPureMappingTestWi
             runtime.createInMemoryAndCompile(Tuples.pair(TEST_ENUMERATION_MAPPING_SOURCE_ID, TEST_SOURCES.get(TEST_ENUMERATION_MAPPING_SOURCE_ID)));
             runtime.delete(TEST_ENUMERATION_MAPPING_SOURCE_ID);
             runtime.compile();
-            Assert.assertEquals("Graph size mismatch at iteration #" + i, size, repository.serialize().length);
+            Assertions.assertEquals(size, repository.serialize().length, "Graph size mismatch at iteration #" + i);
         }
     }
 
     @Test
     public void testDuplicateError() throws Exception
     {
-        runtime.createInMemorySource(TEST_ENUMERATION_MAPPING_SOURCE_ID, "Enum OK {e_true,e_false}\n" +
-                "###Mapping\n" +
-                "Mapping myMap1(\n" +
-                "    OK: EnumerationMapping Foo\n" +
-                "    {\n" +
-                "        e_true:  ['FTC', 'FTO'],\n" +
-                "        e_false: 'FTE'\n" +
-                "    }\n" +
-                "    OK: EnumerationMapping Foo\n" +
-                "    {\n" +
-                "        e_true:  ['FTC', 'FTO'],\n" +
-                "        e_false: 'FTE'\n" +
-                "    }\n" +
-                ")\n");
+        runtime.createInMemorySource(TEST_ENUMERATION_MAPPING_SOURCE_ID, """
+                Enum OK {e_true,e_false}
+                ###Mapping
+                Mapping myMap1(
+                    OK: EnumerationMapping Foo
+                    {
+                        e_true:  ['FTC', 'FTO'],
+                        e_false: 'FTE'
+                    }
+                    OK: EnumerationMapping Foo
+                    {
+                        e_true:  ['FTC', 'FTO'],
+                        e_false: 'FTE'
+                    }
+                )
+                """);
         try
         {
             runtime.compile();
-            Assert.fail();
+            Assertions.fail();
         }
         catch (Exception e)
         {
@@ -175,36 +183,42 @@ public class TestPureRuntimeEnumerationMapping extends AbstractPureMappingTestWi
     @Test
     public void testStabilityOnDeletionForSimpleEumToEnumMapping()
     {
-        String modelCode = "###Pure\n" +
-                "\n" +
-                "Enum my::SourceEnum\n" +
-                "{\n" +
-                "   A, B\n" +
-                "}\n" +
-                "\n" +
-                "Enum my::TargetEnum\n" +
-                "{\n" +
-                "   X, Y\n" +
-                "}\n";
+        String modelCode = """
+                ###Pure
+                
+                Enum my::SourceEnum
+                {
+                   A, B
+                }
+                
+                Enum my::TargetEnum
+                {
+                   X, Y
+                }
+                """;
 
-        String mappingCode = "###Mapping\n" +
-                "import my::*;\n" +
-                "\n" +
-                "Mapping my::TestMapping\n" +
-                "(\n" +
-                "   TargetEnum : EnumerationMapping\n" +
-                "   {\n" +
-                "      X : SourceEnum.A,\n" +
-                "      Y : my::SourceEnum.B\n" +
-                "   }\n" +
-                ")\n";
+        String mappingCode = """
+                ###Mapping
+                import my::*;
+                
+                Mapping my::TestMapping
+                (
+                   TargetEnum : EnumerationMapping
+                   {
+                      X : SourceEnum.A,
+                      Y : my::SourceEnum.B
+                   }
+                )
+                """;
 
-        String updatedModelCode = "###Pure\n" +
-                "\n" +
-                "Enum my::TargetEnum\n" +
-                "{\n" +
-                "   X, Y\n" +
-                "}\n";
+        String updatedModelCode = """
+                ###Pure
+                
+                Enum my::TargetEnum
+                {
+                   X, Y
+                }
+                """;
 
         RuntimeVerifier.verifyOperationIsStable(
                 new RuntimeTestScriptBuilder()
@@ -225,41 +239,47 @@ public class TestPureRuntimeEnumerationMapping extends AbstractPureMappingTestWi
     @Test
     public void testStabilityOnUpdationForSimpleEumToEnumMapping()
     {
-        String modelCode = "###Pure\n" +
-                "\n" +
-                "Enum my::SourceEnum\n" +
-                "{\n" +
-                "   A, B\n" +
-                "}\n" +
-                "\n" +
-                "Enum my::TargetEnum\n" +
-                "{\n" +
-                "   X, Y\n" +
-                "}\n";
+        String modelCode = """
+                ###Pure
+                
+                Enum my::SourceEnum
+                {
+                   A, B
+                }
+                
+                Enum my::TargetEnum
+                {
+                   X, Y
+                }
+                """;
 
-        String mappingCode = "###Mapping\n" +
-                "import my::*;\n" +
-                "\n" +
-                "Mapping my::TestMapping\n" +
-                "(\n" +
-                "   TargetEnum : EnumerationMapping\n" +
-                "   {\n" +
-                "      X : SourceEnum.A,\n" +
-                "      Y : my::SourceEnum.B\n" +
-                "   }\n" +
-                ")\n";
+        String mappingCode = """
+                ###Mapping
+                import my::*;
+                
+                Mapping my::TestMapping
+                (
+                   TargetEnum : EnumerationMapping
+                   {
+                      X : SourceEnum.A,
+                      Y : my::SourceEnum.B
+                   }
+                )
+                """;
 
-        String updatedModelCode = "###Pure\n" +
-                "\n" +
-                "Enum my::SourceEnum\n" +
-                "{\n" +
-                "   A\n" +
-                "}\n" +
-                "\n" +
-                "Enum my::TargetEnum\n" +
-                "{\n" +
-                "   X, Y\n" +
-                "}\n";
+        String updatedModelCode = """
+                ###Pure
+                
+                Enum my::SourceEnum
+                {
+                   A
+                }
+                
+                Enum my::TargetEnum
+                {
+                   X, Y
+                }
+                """;
 
         RuntimeVerifier.verifyOperationIsStable(
                 new RuntimeTestScriptBuilder()
@@ -280,36 +300,42 @@ public class TestPureRuntimeEnumerationMapping extends AbstractPureMappingTestWi
     @Test
     public void testStabilityOnDeletionForComplexEumToEnumMapping()
     {
-        String modelCode = "###Pure\n" +
-                "\n" +
-                "Enum my::SourceEnum\n" +
-                "{\n" +
-                "   A, B, C\n" +
-                "}\n" +
-                "\n" +
-                "Enum my::TargetEnum\n" +
-                "{\n" +
-                "   X, Y\n" +
-                "}\n";
+        String modelCode = """
+                ###Pure
+                
+                Enum my::SourceEnum
+                {
+                   A, B, C
+                }
+                
+                Enum my::TargetEnum
+                {
+                   X, Y
+                }
+                """;
 
-        String mappingCode = "###Mapping\n" +
-                "import my::*;\n" +
-                "\n" +
-                "Mapping my::TestMapping\n" +
-                "(\n" +
-                "   TargetEnum : EnumerationMapping\n" +
-                "   {\n" +
-                "      X : SourceEnum.A,\n" +
-                "      Y : [SourceEnum.B, my::SourceEnum.C]\n" +
-                "   }\n" +
-                ")\n";
+        String mappingCode = """
+                ###Mapping
+                import my::*;
+                
+                Mapping my::TestMapping
+                (
+                   TargetEnum : EnumerationMapping
+                   {
+                      X : SourceEnum.A,
+                      Y : [SourceEnum.B, my::SourceEnum.C]
+                   }
+                )
+                """;
 
-        String updatedModelCode = "###Pure\n" +
-                "\n" +
-                "Enum my::TargetEnum\n" +
-                "{\n" +
-                "   X, Y\n" +
-                "}\n";
+        String updatedModelCode = """
+                ###Pure
+                
+                Enum my::TargetEnum
+                {
+                   X, Y
+                }
+                """;
 
         RuntimeVerifier.verifyOperationIsStable(
                 new RuntimeTestScriptBuilder()
@@ -330,41 +356,47 @@ public class TestPureRuntimeEnumerationMapping extends AbstractPureMappingTestWi
     @Test
     public void testStabilityOnUpdationForComplexEumToEnumMapping()
     {
-        String modelCode = "###Pure\n" +
-                "\n" +
-                "Enum my::SourceEnum\n" +
-                "{\n" +
-                "   A, B, C\n" +
-                "}\n" +
-                "\n" +
-                "Enum my::TargetEnum\n" +
-                "{\n" +
-                "   X, Y\n" +
-                "}\n";
+        String modelCode = """
+                ###Pure
+                
+                Enum my::SourceEnum
+                {
+                   A, B, C
+                }
+                
+                Enum my::TargetEnum
+                {
+                   X, Y
+                }
+                """;
 
-        String mappingCode = "###Mapping\n" +
-                "import my::*;\n" +
-                "\n" +
-                "Mapping my::TestMapping\n" +
-                "(\n" +
-                "   TargetEnum : EnumerationMapping\n" +
-                "   {\n" +
-                "      X : SourceEnum.A,\n" +
-                "      Y : [SourceEnum.B, my::SourceEnum.C]\n" +
-                "   }\n" +
-                ")\n";
+        String mappingCode = """
+                ###Mapping
+                import my::*;
+                
+                Mapping my::TestMapping
+                (
+                   TargetEnum : EnumerationMapping
+                   {
+                      X : SourceEnum.A,
+                      Y : [SourceEnum.B, my::SourceEnum.C]
+                   }
+                )
+                """;
 
-        String updatedModelCode = "###Pure\n" +
-                "\n" +
-                "Enum my::SourceEnum\n" +
-                "{\n" +
-                "   A, B\n" +
-                "}\n" +
-                "\n" +
-                "Enum my::TargetEnum\n" +
-                "{\n" +
-                "   X, Y\n" +
-                "}\n";
+        String updatedModelCode = """
+                ###Pure
+                
+                Enum my::SourceEnum
+                {
+                   A, B
+                }
+                
+                Enum my::TargetEnum
+                {
+                   X, Y
+                }
+                """;
 
         RuntimeVerifier.verifyOperationIsStable(
                 new RuntimeTestScriptBuilder()
@@ -385,52 +417,58 @@ public class TestPureRuntimeEnumerationMapping extends AbstractPureMappingTestWi
     @Test
     public void testStabilityOnDeletionForHybridEumToEnumMapping()
     {
-        String modelCode = "###Pure\n" +
-                "\n" +
-                "Enum my::SourceEnum1\n" +
-                "{\n" +
-                "   A, B, C, D\n" +
-                "}\n" +
-                "\n" +
-                "Enum my::SourceEnum2\n" +
-                "{\n" +
-                "   P, Q, R, S\n" +
-                "}\n" +
-                "\n" +
-                "Enum my::TargetEnum\n" +
-                "{\n" +
-                "   U, V, W, X, Y, Z\n" +
-                "}\n" +
-                "\n";
+        String modelCode = """
+                ###Pure
+                
+                Enum my::SourceEnum1
+                {
+                   A, B, C, D
+                }
+                
+                Enum my::SourceEnum2
+                {
+                   P, Q, R, S
+                }
+                
+                Enum my::TargetEnum
+                {
+                   U, V, W, X, Y, Z
+                }
+                
+                """;
 
-        String mappingCode = "###Mapping\n" +
-                "import my::*;\n" +
-                "\n" +
-                "Mapping my::TestMapping\n" +
-                "(\n" +
-                "   TargetEnum : EnumerationMapping\n" +
-                "   {\n" +
-                "      U : SourceEnum2.P,\n" +
-                "      V : my::SourceEnum2.P,\n" +
-                "      W : [SourceEnum2.P, my::SourceEnum2.Q],\n" +
-                "      X : [my::SourceEnum2.P, SourceEnum2.Q, SourceEnum2.S],\n" +
-                "      Y : [SourceEnum2.R, SourceEnum2.S, SourceEnum2.Q],\n" +
-                "      Z : SourceEnum2.Q\n" +
-                "   }\n" +
-                ")";
+        String mappingCode = """
+                ###Mapping
+                import my::*;
+                
+                Mapping my::TestMapping
+                (
+                   TargetEnum : EnumerationMapping
+                   {
+                      U : SourceEnum2.P,
+                      V : my::SourceEnum2.P,
+                      W : [SourceEnum2.P, my::SourceEnum2.Q],
+                      X : [my::SourceEnum2.P, SourceEnum2.Q, SourceEnum2.S],
+                      Y : [SourceEnum2.R, SourceEnum2.S, SourceEnum2.Q],
+                      Z : SourceEnum2.Q
+                   }
+                )\
+                """;
 
-        String updatedModelCode = "###Pure\n" +
-                "\n" +
-                "Enum my::SourceEnum1\n" +
-                "{\n" +
-                "   A, B, C, D\n" +
-                "}\n" +
-                "\n" +
-                "Enum my::TargetEnum\n" +
-                "{\n" +
-                "   U, V, W, X, Y, Z\n" +
-                "}\n" +
-                "\n";
+        String updatedModelCode = """
+                ###Pure
+                
+                Enum my::SourceEnum1
+                {
+                   A, B, C, D
+                }
+                
+                Enum my::TargetEnum
+                {
+                   U, V, W, X, Y, Z
+                }
+                
+                """;
 
         RuntimeVerifier.verifyOperationIsStable(
                 new RuntimeTestScriptBuilder()
@@ -451,57 +489,63 @@ public class TestPureRuntimeEnumerationMapping extends AbstractPureMappingTestWi
     @Test
     public void testStabilityOnUpdationForHybridEumToEnumMapping()
     {
-        String modelCode = "###Pure\n" +
-                "\n" +
-                "Enum my::SourceEnum1\n" +
-                "{\n" +
-                "   A, B, C, D\n" +
-                "}\n" +
-                "\n" +
-                "Enum my::SourceEnum2\n" +
-                "{\n" +
-                "   P, Q, R, S\n" +
-                "}\n" +
-                "\n" +
-                "Enum my::TargetEnum\n" +
-                "{\n" +
-                "   U, V, W, X, Y, Z\n" +
-                "}\n" +
-                "\n";
+        String modelCode = """
+                ###Pure
+                
+                Enum my::SourceEnum1
+                {
+                   A, B, C, D
+                }
+                
+                Enum my::SourceEnum2
+                {
+                   P, Q, R, S
+                }
+                
+                Enum my::TargetEnum
+                {
+                   U, V, W, X, Y, Z
+                }
+                
+                """;
 
-        String mappingCode = "###Mapping\n" +
-                "import my::*;\n" +
-                "\n" +
-                "Mapping my::TestMapping\n" +
-                "(\n" +
-                "   TargetEnum : EnumerationMapping\n" +
-                "   {\n" +
-                "      U : my::SourceEnum2.P,\n" +
-                "      V : SourceEnum2.P,\n" +
-                "      W : [SourceEnum2.P, my::SourceEnum2.Q],\n" +
-                "      X : [my::SourceEnum2.P, SourceEnum2.Q],\n" +
-                "      Y : [SourceEnum2.R, SourceEnum2.Q, SourceEnum2.P],\n" +
-                "      Z : SourceEnum2.P\n" +
-                "   }\n" +
-                ")";
+        String mappingCode = """
+                ###Mapping
+                import my::*;
+                
+                Mapping my::TestMapping
+                (
+                   TargetEnum : EnumerationMapping
+                   {
+                      U : my::SourceEnum2.P,
+                      V : SourceEnum2.P,
+                      W : [SourceEnum2.P, my::SourceEnum2.Q],
+                      X : [my::SourceEnum2.P, SourceEnum2.Q],
+                      Y : [SourceEnum2.R, SourceEnum2.Q, SourceEnum2.P],
+                      Z : SourceEnum2.P
+                   }
+                )\
+                """;
 
-        String updatedModelCode = "###Pure\n" +
-                "\n" +
-                "Enum my::SourceEnum1\n" +
-                "{\n" +
-                "   A, B, C\n" +
-                "}\n" +
-                "\n" +
-                "Enum my::SourceEnum2\n" +
-                "{\n" +
-                "   P, Q\n" +
-                "}\n" +
-                "\n" +
-                "Enum my::TargetEnum\n" +
-                "{\n" +
-                "   U, V, W, X, Y, Z\n" +
-                "}\n" +
-                "\n";
+        String updatedModelCode = """
+                ###Pure
+                
+                Enum my::SourceEnum1
+                {
+                   A, B, C
+                }
+                
+                Enum my::SourceEnum2
+                {
+                   P, Q
+                }
+                
+                Enum my::TargetEnum
+                {
+                   U, V, W, X, Y, Z
+                }
+                
+                """;
 
         RuntimeVerifier.verifyOperationIsStable(
                 new RuntimeTestScriptBuilder()

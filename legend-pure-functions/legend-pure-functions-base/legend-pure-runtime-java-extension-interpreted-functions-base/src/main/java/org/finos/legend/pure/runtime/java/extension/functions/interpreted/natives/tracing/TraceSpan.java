@@ -219,7 +219,7 @@ public class TraceSpan extends NativeFunction
             }
             if (span != null)
             {
-                span.setTag("Exception", String.format("Unable to resolve tags - [%s]", e.getMessage()));
+                span.setTag("Exception", "Unable to resolve tags - [%s]".formatted(e.getMessage()));
             }
         }
     }

@@ -19,198 +19,219 @@ import org.eclipse.collections.api.factory.Maps;
 import org.finos.legend.pure.m2.relational.AbstractPureRelationalTestWithCoreCompiled;
 import org.finos.legend.pure.m3.tests.RuntimeTestScriptBuilder;
 import org.finos.legend.pure.m3.tests.RuntimeVerifier;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class TestPureRuntimeInlineEmbeddedMapping extends AbstractPureRelationalTestWithCoreCompiled
 {
-    private static final String INITIAL_DATA = "import other::*;\n" +
-            "Class other::Person\n" +
-            "{\n" +
-            "    name:String[1];\n" +
-            "    firm:Firm[1];\n" +
-            "}\n" +
-            "Class other::Address\n" +
-            "{\n" +
-            "    name:String[1];\n" +
-            "}\n" +
-            "Class other::Firm\n" +
-            "{\n" +
-            "    legalName:String[1];\n" +
-            "}\n";
+    private static final String INITIAL_DATA = """
+            import other::*;
+            Class other::Person
+            {
+                name:String[1];
+                firm:Firm[1];
+            }
+            Class other::Address
+            {
+                name:String[1];
+            }
+            Class other::Firm
+            {
+                legalName:String[1];
+            }
+            """;
 
 
     private static final String STORE =
-            "###Relational\n" +
-                    "Database mapping::db(\n" +
-                    "   Table employeeFirmDenormTable\n" +
-                    "   (\n" +
-                    "    id INT PRIMARY KEY,\n" +
-                    "    name VARCHAR(200),\n" +
-                    "    firmId INT,\n" +
-                    "    legalName VARCHAR(200),\n" +
-                    "    address1 VARCHAR(200),\n" +
-                    "    postcode VARCHAR(10)\n" +
-                    "   )\n" +
-                    ")\n";
+            """
+            ###Relational
+            Database mapping::db(
+               Table employeeFirmDenormTable
+               (
+                id INT PRIMARY KEY,
+                name VARCHAR(200),
+                firmId INT,
+                legalName VARCHAR(200),
+                address1 VARCHAR(200),
+                postcode VARCHAR(10)
+               )
+            )
+            """;
 
 
     private static final String INITIAL_MAPPING =
-            "###Mapping\n" +
-                    "import other::*;\n" +
-                    "import mapping::*;\n" +
-                    "Mapping mappingPackage::myMapping\n" +
-                    "(\n" +
-                    "    Firm[firm1]: Relational\n" +
-                    "    {\n" +
-                    "       legalName : [db]employeeFirmDenormTable.name\n" +
-                    "    }\n" +
-                    "    Person[alias1]: Relational\n" +
-                    "    {\n" +
-                    "        name : [db]employeeFirmDenormTable.name,\n" +
-                    "        firm(\n" +
-                    "        ) Inline [firm1] \n" +
-                    "    }\n" +
-                    ")\n";
+            """
+            ###Mapping
+            import other::*;
+            import mapping::*;
+            Mapping mappingPackage::myMapping
+            (
+                Firm[firm1]: Relational
+                {
+                   legalName : [db]employeeFirmDenormTable.name
+                }
+                Person[alias1]: Relational
+                {
+                    name : [db]employeeFirmDenormTable.name,
+                    firm(
+                    ) Inline [firm1]\s
+                }
+            )
+            """;
 
     private static final String MAPPING_INVALID_INLINE =
-            "###Mapping\n" +
-                    "import other::*;\n" +
-                    "import mapping::*;\n" +
-                    "Mapping mappingPackage::myMapping\n" +
-                    "(\n" +
-                    "    Firm[firm1]: Relational\n" +
-                    "    {\n" +
-                    "       legalName : [db]employeeFirmDenormTable.name\n" +
-                    "    }\n" +
-                    "    Person[alias1]: Relational\n" +
-                    "    {\n" +
-                    "        name : [db]employeeFirmDenormTable.name,\n" +
-                    "        firm(\n" +
-                    "        ) Inline [firm2] \n" +
-                    "    }\n" +
-                    ")\n";
+            """
+            ###Mapping
+            import other::*;
+            import mapping::*;
+            Mapping mappingPackage::myMapping
+            (
+                Firm[firm1]: Relational
+                {
+                   legalName : [db]employeeFirmDenormTable.name
+                }
+                Person[alias1]: Relational
+                {
+                    name : [db]employeeFirmDenormTable.name,
+                    firm(
+                    ) Inline [firm2]\s
+                }
+            )
+            """;
 
     private static final String MAPPING_DELETED1_INLINE =
-            "###Mapping\n" +
-                    "import other::*;\n" +
-                    "import mapping::*;\n" +
-                    "Mapping mappingPackage::myMapping\n" +
-                    "(\n" +
-                    "    Person[alias1]: Relational\n" +
-                    "    {\n" +
-                    "        name : [db]employeeFirmDenormTable.name\n" +
-                    "    }\n" +
-                    ")\n";
+            """
+            ###Mapping
+            import other::*;
+            import mapping::*;
+            Mapping mappingPackage::myMapping
+            (
+                Person[alias1]: Relational
+                {
+                    name : [db]employeeFirmDenormTable.name
+                }
+            )
+            """;
 
     private static final String MAPPING_DELETED_INLINE =
-            "###Mapping\n" +
-                    "import other::*;\n" +
-                    "import mapping::*;\n" +
-                    "Mapping mappingPackage::myMapping\n" +
-                    "(\n" +
-                    "    Person[alias1]: Relational\n" +
-                    "    {\n" +
-                    "        name : [db]employeeFirmDenormTable.name,\n" +
-                    "        firm () Inline[firm1] \n" +
-                    "    }\n" +
-                    ")\n";
+            """
+            ###Mapping
+            import other::*;
+            import mapping::*;
+            Mapping mappingPackage::myMapping
+            (
+                Person[alias1]: Relational
+                {
+                    name : [db]employeeFirmDenormTable.name,
+                    firm () Inline[firm1]\s
+                }
+            )
+            """;
 
     private static final String MAPPING_EMPTY_INLINE =
-            "###Mapping\n" +
-                    "import other::*;\n" +
-                    "import mapping::*;\n" +
-                    "Mapping mappingPackage::myMapping\n" +
-                    "(\n" +
-                    "    Firm[firm1]: Relational\n" +
-                    "    {\n" +
-                    "       legalName : [db]employeeFirmDenormTable.name\n" +
-                    "    }\n" +
-                    "    Person[alias1]: Relational\n" +
-                    "    {\n" +
-                    "        name : [db]employeeFirmDenormTable.name,\n" +
-                    "        firm(\n" +
-                    "        ) Inline [] \n" +
-                    "    }\n" +
-                    ")\n";
+            """
+            ###Mapping
+            import other::*;
+            import mapping::*;
+            Mapping mappingPackage::myMapping
+            (
+                Firm[firm1]: Relational
+                {
+                   legalName : [db]employeeFirmDenormTable.name
+                }
+                Person[alias1]: Relational
+                {
+                    name : [db]employeeFirmDenormTable.name,
+                    firm(
+                    ) Inline []\s
+                }
+            )
+            """;
 
     private static final String MAPPING_REMOVE_INLINE_KEYWORD =
-            "###Mapping\n" +
-                    "import other::*;\n" +
-                    "import mapping::*;\n" +
-                    "Mapping mappingPackage::myMapping\n" +
-                    "(\n" +
-                    "    Firm[firm1]: Relational\n" +
-                    "    {\n" +
-                    "       legalName : [db]employeeFirmDenormTable.name\n" +
-                    "    }\n" +
-                    "    Person[alias1]: Relational\n" +
-                    "    {\n" +
-                    "        name : [db]employeeFirmDenormTable.name,\n" +
-                    "        firm(\n" +
-                    "        )\n" +
-                    "    }\n" +
-                    ")\n";
+            """
+            ###Mapping
+            import other::*;
+            import mapping::*;
+            Mapping mappingPackage::myMapping
+            (
+                Firm[firm1]: Relational
+                {
+                   legalName : [db]employeeFirmDenormTable.name
+                }
+                Person[alias1]: Relational
+                {
+                    name : [db]employeeFirmDenormTable.name,
+                    firm(
+                    )
+                }
+            )
+            """;
 
 
     private static final String MAPPING_CHANGE_INLINE_SETID =
-            "###Mapping\n" +
-                    "import other::*;\n" +
-                    "import mapping::*;\n" +
-                    "Mapping mappingPackage::myMapping\n" +
-                    "(\n" +
-                    "    Firm[firmNew]: Relational\n" +
-                    "    {\n" +
-                    "       legalName : [db]employeeFirmDenormTable.name\n" +
-                    "    }\n" +
-                    "    Person[alias1]: Relational\n" +
-                    "    {\n" +
-                    "        name : [db]employeeFirmDenormTable.name,\n" +
-                    "        firm(\n" +
-                    "        ) Inline [firm1] \n" +
-                    "    }\n" +
-                    ")\n";
+            """
+            ###Mapping
+            import other::*;
+            import mapping::*;
+            Mapping mappingPackage::myMapping
+            (
+                Firm[firmNew]: Relational
+                {
+                   legalName : [db]employeeFirmDenormTable.name
+                }
+                Person[alias1]: Relational
+                {
+                    name : [db]employeeFirmDenormTable.name,
+                    firm(
+                    ) Inline [firm1]\s
+                }
+            )
+            """;
 
     private static final String INITIAL_MAPPING_CHANGE_TO_EMBEDDED =
-            "###Mapping\n" +
-                    "import other::*;\n" +
-                    "import mapping::*;\n" +
-                    "Mapping mappingPackage::myMapping\n" +
-                    "(\n" +
-
-                    "    Firm[firm1]: Relational\n" +
-                    "    {\n" +
-                    "       legalName : [db]employeeFirmDenormTable.name\n" +
-                    "    }\n" +
-                    "    Person[alias1]: Relational\n" +
-                    "    {\n" +
-                    "        name : [db]employeeFirmDenormTable.name,\n" +
-                    "        firm(\n" +
-                    "            legalName : [db]employeeFirmDenormTable.legalName" +
-                    "        )  \n" +
-                    "    }\n" +
-                    ")\n";
+            """
+###Mapping
+import other::*;
+import mapping::*;
+Mapping mappingPackage::myMapping
+(
+    Firm[firm1]: Relational
+    {
+       legalName : [db]employeeFirmDenormTable.name
+    }
+    Person[alias1]: Relational
+    {
+        name : [db]employeeFirmDenormTable.name,
+        firm(
+            legalName : [db]employeeFirmDenormTable.legalName\
+        ) \s
+    }
+)
+""";
 
     private static final String MAPPING_INVALID_TARGET_TYPE =
-            "###Mapping\n" +
-                    "import other::*;\n" +
-                    "import mapping::*;\n" +
-                    "Mapping mappingPackage::myMapping\n" +
-                    "(\n" +
-                    "    Address[address1]: Relational\n" +
-                    "    {\n" +
-                    "       name : [db]employeeFirmDenormTable.address1\n" +
-                    "    }\n" +
-                    "    Firm[firm1]: Relational\n" +
-                    "    {\n" +
-                    "       legalName : [db]employeeFirmDenormTable.name\n" +
-                    "    }\n" +
-                    "    Person[alias1]: Relational\n" +
-                    "    {\n" +
-                    "        name : [db]employeeFirmDenormTable.name,\n" +
-                    "        firm(\n" +
-                    "        ) Inline [address1] \n" +
-                    "    }\n" +
-                    ")\n";
+            """
+            ###Mapping
+            import other::*;
+            import mapping::*;
+            Mapping mappingPackage::myMapping
+            (
+                Address[address1]: Relational
+                {
+                   name : [db]employeeFirmDenormTable.address1
+                }
+                Firm[firm1]: Relational
+                {
+                   legalName : [db]employeeFirmDenormTable.name
+                }
+                Person[alias1]: Relational
+                {
+                    name : [db]employeeFirmDenormTable.name,
+                    firm(
+                    ) Inline [address1]\s
+                }
+            )
+            """;
 
 
     @Test

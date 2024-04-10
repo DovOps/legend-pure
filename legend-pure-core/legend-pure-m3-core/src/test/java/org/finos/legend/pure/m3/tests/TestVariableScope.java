@@ -17,20 +17,20 @@ package org.finos.legend.pure.m3.tests;
 import org.finos.legend.pure.m4.coreinstance.SourceInformation;
 import org.finos.legend.pure.m4.exception.PureCompilationException;
 import org.finos.legend.pure.m4.exception.PureException;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestVariableScope extends AbstractPureTestWithCoreCompiledPlatform
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getExtra());
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("fromString.pure");
@@ -41,12 +41,14 @@ public class TestVariableScope extends AbstractPureTestWithCoreCompiledPlatform
     {
         try
         {
-            compileTestSource("fromString.pure", "function test():Integer[1]\n" +
-                    "{\n" +
-                    "    let a = 5;\n" +
-                    "    let a = 8;\n" +
-                    "}");
-            Assert.fail();
+            compileTestSource("fromString.pure", """
+                    function test():Integer[1]
+                    {
+                        let a = 5;
+                        let a = 8;
+                    }\
+                    """);
+            Assertions.fail();
         }
         catch (Exception e)
         {
@@ -59,11 +61,13 @@ public class TestVariableScope extends AbstractPureTestWithCoreCompiledPlatform
     {
         try
         {
-            compileTestSource("fromString.pure", "function func(s:String[1]):String[1]\n" +
-                    "{\n" +
-                    "    let s = 'New';\n" +
-                    "}");
-            Assert.fail();
+            compileTestSource("fromString.pure", """
+                    function func(s:String[1]):String[1]
+                    {
+                        let s = 'New';
+                    }\
+                    """);
+            Assertions.fail();
         }
         catch (Exception e)
         {
@@ -76,23 +80,25 @@ public class TestVariableScope extends AbstractPureTestWithCoreCompiledPlatform
     {
         try
         {
-            compileTestSource("function testUnknownVariable():Nil[0]\n" +
-                    "{\n" +
-                    "    print($var);\n" +
-                    "}\n");
-            Assert.fail();
+            compileTestSource("""
+                    function testUnknownVariable():Nil[0]
+                    {
+                        print($var);
+                    }
+                    """);
+            Assertions.fail();
         }
         catch (Exception e)
         {
             PureException pe = PureException.findPureException(e);
-            Assert.assertNotNull(pe);
-            Assert.assertTrue(pe instanceof PureCompilationException);
-            Assert.assertEquals("The variable 'var' is unknown!", pe.getInfo());
+            Assertions.assertNotNull(pe);
+            Assertions.assertTrue(pe instanceof PureCompilationException);
+            Assertions.assertEquals("The variable 'var' is unknown!", pe.getInfo());
 
             SourceInformation sourceInfo = pe.getSourceInformation();
-            Assert.assertNotNull(sourceInfo);
-            Assert.assertEquals(3, sourceInfo.getLine());
-            Assert.assertEquals(12, sourceInfo.getColumn());
+            Assertions.assertNotNull(sourceInfo);
+            Assertions.assertEquals(3, sourceInfo.getLine());
+            Assertions.assertEquals(12, sourceInfo.getColumn());
         }
     }
 }

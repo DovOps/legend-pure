@@ -23,20 +23,20 @@ import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
 import org.finos.legend.pure.runtime.java.compiled.execution.FunctionExecutionCompiledBuilder;
 import org.finos.legend.pure.runtime.java.compiled.factory.JavaModelFactoryRegistryLoader;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestNilTypeCompiled extends AbstractPureTestWithCoreCompiled
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getFunctionExecution(), JavaModelFactoryRegistryLoader.loader());
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("fromString.pure");
@@ -45,10 +45,12 @@ public class TestNilTypeCompiled extends AbstractPureTestWithCoreCompiled
     @Test
     public void testNilCastToIntegerReturnValueMany() throws Exception
     {
-        compileTestSource("fromString.pure", "function test::testFn1():Integer[*]\n" +
-                "{\n" +
-                "    []\n" +
-                "}\n");
+        compileTestSource("fromString.pure", """
+                function test::testFn1():Integer[*]
+                {
+                    []
+                }
+                """);
 
         this.assertNilType(this.execute("test::testFn1():Integer[*]"));
     }
@@ -56,10 +58,12 @@ public class TestNilTypeCompiled extends AbstractPureTestWithCoreCompiled
     @Test
     public void testNilCastToIntegerReturnValueZeroOne() throws Exception
     {
-        compileTestSource("fromString.pure", "function test::testFn2():Integer[0..1]\n" +
-                "{\n" +
-                "    []\n" +
-                "}\n");
+        compileTestSource("fromString.pure", """
+                function test::testFn2():Integer[0..1]
+                {
+                    []
+                }
+                """);
 
         this.assertNilType(this.execute("test::testFn2():Integer[0..1]"));
     }
@@ -67,11 +71,13 @@ public class TestNilTypeCompiled extends AbstractPureTestWithCoreCompiled
     @Test
     public void testNilVariableCastToStringReturnValueMany() throws Exception
     {
-        compileTestSource("fromString.pure", "function test::testFn3():String[*]\n" +
-                "{\n" +
-                "    let x = [];\n" +
-                "    $x;\n" +
-                "}\n");
+        compileTestSource("fromString.pure", """
+                function test::testFn3():String[*]
+                {
+                    let x = [];
+                    $x;
+                }
+                """);
 
         this.assertNilType(this.execute("test::testFn3():String[*]"));
     }
@@ -79,11 +85,13 @@ public class TestNilTypeCompiled extends AbstractPureTestWithCoreCompiled
     @Test
     public void testNilVariableCastToStringReturnValueZeroOne() throws Exception
     {
-        compileTestSource("fromString.pure", "function test::testFn4():String[0..1]\n" +
-                "{\n" +
-                "    let x = [];\n" +
-                "    $x;\n" +
-                "}\n");
+        compileTestSource("fromString.pure", """
+                function test::testFn4():String[0..1]
+                {
+                    let x = [];
+                    $x;
+                }
+                """);
 
         this.assertNilType(this.execute("test::testFn4():String[0..1]"));
     }
@@ -91,15 +99,17 @@ public class TestNilTypeCompiled extends AbstractPureTestWithCoreCompiled
     @Test
     public void testNilAsStringParamMany() throws Exception
     {
-        compileTestSource("fromString.pure", "function test::testHelper1(strings:String[*]):String[1]\n" +
-                "{\n" +
-                "    joinStrings($strings, '')\n" +
-                "}\n" +
-                "\n" +
-                "function test::testFn5():String[1]\n" +
-                "{\n" +
-                "    test::testHelper1([])\n" +
-                "}\n");
+        compileTestSource("fromString.pure", """
+                function test::testHelper1(strings:String[*]):String[1]
+                {
+                    joinStrings($strings, '')
+                }
+                
+                function test::testFn5():String[1]
+                {
+                    test::testHelper1([])
+                }
+                """);
 
         this.assertValue("", this.execute("test::testFn5():String[1]"));
     }
@@ -107,16 +117,18 @@ public class TestNilTypeCompiled extends AbstractPureTestWithCoreCompiled
     @Test
     public void testNilVariableAsIntegerParamMany() throws Exception
     {
-        compileTestSource("fromString.pure", "function test::testHelper2(nums:Integer[*]):Integer[1]\n" +
-                "{\n" +
-                "    plus($nums)\n" +
-                "}\n" +
-                "\n" +
-                "function test::testFn6():Integer[1]\n" +
-                "{\n" +
-                "    let x = [];\n" +
-                "    test::testHelper2($x);\n" +
-                "}\n");
+        compileTestSource("fromString.pure", """
+                function test::testHelper2(nums:Integer[*]):Integer[1]
+                {
+                    plus($nums)
+                }
+                
+                function test::testFn6():Integer[1]
+                {
+                    let x = [];
+                    test::testHelper2($x);
+                }
+                """);
 
         this.assertValue(0L, this.execute("test::testFn6():Integer[1]"));
     }
@@ -124,15 +136,17 @@ public class TestNilTypeCompiled extends AbstractPureTestWithCoreCompiled
     @Test
     public void testNilAsPairParamZeroOne() throws Exception
     {
-        compileTestSource("fromString.pure", "function test::testHelper3(y:Pair<Integer,Any>[0..1]):Integer[1]\n" +
-                "{\n" +
-                "    if($y->isEmpty(), |7, |$y->toOne().first)\n" +
-                "}\n" +
-                "\n" +
-                "function test::testFn7():Integer[1]\n" +
-                "{\n" +
-                "    test::testHelper3([])\n" +
-                "}\n");
+        compileTestSource("fromString.pure", """
+                function test::testHelper3(y:Pair<Integer,Any>[0..1]):Integer[1]
+                {
+                    if($y->isEmpty(), |7, |$y->toOne().first)
+                }
+                
+                function test::testFn7():Integer[1]
+                {
+                    test::testHelper3([])
+                }
+                """);
 
         this.assertValue(7L, this.execute("test::testFn7():Integer[1]"));
     }
@@ -140,16 +154,18 @@ public class TestNilTypeCompiled extends AbstractPureTestWithCoreCompiled
     @Test
     public void testNilVariableAsPairParamZeroOne() throws Exception
     {
-        compileTestSource("fromString.pure", "function test::testHelper3(y:Pair<Integer,Any>[0..1]):Integer[1]\n" +
-                "{\n" +
-                "    if($y->isEmpty(), |7, |$y->toOne().first)\n" +
-                "}\n" +
-                "\n" +
-                "function test::testFn8():Integer[1]\n" +
-                "{\n" +
-                "    let x = [];\n" +
-                "    test::testHelper3($x);\n" +
-                "}\n");
+        compileTestSource("fromString.pure", """
+                function test::testHelper3(y:Pair<Integer,Any>[0..1]):Integer[1]
+                {
+                    if($y->isEmpty(), |7, |$y->toOne().first)
+                }
+                
+                function test::testFn8():Integer[1]
+                {
+                    let x = [];
+                    test::testHelper3($x);
+                }
+                """);
 
         this.assertValue(7L, this.execute("test::testFn8():Integer[1]"));
     }
@@ -157,45 +173,48 @@ public class TestNilTypeCompiled extends AbstractPureTestWithCoreCompiled
     @Test
     public void testNilVariableAsParam() throws Exception
     {
-        compileTestSource("fromString.pure", "function test::testHelper1(strings:String[*]):String[1]\n" +
-                "{\n" +
-                "    joinStrings($strings, '')\n" +
-                "}\n" +
-                "\n" +
-                "function test::testHelper2(nums:Integer[*]):Integer[1]\n" +
-                "{\n" +
-                "    plus($nums)\n" +
-                "}\n" +
-                "" +
-                "function meta::pure::functions::collection::pair<U,V>(first:U[1], second:V[1]):Pair<U,V>[1]\n" +
-                "{\n" +
-                "   ^Pair<U,V>(first=$first, second=$second);\n" +
-                "}\n" +
-                "function test::testFn9():Pair<Number,String>[1]\n" +
-                "{\n" +
-                "    let x = [];\n" +
-                "    let y = test::testHelper2($x);\n" +
-                "    let z = test::testHelper1($x);\n" +
-                "    pair($y, $z);\n" +
-                "}\n");
+        compileTestSource("fromString.pure", """
+                function test::testHelper1(strings:String[*]):String[1]
+                {
+                    joinStrings($strings, '')
+                }
+                
+                function test::testHelper2(nums:Integer[*]):Integer[1]
+                {
+                    plus($nums)
+                }
+                function meta::pure::functions::collection::pair<U,V>(first:U[1], second:V[1]):Pair<U,V>[1]
+                {
+                   ^Pair<U,V>(first=$first, second=$second);
+                }
+                function test::testFn9():Pair<Number,String>[1]
+                {
+                    let x = [];
+                    let y = test::testHelper2($x);
+                    let z = test::testHelper1($x);
+                    pair($y, $z);
+                }
+                """);
         Pair resultPair = (Pair) Iterate.getFirst(((InstanceValue) this.execute("test::testFn9():Pair[1]"))._values());
-        Assert.assertEquals(0L, resultPair._first());
-        Assert.assertEquals("", resultPair._second());
+        Assertions.assertEquals(0L, resultPair._first());
+        Assertions.assertEquals("", resultPair._second());
     }
 
     @Test
     public void testNilTypeAsReturnValue() throws Exception
     {
-        compileTestSource("fromString.pure", "function test::testHelper4(strings:String[*]): Nil[0]\n" +
-                "{\n" +
-                "   [];\n" +
-                "}\n" +
-                "\n" +
-                "function test::testFn10():String[0..1]\n" +
-                "{\n" +
-                "   let x = [];\n" +
-                "   test::testHelper4($x);\n" +
-                "}\n");
+        compileTestSource("fromString.pure", """
+                function test::testHelper4(strings:String[*]): Nil[0]
+                {
+                   [];
+                }
+                
+                function test::testFn10():String[0..1]
+                {
+                   let x = [];
+                   test::testHelper4($x);
+                }
+                """);
 
         this.assertNilType(this.execute("test::testFn10():String[0..1]"));
     }
@@ -203,11 +222,13 @@ public class TestNilTypeCompiled extends AbstractPureTestWithCoreCompiled
     @Test
     public void testNilWithAddInMap() throws Exception
     {
-        compileTestSource("fromString.pure", "function test::testFn():String[1]\n" +
-                "{\n" +
-                "  let dummy = [];\n" +
-                "  ['a', 'b', 'c', 'd']->map(s | add($dummy, $s))->joinStrings(', ');\n" +
-                "}\n");
+        compileTestSource("fromString.pure", """
+                function test::testFn():String[1]
+                {
+                  let dummy = [];
+                  ['a', 'b', 'c', 'd']->map(s | add($dummy, $s))->joinStrings(', ');
+                }
+                """);
         assertValue("a, b, c, d", this.execute("test::testFn():String[1]"));
     }
 
@@ -218,11 +239,11 @@ public class TestNilTypeCompiled extends AbstractPureTestWithCoreCompiled
 
     private void assertNilType(CoreInstance instance)
     {
-        Assert.assertTrue(this.processorSupport.valueSpecification_instanceOf(instance, M3Paths.Nil));
+        Assertions.assertTrue(this.processorSupport.valueSpecification_instanceOf(instance, M3Paths.Nil));
     }
 
     private void assertValue(Object expected, CoreInstance instance)
     {
-        Assert.assertEquals(expected, Iterate.getFirst(((InstanceValue) instance)._values()));
+        Assertions.assertEquals(expected, Iterate.getFirst(((InstanceValue) instance)._values()));
     }
 }

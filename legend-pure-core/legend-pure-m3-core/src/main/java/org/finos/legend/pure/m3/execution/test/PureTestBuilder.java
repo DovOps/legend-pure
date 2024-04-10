@@ -15,7 +15,6 @@
 package org.finos.legend.pure.m3.execution.test;
 
 import junit.framework.Test;
-import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import org.eclipse.collections.api.RichIterable;
 import org.eclipse.collections.api.factory.Lists;
@@ -26,9 +25,12 @@ import org.finos.legend.pure.m3.navigation.Instance;
 import org.finos.legend.pure.m3.navigation.M3Properties;
 import org.finos.legend.pure.m3.navigation.ProcessorSupport;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
-import org.junit.Ignore;
+import org.junit.Assert;
+import org.junit.jupiter.api.Disabled;
 
 import java.util.Comparator;
+
+import static org.junit.jupiter.api.Assertions.super;
 
 public class PureTestBuilder
 {
@@ -72,8 +74,8 @@ public class PureTestBuilder
         return suite;
     }
 
-    @Ignore
-    public static class PureTestCase extends TestCase
+    @Disabled
+    public static class PureTestCase extends Assert
     {
         CoreInstance coreInstance;
         Object param;

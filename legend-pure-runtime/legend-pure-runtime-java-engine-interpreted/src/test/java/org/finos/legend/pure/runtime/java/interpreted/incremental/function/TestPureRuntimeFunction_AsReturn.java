@@ -18,20 +18,20 @@ import org.finos.legend.pure.m3.execution.FunctionExecution;
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
 import org.finos.legend.pure.m4.exception.PureCompilationException;
 import org.finos.legend.pure.runtime.java.interpreted.FunctionExecutionInterpreted;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestPureRuntimeFunction_AsReturn extends AbstractPureTestWithCoreCompiled
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getFunctionExecution());
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("sourceId.pure");
@@ -42,11 +42,13 @@ public class TestPureRuntimeFunction_AsReturn extends AbstractPureTestWithCoreCo
     public void testPureRuntimeFunctionAsReturn() throws Exception
     {
         runtime.createInMemorySource("sourceId.pure", "function sourceFunction():String[1]{'theFunc'}");
-        runtime.createInMemorySource("userId.pure", "function test():Function<{->String[1]}>[1]{sourceFunction__String_1_}" +
-                "function go():Nil[0]{print(test()->eval(),1)}\n");
+        runtime.createInMemorySource("userId.pure", """
+                function test():Function<{->String[1]}>[1]{sourceFunction__String_1_}\
+                function go():Nil[0]{print(test()->eval(),1)}
+                """);
         this.compileAndExecute("go():Nil[0]");
         int size = runtime.getModelRepository().serialize().length;
-        Assert.assertEquals("'theFunc'", functionExecution.getConsole().getLine(0));
+        Assertions.assertEquals("'theFunc'", functionExecution.getConsole().getLine(0));
 
         for (int i = 0; i < 10; i++)
         {
@@ -54,7 +56,7 @@ public class TestPureRuntimeFunction_AsReturn extends AbstractPureTestWithCoreCo
             try
             {
                 runtime.compile();
-                Assert.fail();
+                Assertions.fail();
             }
             catch (Exception e)
             {
@@ -63,12 +65,12 @@ public class TestPureRuntimeFunction_AsReturn extends AbstractPureTestWithCoreCo
 
             runtime.createInMemorySource("sourceId.pure", "function sourceFunction():String[1]{'the New Func!'}");
             this.compileAndExecute("go():Nil[0]");
-            Assert.assertEquals("'the New Func!'", functionExecution.getConsole().getLine(0));
+            Assertions.assertEquals("'the New Func!'", functionExecution.getConsole().getLine(0));
         }
         runtime.delete("sourceId.pure");
         runtime.createInMemorySource("sourceId.pure", "function sourceFunction():String[1]{'theFunc'}");
         runtime.compile();
-        Assert.assertEquals("Graph size mismatch", size, repository.serialize().length);
+        Assertions.assertEquals(size, repository.serialize().length, "Graph size mismatch");
     }
 
 
@@ -76,11 +78,13 @@ public class TestPureRuntimeFunction_AsReturn extends AbstractPureTestWithCoreCo
     public void testPureRuntimeFunctionAsReturnWithError() throws Exception
     {
         runtime.createInMemorySource("sourceId.pure", "function sourceFunction():String[1]{'theFunc'}");
-        runtime.createInMemorySource("userId.pure", "function test():Function<{->String[1]}>[1]{sourceFunction__String_1_}" +
-                "function go():Nil[0]{print(test()->eval(),1)}\n");
+        runtime.createInMemorySource("userId.pure", """
+                function test():Function<{->String[1]}>[1]{sourceFunction__String_1_}\
+                function go():Nil[0]{print(test()->eval(),1)}
+                """);
         this.compileAndExecute("go():Nil[0]");
         int size = runtime.getModelRepository().serialize().length;
-        Assert.assertEquals("'theFunc'", functionExecution.getConsole().getLine(0));
+        Assertions.assertEquals("'theFunc'", functionExecution.getConsole().getLine(0));
 
         for (int i = 0; i < 10; i++)
         {
@@ -88,7 +92,7 @@ public class TestPureRuntimeFunction_AsReturn extends AbstractPureTestWithCoreCo
             try
             {
                 runtime.compile();
-                Assert.fail();
+                Assertions.fail();
             }
             catch (Exception e)
             {
@@ -99,7 +103,7 @@ public class TestPureRuntimeFunction_AsReturn extends AbstractPureTestWithCoreCo
             {
                 runtime.createInMemorySource("sourceId.pure", "function sourceFunction():Integer[1]{1}");
                 runtime.compile();
-                Assert.fail();
+                Assertions.fail();
             }
             catch (Exception e)
             {
@@ -108,7 +112,7 @@ public class TestPureRuntimeFunction_AsReturn extends AbstractPureTestWithCoreCo
         }
         runtime.modify("sourceId.pure", "function sourceFunction():String[1]{'theFunc'}");
         runtime.compile();
-        Assert.assertEquals("Graph size mismatch", size, repository.serialize().length);
+        Assertions.assertEquals(size, repository.serialize().length, "Graph size mismatch");
     }
 
     protected static FunctionExecution getFunctionExecution()

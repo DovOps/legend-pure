@@ -28,9 +28,9 @@ import org.eclipse.collections.impl.tuple.Tuples;
 import org.eclipse.collections.impl.utility.LazyIterate;
 import org.finos.legend.pure.m2.relational.AbstractPureRelationalTestWithCoreCompiled;
 import org.finos.legend.pure.m4.exception.PureCompilationException;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class TestPureRuntimeMappingStoreSubstitution extends AbstractPureRelationalTestWithCoreCompiled
 {
@@ -51,86 +51,100 @@ public class TestPureRuntimeMappingStoreSubstitution extends AbstractPureRelatio
 
     private MutableMap<String, String> sources = Maps.mutable.empty();
 
-    @Before
+    @BeforeEach
     public void setUp()
     {
         this.sources.put(MODEL_SOURCE_ID,
-                "import test::*;\n" +
-                        "\n" +
-                        "Class test::Person\n" +
-                        "{\n" +
-                        "   name:String[1];\n" +
-                        "}\n" +
-                        "\n" +
-                        "Class test::Firm\n" +
-                        "{\n" +
-                        "   name:String[1];\n" +
-                        "}\n" +
-                        "\n" +
-                        "Association test::Employment\n" +
-                        "{\n" +
-                        "   employer:Firm[0..1];" +
-                        "   employees:Person[*];\n" +
-                        "}");
+                """
+                import test::*;
+                
+                Class test::Person
+                {
+                   name:String[1];
+                }
+                
+                Class test::Firm
+                {
+                   name:String[1];
+                }
+                
+                Association test::Employment
+                {
+                   employer:Firm[0..1];\
+                   employees:Person[*];
+                }\
+                """);
         this.sources.put(PERSON_STORE_SOURCE_ID,
-                "###Relational\n" +
-                        "Database test::PersonDB\n" +
-                        "(\n" +
-                        "   Table personTb(name VARCHAR(200), firmId INT)\n" +
-                        ")");
+                """
+                ###Relational
+                Database test::PersonDB
+                (
+                   Table personTb(name VARCHAR(200), firmId INT)
+                )\
+                """);
         this.sources.put(FIRM_STORE_SOURCE_ID,
-                "###Relational\n" +
-                        "Database test::FirmDB\n" +
-                        "(\n" +
-                        "   Table firmTb(id INT, name VARCHAR(200))\n" +
-                        ")");
+                """
+                ###Relational
+                Database test::FirmDB
+                (
+                   Table firmTb(id INT, name VARCHAR(200))
+                )\
+                """);
         this.sources.put(FULL_STORE_SOURCE_ID,
-                "###Relational\n" +
-                        "Database test::FullDB\n" +
-                        "(\n" +
-                        "   include test::PersonDB\n" +
-                        "   include test::FirmDB\n" +
-                        "   Join Person_Firm(personTb.firmId = firmTb.id)\n" +
-                        ")");
+                """
+                ###Relational
+                Database test::FullDB
+                (
+                   include test::PersonDB
+                   include test::FirmDB
+                   Join Person_Firm(personTb.firmId = firmTb.id)
+                )\
+                """);
         this.sources.put(PERSON_MAPPING_SOURCE_ID,
-                "###Mapping\n" +
-                        "import test::*;\n" +
-                        "\n" +
-                        "Mapping test::PersonMapping\n" +
-                        "(\n" +
-                        "  Person[person] : Relational\n" +
-                        "           {\n" +
-                        "              name:[PersonDB]personTb.name\n" +
-                        "           }\n" +
-                        ")");
+                """
+                ###Mapping
+                import test::*;
+                
+                Mapping test::PersonMapping
+                (
+                  Person[person] : Relational
+                           {
+                              name:[PersonDB]personTb.name
+                           }
+                )\
+                """);
         this.sources.put(FIRM_MAPPING_SOURCE_ID,
-                "###Mapping\n" +
-                        "import test::*;\n" +
-                        "\n" +
-                        "Mapping test::FirmMapping\n" +
-                        "(\n" +
-                        "  Firm[firm] : Relational\n" +
-                        "           {\n" +
-                        "              name:[FirmDB]firmTb.name\n" +
-                        "           }\n" +
-                        ")");
+                """
+                ###Mapping
+                import test::*;
+                
+                Mapping test::FirmMapping
+                (
+                  Firm[firm] : Relational
+                           {
+                              name:[FirmDB]firmTb.name
+                           }
+                )\
+                """);
         this.sources.put(FULL_MAPPING_SOURCE_ID,
-                "###Mapping\n" +
-                        "import test::*;\n" +
-                        "\n" +
-                        "Mapping test::FullMapping\n" +
-                        "(\n" +
-                        "   include PersonMapping[PersonDB -> FullDB]\n" +
-                        "   include FirmMapping[FirmDB -> FullDB]\n" +
-                        "   Employment : Relational\n" +
-                        "                {\n" +
-                        "                   AssociationMapping\n" +
-                        "                   (\n" +
-                        "                      employer[person,firm] : [FullDB]@Person_Firm,\n" +
-                        "                      employees[firm,person] : [FullDB]@Person_Firm\n" +
-                        "                   )\n" +
-                        "                }\n" +
-                        ")");
+                """
+                ###Mapping
+                import test::*;
+                
+                Mapping test::FullMapping
+                (
+                   include PersonMapping[PersonDB -> FullDB]
+                   include FirmMapping[FirmDB -> FullDB]
+                   Employment : Relational
+                                {
+                                   AssociationMapping
+                                   (
+                                      employer[person,firm] : [FullDB]@Person_Firm,
+                                      employees[firm,person] : [FullDB]@Person_Firm
+                                   )
+                                }
+                )\
+                """);
     }
 
     @Test
@@ -142,14 +156,14 @@ public class TestPureRuntimeMappingStoreSubstitution extends AbstractPureRelatio
         for (int i = 0; i < TEST_COUNT; i++)
         {
             compileSources(MAPPING_SOURCES);
-            Assert.assertNotNull(this.runtime.getCoreInstance("test::PersonMapping"));
-            Assert.assertNotNull(this.runtime.getCoreInstance("test::FirmMapping"));
-            Assert.assertNotNull(this.runtime.getCoreInstance("test::FullMapping"));
+            Assertions.assertNotNull(this.runtime.getCoreInstance("test::PersonMapping"));
+            Assertions.assertNotNull(this.runtime.getCoreInstance("test::FirmMapping"));
+            Assertions.assertNotNull(this.runtime.getCoreInstance("test::FullMapping"));
             deleteSources(MAPPING_SOURCES);
-            Assert.assertNull(this.runtime.getCoreInstance("test::PersonMapping"));
-            Assert.assertNull(this.runtime.getCoreInstance("test::FirmMapping"));
-            Assert.assertNull(this.runtime.getCoreInstance("test::FullMapping"));
-            Assert.assertEquals("Failed on iteration #" + i, expectedSize, this.repository.serialize().length);
+            Assertions.assertNull(this.runtime.getCoreInstance("test::PersonMapping"));
+            Assertions.assertNull(this.runtime.getCoreInstance("test::FirmMapping"));
+            Assertions.assertNull(this.runtime.getCoreInstance("test::FullMapping"));
+            Assertions.assertEquals(expectedSize, this.repository.serialize().length, "Failed on iteration #" + i);
         }
     }
 
@@ -162,10 +176,10 @@ public class TestPureRuntimeMappingStoreSubstitution extends AbstractPureRelatio
         for (int i = 0; i < TEST_COUNT; i++)
         {
             compileSource(FULL_MAPPING_SOURCE_ID);
-            Assert.assertNotNull(this.runtime.getCoreInstance("test::FullMapping"));
+            Assertions.assertNotNull(this.runtime.getCoreInstance("test::FullMapping"));
             deleteSource(FULL_MAPPING_SOURCE_ID);
-            Assert.assertNull(this.runtime.getCoreInstance("test::FullMapping"));
-            Assert.assertEquals("Failed on iteration #" + i, expectedSize, this.repository.serialize().length);
+            Assertions.assertNull(this.runtime.getCoreInstance("test::FullMapping"));
+            Assertions.assertEquals(expectedSize, this.repository.serialize().length, "Failed on iteration #" + i);
         }
     }
 
@@ -180,14 +194,14 @@ public class TestPureRuntimeMappingStoreSubstitution extends AbstractPureRelatio
             try
             {
                 deleteSource(MODEL_SOURCE_ID);
-                Assert.fail("Expected compilation exception");
+                Assertions.fail("Expected compilation exception");
             }
             catch (Exception e)
             {
                 assertPureException(PureCompilationException.class, Pattern.compile("(test::)?(Person|Firm|Employment) has not been defined!"), e);
             }
             compileSource(MODEL_SOURCE_ID);
-            Assert.assertEquals("Failed on iteration #" + i, expectedSize, this.repository.serialize().length);
+            Assertions.assertEquals(expectedSize, this.repository.serialize().length, "Failed on iteration #" + i);
         }
     }
 
@@ -202,14 +216,14 @@ public class TestPureRuntimeMappingStoreSubstitution extends AbstractPureRelatio
             try
             {
                 deleteSource(PERSON_STORE_SOURCE_ID);
-                Assert.fail("Expected compilation exception");
+                Assertions.fail("Expected compilation exception");
             }
             catch (Exception e)
             {
                 assertPureException(PureCompilationException.class, Pattern.compile("(test::)?PersonDB has not been defined!"), e);
             }
             compileSource(PERSON_STORE_SOURCE_ID);
-            Assert.assertEquals("Failed on iteration #" + i, expectedSize, this.repository.serialize().length);
+            Assertions.assertEquals(expectedSize, this.repository.serialize().length, "Failed on iteration #" + i);
         }
     }
 
@@ -224,14 +238,14 @@ public class TestPureRuntimeMappingStoreSubstitution extends AbstractPureRelatio
             try
             {
                 deleteSource(FIRM_STORE_SOURCE_ID);
-                Assert.fail("Expected compilation exception");
+                Assertions.fail("Expected compilation exception");
             }
             catch (Exception e)
             {
                 assertPureException(PureCompilationException.class, Pattern.compile("(test::)?FirmDB has not been defined!"), e);
             }
             compileSource(FIRM_STORE_SOURCE_ID);
-            Assert.assertEquals("Failed on iteration #" + i, expectedSize, this.repository.serialize().length);
+            Assertions.assertEquals(expectedSize, this.repository.serialize().length, "Failed on iteration #" + i);
         }
     }
 
@@ -246,14 +260,14 @@ public class TestPureRuntimeMappingStoreSubstitution extends AbstractPureRelatio
             try
             {
                 deleteSource(FULL_STORE_SOURCE_ID);
-                Assert.fail("Expected compilation exception");
+                Assertions.fail("Expected compilation exception");
             }
             catch (Exception e)
             {
                 assertPureException(PureCompilationException.class, "FullDB has not been defined!", FULL_MAPPING_SOURCE_ID, 6, 38, e);
             }
             compileSource(FULL_STORE_SOURCE_ID);
-            Assert.assertEquals("Failed on iteration #" + i, expectedSize, this.repository.serialize().length);
+            Assertions.assertEquals(expectedSize, this.repository.serialize().length, "Failed on iteration #" + i);
         }
     }
 
@@ -268,14 +282,14 @@ public class TestPureRuntimeMappingStoreSubstitution extends AbstractPureRelatio
             try
             {
                 deleteSource(PERSON_MAPPING_SOURCE_ID);
-                Assert.fail("Expected compilation exception");
+                Assertions.fail("Expected compilation exception");
             }
             catch (Exception e)
             {
                 assertPureException(PureCompilationException.class, "PersonMapping has not been defined!", FULL_MAPPING_SOURCE_ID, 6, 12, e);
             }
             compileSource(PERSON_MAPPING_SOURCE_ID);
-            Assert.assertEquals("Failed on iteration #" + i, expectedSize, this.repository.serialize().length);
+            Assertions.assertEquals(expectedSize, this.repository.serialize().length, "Failed on iteration #" + i);
         }
     }
 
@@ -290,14 +304,14 @@ public class TestPureRuntimeMappingStoreSubstitution extends AbstractPureRelatio
             try
             {
                 deleteSource(FIRM_MAPPING_SOURCE_ID);
-                Assert.fail("Expected compilation exception");
+                Assertions.fail("Expected compilation exception");
             }
             catch (Exception e)
             {
                 assertPureException(PureCompilationException.class, "FirmMapping has not been defined!", FULL_MAPPING_SOURCE_ID, 7, 12, e);
             }
             compileSource(FIRM_MAPPING_SOURCE_ID);
-            Assert.assertEquals("Failed on iteration #" + i, expectedSize, this.repository.serialize().length);
+            Assertions.assertEquals(expectedSize, this.repository.serialize().length, "Failed on iteration #" + i);
         }
     }
 
@@ -311,7 +325,7 @@ public class TestPureRuntimeMappingStoreSubstitution extends AbstractPureRelatio
         {
             deleteSource(FULL_MAPPING_SOURCE_ID);
             compileSource(FULL_MAPPING_SOURCE_ID);
-            Assert.assertEquals("Failed on iteration #" + i, expectedSize, this.repository.serialize().length);
+            Assertions.assertEquals(expectedSize, this.repository.serialize().length, "Failed on iteration #" + i);
         }
     }
 

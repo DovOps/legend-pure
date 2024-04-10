@@ -18,13 +18,13 @@ import org.finos.legend.pure.m2.dsl.mapping.M2MappingPaths;
 import org.finos.legend.pure.m3.navigation.Instance;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
 import org.finos.legend.pure.m4.serialization.grammar.antlr.PureParserException;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestNamespaces extends AbstractPureMappingTestWithCoreCompiled
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime();
@@ -34,18 +34,22 @@ public class TestNamespaces extends AbstractPureMappingTestWithCoreCompiled
     public void testMappingNameConflict()
     {
         compileTestSource("mapping1.pure",
-                "###Mapping\n" +
-                        "Mapping test::MyMapping ()");
+                """
+                ###Mapping
+                Mapping test::MyMapping ()\
+                """);
         CoreInstance myMapping = runtime.getCoreInstance("test::MyMapping");
-        Assert.assertNotNull(myMapping);
-        Assert.assertTrue(Instance.instanceOf(myMapping, M2MappingPaths.Mapping, processorSupport));
+        Assertions.assertNotNull(myMapping);
+        Assertions.assertTrue(Instance.instanceOf(myMapping, M2MappingPaths.Mapping, processorSupport));
 
         try
         {
             compileTestSource("mapping2.pure",
-                    "###Mapping\n" +
-                            "Mapping test::MyMapping ()");
-            Assert.fail("Expected compilation error");
+                    """
+                    ###Mapping
+                    Mapping test::MyMapping ()\
+                    """);
+            Assertions.fail("Expected compilation error");
         }
         catch (Exception e)
         {

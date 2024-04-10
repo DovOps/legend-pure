@@ -44,7 +44,7 @@ public class RouteNodePropertyStubUnloaderWalk implements MatchRunner<RouteNodeP
         }
         else
         {
-            RootRouteNode rootNode = ownerNode instanceof PropertyRouteNode ? ((PropertyRouteNode)ownerNode)._root() : null;
+            RootRouteNode rootNode = ownerNode instanceof PropertyRouteNode prn ? prn._root() : null;
             if (rootNode != null)
             {
                 matcher.fullMatch(rootNode, state);

@@ -160,7 +160,7 @@ public class FunctionExpressionValidator implements MatchRunner<FunctionExpressi
                         else
                         {
                             Type type = (Type) ImportStub.withImportStubByPass(givenInstanceGenericType._rawTypeCoreInstance(), processorSupport);
-                            ListIterable<? extends TypeParameter> typeParameters = type instanceof Class ? (ListIterable<? extends TypeParameter>) ((Class) type)._typeParameters() : Lists.fixedSize.empty();
+                            ListIterable<? extends TypeParameter> typeParameters = type instanceof Class c ? (ListIterable<? extends TypeParameter>) c._typeParameters() : Lists.fixedSize.empty();
                             boolean covariant = org.finos.legend.pure.m3.navigation.typeparameter.TypeParameter.isCovariant(typeParameters.get(k));
                             Type typeArgument2 = (Type) ImportStub.withImportStubByPass(bound.get(k)._rawTypeCoreInstance(), processorSupport);
 

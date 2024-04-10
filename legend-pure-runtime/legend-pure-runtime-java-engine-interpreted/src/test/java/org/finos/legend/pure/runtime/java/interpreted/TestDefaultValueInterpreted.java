@@ -16,18 +16,18 @@ package org.finos.legend.pure.runtime.java.interpreted;
 
 import org.finos.legend.pure.m3.execution.FunctionExecution;
 import org.finos.legend.pure.m3.tests.elements.property.AbstractTestDefaultValue;
-import org.junit.After;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 
 public class TestDefaultValueInterpreted extends AbstractTestDefaultValue
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getFunctionExecution());
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("defaultValueSource.pure");

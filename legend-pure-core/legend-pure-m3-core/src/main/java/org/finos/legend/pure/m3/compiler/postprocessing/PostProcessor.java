@@ -110,9 +110,9 @@ public class PostProcessor
         // Specializations
         newInstancesConsolidated.forEach(coreInstance ->
         {
-            if (coreInstance instanceof org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.type.Type)
+            if (coreInstance instanceof org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.type.Type type)
             {
-                SpecializationProcessor.process((org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.type.Type) coreInstance, processorSupport);
+                SpecializationProcessor.process(type, processorSupport);
             }
         });
     }
@@ -124,13 +124,13 @@ public class PostProcessor
         MutableList<Association> associationProjections = Lists.mutable.empty();
         newInstancesConsolidated.forEach(i ->
         {
-            if (i instanceof AssociationProjection)
+            if (i instanceof AssociationProjection projection)
             {
-                associationProjections.add((Association) i);
+                associationProjections.add(projection);
             }
-            else if (i instanceof Association)
+            else if (i instanceof Association association)
             {
-                associations.add((Association) i);
+                associations.add(association);
             }
         });
 
@@ -141,10 +141,10 @@ public class PostProcessor
     {
         newInstancesConsolidated.forEach(instance ->
         {
-            if (instance instanceof Class)
+            if (instance instanceof Class class1)
             {
-                MilestoningClassProcessor.process((Class<?>) instance, context, processorSupport, modelRepository);
-                MilestoningPropertyProcessor.process((Class<?>) instance, context, processorSupport, modelRepository);
+                MilestoningClassProcessor.process(class1, context, processorSupport, modelRepository);
+                MilestoningPropertyProcessor.process(class1, context, processorSupport, modelRepository);
             }
         });
     }

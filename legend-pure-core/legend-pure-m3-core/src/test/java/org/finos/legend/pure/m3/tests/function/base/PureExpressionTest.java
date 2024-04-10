@@ -26,8 +26,8 @@ import org.finos.legend.pure.m4.ModelRepository;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
 import org.finos.legend.pure.m4.coreinstance.primitive.BooleanCoreInstance;
 import org.finos.legend.pure.m4.exception.PureException;
-import org.junit.After;
-import org.junit.Assert;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 
 import java.util.UUID;
 import java.util.regex.Pattern;
@@ -39,7 +39,7 @@ public abstract class PureExpressionTest extends AbstractPureTestWithCoreCompile
 {
     private final MutableList<String> sourcesToDelete = Lists.mutable.empty();
 
-    @After
+    @AfterEach
     public void deleteTestSources()
     {
         this.sourcesToDelete.forEach(runtime::delete);
@@ -53,7 +53,7 @@ public abstract class PureExpressionTest extends AbstractPureTestWithCoreCompile
 
     public void assertExpressionTrue(String message, String expression)
     {
-        Assert.assertTrue(message, evaluateBooleanExpression(expression));
+        Assertions.assertTrue(evaluateBooleanExpression(expression), message);
     }
 
     public void assertExpressionFalse(String expression)
@@ -63,36 +63,36 @@ public abstract class PureExpressionTest extends AbstractPureTestWithCoreCompile
 
     public void assertExpressionFalse(String message, String expression)
     {
-        Assert.assertFalse(message, evaluateBooleanExpression(expression));
+        Assertions.assertFalse(evaluateBooleanExpression(expression), message);
     }
 
     public void assertExpressionRaisesPureException(String expectedInfo, String expression)
     {
-        PureException e = Assert.assertThrows(PureException.class, () -> evaluateExpression(expression, "Any", true));
+        PureException e = Assertions.assertThrows(PureException.class, () -> evaluateExpression(expression, "Any", true));
         assertPureException(expectedInfo, e);
     }
 
     public void assertExpressionRaisesPureException(Pattern expectedInfo, String expression)
     {
-        PureException e = Assert.assertThrows(PureException.class, () -> evaluateExpression(expression, "Any", true));
+        PureException e = Assertions.assertThrows(PureException.class, () -> evaluateExpression(expression, "Any", true));
         assertPureException(expectedInfo, e);
     }
 
     public void assertExpressionWithManyMultiplicityReturnRaisesPureException(String expectedInfo, int expectedLine, int expectedColumn, String expression)
     {
-        PureException e = Assert.assertThrows(PureException.class, () -> evaluateExpression(expression, "Any", false));
+        PureException e = Assertions.assertThrows(PureException.class, () -> evaluateExpression(expression, "Any", false));
         assertPureException(expectedInfo, expectedLine, expectedColumn, e);
     }
 
     public void assertExpressionRaisesPureException(String expectedInfo, int expectedLine, int expectedColumn, String expression)
     {
-        PureException e = Assert.assertThrows(PureException.class, () -> evaluateExpression(expression, "Any", true));
+        PureException e = Assertions.assertThrows(PureException.class, () -> evaluateExpression(expression, "Any", true));
         assertPureException(expectedInfo, expectedLine, expectedColumn, e);
     }
 
     public void assertExpressionRaisesPureException(Pattern expectedInfo, int expectedLine, int expectedColumn, String expression)
     {
-        PureException e = Assert.assertThrows(PureException.class, () -> evaluateExpression(expression, "Any", true));
+        PureException e = Assertions.assertThrows(PureException.class, () -> evaluateExpression(expression, "Any", true));
         assertPureException(expectedInfo, expectedLine, expectedColumn, e);
     }
 
@@ -105,9 +105,9 @@ public abstract class PureExpressionTest extends AbstractPureTestWithCoreCompile
     private boolean evaluateBooleanExpression(String expression)
     {
         CoreInstance value = (CoreInstance) evaluateExpression(expression, M3Paths.Boolean, true);
-        if (value instanceof BooleanCoreInstance)
+        if (value instanceof BooleanCoreInstance instance)
         {
-            return ((BooleanCoreInstance) value).getValue();
+            return instance.getValue();
         }
 
         String valueName = value.getName();

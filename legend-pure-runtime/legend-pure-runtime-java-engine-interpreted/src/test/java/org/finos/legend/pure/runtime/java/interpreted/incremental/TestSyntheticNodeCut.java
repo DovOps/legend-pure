@@ -19,20 +19,20 @@ import org.finos.legend.pure.m3.navigation.M3Properties;
 import org.finos.legend.pure.m3.execution.FunctionExecution;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
 import org.finos.legend.pure.runtime.java.interpreted.FunctionExecutionInterpreted;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestSyntheticNodeCut extends AbstractPureTestWithCoreCompiled
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getFunctionExecution());
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("testSource.pure");
@@ -41,233 +41,241 @@ public class TestSyntheticNodeCut extends AbstractPureTestWithCoreCompiled
     @Test
     public void testEnsurePropertySourceTypeIsNotResolved()
     {
-        compileTestSource("testSource.pure", "Class A{name:String[1];}\n" +
-                "function\n" +
-                "   {doc.doc = 'Get the property with the given name from the given class. Note that this searches only properties defined directly on the class, not those inherited from super-classes or those which come from associations.'}\n" +
-                "   meta::pure::functions::meta::classPropertyByName(class:Class<Any>[1], name:String[1]):Property<Nil,Any|*>[0..1]\n" +
-                "{\n" +
-                "    $class.properties->filter(p | $p.name == $name)->first()\n" +
-                "}\n" +
-                "function test():Nil[0]\n" +
-                "{\n" +
-                "    print(A->classPropertyByName('name'),10);\n" +
-                "}\n");
+        compileTestSource("testSource.pure", """
+                Class A{name:String[1];}
+                function
+                   {doc.doc = 'Get the property with the given name from the given class. Note that this searches only properties defined directly on the class, not those inherited from super-classes or those which come from associations.'}
+                   meta::pure::functions::meta::classPropertyByName(class:Class<Any>[1], name:String[1]):Property<Nil,Any|*>[0..1]
+                {
+                    $class.properties->filter(p | $p.name == $name)->first()
+                }
+                function test():Nil[0]
+                {
+                    print(A->classPropertyByName('name'),10);
+                }
+                """);
         execute("test():Nil[0]");
-        Assert.assertEquals("name instance Property\n" +
-                "    aggregation(Property):\n" +
-                "        None instance AggregationKind\n" +
-                "            name(Property):\n" +
-                "                None instance String\n" +
-                "    classifierGenericType(Property):\n" +
-                "        Anonymous_StripedId instance GenericType\n" +
-                "            multiplicityArguments(Property):\n" +
-                "                [X] PureOne instance PackageableMultiplicity\n" +
-                "            rawType(Property):\n" +
-                "                [X] Property instance Class\n" +
-                "            referenceUsages(Property):\n" +
-                "                Anonymous_StripedId instance ReferenceUsage\n" +
-                "                    offset(Property):\n" +
-                "                        0 instance Integer\n" +
-                "                    owner(Property):\n" +
-                "                        [_] name instance Property\n" +
-                "                    propertyName(Property):\n" +
-                "                        classifierGenericType instance String\n" +
-                "            typeArguments(Property):\n" +
-                "                Anonymous_StripedId instance GenericType\n" +
-                "                    rawType(Property):\n" +
-                "                        [~>] A instance Class\n" +
-                "                    referenceUsages(Property):\n" +
-                "                        Anonymous_StripedId instance ReferenceUsage\n" +
-                "                            offset(Property):\n" +
-                "                                0 instance Integer\n" +
-                "                            owner(Property):\n" +
-                "                                [_] Anonymous_StripedId instance GenericType\n" +
-                "                            propertyName(Property):\n" +
-                "                                typeArguments instance String\n" +
-                "                Anonymous_StripedId instance GenericType\n" +
-                "                    rawType(Property):\n" +
-                "                        [X] String instance PrimitiveType\n" +
-                "                    referenceUsages(Property):\n" +
-                "                        Anonymous_StripedId instance ReferenceUsage\n" +
-                "                            offset(Property):\n" +
-                "                                1 instance Integer\n" +
-                "                            owner(Property):\n" +
-                "                                [_] Anonymous_StripedId instance GenericType\n" +
-                "                            propertyName(Property):\n" +
-                "                                typeArguments instance String\n" +
-                "    genericType(Property):\n" +
-                "        Anonymous_StripedId instance GenericType\n" +
-                "            rawType(Property):\n" +
-                "                [X] String instance PrimitiveType\n" +
-                "    multiplicity(Property):\n" +
-                "        [X] PureOne instance PackageableMultiplicity\n" +
-                "    name(Property):\n" +
-                "        name instance String\n" +
-                "    owner(Property):\n" +
-                "        [X] A instance Class", functionExecution.getConsole().getLine(0));
+        Assertions.assertEquals("""
+                name instance Property
+                    aggregation(Property):
+                        None instance AggregationKind
+                            name(Property):
+                                None instance String
+                    classifierGenericType(Property):
+                        Anonymous_StripedId instance GenericType
+                            multiplicityArguments(Property):
+                                [X] PureOne instance PackageableMultiplicity
+                            rawType(Property):
+                                [X] Property instance Class
+                            referenceUsages(Property):
+                                Anonymous_StripedId instance ReferenceUsage
+                                    offset(Property):
+                                        0 instance Integer
+                                    owner(Property):
+                                        [_] name instance Property
+                                    propertyName(Property):
+                                        classifierGenericType instance String
+                            typeArguments(Property):
+                                Anonymous_StripedId instance GenericType
+                                    rawType(Property):
+                                        [~>] A instance Class
+                                    referenceUsages(Property):
+                                        Anonymous_StripedId instance ReferenceUsage
+                                            offset(Property):
+                                                0 instance Integer
+                                            owner(Property):
+                                                [_] Anonymous_StripedId instance GenericType
+                                            propertyName(Property):
+                                                typeArguments instance String
+                                Anonymous_StripedId instance GenericType
+                                    rawType(Property):
+                                        [X] String instance PrimitiveType
+                                    referenceUsages(Property):
+                                        Anonymous_StripedId instance ReferenceUsage
+                                            offset(Property):
+                                                1 instance Integer
+                                            owner(Property):
+                                                [_] Anonymous_StripedId instance GenericType
+                                            propertyName(Property):
+                                                typeArguments instance String
+                    genericType(Property):
+                        Anonymous_StripedId instance GenericType
+                            rawType(Property):
+                                [X] String instance PrimitiveType
+                    multiplicity(Property):
+                        [X] PureOne instance PackageableMultiplicity
+                    name(Property):
+                        name instance String
+                    owner(Property):
+                        [X] A instance Class\
+                """, functionExecution.getConsole().getLine(0));
     }
 
     @Test
     public void testEnsureLambdaReturnIsNotResolved()
     {
         compileTestSource("testSource.pure",
-                "Class A{}\n" +
-                        "function testMany():FunctionDefinition<{->A[1]}>[1]\n" +
-                        "{\n" +
-                        "    |^A();\n" +
-                        "}\n");
+                """
+                Class A{}
+                function testMany():FunctionDefinition<{->A[1]}>[1]
+                {
+                    |^A();
+                }
+                """);
         CoreInstance func = runtime.getFunction("testMany():FunctionDefinition[1]");
-        Assert.assertEquals("Anonymous_StripedId instance InstanceValue\n" +
-                        "    genericType(Property):\n" +
-                        "        Anonymous_StripedId instance GenericType\n" +
-                        "            rawType(Property):\n" +
-                        "                LambdaFunction instance Class\n" +
-                        "            typeArguments(Property):\n" +
-                        "                Anonymous_StripedId instance GenericType\n" +
-                        "                    rawType(Property):\n" +
-                        "                        Anonymous_StripedId instance FunctionType\n" +
-                        "                            returnMultiplicity(Property):\n" +
-                        "                                PureOne instance PackageableMultiplicity\n" +
-                        "                            returnType(Property):\n" +
-                        "                                Anonymous_StripedId instance GenericType\n" +
-                        "                                    rawType(Property):\n" +
-                        "                                        Anonymous_StripedId instance ImportStub\n" +
-                        "                                            idOrPath(Property):\n" +
-                        "                                                A instance String\n" +
-                        "                                            importGroup(Property):\n" +
-                        "                                                import_testSource_pure_1 instance ImportGroup\n" +
-                        "                                            resolvedNode(Property):\n" +
-                        "                                                A instance Class\n" +
-                        "    multiplicity(Property):\n" +
-                        "        PureOne instance PackageableMultiplicity\n" +
-                        "    usageContext(Property):\n" +
-                        "        Anonymous_StripedId instance ExpressionSequenceValueSpecificationContext\n" +
-                        "            functionDefinition(Property):\n" +
-                        "                testMany__FunctionDefinition_1_ instance ConcreteFunctionDefinition\n" +
-                        "            offset(Property):\n" +
-                        "                0 instance Integer\n" +
-                        "    values(Property):\n" +
-                        "        testMany$1$system$imports$import_testSource_pure_1$0 instance LambdaFunction\n" +
-                        "            classifierGenericType(Property):\n" +
-                        "                Anonymous_StripedId instance GenericType\n" +
-                        "                    rawType(Property):\n" +
-                        "                        LambdaFunction instance Class\n" +
-                        "                    typeArguments(Property):\n" +
-                        "                        Anonymous_StripedId instance GenericType\n" +
-                        "                            rawType(Property):\n" +
-                        "                                Anonymous_StripedId instance FunctionType\n" +
-                        "                                    function(Property):\n" +
-                        "                                        testMany$1$system$imports$import_testSource_pure_1$0 instance LambdaFunction\n" +
-                        "                                    returnMultiplicity(Property):\n" +
-                        "                                        PureOne instance PackageableMultiplicity\n" +
-                        "                                    returnType(Property):\n" +
-                        "                                        Anonymous_StripedId instance InferredGenericType\n" +
-                        "                                            rawType(Property):\n" +
-                        "                                                Anonymous_StripedId instance ImportStub\n" +
-                        "                                                    idOrPath(Property):\n" +
-                        "                                                        A instance String\n" +
-                        "                                                    importGroup(Property):\n" +
-                        "                                                        import_testSource_pure_1 instance ImportGroup\n" +
-                        "                                                    resolvedNode(Property):\n" +
-                        "                                                        A instance Class\n" +
-                        "                                            referenceUsages(Property):\n" +
-                        "                                                Anonymous_StripedId instance ReferenceUsage\n" +
-                        "                                                    offset(Property):\n" +
-                        "                                                        0 instance Integer\n" +
-                        "                                                    owner(Property):\n" +
-                        "                                                        Anonymous_StripedId instance FunctionType\n" +
-                        "                                                    propertyName(Property):\n" +
-                        "                                                        returnType instance String\n" +
-                        "            expressionSequence(Property):\n" +
-                        "                Anonymous_StripedId instance SimpleFunctionExpression\n" +
-                        "                    func(Property):\n" +
-                        "                        new_Class_1__String_1__T_1_ instance NativeFunction\n" +
-                        "                    functionName(Property):\n" +
-                        "                        new instance String\n" +
-                        "                    genericType(Property):\n" +
-                        "                        Anonymous_StripedId instance InferredGenericType\n" +
-                        "                            rawType(Property):\n" +
-                        "                                Anonymous_StripedId instance ImportStub\n" +
-                        "                                    idOrPath(Property):\n" +
-                        "                                        A instance String\n" +
-                        "                                    importGroup(Property):\n" +
-                        "                                        import_testSource_pure_1 instance ImportGroup\n" +
-                        "                                    resolvedNode(Property):\n" +
-                        "                                        A instance Class\n" +
-                        "                    importGroup(Property):\n" +
-                        "                        import_testSource_pure_1 instance ImportGroup\n" +
-                        "                    multiplicity(Property):\n" +
-                        "                        PureOne instance PackageableMultiplicity\n" +
-                        "                    parametersValues(Property):\n" +
-                        "                        Anonymous_StripedId instance InstanceValue\n" +
-                        "                            genericType(Property):\n" +
-                        "                                Anonymous_StripedId instance GenericType\n" +
-                        "                                    rawType(Property):\n" +
-                        "                                        Class instance Class\n" +
-                        "                                    referenceUsages(Property):\n" +
-                        "                                        Anonymous_StripedId instance ReferenceUsage\n" +
-                        "                                            offset(Property):\n" +
-                        "                                                0 instance Integer\n" +
-                        "                                            owner(Property):\n" +
-                        "                                                Anonymous_StripedId instance InstanceValue\n" +
-                        "                                            propertyName(Property):\n" +
-                        "                                                genericType instance String\n" +
-                        "                                    typeArguments(Property):\n" +
-                        "                                        Anonymous_StripedId instance GenericType\n" +
-                        "                                            rawType(Property):\n" +
-                        "                                                Anonymous_StripedId instance ImportStub\n" +
-                        "                                                    idOrPath(Property):\n" +
-                        "                                                        A instance String\n" +
-                        "                                                    importGroup(Property):\n" +
-                        "                                                        import_testSource_pure_1 instance ImportGroup\n" +
-                        "                                                    resolvedNode(Property):\n" +
-                        "                                                        A instance Class\n" +
-                        "                                            referenceUsages(Property):\n" +
-                        "                                                Anonymous_StripedId instance ReferenceUsage\n" +
-                        "                                                    offset(Property):\n" +
-                        "                                                        0 instance Integer\n" +
-                        "                                                    owner(Property):\n" +
-                        "                                                        Anonymous_StripedId instance GenericType\n" +
-                        "                                                    propertyName(Property):\n" +
-                        "                                                        typeArguments instance String\n" +
-                        "                            multiplicity(Property):\n" +
-                        "                                PureOne instance PackageableMultiplicity\n" +
-                        "                            usageContext(Property):\n" +
-                        "                                Anonymous_StripedId instance ParameterValueSpecificationContext\n" +
-                        "                                    functionExpression(Property):\n" +
-                        "                                        Anonymous_StripedId instance SimpleFunctionExpression\n" +
-                        "                                    offset(Property):\n" +
-                        "                                        0 instance Integer\n" +
-                        "                            values(Property):\n" +
-                        "                        Anonymous_StripedId instance InstanceValue\n" +
-                        "                            genericType(Property):\n" +
-                        "                                Anonymous_StripedId instance GenericType\n" +
-                        "                                    rawType(Property):\n" +
-                        "                                        String instance PrimitiveType\n" +
-                        "                            multiplicity(Property):\n" +
-                        "                                PureOne instance PackageableMultiplicity\n" +
-                        "                            usageContext(Property):\n" +
-                        "                                Anonymous_StripedId instance ParameterValueSpecificationContext\n" +
-                        "                                    functionExpression(Property):\n" +
-                        "                                        Anonymous_StripedId instance SimpleFunctionExpression\n" +
-                        "                                    offset(Property):\n" +
-                        "                                        1 instance Integer\n" +
-                        "                            values(Property):\n" +
-                        "                                 instance String\n" +
-                        "                    usageContext(Property):\n" +
-                        "                        Anonymous_StripedId instance ExpressionSequenceValueSpecificationContext\n" +
-                        "                            functionDefinition(Property):\n" +
-                        "                                testMany$1$system$imports$import_testSource_pure_1$0 instance LambdaFunction\n" +
-                        "                            offset(Property):\n" +
-                        "                                0 instance Integer\n" +
-                        "            referenceUsages(Property):\n" +
-                        "                Anonymous_StripedId instance ReferenceUsage\n" +
-                        "                    offset(Property):\n" +
-                        "                        0 instance Integer\n" +
-                        "                    owner(Property):\n" +
-                        "                        Anonymous_StripedId instance InstanceValue\n" +
-                        "                    propertyName(Property):\n" +
-                        "                        values instance String",
+        Assertions.assertEquals("""
+                        Anonymous_StripedId instance InstanceValue
+                            genericType(Property):
+                                Anonymous_StripedId instance GenericType
+                                    rawType(Property):
+                                        LambdaFunction instance Class
+                                    typeArguments(Property):
+                                        Anonymous_StripedId instance GenericType
+                                            rawType(Property):
+                                                Anonymous_StripedId instance FunctionType
+                                                    returnMultiplicity(Property):
+                                                        PureOne instance PackageableMultiplicity
+                                                    returnType(Property):
+                                                        Anonymous_StripedId instance GenericType
+                                                            rawType(Property):
+                                                                Anonymous_StripedId instance ImportStub
+                                                                    idOrPath(Property):
+                                                                        A instance String
+                                                                    importGroup(Property):
+                                                                        import_testSource_pure_1 instance ImportGroup
+                                                                    resolvedNode(Property):
+                                                                        A instance Class
+                            multiplicity(Property):
+                                PureOne instance PackageableMultiplicity
+                            usageContext(Property):
+                                Anonymous_StripedId instance ExpressionSequenceValueSpecificationContext
+                                    functionDefinition(Property):
+                                        testMany__FunctionDefinition_1_ instance ConcreteFunctionDefinition
+                                    offset(Property):
+                                        0 instance Integer
+                            values(Property):
+                                testMany$1$system$imports$import_testSource_pure_1$0 instance LambdaFunction
+                                    classifierGenericType(Property):
+                                        Anonymous_StripedId instance GenericType
+                                            rawType(Property):
+                                                LambdaFunction instance Class
+                                            typeArguments(Property):
+                                                Anonymous_StripedId instance GenericType
+                                                    rawType(Property):
+                                                        Anonymous_StripedId instance FunctionType
+                                                            function(Property):
+                                                                testMany$1$system$imports$import_testSource_pure_1$0 instance LambdaFunction
+                                                            returnMultiplicity(Property):
+                                                                PureOne instance PackageableMultiplicity
+                                                            returnType(Property):
+                                                                Anonymous_StripedId instance InferredGenericType
+                                                                    rawType(Property):
+                                                                        Anonymous_StripedId instance ImportStub
+                                                                            idOrPath(Property):
+                                                                                A instance String
+                                                                            importGroup(Property):
+                                                                                import_testSource_pure_1 instance ImportGroup
+                                                                            resolvedNode(Property):
+                                                                                A instance Class
+                                                                    referenceUsages(Property):
+                                                                        Anonymous_StripedId instance ReferenceUsage
+                                                                            offset(Property):
+                                                                                0 instance Integer
+                                                                            owner(Property):
+                                                                                Anonymous_StripedId instance FunctionType
+                                                                            propertyName(Property):
+                                                                                returnType instance String
+                                    expressionSequence(Property):
+                                        Anonymous_StripedId instance SimpleFunctionExpression
+                                            func(Property):
+                                                new_Class_1__String_1__T_1_ instance NativeFunction
+                                            functionName(Property):
+                                                new instance String
+                                            genericType(Property):
+                                                Anonymous_StripedId instance InferredGenericType
+                                                    rawType(Property):
+                                                        Anonymous_StripedId instance ImportStub
+                                                            idOrPath(Property):
+                                                                A instance String
+                                                            importGroup(Property):
+                                                                import_testSource_pure_1 instance ImportGroup
+                                                            resolvedNode(Property):
+                                                                A instance Class
+                                            importGroup(Property):
+                                                import_testSource_pure_1 instance ImportGroup
+                                            multiplicity(Property):
+                                                PureOne instance PackageableMultiplicity
+                                            parametersValues(Property):
+                                                Anonymous_StripedId instance InstanceValue
+                                                    genericType(Property):
+                                                        Anonymous_StripedId instance GenericType
+                                                            rawType(Property):
+                                                                Class instance Class
+                                                            referenceUsages(Property):
+                                                                Anonymous_StripedId instance ReferenceUsage
+                                                                    offset(Property):
+                                                                        0 instance Integer
+                                                                    owner(Property):
+                                                                        Anonymous_StripedId instance InstanceValue
+                                                                    propertyName(Property):
+                                                                        genericType instance String
+                                                            typeArguments(Property):
+                                                                Anonymous_StripedId instance GenericType
+                                                                    rawType(Property):
+                                                                        Anonymous_StripedId instance ImportStub
+                                                                            idOrPath(Property):
+                                                                                A instance String
+                                                                            importGroup(Property):
+                                                                                import_testSource_pure_1 instance ImportGroup
+                                                                            resolvedNode(Property):
+                                                                                A instance Class
+                                                                    referenceUsages(Property):
+                                                                        Anonymous_StripedId instance ReferenceUsage
+                                                                            offset(Property):
+                                                                                0 instance Integer
+                                                                            owner(Property):
+                                                                                Anonymous_StripedId instance GenericType
+                                                                            propertyName(Property):
+                                                                                typeArguments instance String
+                                                    multiplicity(Property):
+                                                        PureOne instance PackageableMultiplicity
+                                                    usageContext(Property):
+                                                        Anonymous_StripedId instance ParameterValueSpecificationContext
+                                                            functionExpression(Property):
+                                                                Anonymous_StripedId instance SimpleFunctionExpression
+                                                            offset(Property):
+                                                                0 instance Integer
+                                                    values(Property):
+                                                Anonymous_StripedId instance InstanceValue
+                                                    genericType(Property):
+                                                        Anonymous_StripedId instance GenericType
+                                                            rawType(Property):
+                                                                String instance PrimitiveType
+                                                    multiplicity(Property):
+                                                        PureOne instance PackageableMultiplicity
+                                                    usageContext(Property):
+                                                        Anonymous_StripedId instance ParameterValueSpecificationContext
+                                                            functionExpression(Property):
+                                                                Anonymous_StripedId instance SimpleFunctionExpression
+                                                            offset(Property):
+                                                                1 instance Integer
+                                                    values(Property):
+                                                         instance String
+                                            usageContext(Property):
+                                                Anonymous_StripedId instance ExpressionSequenceValueSpecificationContext
+                                                    functionDefinition(Property):
+                                                        testMany$1$system$imports$import_testSource_pure_1$0 instance LambdaFunction
+                                                    offset(Property):
+                                                        0 instance Integer
+                                    referenceUsages(Property):
+                                        Anonymous_StripedId instance ReferenceUsage
+                                            offset(Property):
+                                                0 instance Integer
+                                            owner(Property):
+                                                Anonymous_StripedId instance InstanceValue
+                                            propertyName(Property):
+                                                values instance String\
+                        """,
                 func.getValueForMetaPropertyToOne(M3Properties.expressionSequence).printWithoutDebug("", 10));
     }
 

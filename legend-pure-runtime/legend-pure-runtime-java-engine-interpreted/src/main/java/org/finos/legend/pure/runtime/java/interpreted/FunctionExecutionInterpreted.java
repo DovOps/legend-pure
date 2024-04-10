@@ -387,9 +387,9 @@ public class FunctionExecutionInterpreted implements FunctionExecution
 
     public CoreInstance executeLambda(LambdaFunction function, ListIterable<? extends CoreInstance> params, Stack<MutableMap<String, CoreInstance>> resolvedTypeParameters, Stack<MutableMap<String, CoreInstance>> resolvedMultiplicityParameters, VariableContext context, CoreInstance functionExpressionToUseInStack, Profiler profiler, InstantiationContext instantiationContext, ExecutionSupport executionSupport)
     {
-        if (function instanceof LambdaWithContext)
+        if (function instanceof LambdaWithContext withContext)
         {
-            context = ((LambdaWithContext) function).getVariableContext();
+            context = withContext.getVariableContext();
         }
 
         return this.executeFunctionExecuteParams(function, params, resolvedTypeParameters, resolvedMultiplicityParameters, context, functionExpressionToUseInStack, profiler, instantiationContext, executionSupport);
@@ -400,9 +400,9 @@ public class FunctionExecutionInterpreted implements FunctionExecution
      */
     public CoreInstance executeLambdaFromNative(CoreInstance function, ListIterable<? extends CoreInstance> params, Stack<MutableMap<String, CoreInstance>> resolvedTypeParameters, Stack<MutableMap<String, CoreInstance>> resolvedMultiplicityParameters, VariableContext context, CoreInstance functionExpressionToUseInStack, Profiler profiler, InstantiationContext instantiationContext, ExecutionSupport executionSupport)
     {
-        if (function instanceof LambdaWithContext)
+        if (function instanceof LambdaWithContext withContext)
         {
-            context = ((LambdaWithContext) function).getVariableContext();
+            context = withContext.getVariableContext();
         }
 
         return this.executeFunction(false, LambdaFunctionCoreInstanceWrapper.toLambdaFunction(function), params, resolvedTypeParameters, resolvedMultiplicityParameters, context, functionExpressionToUseInStack, profiler, instantiationContext, executionSupport);
@@ -596,9 +596,9 @@ public class FunctionExecutionInterpreted implements FunctionExecution
                 }
                 else if (sourceInfo != null && sourceInfo != pureException.getSourceInformation())
                 {
-                    if (pureException instanceof PureAssertFailException)
+                    if (pureException instanceof PureAssertFailException exception)
                     {
-                        throw new PureAssertFailException(sourceInfo, pureException.getInfo(), (PureAssertFailException) pureException);
+                        throw new PureAssertFailException(sourceInfo, pureException.getInfo(), exception);
                     }
                     else
                     {

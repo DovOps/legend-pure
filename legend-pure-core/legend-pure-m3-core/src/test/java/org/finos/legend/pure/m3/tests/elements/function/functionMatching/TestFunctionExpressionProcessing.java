@@ -16,20 +16,20 @@ package org.finos.legend.pure.m3.tests.elements.function.functionMatching;
 
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiledPlatform;
 import org.finos.legend.pure.m3.exception.PureUnmatchedFunctionException;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestFunctionExpressionProcessing extends AbstractPureTestWithCoreCompiledPlatform
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getExtra());
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("sample.pure");
@@ -42,34 +42,36 @@ public class TestFunctionExpressionProcessing extends AbstractPureTestWithCoreCo
         {
             runtime.createInMemorySource(
                     "sample.pure",
-                    "function go():Any[*]\n" +
-                            "{\n" +
-                            "   helloX('1', '2')->println();\n" +
-                            "}\n" +
-                            "\n" +
-                            "function a::helloX(a:Integer[1], b:String[1]):String[*]\n" +
-                            "{\n" +
-                            "   'hello_str_str';\n" +
-                            "}\n" +
-                            "\n" +
-                            "function b::c::helloX(a:String[1], b:Integer[1]):String[*]\n" +
-                            "{\n" +
-                            "   'hello_str_str';\n" +
-                            "}\n" +
-                            "\n" +
-                            "function b::d::helloX(a:String[1], b:String[1]):String[*]\n" +
-                            "{\n" +
-                            "   'hello_str_str';\n" +
-                            "}\n" +
-                            "\n" +
-                            "###Pure\n" +
-                            "function goX():Any[*]\n" +
-                            "{\n" +
-                            "   'goX'->print(1)\n" +
-                            "}\n"
+                    """
+                    function go():Any[*]
+                    {
+                       helloX('1', '2')->println();
+                    }
+                    
+                    function a::helloX(a:Integer[1], b:String[1]):String[*]
+                    {
+                       'hello_str_str';
+                    }
+                    
+                    function b::c::helloX(a:String[1], b:Integer[1]):String[*]
+                    {
+                       'hello_str_str';
+                    }
+                    
+                    function b::d::helloX(a:String[1], b:String[1]):String[*]
+                    {
+                       'hello_str_str';
+                    }
+                    
+                    ###Pure
+                    function goX():Any[*]
+                    {
+                       'goX'->print(1)
+                    }
+                    """
             );
             runtime.compile();
-            Assert.fail();
+            Assertions.fail();
         }
         catch (Exception e)
         {
@@ -89,39 +91,41 @@ public class TestFunctionExpressionProcessing extends AbstractPureTestWithCoreCo
         {
             runtime.createInMemorySource(
                     "sample.pure",
-                    "function go():Any[*]\n" +
-                            "{\n" +
-                            "   helloX('1', '2')->print(1);\n" +
-                            "}\n" +
-                            "\n" +
-                            "function helloX(a:Integer[1], b:Integer[1]):String[*]\n" +
-                            "{\n" +
-                            "   'hello_str_str';\n" +
-                            "}\n" +
-                            "\n" +
-                            "function a::helloX(a:Integer[1], b:String[1]):String[*]\n" +
-                            "{\n" +
-                            "   'hello_str_str';\n" +
-                            "}\n" +
-                            "\n" +
-                            "function b::c::helloX(a:String[1], b:Integer[1]):String[*]\n" +
-                            "{\n" +
-                            "   'hello_str_str';\n" +
-                            "}\n" +
-                            "\n" +
-                            "function b::d::helloX(a:String[1], b:String[1]):String[*]\n" +
-                            "{\n" +
-                            "   'hello_str_str';\n" +
-                            "}\n" +
-                            "\n" +
-                            "###Pure\n" +
-                            "function goX():Any[*]\n" +
-                            "{\n" +
-                            "   'goX'->print(1)\n" +
-                            "}\n"
+                    """
+                    function go():Any[*]
+                    {
+                       helloX('1', '2')->print(1);
+                    }
+                    
+                    function helloX(a:Integer[1], b:Integer[1]):String[*]
+                    {
+                       'hello_str_str';
+                    }
+                    
+                    function a::helloX(a:Integer[1], b:String[1]):String[*]
+                    {
+                       'hello_str_str';
+                    }
+                    
+                    function b::c::helloX(a:String[1], b:Integer[1]):String[*]
+                    {
+                       'hello_str_str';
+                    }
+                    
+                    function b::d::helloX(a:String[1], b:String[1]):String[*]
+                    {
+                       'hello_str_str';
+                    }
+                    
+                    ###Pure
+                    function goX():Any[*]
+                    {
+                       'goX'->print(1)
+                    }
+                    """
             );
             runtime.compile();
-            Assert.fail();
+            Assertions.fail();
         }
         catch (Exception e)
         {
@@ -142,40 +146,42 @@ public class TestFunctionExpressionProcessing extends AbstractPureTestWithCoreCo
         {
             runtime.createInMemorySource(
                     "sample.pure",
-                    "import b::c::*;\n" +
-                            "function go():Any[*]\n" +
-                            "{\n" +
-                            "   helloX('1', '2')->print(1);\n" +
-                            "}\n" +
-                            "\n" +
-                            "function helloX(a:Integer[1], b:Integer[1]):String[*]\n" +
-                            "{\n" +
-                            "   'hello_str_str';\n" +
-                            "}\n" +
-                            "\n" +
-                            "function a::helloX(a:Integer[1], b:String[1]):String[*]\n" +
-                            "{\n" +
-                            "   'hello_str_str';\n" +
-                            "}\n" +
-                            "\n" +
-                            "function b::c::helloX(a:String[1], b:Integer[1]):String[*]\n" +
-                            "{\n" +
-                            "   'hello_str_str';\n" +
-                            "}\n" +
-                            "\n" +
-                            "function b::d::helloX(a:String[1], b:String[1]):String[*]\n" +
-                            "{\n" +
-                            "   'hello_str_str';\n" +
-                            "}\n" +
-                            "\n" +
-                            "###Pure\n" +
-                            "function goX():Any[*]\n" +
-                            "{\n" +
-                            "   'goX'->print(1)\n" +
-                            "}\n"
+                    """
+                    import b::c::*;
+                    function go():Any[*]
+                    {
+                       helloX('1', '2')->print(1);
+                    }
+                    
+                    function helloX(a:Integer[1], b:Integer[1]):String[*]
+                    {
+                       'hello_str_str';
+                    }
+                    
+                    function a::helloX(a:Integer[1], b:String[1]):String[*]
+                    {
+                       'hello_str_str';
+                    }
+                    
+                    function b::c::helloX(a:String[1], b:Integer[1]):String[*]
+                    {
+                       'hello_str_str';
+                    }
+                    
+                    function b::d::helloX(a:String[1], b:String[1]):String[*]
+                    {
+                       'hello_str_str';
+                    }
+                    
+                    ###Pure
+                    function goX():Any[*]
+                    {
+                       'goX'->print(1)
+                    }
+                    """
             );
             runtime.compile();
-            Assert.fail();
+            Assertions.fail();
         }
         catch (Exception e)
         {
@@ -196,41 +202,43 @@ public class TestFunctionExpressionProcessing extends AbstractPureTestWithCoreCo
         {
             runtime.createInMemorySource(
                     "sample.pure",
-                    "import a::*;\n" +
-                            "import b::c::*;\n" +
-                            "function go():Any[*]\n" +
-                            "{\n" +
-                            "   helloX('1', '2')->print(1);\n" +
-                            "}\n" +
-                            "\n" +
-                            "function helloX(a:Integer[1], b:Integer[1]):String[*]\n" +
-                            "{\n" +
-                            "   'hello_str_str';\n" +
-                            "}\n" +
-                            "\n" +
-                            "function a::helloX(a:Integer[1], b:String[1]):String[*]\n" +
-                            "{\n" +
-                            "   'hello_str_str';\n" +
-                            "}\n" +
-                            "\n" +
-                            "function b::c::helloX(a:String[1], b:Integer[1]):String[*]\n" +
-                            "{\n" +
-                            "   'hello_str_str';\n" +
-                            "}\n" +
-                            "\n" +
-                            "function b::d::helloX(a:String[1], b:String[1]):String[*]\n" +
-                            "{\n" +
-                            "   'hello_str_str';\n" +
-                            "}\n" +
-                            "\n" +
-                            "###Pure\n" +
-                            "function goX():Any[*]\n" +
-                            "{\n" +
-                            "   'goX'->print(1)\n" +
-                            "}\n"
+                    """
+                    import a::*;
+                    import b::c::*;
+                    function go():Any[*]
+                    {
+                       helloX('1', '2')->print(1);
+                    }
+                    
+                    function helloX(a:Integer[1], b:Integer[1]):String[*]
+                    {
+                       'hello_str_str';
+                    }
+                    
+                    function a::helloX(a:Integer[1], b:String[1]):String[*]
+                    {
+                       'hello_str_str';
+                    }
+                    
+                    function b::c::helloX(a:String[1], b:Integer[1]):String[*]
+                    {
+                       'hello_str_str';
+                    }
+                    
+                    function b::d::helloX(a:String[1], b:String[1]):String[*]
+                    {
+                       'hello_str_str';
+                    }
+                    
+                    ###Pure
+                    function goX():Any[*]
+                    {
+                       'goX'->print(1)
+                    }
+                    """
             );
             runtime.compile();
-            Assert.fail();
+            Assertions.fail();
         }
         catch (Exception e)
         {
@@ -251,37 +259,39 @@ public class TestFunctionExpressionProcessing extends AbstractPureTestWithCoreCo
         {
             runtime.createInMemorySource(
                     "sample.pure",
-                    "import a::*;\n" +
-                            "import b::c::*;\n" +
-                            "import b::d::*;\n" +
-                            "function go():Any[*]\n" +
-                            "{\n" +
-                            "   helloX('1')->print(1);\n" +
-                            "}\n" +
-                            "\n" +
-                            "function a::helloX(a:Integer[1], b:String[1]):String[*]\n" +
-                            "{\n" +
-                            "   'hello_str_str';\n" +
-                            "}\n" +
-                            "\n" +
-                            "function b::c::helloX(a:String[1], b:Integer[1]):String[*]\n" +
-                            "{\n" +
-                            "   'hello_str_str';\n" +
-                            "}\n" +
-                            "\n" +
-                            "function b::d::helloX(a:String[1], b:String[1]):String[*]\n" +
-                            "{\n" +
-                            "   'hello_str_str';\n" +
-                            "}\n" +
-                            "\n" +
-                            "###Pure\n" +
-                            "function goX():Any[*]\n" +
-                            "{\n" +
-                            "   'goX'->print(1)\n" +
-                            "}\n"
+                    """
+                    import a::*;
+                    import b::c::*;
+                    import b::d::*;
+                    function go():Any[*]
+                    {
+                       helloX('1')->print(1);
+                    }
+                    
+                    function a::helloX(a:Integer[1], b:String[1]):String[*]
+                    {
+                       'hello_str_str';
+                    }
+                    
+                    function b::c::helloX(a:String[1], b:Integer[1]):String[*]
+                    {
+                       'hello_str_str';
+                    }
+                    
+                    function b::d::helloX(a:String[1], b:String[1]):String[*]
+                    {
+                       'hello_str_str';
+                    }
+                    
+                    ###Pure
+                    function goX():Any[*]
+                    {
+                       'goX'->print(1)
+                    }
+                    """
             );
             runtime.compile();
-            Assert.fail();
+            Assertions.fail();
         }
         catch (Exception e)
         {
@@ -301,35 +311,37 @@ public class TestFunctionExpressionProcessing extends AbstractPureTestWithCoreCo
         {
             compileTestSource(
                     "sample.pure",
-                    "###Pure\n" +
-                            "function goX():Any[*]\n" +
-                            "{\n" +
-                            "   'goX'->print(1)\n" +
-                            "}\n" +
-                            "\n" +
-                            "###Pure\n" +
-                            "import b::c::*;\n" +
-                            "function go():Any[*]\n" +
-                            "{\n" +
-                            "   helloX('1')->print(1);\n" +
-                            "}\n" +
-                            "\n" +
-                            "function a::helloX(a:Integer[1], b:String[1]):String[*]\n" +
-                            "{\n" +
-                            "   'hello_str_str';\n" +
-                            "}\n" +
-                            "\n" +
-                            "function b::c::helloX(a:String[1], b:Integer[1]):String[*]\n" +
-                            "{\n" +
-                            "   'hello_str_str';\n" +
-                            "}\n" +
-                            "\n" +
-                            "function b::c::helloX(a:String[1], b:String[1]):String[*]\n" +
-                            "{\n" +
-                            "   'hello_str_str';\n" +
-                            "}"
+                    """
+                    ###Pure
+                    function goX():Any[*]
+                    {
+                       'goX'->print(1)
+                    }
+                    
+                    ###Pure
+                    import b::c::*;
+                    function go():Any[*]
+                    {
+                       helloX('1')->print(1);
+                    }
+                    
+                    function a::helloX(a:Integer[1], b:String[1]):String[*]
+                    {
+                       'hello_str_str';
+                    }
+                    
+                    function b::c::helloX(a:String[1], b:Integer[1]):String[*]
+                    {
+                       'hello_str_str';
+                    }
+                    
+                    function b::c::helloX(a:String[1], b:String[1]):String[*]
+                    {
+                       'hello_str_str';
+                    }\
+                    """
             );
-            Assert.fail();
+            Assertions.fail();
         }
         catch (Exception e)
         {

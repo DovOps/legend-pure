@@ -15,7 +15,7 @@
 package org.finos.legend.pure.m3.tests.function.base.math;
 
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public abstract class AbstractTestTimes extends AbstractPureTestWithCoreCompiled
 {
@@ -23,10 +23,12 @@ public abstract class AbstractTestTimes extends AbstractPureTestWithCoreCompiled
     public void testBasic()
     {
         compileTestSource("fromString.pure",
-                "function test():Boolean[1]\n" +
-                        "{\n" +
-                        "   assert(6 == [1,2,3]->times(), |'');\n" +
-                        "}\n");
+                """
+                function test():Boolean[1]
+                {
+                   assert(6 == [1,2,3]->times(), |'');
+                }
+                """);
         this.execute("test():Boolean[1]");
     }
 
@@ -34,10 +36,12 @@ public abstract class AbstractTestTimes extends AbstractPureTestWithCoreCompiled
     public void testDecimal()
     {
         compileTestSource("fromString.pure",
-                "function test():Boolean[1]\n" +
-                        "{\n" +
-                        "   assert(353791.470d == [19.905d,17774]->times(), |'');\n" +
-                        "}\n");
+                """
+                function test():Boolean[1]
+                {
+                   assert(353791.470d == [19.905d,17774]->times(), |'');
+                }
+                """);
         this.execute("test():Boolean[1]");
     }
 
@@ -45,10 +49,12 @@ public abstract class AbstractTestTimes extends AbstractPureTestWithCoreCompiled
     public void testEval()
     {
         compileTestSource("fromString.pure",
-                "function test():Boolean[1]\n" +
-                        "{\n" +
-                        "   assert(6 == times_Number_MANY__Number_1_->eval([1,2,3]), |'');\n" +
-                        "}\n");
+                """
+                function test():Boolean[1]
+                {
+                   assert(6 == times_Number_MANY__Number_1_->eval([1,2,3]), |'');
+                }
+                """);
         this.execute("test():Boolean[1]");
     }
 }

@@ -80,9 +80,8 @@ public class DynamicPureFunctionImpl<T> implements SharedPureFunction<T>
         return (T) this.func._expressionSequence().injectInto(null, (previousResult, expression) ->
         {
             Object result = Reactivator.reactivateWithoutJavaCompilation(this.bridge, expression, executionOpenVarsPureMap, es);
-            if (expression instanceof SimpleFunctionExpression)
+            if (expression instanceof SimpleFunctionExpression sfe)
             {
-                SimpleFunctionExpression sfe = (SimpleFunctionExpression) expression;
                 Function<?> sfeFunc = sfe._func();
                 if ((sfeFunc instanceof NativeFunction) && "letFunction_String_1__T_m__T_m_".equals(sfeFunc._name()))
                 {
@@ -97,9 +96,9 @@ public class DynamicPureFunctionImpl<T> implements SharedPureFunction<T>
     private List<Object> toPureList(Object value)
     {
         List<Object> list = this.bridge.buildList();
-        if (value instanceof Iterable)
+        if (value instanceof Iterable iterable)
         {
-            list._values(Lists.mutable.withAll((Iterable<?>) value));
+            list._values(Lists.mutable.withAll(iterable));
         }
         else if (value != null)
         {

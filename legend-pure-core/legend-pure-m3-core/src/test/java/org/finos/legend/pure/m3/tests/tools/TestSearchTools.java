@@ -23,21 +23,21 @@ import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiledPlatform;
 import org.finos.legend.pure.m3.tools.PackageTreeIterable;
 import org.finos.legend.pure.m3.tools.SearchTools;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
-import org.junit.After;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.util.regex.Pattern;
 
 public class TestSearchTools extends AbstractPureTestWithCoreCompiledPlatform
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getExtra());
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("SourceId.pure");
@@ -46,19 +46,21 @@ public class TestSearchTools extends AbstractPureTestWithCoreCompiledPlatform
     @Test
     public void testFindInAllPackages()
     {
-        compileTestSource("SourceId.pure", "Class test::TestClass {}\n" +
-                "Class test::searchTools::TestClass {}\n" +
-                "Class test::TestClass1{}\n" +
-                "Class test::TestClass2 {}\n" +
-                "Class test::searchTools::TestClass2 {}\n" +
-                "Profile test::TestProfile {}\n" +
-                "Profile test::searchTools::TestProfile {}\n" +
-                "function test::testFunction1():Any[*] {true;}\n" +
-                "function test::searchTools::testFunction1():Any[*] {true;}\n" +
-                "Enum test::TestEnum {A}\n" +
-                "Enum test::searchTools::TestEnum {A}\n" +
-                "Association test::TestAssociation1 {testClass2:test::TestClass2[1];testClass1:test::TestClass1[1];}\n" +
-                "Association test::searchTools::TestAssociation1 {testClass2:test::searchTools::TestClass2[1];testClass:test::searchTools::TestClass[1];}");
+        compileTestSource("SourceId.pure", """
+                Class test::TestClass {}
+                Class test::searchTools::TestClass {}
+                Class test::TestClass1{}
+                Class test::TestClass2 {}
+                Class test::searchTools::TestClass2 {}
+                Profile test::TestProfile {}
+                Profile test::searchTools::TestProfile {}
+                function test::testFunction1():Any[*] {true;}
+                function test::searchTools::testFunction1():Any[*] {true;}
+                Enum test::TestEnum {A}
+                Enum test::searchTools::TestEnum {A}
+                Association test::TestAssociation1 {testClass2:test::TestClass2[1];testClass1:test::TestClass1[1];}
+                Association test::searchTools::TestAssociation1 {testClass2:test::searchTools::TestClass2[1];testClass:test::searchTools::TestClass[1];}\
+                """);
         //find one class
         CoreInstance test_TestClass1 = runtime.getCoreInstance("test::TestClass1");
         Verify.assertSetsEqual(Sets.mutable.with(test_TestClass1), SearchTools.findInAllPackages("TestClass1", runtime.getModelRepository()).toSet());
@@ -103,20 +105,22 @@ public class TestSearchTools extends AbstractPureTestWithCoreCompiledPlatform
     @Test
     public void testFindInPackages()
     {
-        compileTestSource("SourceId.pure", "Class test::TestClass {}\n" +
-                "Class test::searchTools::TestClass {}\n" +
-                "Class test::test::searchTools::TestClass{}\n" +
-                "Class test::TestClass1{}\n" +
-                "Class test::TestClass2 {}\n" +
-                "Class test::searchTools::TestClass2 {}\n" +
-                "Profile test::TestProfile {}\n" +
-                "Profile test::searchTools::TestProfile {}\n" +
-                "function test::testFunction1():Any[*] {true;}\n" +
-                "function test::searchTools::testFunction1():Any[*] {true;}\n" +
-                "Enum test::TestEnum {A}\n" +
-                "Enum test::searchTools::TestEnum {A}\n" +
-                "Association test::TestAssociation1 {testClass2:test::TestClass2[1];testClass1:test::TestClass1[1];}\n" +
-                "Association test::searchTools::TestAssociation1 {testClass2:test::searchTools::TestClass2[1];testClass:test::searchTools::TestClass[1];}");
+        compileTestSource("SourceId.pure", """
+                Class test::TestClass {}
+                Class test::searchTools::TestClass {}
+                Class test::test::searchTools::TestClass{}
+                Class test::TestClass1{}
+                Class test::TestClass2 {}
+                Class test::searchTools::TestClass2 {}
+                Profile test::TestProfile {}
+                Profile test::searchTools::TestProfile {}
+                function test::testFunction1():Any[*] {true;}
+                function test::searchTools::testFunction1():Any[*] {true;}
+                Enum test::TestEnum {A}
+                Enum test::searchTools::TestEnum {A}
+                Association test::TestAssociation1 {testClass2:test::TestClass2[1];testClass1:test::TestClass1[1];}
+                Association test::searchTools::TestAssociation1 {testClass2:test::searchTools::TestClass2[1];testClass:test::searchTools::TestClass[1];}\
+                """);
 
         MutableList<Package> testPackages = Lists.mutable.empty();
         for (Package pkg : PackageTreeIterable.newRootPackageTreeIterable(runtime.getModelRepository()))

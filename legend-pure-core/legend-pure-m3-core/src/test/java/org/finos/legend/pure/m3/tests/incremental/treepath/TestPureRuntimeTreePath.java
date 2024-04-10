@@ -20,19 +20,19 @@ import org.eclipse.collections.impl.tuple.Tuples;
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiledPlatform;
 import org.finos.legend.pure.m3.tests.RuntimeTestScriptBuilder;
 import org.finos.legend.pure.m3.tests.RuntimeVerifier;
-import org.junit.After;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestPureRuntimeTreePath extends AbstractPureTestWithCoreCompiledPlatform
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getExtra());
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("userId.pure");
@@ -92,10 +92,12 @@ public class TestPureRuntimeTreePath extends AbstractPureTestWithCoreCompiledPla
     public void testPureRuntimeFunctionChangeReferencedFromDerivedProperty()
     {
         String source = "Class A{version : String[1];}\n";
-        String functionSource = "function nice(str:String[1]):String[1] \n" +
-                "{" +
-                "   'nice ' + $str;" +
-                "}";
+        String functionSource = """
+                function nice(str:String[1]):String[1]\s
+                {\
+                   'nice ' + $str;\
+                }\
+                """;
         String badSource = "";
         String sourceId = "sourceId.pure";
         String funcId = "funcId.pure";
@@ -113,23 +115,25 @@ public class TestPureRuntimeTreePath extends AbstractPureTestWithCoreCompiledPla
     @Test
     public void testPureRuntimeWithQualifiedPropertyWithEnum()
     {
-        String source = "Class EntityWithLocations\n" +
-                "{\n" +
-                "    locations : Location[*];\n" +
-                "    locationsByType(types:GeographicEntityType[*])\n" +
-                "    {\n" +
-                "        $this.locations->filter(l | $types->exists(type | is($l.type, $type)))\n" +
-                "    }:Location[*];\n" +
-                "}\n" +
-                "Class Location\n" +
-                "{\n" +
-                "    type : GeographicEntityType[1];\n" +
-                "}\n" +
-                "Enum GeographicEntityType\n" +
-                "{\n" +
-                "    CITY,\n" +
-                "    COUNTRY\n" +
-                "}";
+        String source = """
+                Class EntityWithLocations
+                {
+                    locations : Location[*];
+                    locationsByType(types:GeographicEntityType[*])
+                    {
+                        $this.locations->filter(l | $types->exists(type | is($l.type, $type)))
+                    }:Location[*];
+                }
+                Class Location
+                {
+                    type : GeographicEntityType[1];
+                }
+                Enum GeographicEntityType
+                {
+                    CITY,
+                    COUNTRY
+                }\
+                """;
         String sourceId = "sourceId.pure";
         runtime.createInMemorySource(sourceId, source);
         runtime.createInMemorySource("userId.pure", "function test():Boolean[1]{print(#EntityWithLocations{locationsByType(GeographicEntityType[*]){*}}#,0);true;}");
@@ -143,20 +147,27 @@ public class TestPureRuntimeTreePath extends AbstractPureTestWithCoreCompiledPla
     public void testTreePathWithSelfReferences() throws Exception
     {
         String source = "Class Person{ name: String[1];address:Address[1]; firm: Firm[1]; manager: Person[0..1]; } Class Firm {employees : Person[1];address:Address[1];} Class Address{ street:String[1]; }\n";
-        String treeSource = "function test():Any[*]\n" +
-                "{\n" +
-                " let t = " +
-                "#Person as SP" +
-                "{ \n" +
-                "      * \n" +
-                "      manager as Manager\n " +
-                "      {     \n " +
-                "         +[name]    \n " +
-                "         address as BigHome \n " +
-                "      }     \n " +
-                "      address as Home \n" +
-                "}#;" +
-                "}\n";
+        String treeSource = """
+                function test():Any[*]
+                {
+                 let t = \
+                #Person as SP\
+                {\s
+                      *\s
+                      manager as Manager
+                 \
+                      {    \s
+                 \
+                         +[name]   \s
+                 \
+                         address as BigHome\s
+                 \
+                      }    \s
+                 \
+                      address as Home\s
+                }#;\
+                }
+                """;
         String userId = "userId.pure";
         String sourceId = "sourceId.pure";
         RuntimeVerifier.verifyOperationIsStable(new RuntimeTestScriptBuilder().createInMemorySources(Maps.immutable.with(sourceId, source, userId, treeSource))
@@ -173,23 +184,25 @@ public class TestPureRuntimeTreePath extends AbstractPureTestWithCoreCompiledPla
     @Test
     public void testPureRuntimeWithTreeRemoval()
     {
-        String source = "Class EntityWithLocations\n" +
-                "{\n" +
-                "    locations : Location[*];\n" +
-                "    locationsByType(types:GeographicEntityType[*])\n" +
-                "    {\n" +
-                "        $this.locations->filter(l | $types->exists(type | is($l.type, $type)))\n" +
-                "    }:Location[*];\n" +
-                "}\n" +
-                "Class Location\n" +
-                "{\n" +
-                "    type : GeographicEntityType[1];\n" +
-                "}\n" +
-                "Enum GeographicEntityType\n" +
-                "{\n" +
-                "    CITY,\n" +
-                "    COUNTRY\n" +
-                "}";
+        String source = """
+                Class EntityWithLocations
+                {
+                    locations : Location[*];
+                    locationsByType(types:GeographicEntityType[*])
+                    {
+                        $this.locations->filter(l | $types->exists(type | is($l.type, $type)))
+                    }:Location[*];
+                }
+                Class Location
+                {
+                    type : GeographicEntityType[1];
+                }
+                Enum GeographicEntityType
+                {
+                    CITY,
+                    COUNTRY
+                }\
+                """;
         String sourceId = "sourceId.pure";
         String treeSource = "function test():Boolean[1]{print(#EntityWithLocations{locationsByType(GeographicEntityType[*]){*}}#,0);true;}";
         String userId = "userId.pure";
@@ -207,29 +220,33 @@ public class TestPureRuntimeTreePath extends AbstractPureTestWithCoreCompiledPla
     @Test
     public void testPureRuntimeTreeWithStereotypeRemoval()
     {
-        String profile = "Profile TestProfile\n" +
-                "{\n" +
-                "   stereotypes : [ Root, NewProp, ExistingProp ];\n" +
-                "   tags : [ Id, Name, Description ];\n" +
-                "}\n";
+        String profile = """
+                Profile TestProfile
+                {
+                   stereotypes : [ Root, NewProp, ExistingProp ];
+                   tags : [ Id, Name, Description ];
+                }
+                """;
         String source =
-                "Class EntityWithLocations\n" +
-                        "{\n" +
-                        "    locations : Location[*];\n" +
-                        "    locationsByType(types:GeographicEntityType[*])\n" +
-                        "    {\n" +
-                        "        $this.locations->filter(l | $types->exists(type | is($l.type, $type)))\n" +
-                        "    }:Location[*];\n" +
-                        "}\n" +
-                        "Class Location\n" +
-                        "{\n" +
-                        "    type : GeographicEntityType[1];\n" +
-                        "}\n" +
-                        "Enum GeographicEntityType\n" +
-                        "{\n" +
-                        "    CITY,\n" +
-                        "    COUNTRY\n" +
-                        "}";
+                """
+                Class EntityWithLocations
+                {
+                    locations : Location[*];
+                    locationsByType(types:GeographicEntityType[*])
+                    {
+                        $this.locations->filter(l | $types->exists(type | is($l.type, $type)))
+                    }:Location[*];
+                }
+                Class Location
+                {
+                    type : GeographicEntityType[1];
+                }
+                Enum GeographicEntityType
+                {
+                    CITY,
+                    COUNTRY
+                }\
+                """;
         String sourceId = "sourceId.pure";
         String treeSource = "function test():Boolean[1]{print(#EntityWithLocations<<TestProfile.Root>>{locationsByType(GeographicEntityType[*]){*}}#,0);true;}";
         String treeSourceId = "treeSourceId.pure";
@@ -249,36 +266,41 @@ public class TestPureRuntimeTreePath extends AbstractPureTestWithCoreCompiledPla
     @Test
     public void testAnnotatedChildNodeWithStereotypeRemoval()
     {
-        String profile = "Profile TestProfile\n" +
-                "{\n" +
-                "   stereotypes : [ Root, NewProp, ExistingProp ];\n" +
-                "   tags : [ Id, Name, Description ];\n" +
-                "}\n";
+        String profile = """
+                Profile TestProfile
+                {
+                   stereotypes : [ Root, NewProp, ExistingProp ];
+                   tags : [ Id, Name, Description ];
+                }
+                """;
         String source =
-                "Class EntityWithLocations\n" +
-                        "{\n" +
-                        "    locations : Location[*];\n" +
-                        "    locationsByType(types:GeographicEntityType[*])\n" +
-                        "    {\n" +
-                        "        $this.locations->filter(l | $types->exists(type | is($l.type, $type)))\n" +
-                        "    }:Location[*];\n" +
-                        "}\n" +
-                        "Class Location\n" +
-                        "{\n" +
-                        "    type : GeographicEntityType[1];\n" +
-                        "}\n" +
-                        "Enum GeographicEntityType\n" +
-                        "{\n" +
-                        "    CITY,\n" +
-                        "    COUNTRY\n" +
-                        "}";
+                """
+                Class EntityWithLocations
+                {
+                    locations : Location[*];
+                    locationsByType(types:GeographicEntityType[*])
+                    {
+                        $this.locations->filter(l | $types->exists(type | is($l.type, $type)))
+                    }:Location[*];
+                }
+                Class Location
+                {
+                    type : GeographicEntityType[1];
+                }
+                Enum GeographicEntityType
+                {
+                    CITY,
+                    COUNTRY
+                }\
+                """;
         String sourceId = "sourceId.pure";
-        String treeSource = "function test():Boolean[1]{print(#EntityWithLocations<<TestProfile.Root>>{ \n" +
-                " * \n" +
-                " locationsByType(GeographicEntityType[*]){*} \n" +
-                " locations <<TestProfile.ExistingProp>> {*}" +
-                "\n" +
-                "}#,0);true;}";
+        String treeSource = """
+                function test():Boolean[1]{print(#EntityWithLocations<<TestProfile.Root>>{\s
+                 *\s
+                 locationsByType(GeographicEntityType[*]){*}\s
+                 locations <<TestProfile.ExistingProp>> {*}
+                }#,0);true;}\
+                """;
         String treeSourceId = "treeSourceId.pure";
 
         RuntimeVerifier.verifyOperationIsStable(new RuntimeTestScriptBuilder().createInMemorySources(Maps.immutable.with(sourceId, source, treeSourceId, treeSource, "profile.pure", profile))
@@ -296,34 +318,40 @@ public class TestPureRuntimeTreePath extends AbstractPureTestWithCoreCompiledPla
     @Test
     public void testPureRuntimeWithQualifiedPropertyWithEnumCompileError()
     {
-        String source = "Class EntityWithLocations\n" +
-                "{\n" +
-                "    locations : Location[*];\n" +
-                "    locationsByType(types:GeographicEntityType[*])\n" +
-                "    {\n" +
-                "        $this.locations->filter(l | $types->exists(type | is($l.type, $type)))\n" +
-                "    }:Location[*];\n" +
-                "}\n" +
-                "Class Location\n" +
-                "{\n" +
-                "    type : GeographicEntityType[1];\n" +
-                "}\n";
+        String source = """
+                Class EntityWithLocations
+                {
+                    locations : Location[*];
+                    locationsByType(types:GeographicEntityType[*])
+                    {
+                        $this.locations->filter(l | $types->exists(type | is($l.type, $type)))
+                    }:Location[*];
+                }
+                Class Location
+                {
+                    type : GeographicEntityType[1];
+                }
+                """;
 
-        String enumSource = "Enum GeographicEntityType\n" +
-                "{\n" +
-                "    CITY,\n" +
-                "    COUNTRY\n" +
-                "}";
+        String enumSource = """
+                Enum GeographicEntityType
+                {
+                    CITY,
+                    COUNTRY
+                }\
+                """;
         String sourceId = "sourceId.pure";
         String enumSourceId = "enumSourceId.pure";
         String userId = "userId.pure";
         String treePath = "function test():Boolean[1]{print(#EntityWithLocations{locationsByType(GeographicEntityType[*]){*}}#,0);true;}";
 
-        String enumSourceChange = "Enum GeographicEntityType1\n" +
-                "{\n" +
-                "    CTIY,\n" +
-                "    COUNTRY\n" +
-                "}";
+        String enumSourceChange = """
+                Enum GeographicEntityType1
+                {
+                    CTIY,
+                    COUNTRY
+                }\
+                """;
         String invalidEnumSourceId = "invalidEnumSourceId.pure";
 
         RuntimeVerifier.verifyOperationIsStable(new RuntimeTestScriptBuilder().createInMemorySources(Maps.immutable.with(sourceId, source, enumSourceId, enumSource, userId, treePath))
@@ -342,40 +370,46 @@ public class TestPureRuntimeTreePath extends AbstractPureTestWithCoreCompiledPla
     public void testPureRuntimeWithStereotypesAndTaggedValues()
     {
         String source =
-                "Profile TestProfile\n" +
-                        "{\n" +
-                        "   stereotypes : [ Root, NewProp, ExistingProp ];\n" +
-                        "   tags : [ Id, Name, Description ];\n" +
-                        "}" +
-                        "Class EntityWithLocations\n" +
-                        "{\n" +
-                        "    name : String[1];\n" +
-                        "    locations : Location[*];\n" +
-                        "    locationsByType(types:GeographicEntityType[*])\n" +
-                        "    {\n" +
-                        "        $this.locations->filter(l | $types->exists(type | is($l.type, $type)))\n" +
-                        "    }:Location[*];\n" +
-                        "}\n" +
-                        "Class Location\n" +
-                        "{\n" +
-                        "    type : GeographicEntityType[1];\n" +
-                        "}\n";
+                """
+                Profile TestProfile
+                {
+                   stereotypes : [ Root, NewProp, ExistingProp ];
+                   tags : [ Id, Name, Description ];
+                }\
+                Class EntityWithLocations
+                {
+                    name : String[1];
+                    locations : Location[*];
+                    locationsByType(types:GeographicEntityType[*])
+                    {
+                        $this.locations->filter(l | $types->exists(type | is($l.type, $type)))
+                    }:Location[*];
+                }
+                Class Location
+                {
+                    type : GeographicEntityType[1];
+                }
+                """;
 
-        String enumSource = "Enum GeographicEntityType\n" +
-                "{\n" +
-                "    CITY,\n" +
-                "    COUNTRY\n" +
-                "}";
+        String enumSource = """
+                Enum GeographicEntityType
+                {
+                    CITY,
+                    COUNTRY
+                }\
+                """;
         String sourceId = "sourceId.pure";
         String enumSourceId = "enumSourceId.pure";
         String userId = "userId.pure";
         String treePath = "function test():Boolean[1]{print(#EntityWithLocations<<TestProfile.Root>>{TestProfile.Id='rootNode'}{ +[name<<TestProfile.ExistingProp>>] \nlocationsByType(GeographicEntityType[*])<<TestProfile.ExistingProp>>{TestProfile.Name='enum'}{*}}#,0);true;}";
 
-        String enumSourceChange = "Enum GeographicEntityType1\n" +
-                "{\n" +
-                "    CTIY,\n" +
-                "    COUNTRY\n" +
-                "}";
+        String enumSourceChange = """
+                Enum GeographicEntityType1
+                {
+                    CTIY,
+                    COUNTRY
+                }\
+                """;
         String invalidEnumSourceId = "invalidEnumSourceId.pure";
 
         RuntimeVerifier.verifyOperationIsStable(new RuntimeTestScriptBuilder().createInMemorySources(Maps.immutable.with(sourceId, source, enumSourceId, enumSource, userId, treePath))

@@ -17,12 +17,12 @@ package org.finos.legend.pure.m3.tests.function.base.meta;
 import org.eclipse.collections.api.factory.Lists;
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 public abstract class AbstractTestNewClass extends AbstractPureTestWithCoreCompiled
 {
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("StandardCall.pure");
@@ -32,13 +32,15 @@ public abstract class AbstractTestNewClass extends AbstractPureTestWithCoreCompi
     @Test
     public void standardCall()
     {
-        String source = "function go():Any[*]\n" +
-                "{\n" +
-                "    let newClass = 'meta::pure::functions::meta::newClass'->newClass();\n" +
-                "    assertEquals('newClass', $newClass.name);\n" +
-                "    assertEquals('meta', $newClass.package.name);\n" +
-                "    assertEquals('meta::pure::functions::meta::newClass', $newClass->elementToPath());\n" +
-                "}\n";
+        String source = """
+                function go():Any[*]
+                {
+                    let newClass = 'meta::pure::functions::meta::newClass'->newClass();
+                    assertEquals('newClass', $newClass.name);
+                    assertEquals('meta', $newClass.package.name);
+                    assertEquals('meta::pure::functions::meta::newClass', $newClass->elementToPath());
+                }
+                """;
 
         compileTestSource("StandardCall.pure", source);
         CoreInstance func = runtime.getFunction("go():Any[*]");
@@ -48,12 +50,14 @@ public abstract class AbstractTestNewClass extends AbstractPureTestWithCoreCompi
     @Test
     public void callWithEmptyPackage()
     {
-        String source = "function go():Any[*]\n" +
-                "{\n" +
-                "    let newClass = 'MyNewClass'->newClass();\n" +
-                "    assertEquals('MyNewClass', $newClass.name);\n" +
-                "    assertEquals('MyNewClass', $newClass->elementToPath());\n" +
-                "}\n";
+        String source = """
+                function go():Any[*]
+                {
+                    let newClass = 'MyNewClass'->newClass();
+                    assertEquals('MyNewClass', $newClass.name);
+                    assertEquals('MyNewClass', $newClass->elementToPath());
+                }
+                """;
 
         compileTestSource("StandardCall.pure", source);
         CoreInstance func = runtime.getFunction("go():Any[*]");
@@ -63,12 +67,14 @@ public abstract class AbstractTestNewClass extends AbstractPureTestWithCoreCompi
     @Test
     public void callWithEmpty()
     {
-        String source = "function go():Any[*]\n" +
-                "{\n" +
-                "    let newClass = ''->newClass();\n" +
-                "    assertEquals('', $newClass.name);\n" +
-                "    assertEquals('', $newClass->elementToPath());\n" +
-                "}\n";
+        String source = """
+                function go():Any[*]
+                {
+                    let newClass = ''->newClass();
+                    assertEquals('', $newClass.name);
+                    assertEquals('', $newClass->elementToPath());
+                }
+                """;
 
         compileTestSource("StandardCall.pure", source);
         CoreInstance func = runtime.getFunction("go():Any[*]");
@@ -78,11 +84,13 @@ public abstract class AbstractTestNewClass extends AbstractPureTestWithCoreCompi
     @Test
     public void newPackage()
     {
-        String source = "function go():Any[*]\n" +
-                "{\n" +
-                "    let newClass = 'foo::bar::newClass'->newClass();\n" +
-                "    assertEquals('foo::bar::newClass', $newClass->elementToPath());\n" +
-                "}\n";
+        String source = """
+                function go():Any[*]
+                {
+                    let newClass = 'foo::bar::newClass'->newClass();
+                    assertEquals('foo::bar::newClass', $newClass->elementToPath());
+                }
+                """;
 
         compileTestSource("StandardCall.pure", source);
         CoreInstance func = runtime.getFunction("go():Any[*]");

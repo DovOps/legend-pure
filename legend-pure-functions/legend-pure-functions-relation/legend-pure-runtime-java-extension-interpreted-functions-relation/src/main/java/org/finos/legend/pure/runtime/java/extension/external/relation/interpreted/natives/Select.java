@@ -54,13 +54,13 @@ public class Select extends Shared
 
         Object cols = Instance.getValueForMetaPropertyToOneResolved(params.get(1), M3Properties.values, processorSupport);
         ListIterable<String> ids;
-        if (cols instanceof ColSpec)
+        if (cols instanceof ColSpec spec)
         {
-            ids = Lists.mutable.with(((ColSpec<?>) cols)._name());
+            ids = Lists.mutable.with(spec._name());
         }
-        else if (cols instanceof ColSpecArray)
+        else if (cols instanceof ColSpecArray array)
         {
-            ids = ((ColSpecArray<?>) cols)._names().collect(c -> (String) c).toList();
+            ids = array._names().collect(c -> (String) c).toList();
         }
         else
         {

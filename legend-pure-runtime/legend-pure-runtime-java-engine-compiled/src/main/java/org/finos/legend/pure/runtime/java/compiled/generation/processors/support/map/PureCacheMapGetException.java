@@ -36,7 +36,7 @@ public class PureCacheMapGetException extends PureExecutionException
     {
         StringBuilder info = new StringBuilder("Exception fetching Cache value for Key ");
         info.append(key);
-        String subInfo = (cause instanceof PureException) ? ((PureException)cause).getInfo() : cause.getMessage();
+        String subInfo = (cause instanceof PureException pe) ? pe.getInfo() : cause.getMessage();
         if (subInfo != null)
         {
             info.append(": ");

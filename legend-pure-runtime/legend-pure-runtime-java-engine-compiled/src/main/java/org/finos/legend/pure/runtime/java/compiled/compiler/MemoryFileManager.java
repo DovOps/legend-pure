@@ -105,9 +105,9 @@ public class MemoryFileManager extends ForwardingJavaFileManager<StandardJavaFil
     @Override
     public String inferBinaryName(Location location, JavaFileObject file)
     {
-        if (file instanceof ClassJavaSource)
+        if (file instanceof ClassJavaSource source)
         {
-            return ((ClassJavaSource) file).inferBinaryName();
+            return source.inferBinaryName();
         }
         return super.inferBinaryName(location, file);
     }
@@ -134,7 +134,7 @@ public class MemoryFileManager extends ForwardingJavaFileManager<StandardJavaFil
         }
         if (this.message != null)
         {
-            this.message.setMessage(String.format("Compiling Java classes (%,d)", this.count));
+            this.message.setMessage("Compiling Java classes (%,d)".formatted(this.count));
         }
         this.count++;
         return source;

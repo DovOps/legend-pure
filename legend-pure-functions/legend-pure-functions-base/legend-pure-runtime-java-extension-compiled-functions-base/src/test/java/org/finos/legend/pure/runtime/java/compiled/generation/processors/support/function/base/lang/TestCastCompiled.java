@@ -21,14 +21,14 @@ import org.finos.legend.pure.m3.tests.function.base.lang.AbstractTestCast;
 import org.finos.legend.pure.runtime.java.compiled.execution.FunctionExecutionCompiledBuilder;
 import org.finos.legend.pure.runtime.java.compiled.factory.JavaModelFactoryRegistryLoader;
 import org.finos.legend.pure.runtime.java.compiled.generation.JavaPackageAndImportBuilder;
-import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 
 import javax.lang.model.SourceVersion;
 
 public class TestCastCompiled extends AbstractTestCast
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         AbstractPureTestWithCoreCompiled.setUpRuntime(getFunctionExecution(), AbstractTestCast.getCodeStorage(), JavaModelFactoryRegistryLoader.loader(), getExtra());
@@ -49,57 +49,57 @@ public class TestCastCompiled extends AbstractTestCast
     protected void checkInvalidCastWithTypeParametersRootException(PureExecutionException e)
     {
         Exception root = findRootException(e);
-        Assert.assertTrue(root instanceof ClassCastException);
+        Assertions.assertTrue(root instanceof ClassCastException);
         String message = root.getMessage();
         if (SourceVersion.latest().compareTo(SourceVersion.RELEASE_8) > 0)
         {
             String expectedStart = "class " + JavaPackageAndImportBuilder.rootPackage() + ".Root_X_Impl cannot be cast to class " + JavaPackageAndImportBuilder.rootPackage() + ".Root_Y";
             if (!message.startsWith(expectedStart))
             {
-                Assert.assertEquals("should start with expected", expectedStart, message);
+                Assertions.assertEquals(expectedStart, message, "should start with expected");
             }
         }
         else
         {
             String expectedMessage = JavaPackageAndImportBuilder.rootPackage() + ".Root_X_Impl incompatible with " + JavaPackageAndImportBuilder.rootPackage() + ".Root_Y";
-            Assert.assertEquals(expectedMessage, message);
+            Assertions.assertEquals(expectedMessage, message);
         }
     }
 
     @Override
     protected void checkPrimitiveConcreteOneTopLevelException(PureExecutionException e)
     {
-        Assert.assertSame(e, findRootException(e));
+        Assertions.assertSame(e, findRootException(e));
     }
 
     @Override
     protected void checkPrimitiveConcreteManyTopLevelException(PureExecutionException e)
     {
-        Assert.assertSame(e, findRootException(e));
+        Assertions.assertSame(e, findRootException(e));
     }
 
     @Override
     protected void checkNonPrimitiveConcreteOneTopLevelException(PureExecutionException e)
     {
-        Assert.assertSame(e, findRootException(e));
+        Assertions.assertSame(e, findRootException(e));
     }
 
     @Override
     protected void checkNonPrimitiveConcreteManyTopLevelException(PureExecutionException e)
     {
-        Assert.assertSame(e, findRootException(e));
+        Assertions.assertSame(e, findRootException(e));
     }
 
     @Override
     protected void checkEnumToStringCastTopLevelException(PureExecutionException e)
     {
-        Assert.assertSame(e, findRootException(e));
+        Assertions.assertSame(e, findRootException(e));
     }
 
     @Override
     protected void checkPrimitiveNonConcreteOneTopLevelException(PureExecutionException e)
     {
-        Assert.assertSame(e, findRootException(e));
+        Assertions.assertSame(e, findRootException(e));
     }
 
     @Override
@@ -111,7 +111,7 @@ public class TestCastCompiled extends AbstractTestCast
     @Override
     protected void checkNonPrimitiveNonConcreteOneTopLevelException(PureExecutionException e)
     {
-        Assert.assertSame(e, findRootException(e));
+        Assertions.assertSame(e, findRootException(e));
     }
 
     @Override
@@ -123,7 +123,7 @@ public class TestCastCompiled extends AbstractTestCast
     @Override
     protected void checkPrimitiveNonConcreteManyTopLevelException(PureExecutionException e)
     {
-        Assert.assertSame(e, findRootException(e));
+        Assertions.assertSame(e, findRootException(e));
     }
 
     @Override
@@ -135,7 +135,7 @@ public class TestCastCompiled extends AbstractTestCast
     @Override
     protected void checkNonPrimitiveNonConcreteManyTopLevelException(PureExecutionException e)
     {
-        Assert.assertSame(e, findRootException(e));
+        Assertions.assertSame(e, findRootException(e));
     }
 
     @Override

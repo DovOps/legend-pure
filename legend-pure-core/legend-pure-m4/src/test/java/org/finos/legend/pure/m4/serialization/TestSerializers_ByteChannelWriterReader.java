@@ -16,10 +16,10 @@ package org.finos.legend.pure.m4.serialization;
 
 import org.finos.legend.pure.m4.serialization.binary.BinaryReaders;
 import org.finos.legend.pure.m4.serialization.binary.BinaryWriters;
-import org.junit.After;
-import org.junit.Rule;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.io.TempDir;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
@@ -29,19 +29,19 @@ import java.nio.file.StandardOpenOption;
 
 public class TestSerializers_ByteChannelWriterReader extends TestSerializers
 {
-    @Rule
-    public TemporaryFolder tempFolder = new TemporaryFolder();
+    @TempDir
+    public File tempFolder;
 
     private WritableByteChannel writableByteChannel;
     private ReadableByteChannel readableByteChannel;
 
-    @After
+    @AfterEach
     public void cleanUpWritableByteChannel() throws IOException
     {
         closeWritableByteChannel();
     }
 
-    @After
+    @AfterEach
     public void cleanUpReadableByteChannel() throws IOException
     {
         closeReadableByteChannel();
@@ -50,7 +50,7 @@ public class TestSerializers_ByteChannelWriterReader extends TestSerializers
     @Override
     protected WriterReader newWriterReader() throws IOException
     {
-        Path tmpFile = this.tempFolder.newFile().toPath();
+        Path tmpFile = File.createTempFile("junit", null, this.tempFolder).toPath();
         return new WriterReader()
         {
             @Override

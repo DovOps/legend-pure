@@ -17,21 +17,21 @@ package org.finos.legend.pure.m3.tests.incremental.profile;
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiledPlatform;
 import org.finos.legend.pure.m3.tests.RuntimeTestScriptBuilder;
 import org.finos.legend.pure.m3.tests.RuntimeVerifier;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestPureRuntimeStereotype extends AbstractPureTestWithCoreCompiledPlatform
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getExtra());
     }
 
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("userId.pure");
@@ -107,25 +107,30 @@ public class TestPureRuntimeStereotype extends AbstractPureTestWithCoreCompiledP
     {
 
         runtime.createInMemorySource("userId.pure", "Profile my::profile::testProfile{stereotypes:[s1,s2];tags: [name];}");
-        runtime.createInMemorySource("sourceId.pure", "import meta::pure::functions::meta::*;\n" +
-                "function meta::pure::functions::meta::stereotype(profile:Profile[1], str:String[1]):Stereotype[1]" +
-                "{" +
-                "   $profile.stereotypes->at(0);" +
-                "}\n" +
-                "function meta::pure::functions::meta::hasStereotype(f:ElementWithStereotypes[1], stereotype:String[1], profile:Profile[1]):Boolean[1]\n" +
-                "{\n" +
-                "    let st = $profile->stereotype($stereotype);\n" +
-                "    !$f.stereotypes->filter(s | $s == $st)->isEmpty();\n" +
-                "}\nfunction hasStereo(a:ElementWithStereotypes[1]):Boolean[1]{ if($a->hasStereotype('s1',my::profile::testProfile), | true, | false)}");
+        runtime.createInMemorySource("sourceId.pure", """
+                import meta::pure::functions::meta::*;
+                function meta::pure::functions::meta::stereotype(profile:Profile[1], str:String[1]):Stereotype[1]\
+                {\
+                   $profile.stereotypes->at(0);\
+                }
+                function meta::pure::functions::meta::hasStereotype(f:ElementWithStereotypes[1], stereotype:String[1], profile:Profile[1]):Boolean[1]
+                {
+                    let st = $profile->stereotype($stereotype);
+                    !$f.stereotypes->filter(s | $s == $st)->isEmpty();
+                }
+                function hasStereo(a:ElementWithStereotypes[1]):Boolean[1]{ if($a->hasStereotype('s1',my::profile::testProfile), | true, | false)}\
+                """);
         runtime.compile();
         int size = runtime.getModelRepository().serialize().length;
 
         for (int i = 0; i < 10; i++)
         {
-            runtime.modify("userId.pure", "////My Comment\n" +
-                    "Profile my::profile::testProfile{stereotypes:[s1,s2];tags: [name];}");
+            runtime.modify("userId.pure", """
+                    ////My Comment
+                    Profile my::profile::testProfile{stereotypes:[s1,s2];tags: [name];}\
+                    """);
             runtime.compile();
-            Assert.assertEquals("Graph size mismatch", size, repository.serialize().length);
+            Assertions.assertEquals(size, repository.serialize().length, "Graph size mismatch");
         }
     }
 
@@ -134,18 +139,22 @@ public class TestPureRuntimeStereotype extends AbstractPureTestWithCoreCompiledP
     {
 
         RuntimeVerifier.verifyOperationIsStable(new RuntimeTestScriptBuilder().createInMemorySource("userId.pure", "Profile my::pack::testProfile{stereotypes:[s1,s2];tags: [name];}")
-                        .createInMemorySource("sourceId.pure", "import meta::pure::functions::meta::*;\n" +
-                                "import my::pack::*;\n" +
-                                "Class my::pack::A{ value:Any[0..1]; }\n" +
-                                "function meta::pure::functions::meta::stereotype(profile:Profile[1], str:String[1]):Stereotype[1]" +
-                                "{" +
-                                "   $profile.stereotypes->at(0);" +
-                                "}\n" +
-                                "function my::pack::newObj(a:ElementWithStereotypes[1]):A[1]{ ^A(value=if(!$a.stereotypes->filter(x|$x == my::pack::testProfile->stereotype('s1'))->isEmpty(), | true, | false))}")
+                        .createInMemorySource("sourceId.pure", """
+                                import meta::pure::functions::meta::*;
+                                import my::pack::*;
+                                Class my::pack::A{ value:Any[0..1]; }
+                                function meta::pure::functions::meta::stereotype(profile:Profile[1], str:String[1]):Stereotype[1]\
+                                {\
+                                   $profile.stereotypes->at(0);\
+                                }
+                                function my::pack::newObj(a:ElementWithStereotypes[1]):A[1]{ ^A(value=if(!$a.stereotypes->filter(x|$x == my::pack::testProfile->stereotype('s1'))->isEmpty(), | true, | false))}\
+                                """)
                         .compile(),
                 new RuntimeTestScriptBuilder()
-                        .updateSource("userId.pure", "////My Comment\n" +
-                                "Profile my::pack::testProfile{stereotypes:[s1,s2];tags: [name];}")
+                        .updateSource("userId.pure", """
+                                ////My Comment
+                                Profile my::pack::testProfile{stereotypes:[s1,s2];tags: [name];}\
+                                """)
                         .compile(),
                 runtime, functionExecution, this.getAdditionalVerifiers());
     }
@@ -158,8 +167,10 @@ public class TestPureRuntimeStereotype extends AbstractPureTestWithCoreCompiledP
                         .createInMemorySource("classId.pure", "Class my::pack::A{ value:my::pack::myEnum[0..1]; }\n")
                         .compile(),
                 new RuntimeTestScriptBuilder()
-                        .updateSource("userId.pure", "////My Comment\n" +
-                                "Profile my::pack::testProfile{stereotypes:[s1,s2];tags: [name];}")
+                        .updateSource("userId.pure", """
+                                ////My Comment
+                                Profile my::pack::testProfile{stereotypes:[s1,s2];tags: [name];}\
+                                """)
                         .compile(),
                 runtime, functionExecution, this.getAdditionalVerifiers());
 

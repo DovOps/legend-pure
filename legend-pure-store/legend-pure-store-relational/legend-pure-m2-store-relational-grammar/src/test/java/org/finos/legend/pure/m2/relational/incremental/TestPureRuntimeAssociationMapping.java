@@ -19,126 +19,142 @@ import org.eclipse.collections.api.factory.Maps;
 import org.finos.legend.pure.m2.relational.AbstractPureRelationalTestWithCoreCompiled;
 import org.finos.legend.pure.m3.tests.RuntimeTestScriptBuilder;
 import org.finos.legend.pure.m3.tests.RuntimeVerifier;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class TestPureRuntimeAssociationMapping extends AbstractPureRelationalTestWithCoreCompiled
 {
 
-    private static final String INITIAL_DATA = "import other::*;\n" +
-            "\n" +
-            "Class other::Person\n" +
-            "{\n" +
-            "    name:String[1];\n" +
-            "}\n" +
-            "Class other::Firm\n" +
-            "{\n" +
-            "    legalName:String[1];\n" +
-            "}\n";
+    private static final String INITIAL_DATA = """
+            import other::*;
+            
+            Class other::Person
+            {
+                name:String[1];
+            }
+            Class other::Firm
+            {
+                legalName:String[1];
+            }
+            """;
 
-    private static final String ASSOCIATION = "import other::*;\n" +
-            "Association other::Firm_Person\n" +
-            "{\n" +
-            "    firm:Firm[1];\n" +
-            "    employees:Person[1];\n" +
-            "}\n";
+    private static final String ASSOCIATION = """
+            import other::*;
+            Association other::Firm_Person
+            {
+                firm:Firm[1];
+                employees:Person[1];
+            }
+            """;
 
     private static final String STORE =
-            "###Relational\n" +
-                    "Database mapping::db(\n" +
-                    "   Table employeeFirmDenormTable\n" +
-                    "   (\n" +
-                    "    id INT PRIMARY KEY,\n" +
-                    "    name VARCHAR(200),\n" +
-                    "    firmId INT,\n" +
-                    "    legalName VARCHAR(200)\n" +
-                    "   )\n" +
-                    "   Join firmJoin(employeeFirmDenormTable.firmId = {target}.firmId)\n" +
-                    ")\n";
+            """
+            ###Relational
+            Database mapping::db(
+               Table employeeFirmDenormTable
+               (
+                id INT PRIMARY KEY,
+                name VARCHAR(200),
+                firmId INT,
+                legalName VARCHAR(200)
+               )
+               Join firmJoin(employeeFirmDenormTable.firmId = {target}.firmId)
+            )
+            """;
 
     private static final String INITIAL_MAPPING =
-            "###Mapping\n" +
-                    "import other::*;\n" +
-                    "import mapping::*;\n" +
-                    "Mapping mappingPackage::subMapping1\n" +
-                    "(\n" +
-                    "    Person[per1]: Relational\n" +
-                    "    {\n" +
-                    "        name : [db]employeeFirmDenormTable.name\n" +
-                    "    }\n" +
-                    "    Firm[fir1]: Relational\n" +
-                    "    {\n" +
-                    "        legalName : [db]employeeFirmDenormTable.legalName\n" +
-                    "    }\n" +
-                    "\n" +
-                    ")\n";
+            """
+            ###Mapping
+            import other::*;
+            import mapping::*;
+            Mapping mappingPackage::subMapping1
+            (
+                Person[per1]: Relational
+                {
+                    name : [db]employeeFirmDenormTable.name
+                }
+                Firm[fir1]: Relational
+                {
+                    legalName : [db]employeeFirmDenormTable.legalName
+                }
+            
+            )
+            """;
 
     private static final String MAPPING_WITH_ASSOCIATION =
-            "###Mapping\n" +
-                    "import other::*;\n" +
-                    "import mapping::*;\n" +
-                    "Mapping mappingPackage::subMapping1\n" +
-                    "(\n" +
-                    "    Person[per1]: Relational\n" +
-                    "    {\n" +
-                    "        name : [db]employeeFirmDenormTable.name\n" +
-                    "    }\n" +
-                    "    Firm[fir1]: Relational\n" +
-                    "    {\n" +
-                    "        legalName : [db]employeeFirmDenormTable.legalName\n" +
-                    "    }\n" +
-                    "\n" +
-                    "    Firm_Person: Relational\n" +
-                    "    {\n" +
-                    "        AssociationMapping\n" +
-                    "        (\n" +
-                    "           employees[fir1,per1] : [db]@firmJoin,\n" +
-                    "           firm[per1,fir1] : [db]@firmJoin\n" +
-                    "        )\n" +
-                    "    }\n" +
-                    ")\n";
+            """
+            ###Mapping
+            import other::*;
+            import mapping::*;
+            Mapping mappingPackage::subMapping1
+            (
+                Person[per1]: Relational
+                {
+                    name : [db]employeeFirmDenormTable.name
+                }
+                Firm[fir1]: Relational
+                {
+                    legalName : [db]employeeFirmDenormTable.legalName
+                }
+            
+                Firm_Person: Relational
+                {
+                    AssociationMapping
+                    (
+                       employees[fir1,per1] : [db]@firmJoin,
+                       firm[per1,fir1] : [db]@firmJoin
+                    )
+                }
+            )
+            """;
 
 
     private static final String MAPPING1 =
-            "###Mapping\n" +
-                    "import other::*;\n" +
-                    "import mapping::*;\n" +
-                    "Mapping mappingPackage::subMapping1\n" +
-                    "(\n" +
-                    "    Person[per1]: Relational\n" +
-                    "    {\n" +
-                    "        name : [db]employeeFirmDenormTable.name\n" +
-                    "    }\n" +
-                    ")\n";
+            """
+            ###Mapping
+            import other::*;
+            import mapping::*;
+            Mapping mappingPackage::subMapping1
+            (
+                Person[per1]: Relational
+                {
+                    name : [db]employeeFirmDenormTable.name
+                }
+            )
+            """;
 
     private static final String MAPPING2 =
-            "###Mapping\n" +
-                    "import other::*;\n" +
-                    "import mapping::*;\n" +
-                    "Mapping mappingPackage::subMapping2\n" +
-                    "(\n" +
-                    "    Firm[fir1]: Relational\n" +
-                    "    {\n" +
-                    "        legalName : [db]employeeFirmDenormTable.legalName\n" +
-                    "    }\n" +
-                    ")\n";
+            """
+            ###Mapping
+            import other::*;
+            import mapping::*;
+            Mapping mappingPackage::subMapping2
+            (
+                Firm[fir1]: Relational
+                {
+                    legalName : [db]employeeFirmDenormTable.legalName
+                }
+            )
+            """;
 
     private static final String MAPPING3 =
-            "###Mapping\n" +
-                    "import other::*;\n" +
-                    "import mapping::*;\n" +
-                    "Mapping mappingPackage::subMapping3\n" +
-                    "(\n" +
-                    "    include mappingPackage::subMapping1\n" +
-                    "    include mappingPackage::subMapping2\n" +
-                    "    Firm_Person: Relational\n" +
-                    "    {\n" +
-                    "        AssociationMapping\n" +
-                    "        (\n" +
-                    "           employees[fir1,per1] : [db]@firmJoin,\n" +
-                    "           firm[per1,fir1] : [db]@firmJoin\n" +
-                    "        )\n" +
-                    "    }\n" +
-                    ")\n";
+            """
+            ###Mapping
+            import other::*;
+            import mapping::*;
+            Mapping mappingPackage::subMapping3
+            (
+                include mappingPackage::subMapping1
+                include mappingPackage::subMapping2
+                Firm_Person: Relational
+                {
+                    AssociationMapping
+                    (
+                       employees[fir1,per1] : [db]@firmJoin,
+                       firm[per1,fir1] : [db]@firmJoin
+                    )
+                }
+            )
+            """;
 
     @Test
     public void testCreateAndDeleteAssociationMappingSameFile() throws Exception

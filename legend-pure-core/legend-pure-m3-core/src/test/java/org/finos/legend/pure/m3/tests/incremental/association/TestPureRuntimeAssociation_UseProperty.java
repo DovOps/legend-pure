@@ -17,19 +17,19 @@ package org.finos.legend.pure.m3.tests.incremental.association;
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiledPlatform;
 import org.finos.legend.pure.m3.tests.RuntimeTestScriptBuilder;
 import org.finos.legend.pure.m3.tests.RuntimeVerifier;
-import org.junit.After;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestPureRuntimeAssociation_UseProperty extends AbstractPureTestWithCoreCompiledPlatform
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getExtra());
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("userId.pure");
@@ -40,10 +40,12 @@ public class TestPureRuntimeAssociation_UseProperty extends AbstractPureTestWith
     public void testPureRuntimeAssociation_UseProperty() throws Exception
     {
         RuntimeVerifier.verifyOperationIsStable(new RuntimeTestScriptBuilder().createInMemorySource("sourceId.pure", "Association a {a:test::A[0..1];b:test::B[0..1];}")
-                        .createInMemorySource("userId.pure", "import test::*;\n" +
-                                "Class test::A{}\n" +
-                                "Class test::B{}\n" +
-                                "function test():Any[*]{ let k = ^A(b=^B()); $k.b;}")
+                        .createInMemorySource("userId.pure", """
+                                import test::*;
+                                Class test::A{}
+                                Class test::B{}
+                                function test():Any[*]{ let k = ^A(b=^B()); $k.b;}\
+                                """)
                         .compile(),
                 new RuntimeTestScriptBuilder()
                         .deleteSource("sourceId.pure")
@@ -59,10 +61,12 @@ public class TestPureRuntimeAssociation_UseProperty extends AbstractPureTestWith
     public void testPureRuntimeAssociation_UsePropertyError() throws Exception
     {
         RuntimeVerifier.verifyOperationIsStable(new RuntimeTestScriptBuilder().createInMemorySource("sourceId.pure", "Association a {a:test::A[0..1];b:test::B[0..1];}")
-                        .createInMemorySource("userId.pure", "import test::*;\n" +
-                                "Class test::A{}\n" +
-                                "Class test::B{}\n" +
-                                "function test():Any[*]{ let k = ^A(b=^B()); $k.b;}")
+                        .createInMemorySource("userId.pure", """
+                                import test::*;
+                                Class test::A{}
+                                Class test::B{}
+                                function test():Any[*]{ let k = ^A(b=^B()); $k.b;}\
+                                """)
                         .compile(),
                 new RuntimeTestScriptBuilder()
                         .deleteSource("sourceId.pure")

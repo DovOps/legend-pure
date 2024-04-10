@@ -35,13 +35,15 @@ public class Mod extends AbstractNative
     @Override
     public String buildBody()
     {
-        return "new DefendedPureFunction2<Long, Long, Long>()\n" +
-                "        {\n" +
-                "            @Override\n" +
-                "            public Long value(Long input1, Long input2, ExecutionSupport es)\n" +
-                "            {\n" +
-                "                return FunctionsGen.mod(input1, input2);\n" +
-                "            }\n" +
-                "        }";
+        return """
+                new DefendedPureFunction2<Long, Long, Long>()
+                        {
+                            @Override
+                            public Long value(Long input1, Long input2, ExecutionSupport es)
+                            {
+                                return FunctionsGen.mod(input1, input2);
+                            }
+                        }\
+                """;
     }
 }

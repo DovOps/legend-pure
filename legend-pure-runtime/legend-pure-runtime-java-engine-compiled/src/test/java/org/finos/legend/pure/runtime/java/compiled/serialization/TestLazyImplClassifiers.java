@@ -23,23 +23,23 @@ import org.finos.legend.pure.runtime.java.compiled.metadata.Metadata;
 import org.finos.legend.pure.runtime.java.compiled.metadata.MetadataLazy;
 import org.finos.legend.pure.runtime.java.compiled.serialization.binary.DistributedBinaryGraphDeserializer;
 import org.finos.legend.pure.runtime.java.compiled.serialization.binary.DistributedBinaryGraphSerializer;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 
 public class TestLazyImplClassifiers extends AbstractPureTestWithCoreCompiled
 {
     private Metadata metadataLazy;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getFunctionExecution(), JavaModelFactoryRegistryLoader.loader());
     }
 
-    @Before
+    @BeforeEach
     public void setUpLazyMetaData()
     {
         MutableMap<String, byte[]> fileBytes = Maps.mutable.empty();
@@ -53,7 +53,7 @@ public class TestLazyImplClassifiers extends AbstractPureTestWithCoreCompiled
     {
         CoreInstance expected = this.metadataLazy.getMetadata("meta::pure::metamodel::type::Class", "Root::meta::pure::metamodel::type::PrimitiveType");
         boolean primitiveClassiferSetForAllPrimitiveTypes = this.metadataLazy.getMetadata("meta::pure::metamodel::type::PrimitiveType").allSatisfy(ci -> ci.getClassifier() == expected);
-        Assert.assertTrue(primitiveClassiferSetForAllPrimitiveTypes);
+        Assertions.assertTrue(primitiveClassiferSetForAllPrimitiveTypes);
     }
 
     @Test
@@ -62,7 +62,7 @@ public class TestLazyImplClassifiers extends AbstractPureTestWithCoreCompiled
         CoreInstance expected = this.metadataLazy.getMetadata("meta::pure::metamodel::type::Class", "Root::meta::pure::metamodel::type::Class");
         CoreInstance ci = this.metadataLazy.getMetadata("meta::pure::metamodel::type::Class", "Root::meta::pure::metamodel::function::property::Property");
         CoreInstance classifier = ci.getClassifier();
-        Assert.assertEquals(expected, classifier);
+        Assertions.assertEquals(expected, classifier);
     }
 
     @Test
@@ -71,6 +71,6 @@ public class TestLazyImplClassifiers extends AbstractPureTestWithCoreCompiled
         CoreInstance expected = this.metadataLazy.getMetadata("meta::pure::metamodel::type::Class", "Root::meta::pure::metamodel::type::Enumeration");
         CoreInstance ci = this.metadataLazy.getMetadata("meta::pure::metamodel::type::Enumeration", "Root::meta::pure::metamodel::function::property::AggregationKind");
         CoreInstance classifier = ci.getClassifier();
-        Assert.assertEquals(expected, classifier);
+        Assertions.assertEquals(expected, classifier);
     }
 }

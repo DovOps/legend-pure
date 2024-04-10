@@ -17,13 +17,13 @@ package org.finos.legend.pure.m3.tests.elements.function.functionMatching;
 import org.finos.legend.pure.m3.exception.PureUnmatchedFunctionException;
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiledPlatform;
 import org.finos.legend.pure.m4.exception.PureCompilationException;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestGeneralization extends AbstractPureTestWithCoreCompiledPlatform
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getExtra());
@@ -34,41 +34,43 @@ public class TestGeneralization extends AbstractPureTestWithCoreCompiledPlatform
     {
         try
         {
-            compileTestSource("Class A\n" +
-                    "{\n" +
-                    "   propA:String[1];\n" +
-                    "}\n" +
-                    "Class C\n" +
-                    "{\n" +
-                    "   propC:String[1];\n" +
-                    "}\n" +
-                    "Class B extends A,C\n" +
-                    "{\n" +
-                    "   propB:String[1];\n" +
-                    "}\n" +
-                    "Class D\n" +
-                    "{\n" +
-                    "}\n" +
-                    "function simpleTest():String[1]\n" +
-                    "{\n" +
-                    "   let b = ^B(propA='iA',propB='iB',propC='iC');\n" +
-                    "   callWithA($b);\n" +
-                    "   callWithC($b);\n" +
-                    "   callWithD($b);\n" +
-                    "}\n" +
-                    "function callWithA(a:A[1]):String[1]\n" +
-                    "{\n" +
-                    "   $a.propA;\n" +
-                    "}\n" +
-                    "function callWithC(c:C[1]):String[1]\n" +
-                    "{\n" +
-                    "   $c.propC;\n" +
-                    "}\n" +
-                    "function callWithD(d:D[1]):String[1]\n" +
-                    "{\n" +
-                    "   'D';\n" +
-                    "}");
-            Assert.fail();
+            compileTestSource("""
+                    Class A
+                    {
+                       propA:String[1];
+                    }
+                    Class C
+                    {
+                       propC:String[1];
+                    }
+                    Class B extends A,C
+                    {
+                       propB:String[1];
+                    }
+                    Class D
+                    {
+                    }
+                    function simpleTest():String[1]
+                    {
+                       let b = ^B(propA='iA',propB='iB',propC='iC');
+                       callWithA($b);
+                       callWithC($b);
+                       callWithD($b);
+                    }
+                    function callWithA(a:A[1]):String[1]
+                    {
+                       $a.propA;
+                    }
+                    function callWithC(c:C[1]):String[1]
+                    {
+                       $c.propC;
+                    }
+                    function callWithD(d:D[1]):String[1]
+                    {
+                       'D';
+                    }\
+                    """);
+            Assertions.fail();
         }
         catch (Exception e)
         {

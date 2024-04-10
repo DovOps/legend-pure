@@ -101,9 +101,9 @@ public class GenericTypeValidator implements MatchRunner<GenericType>
     {
         if (rawType != null)
         {
-            if (rawType instanceof Class)
+            if (rawType instanceof Class class1)
             {
-                RichIterable<? extends TypeParameter> typeParameters = ((Class)rawType)._typeParameters();
+                RichIterable<? extends TypeParameter> typeParameters = class1._typeParameters();
 
                 if (typeArguments.size() != typeParameters.size())
                 {
@@ -132,7 +132,7 @@ public class GenericTypeValidator implements MatchRunner<GenericType>
                     }
                 }
 
-                RichIterable<? extends InstanceValue> multiplicityParameters = ((Class)rawType)._multiplicityParameters();
+                RichIterable<? extends InstanceValue> multiplicityParameters = class1._multiplicityParameters();
                 if (multiplicityArguments.size() != multiplicityParameters.size())
                 {
                     StringBuilder message = new StringBuilder("Multiplicity argument mismatch for the class ");

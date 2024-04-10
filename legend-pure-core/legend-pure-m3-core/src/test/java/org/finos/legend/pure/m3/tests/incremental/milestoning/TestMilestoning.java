@@ -26,14 +26,14 @@ import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiledPlatform;
 import org.finos.legend.pure.m3.tests.RuntimeTestScriptBuilder;
 import org.finos.legend.pure.m3.tests.RuntimeVerifier;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestMilestoning extends AbstractPureTestWithCoreCompiledPlatform
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getFunctionExecution(), new CompositeCodeStorage(new ClassLoaderCodeStorage(getCodeRepositories())), getFactoryRegistryOverride(), getOptions(), getExtra());
@@ -49,7 +49,7 @@ public class TestMilestoning extends AbstractPureTestWithCoreCompiledPlatform
         return repositories;
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("A.pure");
@@ -146,9 +146,11 @@ public class TestMilestoning extends AbstractPureTestWithCoreCompiledPlatform
     public void testNonTemporalClassToBusinessTemporalClassStability()
     {
         String businessTemporalClassB = "Class <<temporal.businesstemporal>> B{}";
-        String bDependentClassA = "Class A{     \n" +
-                " b : B[0..1];\n" +
-                "}            \n";
+        String bDependentClassA = """
+                Class A{    \s
+                 b : B[0..1];
+                }           \s
+                """;
 
         RuntimeVerifier.verifyOperationIsStable(new RuntimeTestScriptBuilder()
                         .createInMemorySource("sourceB.pure", businessTemporalClassB)
@@ -166,12 +168,16 @@ public class TestMilestoning extends AbstractPureTestWithCoreCompiledPlatform
     @Test
     public void testNonTemporalClassToBusinessTemporalClassStabilityViaAssociationRemoveAssn()
     {
-        String classes = "Class A{}\n" +
-                "Class <<temporal.businesstemporal>> B{}\n";
-        String association = "Association AB{" +
-                "  a: A[0..1];" +
-                "  b: B[0..1];" +
-                "}";
+        String classes = """
+                Class A{}
+                Class <<temporal.businesstemporal>> B{}
+                """;
+        String association = """
+                Association AB{\
+                  a: A[0..1];\
+                  b: B[0..1];\
+                }\
+                """;
 
         RuntimeVerifier.verifyOperationIsStable(new RuntimeTestScriptBuilder()
                         .createInMemorySource("classes.pure", classes)
@@ -191,10 +197,12 @@ public class TestMilestoning extends AbstractPureTestWithCoreCompiledPlatform
     {
         String classA = "Class A{}\n";
         String classB = "Class <<temporal.businesstemporal>> B{}\n";
-        String association = "Association AB{\n" +
-                "  a: A[0..1];\n" +
-                "  b: B[0..1];\n" +
-                "}";
+        String association = """
+                Association AB{
+                  a: A[0..1];
+                  b: B[0..1];
+                }\
+                """;
 
         RuntimeVerifier.verifyOperationIsStable(new RuntimeTestScriptBuilder()
                         .createInMemorySource("classes.pure", classA)
@@ -255,13 +263,17 @@ public class TestMilestoning extends AbstractPureTestWithCoreCompiledPlatform
     @Test
     public void testStabilityOfMilestonedQualifiedPropertyUnbindingWithAutomap()
     {
-        String classes = "Class A {b:B[*];} " +
-                "Class B {c:C[1];}" +
-                "Class <<temporal.businesstemporal>> C { idt:Integer[1];}";
-        String functions = "function testLambda():Any[*]{" +
-                "   let bd=%999-12-31;" +
-                "   {a:A[1]|$a.b.c($bd).idt};" +
-                "}";
+        String classes = """
+                Class A {b:B[*];} \
+                Class B {c:C[1];}\
+                Class <<temporal.businesstemporal>> C { idt:Integer[1];}\
+                """;
+        String functions = """
+                function testLambda():Any[*]{\
+                   let bd=%999-12-31;\
+                   {a:A[1]|$a.b.c($bd).idt};\
+                }\
+                """;
         RuntimeVerifier.verifyOperationIsStable(new RuntimeTestScriptBuilder()
                         .createInMemorySource("sourceId.pure", classes)
                         .createInMemorySource("userId.pure", functions)
@@ -276,12 +288,16 @@ public class TestMilestoning extends AbstractPureTestWithCoreCompiledPlatform
     @Test
     public void testStabilityOfNoArgMilestonedProperty()
     {
-        String classes = "Class <<temporal.businesstemporal>> A {b:B[*];} " +
-                "Class <<temporal.businesstemporal>> B {attr:Integer[1];}";
-        String functions = "function noArgQualifiedPropertyUsage():Any[*]{" +
-                "   let bd=%999-12-31;" +
-                "   {|A.all($bd).b.attr};" +
-                "}";
+        String classes = """
+                Class <<temporal.businesstemporal>> A {b:B[*];} \
+                Class <<temporal.businesstemporal>> B {attr:Integer[1];}\
+                """;
+        String functions = """
+                function noArgQualifiedPropertyUsage():Any[*]{\
+                   let bd=%999-12-31;\
+                   {|A.all($bd).b.attr};\
+                }\
+                """;
         RuntimeVerifier.verifyOperationIsStable(new RuntimeTestScriptBuilder()
                         .createInMemorySource("sourceId.pure", classes)
                         .createInMemorySource("userId.pure", functions)
@@ -311,10 +327,12 @@ public class TestMilestoning extends AbstractPureTestWithCoreCompiledPlatform
         String classBNonTemporal = "Class B {attr:Integer[1];}";
         String classBTemporal = "Class <<temporal.businesstemporal>> B {attr:Integer[1];}";
 
-        String functions = "function noArgQualifiedPropertyUsage():Any[*]{" +
-                "   let bd=%999-12-31;" +
-                "   {|A.all($bd).b.attr};" +
-                "}";
+        String functions = """
+                function noArgQualifiedPropertyUsage():Any[*]{\
+                   let bd=%999-12-31;\
+                   {|A.all($bd).b.attr};\
+                }\
+                """;
 
         RuntimeVerifier.verifyOperationIsStable(new RuntimeTestScriptBuilder()
                         .createInMemorySource("sourceIdClassA.pure", classA)
@@ -346,7 +364,7 @@ public class TestMilestoning extends AbstractPureTestWithCoreCompiledPlatform
         runtime.getIncrementalCompiler().updateSource(runtime.getSourceById("classes.pure"), "");
         runtime.compile();
 
-        Assert.assertEquals("Graph size mismatch", size, repository.serialize().length);
+        Assertions.assertEquals(size, repository.serialize().length, "Graph size mismatch");
     }
 
     @Test
@@ -355,9 +373,11 @@ public class TestMilestoning extends AbstractPureTestWithCoreCompiledPlatform
         String a = "Class <<temporal.processingtemporal>> A{version : Integer[1]; b:B[*];}";
         String b = "Class <<temporal.processingtemporal>> B{value : String[1];}";
         String bNoMilestoning = "Class B{}";
-        String go = "function go():Any[*]{" +
-                "{|A.all(%2016)->filter(a|$a.b.value == '')}" +
-                "}";
+        String go = """
+                function go():Any[*]{\
+                {|A.all(%2016)->filter(a|$a.b.value == '')}\
+                }\
+                """;
 
         runtime.createInMemorySource("A.pure", a);
         runtime.createInMemorySource("B.pure", b);
@@ -375,10 +395,12 @@ public class TestMilestoning extends AbstractPureTestWithCoreCompiledPlatform
         String baseClass = "Class <<temporal.businesstemporal>> test::A{id:Integer[0..1];}\n";
         String specializationClassB = "Class <<temporal.businesstemporal>> test::B extends test::A{value:String[0..1];}\n";
         String specializationClassC = "Class <<temporal.businesstemporal>> test::C extends test::A{}\n";
-        String associationB_C = "Association test::controllers::B_C{\n" +
-                "   b: test::B[*];\n" +
-                "   c: test::C[0..1];" +
-                "}\n";
+        String associationB_C = """
+                Association test::controllers::B_C{
+                   b: test::B[*];
+                   c: test::C[0..1];\
+                }
+                """;
         String go = "function test::go():Any[*]{" + "{|test::C.all(%2016)->filter(c|$c.b.value == '')}" + "}";
 
         RuntimeVerifier.verifyOperationIsStable(new RuntimeTestScriptBuilder()
@@ -401,7 +423,7 @@ public class TestMilestoning extends AbstractPureTestWithCoreCompiledPlatform
         runtime.modify("/test/baseClass.pure", baseClass + " ");
         runtime.compile();
 
-        Assert.assertEquals("Graph size mismatch", size, repository.serialize().length);
+        Assertions.assertEquals(size, repository.serialize().length, "Graph size mismatch");
     }
 
     @Test
@@ -410,11 +432,13 @@ public class TestMilestoning extends AbstractPureTestWithCoreCompiledPlatform
         String classSourceId = "/test/myClass.pure";
         String classSource = "Class <<temporal.businesstemporal>> test::Class1 {}\n";
         String assocSourceId = "/test/myAssociation.pure";
-        String assocSource = "Association test::SelfAssoc\n" +
-                "{\n" +
-                "    parent : test::Class1[1];\n" +
-                "    children : test::Class1[*];\n" +
-                "}\n";
+        String assocSource = """
+                Association test::SelfAssoc
+                {
+                    parent : test::Class1[1];
+                    children : test::Class1[*];
+                }
+                """;
 
         RuntimeVerifier.verifyOperationIsStable(new RuntimeTestScriptBuilder().createInMemorySource(classSourceId, classSource)
                         .createInMemorySource(assocSourceId, assocSource)

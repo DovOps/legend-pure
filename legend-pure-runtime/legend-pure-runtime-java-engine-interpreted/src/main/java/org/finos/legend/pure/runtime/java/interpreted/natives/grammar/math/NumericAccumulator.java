@@ -51,9 +51,9 @@ public class NumericAccumulator
         {
             throw new NullPointerException("Cannot add null");
         }
-        else if (number instanceof BigDecimal)
+        else if (number instanceof BigDecimal decimal)
         {
-            add((BigDecimal) number);
+            add(decimal);
         }
         else if (number instanceof Double)
         {
@@ -63,9 +63,9 @@ public class NumericAccumulator
         {
             add(number.floatValue());
         }
-        else if (number instanceof BigInteger)
+        else if (number instanceof BigInteger integer)
         {
-            add((BigInteger) number);
+            add(integer);
         }
         else if (number instanceof Long)
         {
@@ -152,9 +152,9 @@ public class NumericAccumulator
         {
             throw new NullPointerException("Cannot subtract null");
         }
-        else if (number instanceof BigDecimal)
+        else if (number instanceof BigDecimal decimal)
         {
-            subtract((BigDecimal) number);
+            subtract(decimal);
         }
         else if (number instanceof Double)
         {
@@ -164,9 +164,9 @@ public class NumericAccumulator
         {
             subtract(number.floatValue());
         }
-        else if (number instanceof BigInteger)
+        else if (number instanceof BigInteger integer)
         {
-            subtract((BigInteger) number);
+            subtract(integer);
         }
         else if (number instanceof Long)
         {
@@ -253,9 +253,9 @@ public class NumericAccumulator
         {
             throw new NullPointerException("Cannot multiply by null");
         }
-        else if (number instanceof BigDecimal)
+        else if (number instanceof BigDecimal decimal)
         {
-            multiply((BigDecimal) number);
+            multiply(decimal);
         }
         else if (number instanceof Double)
         {
@@ -265,9 +265,9 @@ public class NumericAccumulator
         {
             multiply(number.floatValue());
         }
-        else if (number instanceof BigInteger)
+        else if (number instanceof BigInteger integer)
         {
-            multiply((BigInteger) number);
+            multiply(integer);
         }
         else if (number instanceof Long)
         {
@@ -354,9 +354,9 @@ public class NumericAccumulator
         {
             throw new NullPointerException("Cannot divide by null");
         }
-        else if (number instanceof BigDecimal)
+        else if (number instanceof BigDecimal decimal)
         {
-            divide((BigDecimal) number);
+            divide(decimal);
         }
         else if (number instanceof Double)
         {
@@ -366,9 +366,9 @@ public class NumericAccumulator
         {
             divide(number.floatValue());
         }
-        else if (number instanceof BigInteger)
+        else if (number instanceof BigInteger integer)
         {
-            divide((BigInteger) number);
+            divide(integer);
         }
         else if (number instanceof Long)
         {
@@ -455,9 +455,9 @@ public class NumericAccumulator
         {
             throw new NullPointerException("Cannot divide by null");
         }
-        else if (number instanceof BigDecimal)
+        else if (number instanceof BigDecimal decimal)
         {
-            pow((BigDecimal) number);
+            pow(decimal);
         }
         else if (number instanceof Double)
         {
@@ -467,9 +467,9 @@ public class NumericAccumulator
         {
             pow(number.floatValue());
         }
-        else if (number instanceof BigInteger)
+        else if (number instanceof BigInteger integer)
         {
-            pow((BigInteger) number);
+            pow(integer);
         }
         else if (number instanceof Long)
         {
@@ -560,9 +560,9 @@ public class NumericAccumulator
         {
             throw new NullPointerException("Initial value cannot be null");
         }
-        else if (initialValue instanceof BigDecimal)
+        else if (initialValue instanceof BigDecimal decimal)
         {
-            return newAccumulator((BigDecimal) initialValue);
+            return newAccumulator(decimal);
         }
         else if (initialValue instanceof Double)
         {
@@ -572,9 +572,9 @@ public class NumericAccumulator
         {
             return newAccumulator(initialValue.floatValue());
         }
-        else if (initialValue instanceof BigInteger)
+        else if (initialValue instanceof BigInteger integer)
         {
-            return newAccumulator((BigInteger) initialValue);
+            return newAccumulator(integer);
         }
         else if (initialValue instanceof Long)
         {

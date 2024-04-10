@@ -43,7 +43,7 @@ public class ColumnDataTypeFactory
         String pureTypeName = getPureTypeName(typeName);
         if (pureTypeName == null)
         {
-            throw new ColumnDataTypeException(String.format("Unknown column data type '%s'", typeName));
+            throw new ColumnDataTypeException("Unknown column data type '%s'".formatted(typeName));
         }
         else
         {
@@ -56,21 +56,21 @@ public class ColumnDataTypeFactory
 
                 if (paramValues.length == 1)
                 {
-                    conParamsAndValues.add(String.format("%s=%s", constructorParamNames.get(0), paramValues[0]));
+                    conParamsAndValues.add("%s=%s".formatted(constructorParamNames.get(0), paramValues[0]));
                 }
                 else if (paramValues.length == 2)
                 {
-                    conParamsAndValues.add(String.format("%s=%s", constructorParamNames.get(0), paramValues[0]));
-                    conParamsAndValues.add(String.format("%s=%s", constructorParamNames.get(1), paramValues[1]));
+                    conParamsAndValues.add("%s=%s".formatted(constructorParamNames.get(0), paramValues[0]));
+                    conParamsAndValues.add("%s=%s".formatted(constructorParamNames.get(1), paramValues[1]));
                 }
 
-                return String.format("^%s%s(%s)", DATA_TYPE_ROOT_PACKAGE, pureTypeName, conParamsAndValues.makeString(","));
+                return "^%s%s(%s)".formatted(DATA_TYPE_ROOT_PACKAGE, pureTypeName, conParamsAndValues.makeString(","));
             }
             else
             {
                 //System.out.println("ColumnDataTypeException --> "+sourceName+" "+typeName.beginLine+" "+typeName.toString());
                 //return String.format("^%s%s()", DATA_TYPE_ROOT_PACKAGE, pureTypeName);
-                throw new ColumnDataTypeException(String.format("The data type %s requires %d values but %d were provided", typeName, conParamLength, paramValues.length));
+                throw new ColumnDataTypeException("The data type %s requires %d values but %d were provided".formatted(typeName, conParamLength, paramValues.length));
             }
         }
 

@@ -14,20 +14,20 @@
 
 package org.finos.legend.pure.m2.ds.mapping.test;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestXStoreMapping extends AbstractPureMappingTestWithCoreCompiled
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime();
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("mapping.pure");
@@ -36,55 +36,57 @@ public class TestXStoreMapping extends AbstractPureMappingTestWithCoreCompiled
     @Test
     public void testXStoreMapping()
     {
-        String source = "Class Firm\n" +
-                "{\n" +
-                "   legalName : String[1];\n" +
-                "}\n" +
-                "\n" +
-                "Class Person\n" +
-                "{\n" +
-                "   lastName : String[1];\n" +
-                "}\n" +
-                "\n" +
-                "Association Firm_Person\n" +
-                "{\n" +
-                "   firm : Firm[1];\n" +
-                "   employees : Person[*];\n" +
-                "}\n" +
-                "Class SrcFirm\n" +
-                "{\n" +
-                "   _id : String[1];\n" +
-                "   _legalName : String[1];\n" +
-                "}\n" +
-                "\n" +
-                "Class SrcPerson\n" +
-                "{\n" +
-                "   _lastName : String[1];\n" +
-                "   _firmId : String[1];\n" +
-                "}\n" +
-                "###Mapping\n" +
-                "Mapping FirmMapping\n" +
-                "(\n" +
-                "   Firm[f1] : Pure\n" +
-                "   {\n" +
-                "      ~src SrcFirm " +
-                "      +id:String[1] : $src._id,\n" +
-                "      legalName : $src._legalName\n" +
-                "   }\n" +
-                "   \n" +
-                "   Person[e] : Pure\n" +
-                "   {\n" +
-                "      ~src SrcPerson" +
-                "      +firmId:String[1] : $src._firmId,\n" +
-                "      lastName : $src._lastName\n" +
-                "   }\n" +
-                "   \n" +
-                "   Firm_Person : XStore\n" +
-                "   {\n" +
-                "      firm[e, f1] : $this.firmId == $that.id,\n" +
-                "      employees[f1, e] : $this.id == $that.firmId\n" +
-                "   }\n" +
-                ")\n";
+        String source = """
+                Class Firm
+                {
+                   legalName : String[1];
+                }
+                
+                Class Person
+                {
+                   lastName : String[1];
+                }
+                
+                Association Firm_Person
+                {
+                   firm : Firm[1];
+                   employees : Person[*];
+                }
+                Class SrcFirm
+                {
+                   _id : String[1];
+                   _legalName : String[1];
+                }
+                
+                Class SrcPerson
+                {
+                   _lastName : String[1];
+                   _firmId : String[1];
+                }
+                ###Mapping
+                Mapping FirmMapping
+                (
+                   Firm[f1] : Pure
+                   {
+                      ~src SrcFirm \
+                      +id:String[1] : $src._id,
+                      legalName : $src._legalName
+                   }
+                  \s
+                   Person[e] : Pure
+                   {
+                      ~src SrcPerson\
+                      +firmId:String[1] : $src._firmId,
+                      lastName : $src._lastName
+                   }
+                  \s
+                   Firm_Person : XStore
+                   {
+                      firm[e, f1] : $this.firmId == $that.id,
+                      employees[f1, e] : $this.id == $that.firmId
+                   }
+                )
+                """;
         runtime.createInMemorySource("mapping.pure", source);
         runtime.compile();
         assertSetSourceInformation(source, "Firm");
@@ -96,118 +98,122 @@ public class TestXStoreMapping extends AbstractPureMappingTestWithCoreCompiled
     public void testXStoreMappingTypeError()
     {
         runtime.createInMemorySource("mapping.pure",
-                "Class Firm\n" +
-                        "{\n" +
-                        "   legalName : String[1];\n" +
-                        "}\n" +
-                        "\n" +
-                        "Class Person\n" +
-                        "{\n" +
-                        "   lastName : String[1];\n" +
-                        "}\n" +
-                        "\n" +
-                        "Association Firm_Person\n" +
-                        "{\n" +
-                        "   firm : Firm[1];\n" +
-                        "   employees : Person[*];\n" +
-                        "}\n" +
-                        "Class SrcFirm\n" +
-                        "{\n" +
-                        "   _id : String[1];\n" +
-                        "   _legalName : String[1];\n" +
-                        "}\n" +
-                        "\n" +
-                        "Class SrcPerson\n" +
-                        "{\n" +
-                        "   _lastName : String[1];\n" +
-                        "   _firmId : String[1];\n" +
-                        "}\n" +
-                        "###Mapping\n" +
-                        "Mapping FirmMapping\n" +
-                        "(\n" +
-                        "   Firm[f1] : Pure\n" +
-                        "   {\n" +
-                        "      ~src SrcFirm " +
-                        "      +id:String[1] : $src._id,\n" +
-                        "      legalName : $src._legalName\n" +
-                        "   }\n" +
-                        "   \n" +
-                        "   Person[e] : Pure\n" +
-                        "   {\n" +
-                        "      ~src SrcPerson" +
-                        "      +firmId:Strixng[1] : $src._firmId,\n" +
-                        "      lastName : $src._lastName\n" +
-                        "   }\n" +
-                        "   \n" +
-                        "   Firm_Person : XStore\n" +
-                        "   {\n" +
-                        "      firm[e, f1] : $this.firmId == $that.id,\n" +
-                        "      employees[f1, e] : $this.id == $that.firmId\n" +
-                        "   }\n" +
-                        ")\n");
+                """
+                Class Firm
+                {
+                   legalName : String[1];
+                }
+                
+                Class Person
+                {
+                   lastName : String[1];
+                }
+                
+                Association Firm_Person
+                {
+                   firm : Firm[1];
+                   employees : Person[*];
+                }
+                Class SrcFirm
+                {
+                   _id : String[1];
+                   _legalName : String[1];
+                }
+                
+                Class SrcPerson
+                {
+                   _lastName : String[1];
+                   _firmId : String[1];
+                }
+                ###Mapping
+                Mapping FirmMapping
+                (
+                   Firm[f1] : Pure
+                   {
+                      ~src SrcFirm \
+                      +id:String[1] : $src._id,
+                      legalName : $src._legalName
+                   }
+                  \s
+                   Person[e] : Pure
+                   {
+                      ~src SrcPerson\
+                      +firmId:Strixng[1] : $src._firmId,
+                      lastName : $src._lastName
+                   }
+                  \s
+                   Firm_Person : XStore
+                   {
+                      firm[e, f1] : $this.firmId == $that.id,
+                      employees[f1, e] : $this.id == $that.firmId
+                   }
+                )
+                """);
         try
         {
             runtime.compile();
-            Assert.fail();
+            Assertions.fail();
         }
         catch (Exception e)
         {
-            Assert.assertEquals("Compilation error at (resource:mapping.pure line:38 column:35), \"Strixng has not been defined!\"", e.getMessage());
+            Assertions.assertEquals("Compilation error at (resource:mapping.pure line:38 column:35), \"Strixng has not been defined!\"", e.getMessage());
         }
     }
 
     @Test
     public void testXStoreMappingDiffMul()
     {
-        String source = "Class Firm\n" +
-                "{\n" +
-                "   legalName : String[1];\n" +
-                "}\n" +
-                "\n" +
-                "Class Person\n" +
-                "{\n" +
-                "   lastName : String[1];\n" +
-                "}\n" +
-                "\n" +
-                "Association Firm_Person\n" +
-                "{\n" +
-                "   firm : Firm[1];\n" +
-                "   employees : Person[*];\n" +
-                "}\n" +
-                "Class SrcFirm\n" +
-                "{\n" +
-                "   _id : String[1];\n" +
-                "   _legalName : String[1];\n" +
-                "}\n" +
-                "\n" +
-                "Class SrcPerson\n" +
-                "{\n" +
-                "   _lastName : String[1];\n" +
-                "   _firmId : String[1];\n" +
-                "}\n" +
-                "###Mapping\n" +
-                "Mapping FirmMapping\n" +
-                "(\n" +
-                "   Firm[f1] : Pure\n" +
-                "   {\n" +
-                "      ~src SrcFirm " +
-                "      +id:String[*] : $src._id,\n" +
-                "      legalName : $src._legalName\n" +
-                "   }\n" +
-                "   \n" +
-                "   Person[e] : Pure\n" +
-                "   {\n" +
-                "      ~src SrcPerson" +
-                "      +firmId:String[0..1] : $src._firmId,\n" +
-                "      lastName : $src._lastName\n" +
-                "   }\n" +
-                "   \n" +
-                "   Firm_Person : XStore\n" +
-                "   {\n" +
-                "      firm[e, f1] : $this.firmId == $that.id->toOne(),\n" +
-                "      employees[f1, e] : $this.id->toOne() == $that.firmId\n" +
-                "   }\n" +
-                ")\n";
+        String source = """
+                Class Firm
+                {
+                   legalName : String[1];
+                }
+                
+                Class Person
+                {
+                   lastName : String[1];
+                }
+                
+                Association Firm_Person
+                {
+                   firm : Firm[1];
+                   employees : Person[*];
+                }
+                Class SrcFirm
+                {
+                   _id : String[1];
+                   _legalName : String[1];
+                }
+                
+                Class SrcPerson
+                {
+                   _lastName : String[1];
+                   _firmId : String[1];
+                }
+                ###Mapping
+                Mapping FirmMapping
+                (
+                   Firm[f1] : Pure
+                   {
+                      ~src SrcFirm \
+                      +id:String[*] : $src._id,
+                      legalName : $src._legalName
+                   }
+                  \s
+                   Person[e] : Pure
+                   {
+                      ~src SrcPerson\
+                      +firmId:String[0..1] : $src._firmId,
+                      lastName : $src._lastName
+                   }
+                  \s
+                   Firm_Person : XStore
+                   {
+                      firm[e, f1] : $this.firmId == $that.id->toOne(),
+                      employees[f1, e] : $this.id->toOne() == $that.firmId
+                   }
+                )
+                """;
         runtime.createInMemorySource("mapping.pure", source);
         runtime.compile();
         assertSetSourceInformation(source, "Firm");
@@ -219,65 +225,67 @@ public class TestXStoreMapping extends AbstractPureMappingTestWithCoreCompiled
     @Test
     public void testXStoreAssociationSubtypeMapping()
     {
-        String source = "Class Firm\n" +
-                "{\n" +
-                "   legalName : String[1];\n" +
-                "}\n" +
-                "\n" +
-                "Class Person\n" +
-                "{\n" +
-                "   lastName : String[1];\n" +
-                "}\n" +
-                "Class MyPerson extends Person\n" +
-                "{\n" +
-                "}\n" +
-                "\n" +
-                "Association Firm_MyPerson\n" +
-                "{\n" +
-                "   firm : Firm[1];\n" +
-                "   employees : MyPerson[*];\n" +
-                "}\n" +
-                "Class SrcFirm\n" +
-                "{\n" +
-                "   _id : String[1];\n" +
-                "   _legalName : String[1];\n" +
-                "}\n" +
-                "\n" +
-                "Class SrcPerson\n" +
-                "{\n" +
-                "   _lastName : String[1];\n" +
-                "   _firmId : String[1];\n" +
-                "}\n" +
-                "###Mapping\n" +
-                "Mapping FirmMapping\n" +
-                "(\n" +
-                "   Firm[f1] : Pure\n" +
-                "   {\n" +
-                "      ~src SrcFirm " +
-                "      +id:String[*] : $src._id,\n" +
-                "      legalName : $src._legalName\n" +
-                "   }\n" +
-                "   \n" +
-                "   Person : Pure\n" +
-                "   {\n" +
-                "      ~src SrcPerson" +
-                "      +firmId:String[0..1] : $src._firmId,\n" +
-                "      lastName : $src._lastName\n" +
-                "   }\n" +
-                "   \n" +
-                "   MyPerson : Pure\n" +
-                "   {\n" +
-                "      ~src SrcPerson" +
-                "      +firmId:String[0..1] : $src._firmId,\n" +
-                "      lastName : $src._lastName\n" +
-                "   }\n" +
-                "   \n" +
-                "   Firm_MyPerson : XStore\n" +
-                "   {\n" +
-                "      firm[MyPerson, f1] : $this.firmId == $that.id->toOne(),\n" +
-                "      employees[f1, MyPerson] : $this.id->toOne() == $that.firmId\n" +
-                "   }\n" +
-                ")\n";
+        String source = """
+                Class Firm
+                {
+                   legalName : String[1];
+                }
+                
+                Class Person
+                {
+                   lastName : String[1];
+                }
+                Class MyPerson extends Person
+                {
+                }
+                
+                Association Firm_MyPerson
+                {
+                   firm : Firm[1];
+                   employees : MyPerson[*];
+                }
+                Class SrcFirm
+                {
+                   _id : String[1];
+                   _legalName : String[1];
+                }
+                
+                Class SrcPerson
+                {
+                   _lastName : String[1];
+                   _firmId : String[1];
+                }
+                ###Mapping
+                Mapping FirmMapping
+                (
+                   Firm[f1] : Pure
+                   {
+                      ~src SrcFirm \
+                      +id:String[*] : $src._id,
+                      legalName : $src._legalName
+                   }
+                  \s
+                   Person : Pure
+                   {
+                      ~src SrcPerson\
+                      +firmId:String[0..1] : $src._firmId,
+                      lastName : $src._lastName
+                   }
+                  \s
+                   MyPerson : Pure
+                   {
+                      ~src SrcPerson\
+                      +firmId:String[0..1] : $src._firmId,
+                      lastName : $src._lastName
+                   }
+                  \s
+                   Firm_MyPerson : XStore
+                   {
+                      firm[MyPerson, f1] : $this.firmId == $that.id->toOne(),
+                      employees[f1, MyPerson] : $this.id->toOne() == $that.firmId
+                   }
+                )
+                """;
         runtime.createInMemorySource("mapping.pure", source);
         runtime.compile();
         assertSetSourceInformation(source, "Firm");

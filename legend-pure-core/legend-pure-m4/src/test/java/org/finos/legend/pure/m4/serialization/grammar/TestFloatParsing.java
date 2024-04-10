@@ -15,7 +15,7 @@
 package org.finos.legend.pure.m4.serialization.grammar;
 
 import org.finos.legend.pure.m4.ModelRepository;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class TestFloatParsing extends AbstractPrimitiveParsingTest
 {

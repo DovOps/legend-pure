@@ -31,36 +31,40 @@ import org.finos.legend.pure.runtime.java.compiled.generation.processors.type.Ty
 
 public class ClassLazyImplProcessor
 {
-    private static final String IMPORTS = "import java.util.concurrent.atomic.AtomicBoolean;\n" +
-            "import org.eclipse.collections.api.list.ListIterable;\n" +
-            "import org.eclipse.collections.api.list.MutableList;\n" +
-            "import org.eclipse.collections.api.RichIterable;\n" +
-            "import org.eclipse.collections.api.map.MutableMap;\n" +
-            "import org.eclipse.collections.impl.factory.Lists;\n" +
-            "import org.eclipse.collections.impl.factory.Maps;\n" +
-            "import org.eclipse.collections.impl.map.mutable.UnifiedMap;\n" +
-            "import org.eclipse.collections.api.map.ImmutableMap;\n" +
-            "import org.eclipse.collections.impl.list.mutable.FastList;\n" +
-            "import org.finos.legend.pure.m4.coreinstance.CoreInstance;\n" +
-            "import org.finos.legend.pure.m4.coreinstance.factory.CoreInstanceFactory;\n" +
-            "import org.finos.legend.pure.m4.ModelRepository;\n" +
-            "import org.finos.legend.pure.m4.coreinstance.SourceInformation;\n" +
-            "import org.finos.legend.pure.runtime.java.compiled.metadata.MetadataLazy;\n" +
-            "import org.finos.legend.pure.runtime.java.compiled.generation.processors.support.*;\n" +
-            "import org.finos.legend.pure.runtime.java.compiled.generation.processors.support.function.defended.*;\n" +
-            "import org.finos.legend.pure.runtime.java.compiled.generation.processors.support.function.*;\n" +
-            "import org.finos.legend.pure.runtime.java.compiled.execution.*;\n" +
-            "import org.finos.legend.pure.runtime.java.compiled.execution.sourceInformation.*;\n" +
-            "import org.finos.legend.pure.runtime.java.compiled.generation.processors.support.coreinstance.*;\n" +
-            "import org.finos.legend.pure.runtime.java.compiled.serialization.model.*;\n" +
-            "import org.finos.legend.pure.m3.execution.ExecutionSupport;\n" +
-            "import org.finos.legend.pure.m4.coreinstance.CoreInstance;\n";
+    private static final String IMPORTS = """
+            import java.util.concurrent.atomic.AtomicBoolean;
+            import org.eclipse.collections.api.list.ListIterable;
+            import org.eclipse.collections.api.list.MutableList;
+            import org.eclipse.collections.api.RichIterable;
+            import org.eclipse.collections.api.map.MutableMap;
+            import org.eclipse.collections.impl.factory.Lists;
+            import org.eclipse.collections.impl.factory.Maps;
+            import org.eclipse.collections.impl.map.mutable.UnifiedMap;
+            import org.eclipse.collections.api.map.ImmutableMap;
+            import org.eclipse.collections.impl.list.mutable.FastList;
+            import org.finos.legend.pure.m4.coreinstance.CoreInstance;
+            import org.finos.legend.pure.m4.coreinstance.factory.CoreInstanceFactory;
+            import org.finos.legend.pure.m4.ModelRepository;
+            import org.finos.legend.pure.m4.coreinstance.SourceInformation;
+            import org.finos.legend.pure.runtime.java.compiled.metadata.MetadataLazy;
+            import org.finos.legend.pure.runtime.java.compiled.generation.processors.support.*;
+            import org.finos.legend.pure.runtime.java.compiled.generation.processors.support.function.defended.*;
+            import org.finos.legend.pure.runtime.java.compiled.generation.processors.support.function.*;
+            import org.finos.legend.pure.runtime.java.compiled.execution.*;
+            import org.finos.legend.pure.runtime.java.compiled.execution.sourceInformation.*;
+            import org.finos.legend.pure.runtime.java.compiled.generation.processors.support.coreinstance.*;
+            import org.finos.legend.pure.runtime.java.compiled.serialization.model.*;
+            import org.finos.legend.pure.m3.execution.ExecutionSupport;
+            import org.finos.legend.pure.m4.coreinstance.CoreInstance;
+            """;
 
 
     private static final String QUALIFIER_IMPORTS =
-            "import org.eclipse.collections.api.block.function.Function2;\n" +
-                    "import org.finos.legend.pure.runtime.java.compiled.generation.processors.support.map.PureMap;\n" +
-                    "import org.eclipse.collections.api.block.function.Function0;\n";
+            """
+            import org.eclipse.collections.api.block.function.Function2;
+            import org.finos.legend.pure.runtime.java.compiled.generation.processors.support.map.PureMap;
+            import org.eclipse.collections.api.block.function.Function0;
+            """;
 
     private static final String LAZY_INITIALIZED_SUFFIX = "_initialized";
 

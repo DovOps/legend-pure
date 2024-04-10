@@ -16,20 +16,20 @@ package org.finos.legend.pure.m3.tests.incremental._package;
 
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiledPlatform;
 import org.finos.legend.pure.m4.exception.PureCompilationException;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestPureRuntimePackage extends AbstractPureTestWithCoreCompiledPlatform
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getExtra());
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         setUp();
@@ -38,116 +38,118 @@ public class TestPureRuntimePackage extends AbstractPureTestWithCoreCompiledPlat
     @Test
     public void testPackageRemovedWhenEmpty()
     {
-        Assert.assertNull(runtime.getCoreInstance("test_package1"));
-        Assert.assertNull(runtime.getCoreInstance("test_package1::test_package2"));
-        Assert.assertNull(runtime.getCoreInstance("test_package1::test_package2::TestClass"));
+        Assertions.assertNull(runtime.getCoreInstance("test_package1"));
+        Assertions.assertNull(runtime.getCoreInstance("test_package1::test_package2"));
+        Assertions.assertNull(runtime.getCoreInstance("test_package1::test_package2::TestClass"));
         int size = repository.serialize().length;
 
         compileTestSource("source.pure", "Class test_package1::test_package2::TestClass {}");
-        Assert.assertNotNull(runtime.getCoreInstance("test_package1"));
-        Assert.assertNotNull(runtime.getCoreInstance("test_package1::test_package2"));
-        Assert.assertNotNull(runtime.getCoreInstance("test_package1::test_package2::TestClass"));
+        Assertions.assertNotNull(runtime.getCoreInstance("test_package1"));
+        Assertions.assertNotNull(runtime.getCoreInstance("test_package1::test_package2"));
+        Assertions.assertNotNull(runtime.getCoreInstance("test_package1::test_package2::TestClass"));
 
         runtime.delete("source.pure");
         runtime.compile();
-        Assert.assertNull(runtime.getCoreInstance("test_package1"));
-        Assert.assertNull(runtime.getCoreInstance("test_package1::test_package2"));
-        Assert.assertNull(runtime.getCoreInstance("test_package1::test_package2::TestClass"));
-        Assert.assertEquals(size, repository.serialize().length);
+        Assertions.assertNull(runtime.getCoreInstance("test_package1"));
+        Assertions.assertNull(runtime.getCoreInstance("test_package1::test_package2"));
+        Assertions.assertNull(runtime.getCoreInstance("test_package1::test_package2::TestClass"));
+        Assertions.assertEquals(size, repository.serialize().length);
     }
 
     @Test
     public void testPackageNotRemovedWhenNotEmpty()
     {
-        Assert.assertNull(runtime.getCoreInstance("test_package1"));
-        Assert.assertNull(runtime.getCoreInstance("test_package1::test_package2"));
-        Assert.assertNull(runtime.getCoreInstance("test_package1::test_package2::TestClass1"));
-        Assert.assertNull(runtime.getCoreInstance("test_package1::test_package2::TestClass2"));
+        Assertions.assertNull(runtime.getCoreInstance("test_package1"));
+        Assertions.assertNull(runtime.getCoreInstance("test_package1::test_package2"));
+        Assertions.assertNull(runtime.getCoreInstance("test_package1::test_package2::TestClass1"));
+        Assertions.assertNull(runtime.getCoreInstance("test_package1::test_package2::TestClass2"));
 
         compileTestSource("source1.pure", "Class test_package1::test_package2::TestClass1 {}");
-        Assert.assertNotNull(runtime.getCoreInstance("test_package1"));
-        Assert.assertNotNull(runtime.getCoreInstance("test_package1::test_package2"));
-        Assert.assertNotNull(runtime.getCoreInstance("test_package1::test_package2::TestClass1"));
-        Assert.assertNull(runtime.getCoreInstance("test_package1::test_package2::TestClass2"));
+        Assertions.assertNotNull(runtime.getCoreInstance("test_package1"));
+        Assertions.assertNotNull(runtime.getCoreInstance("test_package1::test_package2"));
+        Assertions.assertNotNull(runtime.getCoreInstance("test_package1::test_package2::TestClass1"));
+        Assertions.assertNull(runtime.getCoreInstance("test_package1::test_package2::TestClass2"));
 
         compileTestSource("source2.pure", "Class test_package1::test_package2::TestClass2 {}");
-        Assert.assertNotNull(runtime.getCoreInstance("test_package1"));
-        Assert.assertNotNull(runtime.getCoreInstance("test_package1::test_package2"));
-        Assert.assertNotNull(runtime.getCoreInstance("test_package1::test_package2::TestClass1"));
-        Assert.assertNotNull(runtime.getCoreInstance("test_package1::test_package2::TestClass2"));
+        Assertions.assertNotNull(runtime.getCoreInstance("test_package1"));
+        Assertions.assertNotNull(runtime.getCoreInstance("test_package1::test_package2"));
+        Assertions.assertNotNull(runtime.getCoreInstance("test_package1::test_package2::TestClass1"));
+        Assertions.assertNotNull(runtime.getCoreInstance("test_package1::test_package2::TestClass2"));
 
         runtime.delete("source1.pure");
         runtime.compile();
-        Assert.assertNotNull(runtime.getCoreInstance("test_package1"));
-        Assert.assertNotNull(runtime.getCoreInstance("test_package1::test_package2"));
-        Assert.assertNull(runtime.getCoreInstance("test_package1::test_package2::TestClass1"));
-        Assert.assertNotNull(runtime.getCoreInstance("test_package1::test_package2::TestClass2"));
+        Assertions.assertNotNull(runtime.getCoreInstance("test_package1"));
+        Assertions.assertNotNull(runtime.getCoreInstance("test_package1::test_package2"));
+        Assertions.assertNull(runtime.getCoreInstance("test_package1::test_package2::TestClass1"));
+        Assertions.assertNotNull(runtime.getCoreInstance("test_package1::test_package2::TestClass2"));
     }
 
     @Test
     public void testMixedPackageRemovedAndNot()
     {
-        Assert.assertNull(runtime.getCoreInstance("test_package1"));
-        Assert.assertNull(runtime.getCoreInstance("test_package1::test_package2"));
-        Assert.assertNull(runtime.getCoreInstance("test_package1::test_package3"));
-        Assert.assertNull(runtime.getCoreInstance("test_package1::test_package2::TestClass1"));
-        Assert.assertNull(runtime.getCoreInstance("test_package1::test_package3::TestClass2"));
+        Assertions.assertNull(runtime.getCoreInstance("test_package1"));
+        Assertions.assertNull(runtime.getCoreInstance("test_package1::test_package2"));
+        Assertions.assertNull(runtime.getCoreInstance("test_package1::test_package3"));
+        Assertions.assertNull(runtime.getCoreInstance("test_package1::test_package2::TestClass1"));
+        Assertions.assertNull(runtime.getCoreInstance("test_package1::test_package3::TestClass2"));
 
         compileTestSource("source1.pure", "Class test_package1::test_package2::TestClass1 {}");
-        Assert.assertNotNull(runtime.getCoreInstance("test_package1"));
-        Assert.assertNotNull(runtime.getCoreInstance("test_package1::test_package2"));
-        Assert.assertNull(runtime.getCoreInstance("test_package1::test_package3"));
-        Assert.assertNotNull(runtime.getCoreInstance("test_package1::test_package2::TestClass1"));
-        Assert.assertNull(runtime.getCoreInstance("test_package1::test_package3::TestClass2"));
+        Assertions.assertNotNull(runtime.getCoreInstance("test_package1"));
+        Assertions.assertNotNull(runtime.getCoreInstance("test_package1::test_package2"));
+        Assertions.assertNull(runtime.getCoreInstance("test_package1::test_package3"));
+        Assertions.assertNotNull(runtime.getCoreInstance("test_package1::test_package2::TestClass1"));
+        Assertions.assertNull(runtime.getCoreInstance("test_package1::test_package3::TestClass2"));
 
         compileTestSource("source2.pure", "Class test_package1::test_package3::TestClass2 {}");
-        Assert.assertNotNull(runtime.getCoreInstance("test_package1"));
-        Assert.assertNotNull(runtime.getCoreInstance("test_package1::test_package2"));
-        Assert.assertNotNull(runtime.getCoreInstance("test_package1::test_package3"));
-        Assert.assertNotNull(runtime.getCoreInstance("test_package1::test_package2::TestClass1"));
-        Assert.assertNotNull(runtime.getCoreInstance("test_package1::test_package3::TestClass2"));
+        Assertions.assertNotNull(runtime.getCoreInstance("test_package1"));
+        Assertions.assertNotNull(runtime.getCoreInstance("test_package1::test_package2"));
+        Assertions.assertNotNull(runtime.getCoreInstance("test_package1::test_package3"));
+        Assertions.assertNotNull(runtime.getCoreInstance("test_package1::test_package2::TestClass1"));
+        Assertions.assertNotNull(runtime.getCoreInstance("test_package1::test_package3::TestClass2"));
 
         runtime.delete("source1.pure");
         runtime.compile();
-        Assert.assertNotNull(runtime.getCoreInstance("test_package1"));
-        Assert.assertNull(runtime.getCoreInstance("test_package1::test_package2"));
-        Assert.assertNotNull(runtime.getCoreInstance("test_package1::test_package3"));
-        Assert.assertNull(runtime.getCoreInstance("test_package1::test_package2::TestClass1"));
-        Assert.assertNotNull(runtime.getCoreInstance("test_package1::test_package3::TestClass2"));
+        Assertions.assertNotNull(runtime.getCoreInstance("test_package1"));
+        Assertions.assertNull(runtime.getCoreInstance("test_package1::test_package2"));
+        Assertions.assertNotNull(runtime.getCoreInstance("test_package1::test_package3"));
+        Assertions.assertNull(runtime.getCoreInstance("test_package1::test_package2::TestClass1"));
+        Assertions.assertNotNull(runtime.getCoreInstance("test_package1::test_package3::TestClass2"));
     }
 
     @Test
     public void testPackageWithReferenceRemoved()
     {
-        Assert.assertNull(runtime.getCoreInstance("test_package1"));
-        Assert.assertNull(runtime.getCoreInstance("test_package1::test_package2"));
-        Assert.assertNull(runtime.getCoreInstance("test_package1::test_package3"));
-        Assert.assertNull(runtime.getCoreInstance("test_package1::test_package2::TestClass"));
-        Assert.assertNull(runtime.getCoreInstance("test_package1::test_package3::testFn__Package_1_"));
+        Assertions.assertNull(runtime.getCoreInstance("test_package1"));
+        Assertions.assertNull(runtime.getCoreInstance("test_package1::test_package2"));
+        Assertions.assertNull(runtime.getCoreInstance("test_package1::test_package3"));
+        Assertions.assertNull(runtime.getCoreInstance("test_package1::test_package2::TestClass"));
+        Assertions.assertNull(runtime.getCoreInstance("test_package1::test_package3::testFn__Package_1_"));
 
         compileTestSource("source1.pure", "Class test_package1::test_package2::TestClass {}");
-        Assert.assertNotNull(runtime.getCoreInstance("test_package1"));
-        Assert.assertNotNull(runtime.getCoreInstance("test_package1::test_package2"));
-        Assert.assertNull(runtime.getCoreInstance("test_package1::test_package3"));
-        Assert.assertNotNull(runtime.getCoreInstance("test_package1::test_package2::TestClass"));
-        Assert.assertNull(runtime.getCoreInstance("test_package1::test_package3::testFn__Package_1_"));
+        Assertions.assertNotNull(runtime.getCoreInstance("test_package1"));
+        Assertions.assertNotNull(runtime.getCoreInstance("test_package1::test_package2"));
+        Assertions.assertNull(runtime.getCoreInstance("test_package1::test_package3"));
+        Assertions.assertNotNull(runtime.getCoreInstance("test_package1::test_package2::TestClass"));
+        Assertions.assertNull(runtime.getCoreInstance("test_package1::test_package3::testFn__Package_1_"));
 
         compileTestSource("source2.pure",
-                "function test_package1::test_package3::testFn():Package[1]\n" +
-                        "{\n" +
-                        "   test_package1::test_package2\n" +
-                        "}");
-        Assert.assertNotNull(runtime.getCoreInstance("test_package1"));
-        Assert.assertNotNull(runtime.getCoreInstance("test_package1::test_package2"));
-        Assert.assertNotNull(runtime.getCoreInstance("test_package1::test_package3"));
-        Assert.assertNotNull(runtime.getCoreInstance("test_package1::test_package2::TestClass"));
-        Assert.assertNotNull(runtime.getCoreInstance("test_package1::test_package3::testFn__Package_1_"));
+                """
+                function test_package1::test_package3::testFn():Package[1]
+                {
+                   test_package1::test_package2
+                }\
+                """);
+        Assertions.assertNotNull(runtime.getCoreInstance("test_package1"));
+        Assertions.assertNotNull(runtime.getCoreInstance("test_package1::test_package2"));
+        Assertions.assertNotNull(runtime.getCoreInstance("test_package1::test_package3"));
+        Assertions.assertNotNull(runtime.getCoreInstance("test_package1::test_package2::TestClass"));
+        Assertions.assertNotNull(runtime.getCoreInstance("test_package1::test_package3::testFn__Package_1_"));
 
         runtime.delete("source1.pure");
         try
         {
             runtime.compile();
-            Assert.fail("Expected compile exception");
+            Assertions.fail("Expected compile exception");
         }
         catch (Exception e)
         {
@@ -159,36 +161,38 @@ public class TestPureRuntimePackage extends AbstractPureTestWithCoreCompiledPlat
     public void testPackageDeleteWithPropertyWithSameNameAsPackage()
     {
         String sourceId = "source.pure";
-        String sourceCode = "Class test_package1::test_name::TestClass1\n" +
-                "{\n" +
-                "   test_name : String[1];\n" +
-                "}";
+        String sourceCode = """
+                Class test_package1::test_name::TestClass1
+                {
+                   test_name : String[1];
+                }\
+                """;
 
-        Assert.assertNull(runtime.getCoreInstance("test_package1"));
-        Assert.assertNull(runtime.getCoreInstance("test_package1::test_name"));
-        Assert.assertNull(runtime.getCoreInstance("test_package1::test_name::TestClass1"));
+        Assertions.assertNull(runtime.getCoreInstance("test_package1"));
+        Assertions.assertNull(runtime.getCoreInstance("test_package1::test_name"));
+        Assertions.assertNull(runtime.getCoreInstance("test_package1::test_name::TestClass1"));
         int beforeSize = repository.serialize().length;
 
         compileTestSource(sourceId, sourceCode);
-        Assert.assertNotNull(runtime.getCoreInstance("test_package1"));
-        Assert.assertNotNull(runtime.getCoreInstance("test_package1::test_name"));
-        Assert.assertNotNull(runtime.getCoreInstance("test_package1::test_name::TestClass1"));
+        Assertions.assertNotNull(runtime.getCoreInstance("test_package1"));
+        Assertions.assertNotNull(runtime.getCoreInstance("test_package1::test_name"));
+        Assertions.assertNotNull(runtime.getCoreInstance("test_package1::test_name::TestClass1"));
         int afterSize = repository.serialize().length;
 
         for (int i = 0; i < 10; i++)
         {
             runtime.delete(sourceId);
             runtime.compile();
-            Assert.assertNull(runtime.getCoreInstance("test_package1"));
-            Assert.assertNull(runtime.getCoreInstance("test_package1::test_name"));
-            Assert.assertNull(runtime.getCoreInstance("test_package1::test_name::TestClass1"));
-            Assert.assertEquals("Failed on iteration #" + i, beforeSize, repository.serialize().length);
+            Assertions.assertNull(runtime.getCoreInstance("test_package1"));
+            Assertions.assertNull(runtime.getCoreInstance("test_package1::test_name"));
+            Assertions.assertNull(runtime.getCoreInstance("test_package1::test_name::TestClass1"));
+            Assertions.assertEquals(beforeSize, repository.serialize().length, "Failed on iteration #" + i);
 
             compileTestSource(sourceId, sourceCode);
-            Assert.assertNotNull(runtime.getCoreInstance("test_package1"));
-            Assert.assertNotNull(runtime.getCoreInstance("test_package1::test_name"));
-            Assert.assertNotNull(runtime.getCoreInstance("test_package1::test_name::TestClass1"));
-            Assert.assertEquals("Failed on iteration #" + i, afterSize, repository.serialize().length);
+            Assertions.assertNotNull(runtime.getCoreInstance("test_package1"));
+            Assertions.assertNotNull(runtime.getCoreInstance("test_package1::test_name"));
+            Assertions.assertNotNull(runtime.getCoreInstance("test_package1::test_name::TestClass1"));
+            Assertions.assertEquals(afterSize, repository.serialize().length, "Failed on iteration #" + i);
         }
     }
 }

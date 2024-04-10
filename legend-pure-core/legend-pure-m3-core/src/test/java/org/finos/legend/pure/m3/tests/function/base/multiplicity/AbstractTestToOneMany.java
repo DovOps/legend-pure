@@ -15,7 +15,7 @@
 package org.finos.legend.pure.m3.tests.function.base.multiplicity;
 
 import org.finos.legend.pure.m3.tests.function.base.PureExpressionTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public abstract class AbstractTestToOneMany extends PureExpressionTest
 {
@@ -30,11 +30,13 @@ public abstract class AbstractTestToOneMany extends PureExpressionTest
     public void testBasic()
     {
         compileTestSource("fromString.pure",
-                "function test():Boolean[1]\n" +
-                        "{\n" +
-                        "   assert([1] == [1]->toOneMany(), |'');\n" +
-                        "   assert([1,2,3] == [1,2,3]->toOneMany(), |'');\n" +
-                        "}\n");
+                """
+                function test():Boolean[1]
+                {
+                   assert([1] == [1]->toOneMany(), |'');
+                   assert([1,2,3] == [1,2,3]->toOneMany(), |'');
+                }
+                """);
         this.execute("test():Boolean[1]");
     }
 
@@ -42,11 +44,13 @@ public abstract class AbstractTestToOneMany extends PureExpressionTest
     public void testEval()
     {
         compileTestSource("fromString.pure",
-                "function test():Boolean[1]\n" +
-                        "{\n" +
-                        "   assert([1] == toOneMany_T_MANY__T_$1_MANY$_->eval([1]), |'');\n" +
-                        "   assert([1,2,3] == toOneMany_T_MANY__T_$1_MANY$_->eval([1,2,3]), |'');\n" +
-                        "}\n");
+                """
+                function test():Boolean[1]
+                {
+                   assert([1] == toOneMany_T_MANY__T_$1_MANY$_->eval([1]), |'');
+                   assert([1,2,3] == toOneMany_T_MANY__T_$1_MANY$_->eval([1,2,3]), |'');
+                }
+                """);
         this.execute("test():Boolean[1]");
     }
 
@@ -54,11 +58,13 @@ public abstract class AbstractTestToOneMany extends PureExpressionTest
     public void testWithMessage()
     {
         compileTestSource("fromString.pure",
-                "function test():Boolean[1]\n" +
-                        "{\n" +
-                        "   assert([1] == [1]->toOneMany(), |'');\n" +
-                        "   assert([1,2,3] == [1,2,3]->toOneMany('Something wrong'), |'');\n" +
-                        "}\n");
+                """
+                function test():Boolean[1]
+                {
+                   assert([1] == [1]->toOneMany(), |'');
+                   assert([1,2,3] == [1,2,3]->toOneMany('Something wrong'), |'');
+                }
+                """);
         this.execute("test():Boolean[1]");
     }
 }

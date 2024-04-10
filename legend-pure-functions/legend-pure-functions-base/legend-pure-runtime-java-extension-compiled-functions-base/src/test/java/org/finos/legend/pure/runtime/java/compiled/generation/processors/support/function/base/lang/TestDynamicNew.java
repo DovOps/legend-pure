@@ -19,11 +19,12 @@ import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
 import org.finos.legend.pure.m3.tests.function.base.lang.AbstractTestDynamicNew;
 import org.finos.legend.pure.runtime.java.compiled.execution.FunctionExecutionCompiledBuilder;
 import org.finos.legend.pure.runtime.java.compiled.factory.JavaModelFactoryRegistryLoader;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestDynamicNew extends AbstractTestDynamicNew
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         AbstractPureTestWithCoreCompiled.setUpRuntime(getFunctionExecution(), AbstractTestDynamicNew.getCodeStorage(), JavaModelFactoryRegistryLoader.loader());
@@ -34,11 +35,13 @@ public class TestDynamicNew extends AbstractTestDynamicNew
         return new FunctionExecutionCompiledBuilder().build();
     }
 
+    @Test
     public void testDefaultValueWithDynamicNew()
     {
 
     }
 
+    @Test
     public void testDefaultValueWithKeyValuePassedAsVariableToDynamicNew()
     {
 

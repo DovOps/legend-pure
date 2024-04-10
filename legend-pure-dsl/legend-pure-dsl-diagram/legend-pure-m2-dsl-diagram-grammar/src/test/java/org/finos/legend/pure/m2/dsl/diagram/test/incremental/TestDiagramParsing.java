@@ -29,22 +29,22 @@ import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
 import org.finos.legend.pure.m4.coreinstance.SourceInformation;
 import org.finos.legend.pure.m4.serialization.grammar.antlr.PureParserException;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
 
 public class TestDiagramParsing extends AbstractPureTestWithCoreCompiled
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime();
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("testDiagram.pure");
@@ -69,7 +69,7 @@ public class TestDiagramParsing extends AbstractPureTestWithCoreCompiled
         try
         {
             compileTestSource("###Diagram\nDiagram test::pure::TestDiagram() {}");
-            Assert.fail("Expected a parser error");
+            Assertions.fail("Expected a parser error");
         }
         catch (Exception e)
         {
@@ -80,7 +80,7 @@ public class TestDiagramParsing extends AbstractPureTestWithCoreCompiled
         try
         {
             compileTestSource("###Diagram\nDiagram test::pure::TestDiagram(width=10.0) {}");
-            Assert.fail("Expected a parser error");
+            Assertions.fail("Expected a parser error");
         }
         catch (Exception e)
         {
@@ -91,7 +91,7 @@ public class TestDiagramParsing extends AbstractPureTestWithCoreCompiled
         try
         {
             compileTestSource("###Diagram\nDiagram test::pure::TestDiagram(height=10.0) {}");
-            Assert.fail("Expected a parser error");
+            Assertions.fail("Expected a parser error");
         }
         catch (Exception e)
         {
@@ -102,7 +102,7 @@ public class TestDiagramParsing extends AbstractPureTestWithCoreCompiled
         try
         {
             compileTestSource("###Diagram\nDiagram test::pure::TestDiagram(junk=10.0) {}");
-            Assert.fail("Expected a parser error");
+            Assertions.fail("Expected a parser error");
         }
         catch (Exception e)
         {
@@ -113,7 +113,7 @@ public class TestDiagramParsing extends AbstractPureTestWithCoreCompiled
         try
         {
             compileTestSource("###Diagram\nDiagram test::pure::TestDiagram(width=10.0, junk=10.0) {}");
-            Assert.fail("Expected a parser error");
+            Assertions.fail("Expected a parser error");
         }
         catch (Exception e)
         {
@@ -124,7 +124,7 @@ public class TestDiagramParsing extends AbstractPureTestWithCoreCompiled
         try
         {
             compileTestSource("###Diagram\nDiagram test::pure::TestDiagram(width=10.0, height=10.0, junk=13.2) {}");
-            Assert.fail("Expected a parser error");
+            Assertions.fail("Expected a parser error");
         }
         catch (Exception e)
         {
@@ -139,12 +139,14 @@ public class TestDiagramParsing extends AbstractPureTestWithCoreCompiled
         // Empty type view
         try
         {
-            compileTestSource("###Diagram\n" +
-                    "Diagram test::pure::TestDiagram(width=10.0, height=10.0)\n" +
-                    "{\n" +
-                    "    TypeView TestClass_1()\n" +
-                    "}\n");
-            Assert.fail("Expected a parser error");
+            compileTestSource("""
+                    ###Diagram
+                    Diagram test::pure::TestDiagram(width=10.0, height=10.0)
+                    {
+                        TypeView TestClass_1()
+                    }
+                    """);
+            Assertions.fail("Expected a parser error");
         }
         catch (Exception e)
         {
@@ -154,12 +156,14 @@ public class TestDiagramParsing extends AbstractPureTestWithCoreCompiled
         // Type view with one bogus property
         try
         {
-            compileTestSource("###Diagram\n" +
-                    "Diagram test::pure::TestDiagram(width=10.0, height=10.0)\n" +
-                    "{\n" +
-                    "    TypeView TestClass_1(junk=13.6)\n" +
-                    "}\n");
-            Assert.fail("Expected a parser error");
+            compileTestSource("""
+                    ###Diagram
+                    Diagram test::pure::TestDiagram(width=10.0, height=10.0)
+                    {
+                        TypeView TestClass_1(junk=13.6)
+                    }
+                    """);
+            Assertions.fail("Expected a parser error");
         }
         catch (Exception e)
         {
@@ -169,15 +173,17 @@ public class TestDiagramParsing extends AbstractPureTestWithCoreCompiled
         // Type view with all valid properties but one
         try
         {
-            compileTestSource("###Diagram\n" +
-                    "Diagram test::pure::TestDiagram(width=10.0, height=10.0)\n" +
-                    "{\n" +
-                    "    TypeView TestClass_1(stereotypesVisible=true, attributesVisible=true,\n" +
-                    "                         attributeStereotypesVisible=true, attributeTypesVisible=true,\n" +
-                    "                         color=#FFFFCC, lineWidth=1.0,\n" +
-                    "                         position=(874.0, 199.46875), width=353.0, height=57.1875)\n" +
-                    "}\n");
-            Assert.fail("Expected a parser error");
+            compileTestSource("""
+                    ###Diagram
+                    Diagram test::pure::TestDiagram(width=10.0, height=10.0)
+                    {
+                        TypeView TestClass_1(stereotypesVisible=true, attributesVisible=true,
+                                             attributeStereotypesVisible=true, attributeTypesVisible=true,
+                                             color=#FFFFCC, lineWidth=1.0,
+                                             position=(874.0, 199.46875), width=353.0, height=57.1875)
+                    }
+                    """);
+            Assertions.fail("Expected a parser error");
         }
         catch (Exception e)
         {
@@ -186,15 +192,17 @@ public class TestDiagramParsing extends AbstractPureTestWithCoreCompiled
 
         try
         {
-            compileTestSource("###Diagram\n" +
-                    "Diagram test::pure::TestDiagram(width=10.0, height=10.0)\n" +
-                    "{\n" +
-                    "    TypeView TestClass_1(type=test::pure::TestClass, stereotypesVisible=true, attributesVisible=true,\n" +
-                    "                         attributeStereotypesVisible=true, attributeTypesVisible=true,\n" +
-                    "                         color=#FFFFCC,\n" +
-                    "                         position=(874.0, 199.46875), width=353.0, height=57.1875)\n" +
-                    "}\n");
-            Assert.fail("Expected a parser error");
+            compileTestSource("""
+                    ###Diagram
+                    Diagram test::pure::TestDiagram(width=10.0, height=10.0)
+                    {
+                        TypeView TestClass_1(type=test::pure::TestClass, stereotypesVisible=true, attributesVisible=true,
+                                             attributeStereotypesVisible=true, attributeTypesVisible=true,
+                                             color=#FFFFCC,
+                                             position=(874.0, 199.46875), width=353.0, height=57.1875)
+                    }
+                    """);
+            Assertions.fail("Expected a parser error");
         }
         catch (Exception e)
         {
@@ -209,12 +217,14 @@ public class TestDiagramParsing extends AbstractPureTestWithCoreCompiled
         // Empty association view
         try
         {
-            compileTestSource("###Diagram\n" +
-                    "Diagram test::pure::TestDiagram(width=10.0, height=10.0)\n" +
-                    "{\n" +
-                    "    AssociationView TestAssociation_1()\n" +
-                    "}\n");
-            Assert.fail("Expected a parser error");
+            compileTestSource("""
+                    ###Diagram
+                    Diagram test::pure::TestDiagram(width=10.0, height=10.0)
+                    {
+                        AssociationView TestAssociation_1()
+                    }
+                    """);
+            Assertions.fail("Expected a parser error");
         }
         catch (Exception e)
         {
@@ -224,12 +234,14 @@ public class TestDiagramParsing extends AbstractPureTestWithCoreCompiled
         // Association view with one bogus property
         try
         {
-            compileTestSource("###Diagram\n" +
-                    "Diagram test::pure::TestDiagram(width=10.0, height=10.0)\n" +
-                    "{\n" +
-                    "    AssociationView TestAssociation_1(junk=13.6)\n" +
-                    "}\n");
-            Assert.fail("Expected a parser error");
+            compileTestSource("""
+                    ###Diagram
+                    Diagram test::pure::TestDiagram(width=10.0, height=10.0)
+                    {
+                        AssociationView TestAssociation_1(junk=13.6)
+                    }
+                    """);
+            Assertions.fail("Expected a parser error");
         }
         catch (Exception e)
         {
@@ -239,29 +251,31 @@ public class TestDiagramParsing extends AbstractPureTestWithCoreCompiled
         // Association view with all valid properties but one
         try
         {
-            compileTestSource("###Diagram\n" +
-                    "Diagram test::pure::TestDiagram(width=10.0, height=10.0)\n" +
-                    "{\n" +
-                    "    TypeView TestClass1_1(type=test::pure::TestClass1, stereotypesVisible=true, attributesVisible=true,\n" +
-                    "                          attributeStereotypesVisible=true, attributeTypesVisible=true,\n" +
-                    "                          color=#FFFFCC, lineWidth=1.0,\n" +
-                    "                          position=(874.0, 199.46875), width=353.0, height=57.1875)\n" +
-                    "    TypeView TestClass2_2(type=test::pure::TestClass2, stereotypesVisible=true, attributesVisible=true,\n" +
-                    "                          attributeStereotypesVisible=true, attributeTypesVisible=true,\n" +
-                    "                          color=#FFFFCC, lineWidth=1.0,\n" +
-                    "                          position=(75.0, 97.1875), width=113.0, height=57.1875)\n" +
-                    "    AssociationView TestAssociation_1(stereotypesVisible=true, nameVisible=false,\n" +
-                    "                                      color=#000000, lineWidth=1.0,\n" +
-                    "                                      lineStyle=SIMPLE, points=[(132.5, 77.0), (155.2, 77.0)],\n" +
-                    "                                      label='Employment',\n" +
-                    "                                      source=TestClass1_1,\n" +
-                    "                                      target=TestClass2_2,\n" +
-                    "                                      sourcePropertyPosition=(132.5, 76.2),\n" +
-                    "                                      sourceMultiplicityPosition=(132.5, 80.0),\n" +
-                    "                                      targetPropertyPosition=(155.2, 76.2),\n" +
-                    "                                      targetMultiplicityPosition=(155.2, 80.0))\n" +
-                    "}\n");
-            Assert.fail("Expected a parser error");
+            compileTestSource("""
+                    ###Diagram
+                    Diagram test::pure::TestDiagram(width=10.0, height=10.0)
+                    {
+                        TypeView TestClass1_1(type=test::pure::TestClass1, stereotypesVisible=true, attributesVisible=true,
+                                              attributeStereotypesVisible=true, attributeTypesVisible=true,
+                                              color=#FFFFCC, lineWidth=1.0,
+                                              position=(874.0, 199.46875), width=353.0, height=57.1875)
+                        TypeView TestClass2_2(type=test::pure::TestClass2, stereotypesVisible=true, attributesVisible=true,
+                                              attributeStereotypesVisible=true, attributeTypesVisible=true,
+                                              color=#FFFFCC, lineWidth=1.0,
+                                              position=(75.0, 97.1875), width=113.0, height=57.1875)
+                        AssociationView TestAssociation_1(stereotypesVisible=true, nameVisible=false,
+                                                          color=#000000, lineWidth=1.0,
+                                                          lineStyle=SIMPLE, points=[(132.5, 77.0), (155.2, 77.0)],
+                                                          label='Employment',
+                                                          source=TestClass1_1,
+                                                          target=TestClass2_2,
+                                                          sourcePropertyPosition=(132.5, 76.2),
+                                                          sourceMultiplicityPosition=(132.5, 80.0),
+                                                          targetPropertyPosition=(155.2, 76.2),
+                                                          targetMultiplicityPosition=(155.2, 80.0))
+                    }
+                    """);
+            Assertions.fail("Expected a parser error");
         }
         catch (Exception e)
         {
@@ -270,29 +284,31 @@ public class TestDiagramParsing extends AbstractPureTestWithCoreCompiled
 
         try
         {
-            compileTestSource("###Diagram\n" +
-                    "Diagram test::pure::TestDiagram(width=10.0, height=10.0)\n" +
-                    "{\n" +
-                    "    TypeView TestClass1_1(type=test::pure::TestClass1, stereotypesVisible=true, attributesVisible=true,\n" +
-                    "                          attributeStereotypesVisible=true, attributeTypesVisible=true,\n" +
-                    "                          color=#FFFFCC, lineWidth=1.0,\n" +
-                    "                          position=(874.0, 199.46875), width=353.0, height=57.1875)\n" +
-                    "    TypeView TestClass2_2(type=test::pure::TestClass2, stereotypesVisible=true, attributesVisible=true,\n" +
-                    "                          attributeStereotypesVisible=true, attributeTypesVisible=true,\n" +
-                    "                          color=#FFFFCC, lineWidth=1.0,\n" +
-                    "                          position=(75.0, 97.1875), width=113.0, height=57.1875)\n" +
-                    "    AssociationView TestAssociation_1(association=test::pure::TestAssociation, stereotypesVisible=true, nameVisible=false,\n" +
-                    "                                      color=#000000,\n" +
-                    "                                      lineStyle=SIMPLE, points=[(132.5, 77.0), (155.2, 77.0)],\n" +
-                    "                                      label='Employment',\n" +
-                    "                                      source=TestClass1_1,\n" +
-                    "                                      target=TestClass2_2,\n" +
-                    "                                      sourcePropertyPosition=(132.5, 76.2),\n" +
-                    "                                      sourceMultiplicityPosition=(132.5, 80.0),\n" +
-                    "                                      targetPropertyPosition=(155.2, 76.2),\n" +
-                    "                                      targetMultiplicityPosition=(155.2, 80.0))\n" +
-                    "}\n");
-            Assert.fail("Expected a parser error");
+            compileTestSource("""
+                    ###Diagram
+                    Diagram test::pure::TestDiagram(width=10.0, height=10.0)
+                    {
+                        TypeView TestClass1_1(type=test::pure::TestClass1, stereotypesVisible=true, attributesVisible=true,
+                                              attributeStereotypesVisible=true, attributeTypesVisible=true,
+                                              color=#FFFFCC, lineWidth=1.0,
+                                              position=(874.0, 199.46875), width=353.0, height=57.1875)
+                        TypeView TestClass2_2(type=test::pure::TestClass2, stereotypesVisible=true, attributesVisible=true,
+                                              attributeStereotypesVisible=true, attributeTypesVisible=true,
+                                              color=#FFFFCC, lineWidth=1.0,
+                                              position=(75.0, 97.1875), width=113.0, height=57.1875)
+                        AssociationView TestAssociation_1(association=test::pure::TestAssociation, stereotypesVisible=true, nameVisible=false,
+                                                          color=#000000,
+                                                          lineStyle=SIMPLE, points=[(132.5, 77.0), (155.2, 77.0)],
+                                                          label='Employment',
+                                                          source=TestClass1_1,
+                                                          target=TestClass2_2,
+                                                          sourcePropertyPosition=(132.5, 76.2),
+                                                          sourceMultiplicityPosition=(132.5, 80.0),
+                                                          targetPropertyPosition=(155.2, 76.2),
+                                                          targetMultiplicityPosition=(155.2, 80.0))
+                    }
+                    """);
+            Assertions.fail("Expected a parser error");
         }
         catch (Exception e)
         {
@@ -305,23 +321,27 @@ public class TestDiagramParsing extends AbstractPureTestWithCoreCompiled
     {
         Parser parser = getRuntimeDiagramParser();
         // Create class with property
-        compileTestSource("Class test::pure::TestClass1\n" +
-                "{\n" +
-                "    testProperty : test::pure::TestClass2[1];\n" +
-                "}\n" +
-                "Class test::pure::TestClass2\n" +
-                "{\n" +
-                "}\n");
+        compileTestSource("""
+                Class test::pure::TestClass1
+                {
+                    testProperty : test::pure::TestClass2[1];
+                }
+                Class test::pure::TestClass2
+                {
+                }
+                """);
 
         // Empty property view
         try
         {
-            compileTestSource("###Diagram\n" +
-                    "Diagram test::pure::TestDiagram(width=10.0, height=10.0)\n" +
-                    "{\n" +
-                    "    PropertyView TestClass1_testProperty_1()\n" +
-                    "}\n");
-            Assert.fail("Expected a parser error");
+            compileTestSource("""
+                    ###Diagram
+                    Diagram test::pure::TestDiagram(width=10.0, height=10.0)
+                    {
+                        PropertyView TestClass1_testProperty_1()
+                    }
+                    """);
+            Assertions.fail("Expected a parser error");
         }
         catch (Exception e)
         {
@@ -331,12 +351,14 @@ public class TestDiagramParsing extends AbstractPureTestWithCoreCompiled
         // Property view with one bogus property
         try
         {
-            compileTestSource("###Diagram\n" +
-                    "Diagram test::pure::TestDiagram(width=10.0, height=10.0)\n" +
-                    "{\n" +
-                    "    PropertyView TestClass1_testProperty_1(junk=13.6)\n" +
-                    "}\n");
-            Assert.fail("Expected a parser error");
+            compileTestSource("""
+                    ###Diagram
+                    Diagram test::pure::TestDiagram(width=10.0, height=10.0)
+                    {
+                        PropertyView TestClass1_testProperty_1(junk=13.6)
+                    }
+                    """);
+            Assertions.fail("Expected a parser error");
         }
         catch (Exception e)
         {
@@ -346,27 +368,29 @@ public class TestDiagramParsing extends AbstractPureTestWithCoreCompiled
         // Property view with all valid properties but one
         try
         {
-            compileTestSource("###Diagram\n" +
-                    "Diagram test::pure::TestDiagram(width=10.0, height=10.0)\n" +
-                    "{\n" +
-                    "    TypeView TestClass1_1(type=test::pure::TestClass1, stereotypesVisible=true, attributesVisible=true,\n" +
-                    "                          attributeStereotypesVisible=true, attributeTypesVisible=true,\n" +
-                    "                          color=#FFFFCC, lineWidth=1.0,\n" +
-                    "                          position=(874.0, 199.46875), width=353.0, height=57.1875)\n" +
-                    "    TypeView TestClass2_2(type=test::pure::TestClass2, stereotypesVisible=true, attributesVisible=true,\n" +
-                    "                          attributeStereotypesVisible=true, attributeTypesVisible=true,\n" +
-                    "                          color=#FFFFCC, lineWidth=1.0,\n" +
-                    "                          position=(75.0, 97.1875), width=113.0, height=57.1875)\n" +
-                    "    PropertyView TestClass1_testProperty_1(stereotypesVisible=true, nameVisible=false,\n" +
-                    "                                           color=#000000, lineWidth=1.0,\n" +
-                    "                                           lineStyle=SIMPLE, points=[(132.5, 77.0), (155.2, 77.0)],\n" +
-                    "                                           label='Employment',\n" +
-                    "                                           source=TestClass1_1,\n" +
-                    "                                           target=TestClass2_2,\n" +
-                    "                                           propertyPosition=(132.5, 76.2),\n" +
-                    "                                           multiplicityPosition=(132.5, 80.0))\n" +
-                    "}\n");
-            Assert.fail("Expected a parser error");
+            compileTestSource("""
+                    ###Diagram
+                    Diagram test::pure::TestDiagram(width=10.0, height=10.0)
+                    {
+                        TypeView TestClass1_1(type=test::pure::TestClass1, stereotypesVisible=true, attributesVisible=true,
+                                              attributeStereotypesVisible=true, attributeTypesVisible=true,
+                                              color=#FFFFCC, lineWidth=1.0,
+                                              position=(874.0, 199.46875), width=353.0, height=57.1875)
+                        TypeView TestClass2_2(type=test::pure::TestClass2, stereotypesVisible=true, attributesVisible=true,
+                                              attributeStereotypesVisible=true, attributeTypesVisible=true,
+                                              color=#FFFFCC, lineWidth=1.0,
+                                              position=(75.0, 97.1875), width=113.0, height=57.1875)
+                        PropertyView TestClass1_testProperty_1(stereotypesVisible=true, nameVisible=false,
+                                                               color=#000000, lineWidth=1.0,
+                                                               lineStyle=SIMPLE, points=[(132.5, 77.0), (155.2, 77.0)],
+                                                               label='Employment',
+                                                               source=TestClass1_1,
+                                                               target=TestClass2_2,
+                                                               propertyPosition=(132.5, 76.2),
+                                                               multiplicityPosition=(132.5, 80.0))
+                    }
+                    """);
+            Assertions.fail("Expected a parser error");
         }
         catch (Exception e)
         {
@@ -375,27 +399,29 @@ public class TestDiagramParsing extends AbstractPureTestWithCoreCompiled
 
         try
         {
-            compileTestSource("###Diagram\n" +
-                    "Diagram test::pure::TestDiagram(width=10.0, height=10.0)\n" +
-                    "{\n" +
-                    "    TypeView TestClass1_1(type=test::pure::TestClass1, stereotypesVisible=true, attributesVisible=true,\n" +
-                    "                          attributeStereotypesVisible=true, attributeTypesVisible=true,\n" +
-                    "                          color=#FFFFCC, lineWidth=1.0,\n" +
-                    "                          position=(874.0, 199.46875), width=353.0, height=57.1875)\n" +
-                    "    TypeView TestClass2_2(type=test::pure::TestClass2, stereotypesVisible=true, attributesVisible=true,\n" +
-                    "                          attributeStereotypesVisible=true, attributeTypesVisible=true,\n" +
-                    "                          color=#FFFFCC, lineWidth=1.0,\n" +
-                    "                          position=(75.0, 97.1875), width=113.0, height=57.1875)\n" +
-                    "    PropertyView TestClass1_testProperty_1(property=test::pure::TestClass1.testProperty, stereotypesVisible=true, nameVisible=false,\n" +
-                    "                                           color=#000000,\n" +
-                    "                                           lineStyle=SIMPLE, points=[(132.5, 77.0), (155.2, 77.0)],\n" +
-                    "                                           label='Employment',\n" +
-                    "                                           source=TestClass1_1,\n" +
-                    "                                           target=TestClass2_2,\n" +
-                    "                                           propertyPosition=(132.5, 76.2),\n" +
-                    "                                           multiplicityPosition=(132.5, 80.0))\n" +
-                    "}\n");
-            Assert.fail("Expected a parser error");
+            compileTestSource("""
+                    ###Diagram
+                    Diagram test::pure::TestDiagram(width=10.0, height=10.0)
+                    {
+                        TypeView TestClass1_1(type=test::pure::TestClass1, stereotypesVisible=true, attributesVisible=true,
+                                              attributeStereotypesVisible=true, attributeTypesVisible=true,
+                                              color=#FFFFCC, lineWidth=1.0,
+                                              position=(874.0, 199.46875), width=353.0, height=57.1875)
+                        TypeView TestClass2_2(type=test::pure::TestClass2, stereotypesVisible=true, attributesVisible=true,
+                                              attributeStereotypesVisible=true, attributeTypesVisible=true,
+                                              color=#FFFFCC, lineWidth=1.0,
+                                              position=(75.0, 97.1875), width=113.0, height=57.1875)
+                        PropertyView TestClass1_testProperty_1(property=test::pure::TestClass1.testProperty, stereotypesVisible=true, nameVisible=false,
+                                                               color=#000000,
+                                                               lineStyle=SIMPLE, points=[(132.5, 77.0), (155.2, 77.0)],
+                                                               label='Employment',
+                                                               source=TestClass1_1,
+                                                               target=TestClass2_2,
+                                                               propertyPosition=(132.5, 76.2),
+                                                               multiplicityPosition=(132.5, 80.0))
+                    }
+                    """);
+            Assertions.fail("Expected a parser error");
         }
         catch (Exception e)
         {
@@ -410,12 +436,14 @@ public class TestDiagramParsing extends AbstractPureTestWithCoreCompiled
         // Empty generalization view
         try
         {
-            compileTestSource("###Diagram\n" +
-                    "Diagram test::pure::TestDiagram(width=10.0, height=10.0)\n" +
-                    "{\n" +
-                    "    GeneralizationView TestClass1_TestClass2_1()\n" +
-                    "}\n");
-            Assert.fail("Expected a parser error");
+            compileTestSource("""
+                    ###Diagram
+                    Diagram test::pure::TestDiagram(width=10.0, height=10.0)
+                    {
+                        GeneralizationView TestClass1_TestClass2_1()
+                    }
+                    """);
+            Assertions.fail("Expected a parser error");
         }
         catch (Exception e)
         {
@@ -425,12 +453,14 @@ public class TestDiagramParsing extends AbstractPureTestWithCoreCompiled
         // Association view with one bogus property
         try
         {
-            compileTestSource("###Diagram\n" +
-                    "Diagram test::pure::TestDiagram(width=10.0, height=10.0)\n" +
-                    "{\n" +
-                    "    GeneralizationView TestClass1_TestClass2_1(junk=13.6)\n" +
-                    "}\n");
-            Assert.fail("Expected a parser error");
+            compileTestSource("""
+                    ###Diagram
+                    Diagram test::pure::TestDiagram(width=10.0, height=10.0)
+                    {
+                        GeneralizationView TestClass1_TestClass2_1(junk=13.6)
+                    }
+                    """);
+            Assertions.fail("Expected a parser error");
         }
         catch (Exception e)
         {
@@ -440,24 +470,26 @@ public class TestDiagramParsing extends AbstractPureTestWithCoreCompiled
         // Association view with all valid properties but one
         try
         {
-            compileTestSource("###Diagram\n" +
-                    "Diagram test::pure::TestDiagram(width=10.0, height=10.0)\n" +
-                    "{\n" +
-                    "    TypeView TestClass1_1(type=test::pure::TestClass1, stereotypesVisible=true, attributesVisible=true,\n" +
-                    "                          attributeStereotypesVisible=true, attributeTypesVisible=true,\n" +
-                    "                          color=#FFFFCC, lineWidth=1.0,\n" +
-                    "                          position=(874.0, 199.46875), width=353.0, height=57.1875)\n" +
-                    "    TypeView TestClass2_2(type=test::pure::TestClass2, stereotypesVisible=true, attributesVisible=true,\n" +
-                    "                          attributeStereotypesVisible=true, attributeTypesVisible=true,\n" +
-                    "                          color=#FFFFCC, lineWidth=1.0,\n" +
-                    "                          position=(75.0, 97.1875), width=113.0, height=57.1875)\n" +
-                    "    GeneralizationView TestClass1_TestClass2_1(lineWidth=1.0,\n" +
-                    "                                               lineStyle=SIMPLE, points=[(132.5, 77.0), (155.2, 77.0)],\n" +
-                    "                                               label='',\n" +
-                    "                                               source=TestClass1_1,\n" +
-                    "                                               target=TestClass2_2)\n" +
-                    "}\n");
-            Assert.fail("Expected a parser error");
+            compileTestSource("""
+                    ###Diagram
+                    Diagram test::pure::TestDiagram(width=10.0, height=10.0)
+                    {
+                        TypeView TestClass1_1(type=test::pure::TestClass1, stereotypesVisible=true, attributesVisible=true,
+                                              attributeStereotypesVisible=true, attributeTypesVisible=true,
+                                              color=#FFFFCC, lineWidth=1.0,
+                                              position=(874.0, 199.46875), width=353.0, height=57.1875)
+                        TypeView TestClass2_2(type=test::pure::TestClass2, stereotypesVisible=true, attributesVisible=true,
+                                              attributeStereotypesVisible=true, attributeTypesVisible=true,
+                                              color=#FFFFCC, lineWidth=1.0,
+                                              position=(75.0, 97.1875), width=113.0, height=57.1875)
+                        GeneralizationView TestClass1_TestClass2_1(lineWidth=1.0,
+                                                                   lineStyle=SIMPLE, points=[(132.5, 77.0), (155.2, 77.0)],
+                                                                   label='',
+                                                                   source=TestClass1_1,
+                                                                   target=TestClass2_2)
+                    }
+                    """);
+            Assertions.fail("Expected a parser error");
         }
         catch (Exception e)
         {
@@ -466,24 +498,26 @@ public class TestDiagramParsing extends AbstractPureTestWithCoreCompiled
 
         try
         {
-            compileTestSource("###Diagram\n" +
-                    "Diagram test::pure::TestDiagram(width=10.0, height=10.0)\n" +
-                    "{\n" +
-                    "    TypeView TestClass1_1(type=test::pure::TestClass1, stereotypesVisible=true, attributesVisible=true,\n" +
-                    "                          attributeStereotypesVisible=true, attributeTypesVisible=true,\n" +
-                    "                          color=#FFFFCC, lineWidth=1.0,\n" +
-                    "                          position=(874.0, 199.46875), width=353.0, height=57.1875)\n" +
-                    "    TypeView TestClass2_2(type=test::pure::TestClass2, stereotypesVisible=true, attributesVisible=true,\n" +
-                    "                          attributeStereotypesVisible=true, attributeTypesVisible=true,\n" +
-                    "                          color=#FFFFCC, lineWidth=1.0,\n" +
-                    "                          position=(75.0, 97.1875), width=113.0, height=57.1875)\n" +
-                    "    GeneralizationView TestClass1_TestClass2_1(color=#000000,\n" +
-                    "                                               lineStyle=SIMPLE, points=[(132.5, 77.0), (155.2, 77.0)],\n" +
-                    "                                               label='',\n" +
-                    "                                               source=TestClass1_1,\n" +
-                    "                                               target=TestClass2_2)\n" +
-                    "}\n");
-            Assert.fail("Expected a parser error");
+            compileTestSource("""
+                    ###Diagram
+                    Diagram test::pure::TestDiagram(width=10.0, height=10.0)
+                    {
+                        TypeView TestClass1_1(type=test::pure::TestClass1, stereotypesVisible=true, attributesVisible=true,
+                                              attributeStereotypesVisible=true, attributeTypesVisible=true,
+                                              color=#FFFFCC, lineWidth=1.0,
+                                              position=(874.0, 199.46875), width=353.0, height=57.1875)
+                        TypeView TestClass2_2(type=test::pure::TestClass2, stereotypesVisible=true, attributesVisible=true,
+                                              attributeStereotypesVisible=true, attributeTypesVisible=true,
+                                              color=#FFFFCC, lineWidth=1.0,
+                                              position=(75.0, 97.1875), width=113.0, height=57.1875)
+                        GeneralizationView TestClass1_TestClass2_1(color=#000000,
+                                                                   lineStyle=SIMPLE, points=[(132.5, 77.0), (155.2, 77.0)],
+                                                                   label='',
+                                                                   source=TestClass1_1,
+                                                                   target=TestClass2_2)
+                    }
+                    """);
+            Assertions.fail("Expected a parser error");
         }
         catch (Exception e)
         {
@@ -494,383 +528,397 @@ public class TestDiagramParsing extends AbstractPureTestWithCoreCompiled
     @Test
     public void testDiagramWithNoGeometry()
     {
-        compileTestSource("###Diagram\n" +
-                "Diagram test::pure::TestDiagram {}\n");
+        compileTestSource("""
+                ###Diagram
+                Diagram test::pure::TestDiagram {}
+                """);
         CoreInstance diagram = runtime.getCoreInstance("test::pure::TestDiagram");
-        Assert.assertNotNull(diagram);
+        Assertions.assertNotNull(diagram);
 
         CoreInstance geometry = Instance.getValueForMetaPropertyToOneResolved(diagram, "rectangleGeometry", processorSupport);
-        Assert.assertNotNull(diagram);
+        Assertions.assertNotNull(diagram);
 
         CoreInstance width = Instance.getValueForMetaPropertyToOneResolved(geometry, "width", processorSupport);
-        Assert.assertNotNull(width);
-        Assert.assertTrue(Instance.instanceOf(width, "Float", processorSupport));
-        Assert.assertEquals("0.0", width.getName());
+        Assertions.assertNotNull(width);
+        Assertions.assertTrue(Instance.instanceOf(width, "Float", processorSupport));
+        Assertions.assertEquals("0.0", width.getName());
 
         CoreInstance height = Instance.getValueForMetaPropertyToOneResolved(geometry, "height", processorSupport);
-        Assert.assertNotNull(height);
-        Assert.assertTrue(Instance.instanceOf(height, "Float", processorSupport));
-        Assert.assertEquals("0.0", height.getName());
+        Assertions.assertNotNull(height);
+        Assertions.assertTrue(Instance.instanceOf(height, "Float", processorSupport));
+        Assertions.assertEquals("0.0", height.getName());
     }
 
     @Test
     public void testPropertyViewWithPropertyNamedPosition()
     {
         compileTestSource("testModel.pure",
-                "Class test::pure::TestClass1\n" +
-                        "{\n" +
-                        "    position:test::pure::TestClass2[1];\n" +
-                        "}\n" +
-                        "\n" +
-                        "Class test::pure::TestClass2\n" +
-                        "{\n" +
-                        "}\n");
+                """
+                Class test::pure::TestClass1
+                {
+                    position:test::pure::TestClass2[1];
+                }
+                
+                Class test::pure::TestClass2
+                {
+                }
+                """);
         compileTestSource("testDiagram.pure",
-                "###Diagram\n" +
-                        "Diagram test::pure::TestDiagram(width=10.0, height=10.0)\n" +
-                        "{\n" +
-                        "    TypeView TestClass1_1(type=test::pure::TestClass1, stereotypesVisible=true, attributesVisible=true,\n" +
-                        "                          attributeStereotypesVisible=true, attributeTypesVisible=true,\n" +
-                        "                          color=#FFFFCC, lineWidth=1.0,\n" +
-                        "                          position=(874.0, 199.46875), width=353.0, height=57.1875)\n" +
-                        "    TypeView TestClass2_2(type=test::pure::TestClass2, stereotypesVisible=true, attributesVisible=true,\n" +
-                        "                          attributeStereotypesVisible=true, attributeTypesVisible=true,\n" +
-                        "                          color=#FFFFCC, lineWidth=1.0,\n" +
-                        "                          position=(75.0, 97.1875), width=113.0, height=57.1875)\n" +
-                        "    PropertyView TestClass1_position_1(property=test::pure::TestClass1.position, stereotypesVisible=true, nameVisible=false,\n" +
-                        "                                       color=#000000, lineWidth=1.0,\n" +
-                        "                                       lineStyle=SIMPLE, points=[(132.5, 77.0), (155.2, 77.0)],\n" +
-                        "                                       label='Employment',\n" +
-                        "                                       source=TestClass1_1,\n" +
-                        "                                       target=TestClass2_2,\n" +
-                        "                                       propertyPosition=(132.5, 76.2),\n" +
-                        "                                       multiplicityPosition=(132.5, 80.0))\n" +
-                        "}\n");
+                """
+                ###Diagram
+                Diagram test::pure::TestDiagram(width=10.0, height=10.0)
+                {
+                    TypeView TestClass1_1(type=test::pure::TestClass1, stereotypesVisible=true, attributesVisible=true,
+                                          attributeStereotypesVisible=true, attributeTypesVisible=true,
+                                          color=#FFFFCC, lineWidth=1.0,
+                                          position=(874.0, 199.46875), width=353.0, height=57.1875)
+                    TypeView TestClass2_2(type=test::pure::TestClass2, stereotypesVisible=true, attributesVisible=true,
+                                          attributeStereotypesVisible=true, attributeTypesVisible=true,
+                                          color=#FFFFCC, lineWidth=1.0,
+                                          position=(75.0, 97.1875), width=113.0, height=57.1875)
+                    PropertyView TestClass1_position_1(property=test::pure::TestClass1.position, stereotypesVisible=true, nameVisible=false,
+                                                       color=#000000, lineWidth=1.0,
+                                                       lineStyle=SIMPLE, points=[(132.5, 77.0), (155.2, 77.0)],
+                                                       label='Employment',
+                                                       source=TestClass1_1,
+                                                       target=TestClass2_2,
+                                                       propertyPosition=(132.5, 76.2),
+                                                       multiplicityPosition=(132.5, 80.0))
+                }
+                """);
         CoreInstance testClass1 = runtime.getCoreInstance("test::pure::TestClass1");
         CoreInstance positionProp = processorSupport.class_findPropertyUsingGeneralization(testClass1, "position");
-        Assert.assertNotNull(positionProp);
+        Assertions.assertNotNull(positionProp);
 
         CoreInstance diagram = runtime.getCoreInstance("test::pure::TestDiagram");
         CoreInstance propView = Instance.getValueForMetaPropertyToOneResolved(diagram, M3Properties.propertyViews, processorSupport);
         CoreInstance viewProp = Instance.getValueForMetaPropertyToOneResolved(propView, M3Properties.property, processorSupport);
-        Assert.assertSame(positionProp, viewProp);
+        Assertions.assertSame(positionProp, viewProp);
     }
 
     @Test
     public void testDiagramWithVariousWhiteSpace()
     {
         compileTestSource("testModel.pure",
-                "Class test::pure::TestClass1\n" +
-                        "{\n" +
-                        "    position:test::pure::TestClass2[1];\n" +
-                        "}\n" +
-                        "\n" +
-                        "Class test::pure::TestClass2\n" +
-                        "{\n" +
-                        "}\n");
+                """
+                Class test::pure::TestClass1
+                {
+                    position:test::pure::TestClass2[1];
+                }
+                
+                Class test::pure::TestClass2
+                {
+                }
+                """);
         compileTestSource("testDiagram.pure",
-                "###Diagram\n" +
-                        "Diagram test::pure::TestDiagram(width=10.0, height=10.0)\n" +
-                        "{\n" +
-                        "    TypeView TestClass1_1(type=test::pure::TestClass1, stereotypesVisible=\n\r" +
-                        "                                                     true, attributesVisible=true,\n" +
-                        "                          attributeStereotypesVisible     =    true, attributeTypesVisible=true,\n" +
-                        "                                    color=#FFFFCC, lineWidth=\r" +
-                        "                                                            1.0,\n" +
-                        "                                    position \n\r" +
-                        "                                       =(874.0, 199.46875), width   \r\n" +
-                        "                                         =353.0, height=57.1875)\n" +
-                        "    TypeView TestClass2_2(type=test::pure::TestClass2, stereotypesVisible=true, attributesVisible=true,\n" +
-                        "                                    attributeStereotypesVisible=true, attributeTypesVisible=true,\n" +
-                        "                                    color=#FFFFCC, lineWidth=1.0,\n" +
-                        "                                    position=(75.0, 97.1875), width=113.0, height=57.1875)\n" +
-                        "    PropertyView TestClass1_position_1(property=test::pure::TestClass1.position, stereotypesVisible=true, nameVisible=false,\n" +
-                        "                                                 color=#000000, lineWidth=1.0,\n" +
-                        "                                                 lineStyle=SIMPLE, points=[(132.5, 77.0), (155.2, 77.0)],\n" +
-                        "                                                 label='Employment',\n" +
-                        "                                                 source=TestClass1_1,\n" +
-                        "                                                 target=TestClass2_2,\n" +
-                        "                                                 propertyPosition=(132.5, 76.2),\n" +
-                        "                                                 multiplicityPosition=(132.5, 80.0))\n" +
-                        "}\n");
+                """
+                ###Diagram
+                Diagram test::pure::TestDiagram(width=10.0, height=10.0)
+                {
+                    TypeView TestClass1_1(type=test::pure::TestClass1, stereotypesVisible=
+                \
+                                                                     true, attributesVisible=true,
+                                          attributeStereotypesVisible     =    true, attributeTypesVisible=true,
+                                                    color=#FFFFCC, lineWidth=\
+                                                                            1.0,
+                                                    position\s
+                \
+                                                       =(874.0, 199.46875), width   
+                                                         =353.0, height=57.1875)
+                    TypeView TestClass2_2(type=test::pure::TestClass2, stereotypesVisible=true, attributesVisible=true,
+                                                    attributeStereotypesVisible=true, attributeTypesVisible=true,
+                                                    color=#FFFFCC, lineWidth=1.0,
+                                                    position=(75.0, 97.1875), width=113.0, height=57.1875)
+                    PropertyView TestClass1_position_1(property=test::pure::TestClass1.position, stereotypesVisible=true, nameVisible=false,
+                                                                 color=#000000, lineWidth=1.0,
+                                                                 lineStyle=SIMPLE, points=[(132.5, 77.0), (155.2, 77.0)],
+                                                                 label='Employment',
+                                                                 source=TestClass1_1,
+                                                                 target=TestClass2_2,
+                                                                 propertyPosition=(132.5, 76.2),
+                                                                 multiplicityPosition=(132.5, 80.0))
+                }
+                """);
         CoreInstance testClass1 = runtime.getCoreInstance("test::pure::TestClass1");
         CoreInstance positionProp = processorSupport.class_findPropertyUsingGeneralization(testClass1, "position");
-        Assert.assertNotNull(positionProp);
+        Assertions.assertNotNull(positionProp);
 
         CoreInstance diagram = runtime.getCoreInstance("test::pure::TestDiagram");
         CoreInstance propView = Instance.getValueForMetaPropertyToOneResolved(diagram, M3Properties.propertyViews, processorSupport);
         CoreInstance viewProp = Instance.getValueForMetaPropertyToOneResolved(propView, M3Properties.property, processorSupport);
-        Assert.assertSame(positionProp, viewProp);
+        Assertions.assertSame(positionProp, viewProp);
     }
 
     @Test
     public void testDiagramModelDiagram()
     {
-        final String source = "###Diagram\n" +
-                "Diagram meta::pure::diagram::DiagramDiagram(width=924.0, height=798.0)\n" +
-                "{\n" +
-                "    TypeView AbstractPathView(type=meta::pure::diagram::AbstractPathView,\n" +
-                "                              stereotypesVisible=true,\n" +
-                "                              attributesVisible=true,\n" +
-                "                              attributeStereotypesVisible=true,\n" +
-                "                              attributeTypesVisible=true,\n" +
-                "                              color=#FFFFCC,\n" +
-                "                              lineWidth=1.0,\n" +
-                "                              position=(599.0, 278.0),\n" +
-                "                              width=123.0,\n" +
-                "                              height=57.1875)\n" +
-                "    TypeView AssociationView(type=meta::pure::diagram::AssociationView,\n" +
-                "                             stereotypesVisible=true,\n" +
-                "                             attributesVisible=true,\n" +
-                "                             attributeStereotypesVisible=true,\n" +
-                "                             attributeTypesVisible=true,\n" +
-                "                             color=#FFFFCC,\n" +
-                "                             lineWidth=1.0,\n" +
-                "                             position=(402.0, 476.0),\n" +
-                "                             width=115.0,\n" +
-                "                             height=42.09375)\n" +
-                "    TypeView Diagram(type=meta::pure::diagram::Diagram,\n" +
-                "                     stereotypesVisible=true,\n" +
-                "                     attributesVisible=true,\n" +
-                "                     attributeStereotypesVisible=true,\n" +
-                "                     attributeTypesVisible=true,\n" +
-                "                     color=#FFFFCC,\n" +
-                "                     lineWidth=1.0,\n" +
-                "                     position=(37.5, 476.0),\n" +
-                "                     width=68.0,\n" +
-                "                     height=42.09375)\n" +
-                "    TypeView DiagramNode(type=meta::pure::diagram::DiagramNode,\n" +
-                "                         stereotypesVisible=true,\n" +
-                "                         attributesVisible=true,\n" +
-                "                         attributeStereotypesVisible=true,\n" +
-                "                         attributeTypesVisible=true,\n" +
-                "                         color=#FFFFCC,\n" +
-                "                         lineWidth=1.0,\n" +
-                "                         position=(310.0, 124.0),\n" +
-                "                         width=299.0,\n" +
-                "                         height=57.1875)\n" +
-                "    TypeView GeneralizationView(type=meta::pure::diagram::GeneralizationView,\n" +
-                "                                stereotypesVisible=true,\n" +
-                "                                attributesVisible=true,\n" +
-                "                                attributeStereotypesVisible=true,\n" +
-                "                                attributeTypesVisible=true,\n" +
-                "                                color=#FFFFCC,\n" +
-                "                                lineWidth=1.0,\n" +
-                "                                position=(599.0, 476.0),\n" +
-                "                                width=129.0,\n" +
-                "                                height=42.09375)\n" +
-                "    TypeView PropertyView(type=meta::pure::diagram::PropertyView,\n" +
-                "                          stereotypesVisible=true,\n" +
-                "                          attributesVisible=true,\n" +
-                "                          attributeStereotypesVisible=true,\n" +
-                "                          attributeTypesVisible=true,\n" +
-                "                          color=#FFFFCC,\n" +
-                "                          lineWidth=1.0,\n" +
-                "                          position=(786.0, 476.0),\n" +
-                "                          width=97.0,\n" +
-                "                          height=42.09375)\n" +
-                "    TypeView TypeView(type=meta::pure::diagram::TypeView,\n" +
-                "                      stereotypesVisible=true,\n" +
-                "                      attributesVisible=true,\n" +
-                "                      attributeStereotypesVisible=true,\n" +
-                "                      attributeTypesVisible=true,\n" +
-                "                      color=#FFFFCC,\n" +
-                "                      lineWidth=1.0,\n" +
-                "                      position=(216.0, 286.0),\n" +
-                "                      width=75.0,\n" +
-                "                      height=42.09375)\n" +
-                "    PropertyView AbstractPathView_source(property=meta::pure::diagram::AbstractPathView.source,\n" +
-                "                                         stereotypesVisible=true,\n" +
-                "                                         nameVisible=true,\n" +
-                "                                         color=#000000,\n" +
-                "                                         lineWidth=-1.0,\n" +
-                "                                         lineStyle=SIMPLE,\n" +
-                "                                         points=[(600.23, 320.0), (290.25, 320.0)],\n" +
-                "                                         label='',\n" +
-                "                                         source=AbstractPathView,\n" +
-                "                                         target=TypeView,\n" +
-                "                                         propertyPosition=(297.5, 320.453125),\n" +
-                "                                         multiplicityPosition=(356.0, 320.453125))\n" +
-                "    PropertyView AbstractPathView_target(property=meta::pure::diagram::AbstractPathView.target,\n" +
-                "                                         stereotypesVisible=true,\n" +
-                "                                         nameVisible=true,\n" +
-                "                                         color=#000000,\n" +
-                "                                         lineWidth=-1.0,\n" +
-                "                                         lineStyle=SIMPLE,\n" +
-                "                                         points=[(600.23, 292.0), (424.0, 292.0), (290.0, 293.0)],\n" +
-                "                                         label='',\n" +
-                "                                         source=AbstractPathView,\n" +
-                "                                         target=TypeView,\n" +
-                "                                         propertyPosition=(299.13357281145454, 278.2436741823325),\n" +
-                "                                         multiplicityPosition=(358.8651741778389, 278.31183889983697))\n" +
-                "    GeneralizationView AbstractPathView_DiagramNode(color=#000000,\n" +
-                "                                                    lineWidth=-1.0,\n" +
-                "                                                    lineStyle=SIMPLE,\n" +
-                "                                                    points=[(459.5, 152.59375), (459.5, 229.59375), (660.5, 229.59375), (660.5, 306.59375)],\n" +
-                "                                                    label='',\n" +
-                "                                                    source=AbstractPathView,\n" +
-                "                                                    target=DiagramNode)\n" +
-                "    GeneralizationView AssociationView_AbstractPathView(color=#000000,\n" +
-                "                                                        lineWidth=-1.0,\n" +
-                "                                                        lineStyle=SIMPLE,\n" +
-                "                                                        points=[(660.5, 306.59375), (660.5, 405.59375), (459.5, 405.59375), (459.5, 497.046875)],\n" +
-                "                                                        label='',\n" +
-                "                                                        source=AssociationView,\n" +
-                "                                                        target=AbstractPathView)\n" +
-                "    GeneralizationView GeneralizationView_AbstractPathView(color=#000000,\n" +
-                "                                                           lineWidth=-1.0,\n" +
-                "                                                           lineStyle=SIMPLE,\n" +
-                "                                                           points=[(660.5, 306.59375), (660.5, 405.59375), (663.5, 405.59375), (663.5, 497.046875)],\n" +
-                "                                                           label='',\n" +
-                "                                                           source=GeneralizationView,\n" +
-                "                                                           target=AbstractPathView)\n" +
-                "    GeneralizationView PropertyView_AbstractPathView(color=#000000,\n" +
-                "                                                     lineWidth=-1.0,\n" +
-                "                                                     lineStyle=SIMPLE,\n" +
-                "                                                     points=[(660.5, 306.59375), (660.5, 405.59375), (834.5, 405.59375), (834.5, 497.046875)],\n" +
-                "                                                     label='',\n" +
-                "                                                     source=PropertyView,\n" +
-                "                                                     target=AbstractPathView)\n" +
-                "    GeneralizationView TypeView_DiagramNode(color=#000000,\n" +
-                "                                            lineWidth=-1.0,\n" +
-                "                                            lineStyle=SIMPLE,\n" +
-                "                                            points=[(459.5, 152.59375), (459.5, 229.59375), (253.5, 229.59375), (253.5, 307.046875)],\n" +
-                "                                            label='',\n" +
-                "                                            source=TypeView,\n" +
-                "                                            target=DiagramNode)\n" +
-                "}\n" +
-                "Diagram meta::pure::diagram::DiagramDiagram1(width=924.0, height=798.0)\n" +
-                "{\n" +
-                "    TypeView AbstractPathView(type=meta::pure::diagram::AbstractPathView,\n" +
-                "                              stereotypesVisible=true,\n" +
-                "                              attributesVisible=true,\n" +
-                "                              attributeStereotypesVisible=true,\n" +
-                "                              attributeTypesVisible=true,\n" +
-                "                              color=#FFFFCC,\n" +
-                "                              lineWidth=1.0,\n" +
-                "                              position=(599.0, 278.0),\n" +
-                "                              width=123.0,\n" +
-                "                              height=57.1875)\n" +
-                "    TypeView AssociationView(type=meta::pure::diagram::AssociationView,\n" +
-                "                             stereotypesVisible=true,\n" +
-                "                             attributesVisible=true,\n" +
-                "                             attributeStereotypesVisible=true,\n" +
-                "                             attributeTypesVisible=true,\n" +
-                "                             color=#FFFFCC,\n" +
-                "                             lineWidth=1.0,\n" +
-                "                             position=(402.0, 476.0),\n" +
-                "                             width=115.0,\n" +
-                "                             height=42.09375)\n" +
-                "    TypeView Diagram(type=meta::pure::diagram::Diagram,\n" +
-                "                     stereotypesVisible=true,\n" +
-                "                     attributesVisible=true,\n" +
-                "                     attributeStereotypesVisible=true,\n" +
-                "                     attributeTypesVisible=true,\n" +
-                "                     color=#FFFFCC,\n" +
-                "                     lineWidth=1.0,\n" +
-                "                     position=(37.5, 476.0),\n" +
-                "                     width=68.0,\n" +
-                "                     height=42.09375)\n" +
-                "    TypeView DiagramNode(type=meta::pure::diagram::DiagramNode,\n" +
-                "                         stereotypesVisible=true,\n" +
-                "                         attributesVisible=true,\n" +
-                "                         attributeStereotypesVisible=true,\n" +
-                "                         attributeTypesVisible=true,\n" +
-                "                         color=#FFFFCC,\n" +
-                "                         lineWidth=1.0,\n" +
-                "                         position=(310.0, 124.0),\n" +
-                "                         width=299.0,\n" +
-                "                         height=57.1875)\n" +
-                "    TypeView GeneralizationView(type=meta::pure::diagram::GeneralizationView,\n" +
-                "                                stereotypesVisible=true,\n" +
-                "                                attributesVisible=true,\n" +
-                "                                attributeStereotypesVisible=true,\n" +
-                "                                attributeTypesVisible=true,\n" +
-                "                                color=#FFFFCC,\n" +
-                "                                lineWidth=1.0,\n" +
-                "                                position=(599.0, 476.0),\n" +
-                "                                width=129.0,\n" +
-                "                                height=42.09375)\n" +
-                "    TypeView PropertyView(type=meta::pure::diagram::PropertyView,\n" +
-                "                          stereotypesVisible=true,\n" +
-                "                          attributesVisible=true,\n" +
-                "                          attributeStereotypesVisible=true,\n" +
-                "                          attributeTypesVisible=true,\n" +
-                "                          color=#FFFFCC,\n" +
-                "                          lineWidth=1.0,\n" +
-                "                          position=(786.0, 476.0),\n" +
-                "                          width=97.0,\n" +
-                "                          height=42.09375)\n" +
-                "    TypeView TypeView(type=meta::pure::diagram::TypeView,\n" +
-                "                      stereotypesVisible=true,\n" +
-                "                      attributesVisible=true,\n" +
-                "                      attributeStereotypesVisible=true,\n" +
-                "                      attributeTypesVisible=true,\n" +
-                "                      color=#FFFFCC,\n" +
-                "                      lineWidth=1.0,\n" +
-                "                      position=(216.0, 286.0),\n" +
-                "                      width=75.0,\n" +
-                "                      height=42.09375)\n" +
-                "    PropertyView AbstractPathView_source(property=meta::pure::diagram::AbstractPathView.source,\n" +
-                "                                         stereotypesVisible=true,\n" +
-                "                                         nameVisible=true,\n" +
-                "                                         color=#000000,\n" +
-                "                                         lineWidth=-1.0,\n" +
-                "                                         lineStyle=SIMPLE,\n" +
-                "                                         points=[(600.23, 320.0), (290.25, 320.0)],\n" +
-                "                                         label='',\n" +
-                "                                         source=AbstractPathView,\n" +
-                "                                         target=TypeView,\n" +
-                "                                         propertyPosition=(297.5, 320.453125),\n" +
-                "                                         multiplicityPosition=(356.0, 320.453125))\n" +
-                "    PropertyView AbstractPathView_target(property=meta::pure::diagram::AbstractPathView.target,\n" +
-                "                                         stereotypesVisible=true,\n" +
-                "                                         nameVisible=true,\n" +
-                "                                         color=#000000,\n" +
-                "                                         lineWidth=-1.0,\n" +
-                "                                         lineStyle=SIMPLE,\n" +
-                "                                         points=[(600.23, 292.0), (424.0, 292.0), (290.0, 293.0)],\n" +
-                "                                         label='',\n" +
-                "                                         source=AbstractPathView,\n" +
-                "                                         target=TypeView,\n" +
-                "                                         propertyPosition=(299.13357281145454, 278.2436741823325),\n" +
-                "                                         multiplicityPosition=(358.8651741778389, 278.31183889983697))\n" +
-                "    GeneralizationView AbstractPathView_DiagramNode(color=#000000,\n" +
-                "                                                    lineWidth=-1.0,\n" +
-                "                                                    lineStyle=SIMPLE,\n" +
-                "                                                    points=[(459.5, 152.59375), (459.5, 229.59375), (660.5, 229.59375), (660.5, 306.59375)],\n" +
-                "                                                    label='',\n" +
-                "                                                    source=AbstractPathView,\n" +
-                "                                                    target=DiagramNode)\n" +
-                "    GeneralizationView AssociationView_AbstractPathView(color=#000000,\n" +
-                "                                                        lineWidth=-1.0,\n" +
-                "                                                        lineStyle=SIMPLE,\n" +
-                "                                                        points=[(660.5, 306.59375), (660.5, 405.59375), (459.5, 405.59375), (459.5, 497.046875)],\n" +
-                "                                                        label='',\n" +
-                "                                                        source=AssociationView,\n" +
-                "                                                        target=AbstractPathView)\n" +
-                "    GeneralizationView GeneralizationView_AbstractPathView(color=#000000,\n" +
-                "                                                           lineWidth=-1.0,\n" +
-                "                                                           lineStyle=SIMPLE,\n" +
-                "                                                           points=[(660.5, 306.59375), (660.5, 405.59375), (663.5, 405.59375), (663.5, 497.046875)],\n" +
-                "                                                           label='',\n" +
-                "                                                           source=GeneralizationView,\n" +
-                "                                                           target=AbstractPathView)\n" +
-                "    GeneralizationView PropertyView_AbstractPathView(color=#000000,\n" +
-                "                                                     lineWidth=-1.0,\n" +
-                "                                                     lineStyle=SIMPLE,\n" +
-                "                                                     points=[(660.5, 306.59375), (660.5, 405.59375), (834.5, 405.59375), (834.5, 497.046875)],\n" +
-                "                                                     label='',\n" +
-                "                                                     source=PropertyView,\n" +
-                "                                                     target=AbstractPathView)\n" +
-                "    GeneralizationView TypeView_DiagramNode(color=#000000,\n" +
-                "                                            lineWidth=-1.0,\n" +
-                "                                            lineStyle=SIMPLE,\n" +
-                "                                            points=[(459.5, 152.59375), (459.5, 229.59375), (253.5, 229.59375), (253.5, 307.046875)],\n" +
-                "                                            label='',\n" +
-                "                                            source=TypeView,\n" +
-                "                                            target=DiagramNode)\n" +
-                "}";
+        final String source = """
+                ###Diagram
+                Diagram meta::pure::diagram::DiagramDiagram(width=924.0, height=798.0)
+                {
+                    TypeView AbstractPathView(type=meta::pure::diagram::AbstractPathView,
+                                              stereotypesVisible=true,
+                                              attributesVisible=true,
+                                              attributeStereotypesVisible=true,
+                                              attributeTypesVisible=true,
+                                              color=#FFFFCC,
+                                              lineWidth=1.0,
+                                              position=(599.0, 278.0),
+                                              width=123.0,
+                                              height=57.1875)
+                    TypeView AssociationView(type=meta::pure::diagram::AssociationView,
+                                             stereotypesVisible=true,
+                                             attributesVisible=true,
+                                             attributeStereotypesVisible=true,
+                                             attributeTypesVisible=true,
+                                             color=#FFFFCC,
+                                             lineWidth=1.0,
+                                             position=(402.0, 476.0),
+                                             width=115.0,
+                                             height=42.09375)
+                    TypeView Diagram(type=meta::pure::diagram::Diagram,
+                                     stereotypesVisible=true,
+                                     attributesVisible=true,
+                                     attributeStereotypesVisible=true,
+                                     attributeTypesVisible=true,
+                                     color=#FFFFCC,
+                                     lineWidth=1.0,
+                                     position=(37.5, 476.0),
+                                     width=68.0,
+                                     height=42.09375)
+                    TypeView DiagramNode(type=meta::pure::diagram::DiagramNode,
+                                         stereotypesVisible=true,
+                                         attributesVisible=true,
+                                         attributeStereotypesVisible=true,
+                                         attributeTypesVisible=true,
+                                         color=#FFFFCC,
+                                         lineWidth=1.0,
+                                         position=(310.0, 124.0),
+                                         width=299.0,
+                                         height=57.1875)
+                    TypeView GeneralizationView(type=meta::pure::diagram::GeneralizationView,
+                                                stereotypesVisible=true,
+                                                attributesVisible=true,
+                                                attributeStereotypesVisible=true,
+                                                attributeTypesVisible=true,
+                                                color=#FFFFCC,
+                                                lineWidth=1.0,
+                                                position=(599.0, 476.0),
+                                                width=129.0,
+                                                height=42.09375)
+                    TypeView PropertyView(type=meta::pure::diagram::PropertyView,
+                                          stereotypesVisible=true,
+                                          attributesVisible=true,
+                                          attributeStereotypesVisible=true,
+                                          attributeTypesVisible=true,
+                                          color=#FFFFCC,
+                                          lineWidth=1.0,
+                                          position=(786.0, 476.0),
+                                          width=97.0,
+                                          height=42.09375)
+                    TypeView TypeView(type=meta::pure::diagram::TypeView,
+                                      stereotypesVisible=true,
+                                      attributesVisible=true,
+                                      attributeStereotypesVisible=true,
+                                      attributeTypesVisible=true,
+                                      color=#FFFFCC,
+                                      lineWidth=1.0,
+                                      position=(216.0, 286.0),
+                                      width=75.0,
+                                      height=42.09375)
+                    PropertyView AbstractPathView_source(property=meta::pure::diagram::AbstractPathView.source,
+                                                         stereotypesVisible=true,
+                                                         nameVisible=true,
+                                                         color=#000000,
+                                                         lineWidth=-1.0,
+                                                         lineStyle=SIMPLE,
+                                                         points=[(600.23, 320.0), (290.25, 320.0)],
+                                                         label='',
+                                                         source=AbstractPathView,
+                                                         target=TypeView,
+                                                         propertyPosition=(297.5, 320.453125),
+                                                         multiplicityPosition=(356.0, 320.453125))
+                    PropertyView AbstractPathView_target(property=meta::pure::diagram::AbstractPathView.target,
+                                                         stereotypesVisible=true,
+                                                         nameVisible=true,
+                                                         color=#000000,
+                                                         lineWidth=-1.0,
+                                                         lineStyle=SIMPLE,
+                                                         points=[(600.23, 292.0), (424.0, 292.0), (290.0, 293.0)],
+                                                         label='',
+                                                         source=AbstractPathView,
+                                                         target=TypeView,
+                                                         propertyPosition=(299.13357281145454, 278.2436741823325),
+                                                         multiplicityPosition=(358.8651741778389, 278.31183889983697))
+                    GeneralizationView AbstractPathView_DiagramNode(color=#000000,
+                                                                    lineWidth=-1.0,
+                                                                    lineStyle=SIMPLE,
+                                                                    points=[(459.5, 152.59375), (459.5, 229.59375), (660.5, 229.59375), (660.5, 306.59375)],
+                                                                    label='',
+                                                                    source=AbstractPathView,
+                                                                    target=DiagramNode)
+                    GeneralizationView AssociationView_AbstractPathView(color=#000000,
+                                                                        lineWidth=-1.0,
+                                                                        lineStyle=SIMPLE,
+                                                                        points=[(660.5, 306.59375), (660.5, 405.59375), (459.5, 405.59375), (459.5, 497.046875)],
+                                                                        label='',
+                                                                        source=AssociationView,
+                                                                        target=AbstractPathView)
+                    GeneralizationView GeneralizationView_AbstractPathView(color=#000000,
+                                                                           lineWidth=-1.0,
+                                                                           lineStyle=SIMPLE,
+                                                                           points=[(660.5, 306.59375), (660.5, 405.59375), (663.5, 405.59375), (663.5, 497.046875)],
+                                                                           label='',
+                                                                           source=GeneralizationView,
+                                                                           target=AbstractPathView)
+                    GeneralizationView PropertyView_AbstractPathView(color=#000000,
+                                                                     lineWidth=-1.0,
+                                                                     lineStyle=SIMPLE,
+                                                                     points=[(660.5, 306.59375), (660.5, 405.59375), (834.5, 405.59375), (834.5, 497.046875)],
+                                                                     label='',
+                                                                     source=PropertyView,
+                                                                     target=AbstractPathView)
+                    GeneralizationView TypeView_DiagramNode(color=#000000,
+                                                            lineWidth=-1.0,
+                                                            lineStyle=SIMPLE,
+                                                            points=[(459.5, 152.59375), (459.5, 229.59375), (253.5, 229.59375), (253.5, 307.046875)],
+                                                            label='',
+                                                            source=TypeView,
+                                                            target=DiagramNode)
+                }
+                Diagram meta::pure::diagram::DiagramDiagram1(width=924.0, height=798.0)
+                {
+                    TypeView AbstractPathView(type=meta::pure::diagram::AbstractPathView,
+                                              stereotypesVisible=true,
+                                              attributesVisible=true,
+                                              attributeStereotypesVisible=true,
+                                              attributeTypesVisible=true,
+                                              color=#FFFFCC,
+                                              lineWidth=1.0,
+                                              position=(599.0, 278.0),
+                                              width=123.0,
+                                              height=57.1875)
+                    TypeView AssociationView(type=meta::pure::diagram::AssociationView,
+                                             stereotypesVisible=true,
+                                             attributesVisible=true,
+                                             attributeStereotypesVisible=true,
+                                             attributeTypesVisible=true,
+                                             color=#FFFFCC,
+                                             lineWidth=1.0,
+                                             position=(402.0, 476.0),
+                                             width=115.0,
+                                             height=42.09375)
+                    TypeView Diagram(type=meta::pure::diagram::Diagram,
+                                     stereotypesVisible=true,
+                                     attributesVisible=true,
+                                     attributeStereotypesVisible=true,
+                                     attributeTypesVisible=true,
+                                     color=#FFFFCC,
+                                     lineWidth=1.0,
+                                     position=(37.5, 476.0),
+                                     width=68.0,
+                                     height=42.09375)
+                    TypeView DiagramNode(type=meta::pure::diagram::DiagramNode,
+                                         stereotypesVisible=true,
+                                         attributesVisible=true,
+                                         attributeStereotypesVisible=true,
+                                         attributeTypesVisible=true,
+                                         color=#FFFFCC,
+                                         lineWidth=1.0,
+                                         position=(310.0, 124.0),
+                                         width=299.0,
+                                         height=57.1875)
+                    TypeView GeneralizationView(type=meta::pure::diagram::GeneralizationView,
+                                                stereotypesVisible=true,
+                                                attributesVisible=true,
+                                                attributeStereotypesVisible=true,
+                                                attributeTypesVisible=true,
+                                                color=#FFFFCC,
+                                                lineWidth=1.0,
+                                                position=(599.0, 476.0),
+                                                width=129.0,
+                                                height=42.09375)
+                    TypeView PropertyView(type=meta::pure::diagram::PropertyView,
+                                          stereotypesVisible=true,
+                                          attributesVisible=true,
+                                          attributeStereotypesVisible=true,
+                                          attributeTypesVisible=true,
+                                          color=#FFFFCC,
+                                          lineWidth=1.0,
+                                          position=(786.0, 476.0),
+                                          width=97.0,
+                                          height=42.09375)
+                    TypeView TypeView(type=meta::pure::diagram::TypeView,
+                                      stereotypesVisible=true,
+                                      attributesVisible=true,
+                                      attributeStereotypesVisible=true,
+                                      attributeTypesVisible=true,
+                                      color=#FFFFCC,
+                                      lineWidth=1.0,
+                                      position=(216.0, 286.0),
+                                      width=75.0,
+                                      height=42.09375)
+                    PropertyView AbstractPathView_source(property=meta::pure::diagram::AbstractPathView.source,
+                                                         stereotypesVisible=true,
+                                                         nameVisible=true,
+                                                         color=#000000,
+                                                         lineWidth=-1.0,
+                                                         lineStyle=SIMPLE,
+                                                         points=[(600.23, 320.0), (290.25, 320.0)],
+                                                         label='',
+                                                         source=AbstractPathView,
+                                                         target=TypeView,
+                                                         propertyPosition=(297.5, 320.453125),
+                                                         multiplicityPosition=(356.0, 320.453125))
+                    PropertyView AbstractPathView_target(property=meta::pure::diagram::AbstractPathView.target,
+                                                         stereotypesVisible=true,
+                                                         nameVisible=true,
+                                                         color=#000000,
+                                                         lineWidth=-1.0,
+                                                         lineStyle=SIMPLE,
+                                                         points=[(600.23, 292.0), (424.0, 292.0), (290.0, 293.0)],
+                                                         label='',
+                                                         source=AbstractPathView,
+                                                         target=TypeView,
+                                                         propertyPosition=(299.13357281145454, 278.2436741823325),
+                                                         multiplicityPosition=(358.8651741778389, 278.31183889983697))
+                    GeneralizationView AbstractPathView_DiagramNode(color=#000000,
+                                                                    lineWidth=-1.0,
+                                                                    lineStyle=SIMPLE,
+                                                                    points=[(459.5, 152.59375), (459.5, 229.59375), (660.5, 229.59375), (660.5, 306.59375)],
+                                                                    label='',
+                                                                    source=AbstractPathView,
+                                                                    target=DiagramNode)
+                    GeneralizationView AssociationView_AbstractPathView(color=#000000,
+                                                                        lineWidth=-1.0,
+                                                                        lineStyle=SIMPLE,
+                                                                        points=[(660.5, 306.59375), (660.5, 405.59375), (459.5, 405.59375), (459.5, 497.046875)],
+                                                                        label='',
+                                                                        source=AssociationView,
+                                                                        target=AbstractPathView)
+                    GeneralizationView GeneralizationView_AbstractPathView(color=#000000,
+                                                                           lineWidth=-1.0,
+                                                                           lineStyle=SIMPLE,
+                                                                           points=[(660.5, 306.59375), (660.5, 405.59375), (663.5, 405.59375), (663.5, 497.046875)],
+                                                                           label='',
+                                                                           source=GeneralizationView,
+                                                                           target=AbstractPathView)
+                    GeneralizationView PropertyView_AbstractPathView(color=#000000,
+                                                                     lineWidth=-1.0,
+                                                                     lineStyle=SIMPLE,
+                                                                     points=[(660.5, 306.59375), (660.5, 405.59375), (834.5, 405.59375), (834.5, 497.046875)],
+                                                                     label='',
+                                                                     source=PropertyView,
+                                                                     target=AbstractPathView)
+                    GeneralizationView TypeView_DiagramNode(color=#000000,
+                                                            lineWidth=-1.0,
+                                                            lineStyle=SIMPLE,
+                                                            points=[(459.5, 152.59375), (459.5, 229.59375), (253.5, 229.59375), (253.5, 307.046875)],
+                                                            label='',
+                                                            source=TypeView,
+                                                            target=DiagramNode)
+                }\
+                """;
         compileTestSource("testDiagram.pure",
                 source);
 
@@ -888,75 +936,77 @@ public class TestDiagramParsing extends AbstractPureTestWithCoreCompiled
         for (ReferenceUsage referenceUsage : typeViewReferenceUsages)
         {
             SourceInformation sourceInformation = referenceUsage.getSourceInformation();
-            Assert.assertEquals("TypeView", lines[sourceInformation.getLine() - 1].substring(sourceInformation.getColumn() - 1, sourceInformation.getColumn() + "TypeView".length() - 1));
+            Assertions.assertEquals("TypeView", lines[sourceInformation.getLine() - 1].substring(sourceInformation.getColumn() - 1, sourceInformation.getColumn() + "TypeView".length() - 1));
         }
     }
 
     @Test
     public void testDiagramModelDiagramWithAssociationView()
     {
-        final String source = "###Diagram\n" +
-                "Diagram meta::pure::diagram::DiagramDiagram(width=924.0, height=798.0)\n" +
-                "{\n" +
-                "    TypeView AssociationView(type=meta::pure::diagram::AssociationView,\n" +
-                "                             stereotypesVisible=true,\n" +
-                "                             attributesVisible=true,\n" +
-                "                             attributeStereotypesVisible=true,\n" +
-                "                             attributeTypesVisible=true,\n" +
-                "                             color=#FFFFCC,\n" +
-                "                             lineWidth=1.0,\n" +
-                "                             position=(402.0, 476.0),\n" +
-                "                             width=115.0,\n" +
-                "                             height=42.09375)\n" +
-                "    TypeView Diagram(type=meta::pure::diagram::Diagram,\n" +
-                "                     stereotypesVisible=true,\n" +
-                "                     attributesVisible=true,\n" +
-                "                     attributeStereotypesVisible=true,\n" +
-                "                     attributeTypesVisible=true,\n" +
-                "                     color=#FFFFCC,\n" +
-                "                     lineWidth=1.0,\n" +
-                "                     position=(37.5, 476.0),\n" +
-                "                     width=68.0,\n" +
-                "                     height=42.09375)\n" +
-                "    TypeView TypeView(type=meta::pure::diagram::TypeView,\n" +
-                "                      stereotypesVisible=true,\n" +
-                "                      attributesVisible=true,\n" +
-                "                      attributeStereotypesVisible=true,\n" +
-                "                      attributeTypesVisible=true,\n" +
-                "                      color=#FFFFCC,\n" +
-                "                      lineWidth=1.0,\n" +
-                "                      position=(216.0, 286.0),\n" +
-                "                      width=75.0,\n" +
-                "                      height=42.09375)\n" +
-                "   AssociationView aview_1(association = meta::pure::diagram::DiagramTypeViews,\n" +
-                "                            stereotypesVisible=true,\n" +
-                "                            nameVisible=false,\n" +
-                "                            color=#000000,\n" +
-                "                            lineWidth=-1.0,\n" +
-                "                            lineStyle=SIMPLE,\n" +
-                "                            points=[(745.13726,491.24757),(444.11680,471.43059)],\n" +
-                "                            label='DiagramTypeViews',\n" +
-                "                            source=Diagram,\n" +
-                "                            target=TypeView,\n" +
-                "                            sourcePropertyPosition=(462.85152, 296.10994),\n" +
-                "                            sourceMultiplicityPosition=(555.18941, 275.10994),\n" +
-                "                            targetPropertyPosition=(450.33789, 270.70564),\n" +
-                "                            targetMultiplicityPosition=(450.33789, 291.70564))\n" +
-                "    AssociationView aview_2(association = meta::pure::diagram::DiagramAssociationViews,\n" +
-                "                            stereotypesVisible=true,\n" +
-                "                            nameVisible=false,\n" +
-                "                            color=#000000,\n" +
-                "                            lineWidth=-1.0,\n" +
-                "                            lineStyle=SIMPLE,\n" +
-                "                            points=[(745.13726,491.24757),(444.11680,471.43059)],\n" +
-                "                            label='DiagramAssociationViews',\n" +
-                "                            source=Diagram,\n" +
-                "                            target=AssociationView,\n" +
-                "                            sourcePropertyPosition=(462.85152, 296.10994),\n" +
-                "                            sourceMultiplicityPosition=(555.18941, 275.10994),\n" +
-                "                            targetPropertyPosition=(450.33789, 270.70564),\n" +
-                "                            targetMultiplicityPosition=(450.33789, 291.70564))\n" +
-                "   } ";
+        final String source = """
+                ###Diagram
+                Diagram meta::pure::diagram::DiagramDiagram(width=924.0, height=798.0)
+                {
+                    TypeView AssociationView(type=meta::pure::diagram::AssociationView,
+                                             stereotypesVisible=true,
+                                             attributesVisible=true,
+                                             attributeStereotypesVisible=true,
+                                             attributeTypesVisible=true,
+                                             color=#FFFFCC,
+                                             lineWidth=1.0,
+                                             position=(402.0, 476.0),
+                                             width=115.0,
+                                             height=42.09375)
+                    TypeView Diagram(type=meta::pure::diagram::Diagram,
+                                     stereotypesVisible=true,
+                                     attributesVisible=true,
+                                     attributeStereotypesVisible=true,
+                                     attributeTypesVisible=true,
+                                     color=#FFFFCC,
+                                     lineWidth=1.0,
+                                     position=(37.5, 476.0),
+                                     width=68.0,
+                                     height=42.09375)
+                    TypeView TypeView(type=meta::pure::diagram::TypeView,
+                                      stereotypesVisible=true,
+                                      attributesVisible=true,
+                                      attributeStereotypesVisible=true,
+                                      attributeTypesVisible=true,
+                                      color=#FFFFCC,
+                                      lineWidth=1.0,
+                                      position=(216.0, 286.0),
+                                      width=75.0,
+                                      height=42.09375)
+                   AssociationView aview_1(association = meta::pure::diagram::DiagramTypeViews,
+                                            stereotypesVisible=true,
+                                            nameVisible=false,
+                                            color=#000000,
+                                            lineWidth=-1.0,
+                                            lineStyle=SIMPLE,
+                                            points=[(745.13726,491.24757),(444.11680,471.43059)],
+                                            label='DiagramTypeViews',
+                                            source=Diagram,
+                                            target=TypeView,
+                                            sourcePropertyPosition=(462.85152, 296.10994),
+                                            sourceMultiplicityPosition=(555.18941, 275.10994),
+                                            targetPropertyPosition=(450.33789, 270.70564),
+                                            targetMultiplicityPosition=(450.33789, 291.70564))
+                    AssociationView aview_2(association = meta::pure::diagram::DiagramAssociationViews,
+                                            stereotypesVisible=true,
+                                            nameVisible=false,
+                                            color=#000000,
+                                            lineWidth=-1.0,
+                                            lineStyle=SIMPLE,
+                                            points=[(745.13726,491.24757),(444.11680,471.43059)],
+                                            label='DiagramAssociationViews',
+                                            source=Diagram,
+                                            target=AssociationView,
+                                            sourcePropertyPosition=(462.85152, 296.10994),
+                                            sourceMultiplicityPosition=(555.18941, 275.10994),
+                                            targetPropertyPosition=(450.33789, 270.70564),
+                                            targetMultiplicityPosition=(450.33789, 291.70564))
+                   } \
+                """;
         compileTestSource("testDiagram.pure", source);
         String[] lines = source.split("\n");
 
@@ -972,7 +1022,7 @@ public class TestDiagramParsing extends AbstractPureTestWithCoreCompiled
         for (ReferenceUsage referenceUsage : associationViewReferenceUsages)
         {
             SourceInformation sourceInformation = referenceUsage.getSourceInformation();
-            Assert.assertEquals("DiagramAssociationViews", lines[sourceInformation.getLine() - 1].substring(sourceInformation.getColumn() - 1, sourceInformation.getColumn() + "DiagramAssociationViews".length() - 1));
+            Assertions.assertEquals("DiagramAssociationViews", lines[sourceInformation.getLine() - 1].substring(sourceInformation.getColumn() - 1, sourceInformation.getColumn() + "DiagramAssociationViews".length() - 1));
         }
 
         associationView = (Association) runtime.getCoreInstance("meta::pure::diagram::DiagramTypeViews");
@@ -987,7 +1037,7 @@ public class TestDiagramParsing extends AbstractPureTestWithCoreCompiled
         for (ReferenceUsage referenceUsage : associationViewReferenceUsages)
         {
             SourceInformation sourceInformation = referenceUsage.getSourceInformation();
-            Assert.assertEquals("DiagramTypeViews", lines[sourceInformation.getLine() - 1].substring(sourceInformation.getColumn() - 1, sourceInformation.getColumn() + "DiagramTypeViews".length() - 1));
+            Assertions.assertEquals("DiagramTypeViews", lines[sourceInformation.getLine() - 1].substring(sourceInformation.getColumn() - 1, sourceInformation.getColumn() + "DiagramTypeViews".length() - 1));
         }
     }
 }

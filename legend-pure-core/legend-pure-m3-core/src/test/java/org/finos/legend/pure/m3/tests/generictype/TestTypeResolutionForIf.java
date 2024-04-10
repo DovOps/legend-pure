@@ -15,20 +15,20 @@
 package org.finos.legend.pure.m3.tests.generictype;
 
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiledPlatform;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestTypeResolutionForIf extends AbstractPureTestWithCoreCompiledPlatform
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getExtra());
     }
 
-    @After
+    @AfterEach
     public void clearRuntime()
     {
         runtime.delete("fromString.pure");
@@ -38,10 +38,12 @@ public class TestTypeResolutionForIf extends AbstractPureTestWithCoreCompiledPla
     public void testIfWithAny()
     {
         compileTestSource("fromString.pure",
-                "function a():Any[1]" +
-                        "{" +
-                        "   if (true, |1, |'String');" +
-                        "}");
+                """
+                function a():Any[1]\
+                {\
+                   if (true, |1, |'String');\
+                }\
+                """);
     }
 
     @Test
@@ -50,14 +52,16 @@ public class TestTypeResolutionForIf extends AbstractPureTestWithCoreCompiledPla
         try
         {
             compileTestSource("fromString.pure",
-                    "function a():Integer[1]" +
-                            "{" +
-                            "   if (true, |1, |'String');" +
-                            "}");
+                    """
+                    function a():Integer[1]\
+                    {\
+                       if (true, |1, |'String');\
+                    }\
+                    """);
         }
         catch (Exception e)
         {
-            Assert.assertEquals("Compilation error at (resource:fromString.pure line:1 column:28), \"Return type error in function 'a'; found: meta::pure::metamodel::type::Any; expected: Integer\"", e.getMessage());
+            Assertions.assertEquals("Compilation error at (resource:fromString.pure line:1 column:28), \"Return type error in function 'a'; found: meta::pure::metamodel::type::Any; expected: Integer\"", e.getMessage());
         }
 
     }
@@ -67,10 +71,12 @@ public class TestTypeResolutionForIf extends AbstractPureTestWithCoreCompiledPla
     {
         // Current bug, but expected by some platform code... Need to eventually fix... return should be Any
         compileTestSource("fromString.pure",
-                "function a<K>(x:K[*]):K[1]" +
-                        "{" +
-                        "   if (true, |$x->at(0), |true);" +
-                        "}");
+                """
+                function a<K>(x:K[*]):K[1]\
+                {\
+                   if (true, |$x->at(0), |true);\
+                }\
+                """);
     }
 
     @Test
@@ -78,10 +84,12 @@ public class TestTypeResolutionForIf extends AbstractPureTestWithCoreCompiledPla
     {
         // Current bug, but expected by some platform code... Need to eventually fix... return should be Any
         compileTestSource("fromString.pure",
-                "function a<K>(x:K[*]):K[1]" +
-                        "{" +
-                        "   if (true, |true, |$x->at(0));" +
-                        "}");
+                """
+                function a<K>(x:K[*]):K[1]\
+                {\
+                   if (true, |true, |$x->at(0));\
+                }\
+                """);
     }
 }
 

@@ -26,19 +26,19 @@ import org.finos.legend.pure.m3.navigation.generictype.GenericType;
 import org.finos.legend.pure.m3.navigation.type.Type;
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiledPlatform;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
-import org.junit.After;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestGenericTypeSuperTypes extends AbstractPureTestWithCoreCompiledPlatform
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getExtra());
     }
 
-    @After
+    @AfterEach
     public void clearRuntime()
     {
         runtime.delete("fromString.pure");
@@ -47,29 +47,31 @@ public class TestGenericTypeSuperTypes extends AbstractPureTestWithCoreCompiledP
     @Test
     public void testDSBCase()
     {
-        compileTestSource("fromString.pure", "import test::*;\n" +
-                "\n" +
-                "Class test::Post\n" +
-                "{\n" +
-                "}\n" +
-                "\n" +
-                "Class test::Pre \n" +
-                "{\n" +
-                "}\n" +
-                "\n" +
-                "Class test::DataSetFilterOperation<F>\n" +
-                "{\n" +
-                "}\n" +
-                "\n" +
-                "Class test::DataSetComparisonPostFilterOperation<T|m> extends DataSetFilterOperation<Post>\n" +
-                "{\n" +
-                "     value : T[m];\n" +
-                "}\n" +
-                "\n" +
-                "Class test::DataSetCompositeFilterOperation<F> extends DataSetFilterOperation<F>\n" +
-                "{\n" +
-                "     rules : DataSetFilterOperation<F>[*];\n" +
-                "}\n");
+        compileTestSource("fromString.pure", """
+                import test::*;
+                
+                Class test::Post
+                {
+                }
+                
+                Class test::Pre\s
+                {
+                }
+                
+                Class test::DataSetFilterOperation<F>
+                {
+                }
+                
+                Class test::DataSetComparisonPostFilterOperation<T|m> extends DataSetFilterOperation<Post>
+                {
+                     value : T[m];
+                }
+                
+                Class test::DataSetCompositeFilterOperation<F> extends DataSetFilterOperation<F>
+                {
+                     rules : DataSetFilterOperation<F>[*];
+                }
+                """);
         CoreInstance genericType1 = Type.wrapGenericType(runtime.getCoreInstance("test::DataSetCompositeFilterOperation"), processorSupport);
         Instance.addValueToProperty(genericType1, M3Properties.typeArguments, Type.wrapGenericType(runtime.getCoreInstance("test::Post"), processorSupport), processorSupport);
         Verify.assertListsEqual(Lists.mutable.with("test::DataSetCompositeFilterOperation<test::Post>", "test::DataSetFilterOperation<test::Post>", M3Paths.Any), getSuperTypesAsStrings(genericType1));
@@ -83,11 +85,13 @@ public class TestGenericTypeSuperTypes extends AbstractPureTestWithCoreCompiledP
     @Test
     public void testWithMultiLevelTypeAndMultiplicityArguments()
     {
-        compileTestSource("fromString.pure", "import test::*;\n" +
-                "\n" +
-                "Class test::A<T,U,V|a,b,c> {}\n" +
-                "Class test::B<W,X|d,e> extends A<W,X,String|d,e,1> {}\n" +
-                "Class test::C<Y|f> extends B<Y,Integer|f,*> {}\n");
+        compileTestSource("fromString.pure", """
+                import test::*;
+                
+                Class test::A<T,U,V|a,b,c> {}
+                Class test::B<W,X|d,e> extends A<W,X,String|d,e,1> {}
+                Class test::C<Y|f> extends B<Y,Integer|f,*> {}
+                """);
 
         CoreInstance genericType1 = Type.wrapGenericType(runtime.getCoreInstance("test::C"), processorSupport);
         Instance.addValueToProperty(genericType1, M3Properties.typeArguments, Type.wrapGenericType(runtime.getCoreInstance(M3Paths.Date), processorSupport), processorSupport);
@@ -98,12 +102,14 @@ public class TestGenericTypeSuperTypes extends AbstractPureTestWithCoreCompiledP
     @Test
     public void testWithNestedTypeArguments()
     {
-        compileTestSource("fromString.pure", "import test::*;\n" +
-                "\n" +
-                "Class test::A<W> {}\n" +
-                "Class test::B<X> {}\n" +
-                "Class test::C<Y> extends A<B<Y>> {}\n" +
-                "Class test::D<Z> extends test::C<Z> {}\n");
+        compileTestSource("fromString.pure", """
+                import test::*;
+                
+                Class test::A<W> {}
+                Class test::B<X> {}
+                Class test::C<Y> extends A<B<Y>> {}
+                Class test::D<Z> extends test::C<Z> {}
+                """);
         CoreInstance genericType1 = Type.wrapGenericType(runtime.getCoreInstance("test::D"), processorSupport);
         Instance.addValueToProperty(genericType1, M3Properties.typeArguments, Type.wrapGenericType(runtime.getCoreInstance(M3Paths.Boolean), processorSupport), processorSupport);
         Verify.assertListsEqual(Lists.mutable.with("test::D<Boolean>", "test::C<Boolean>", "test::A<test::B<Boolean>>", M3Paths.Any), getSuperTypesAsStrings(genericType1));

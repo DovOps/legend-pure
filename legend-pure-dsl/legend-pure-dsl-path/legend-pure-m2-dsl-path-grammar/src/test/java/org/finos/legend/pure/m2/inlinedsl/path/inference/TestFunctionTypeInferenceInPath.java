@@ -24,16 +24,16 @@ import org.finos.legend.pure.m3.serialization.filesystem.repository.CodeReposito
 import org.finos.legend.pure.m3.serialization.filesystem.repository.GenericCodeRepository;
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
 import org.finos.legend.pure.m4.exception.PureCompilationException;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestFunctionTypeInferenceInPath extends AbstractPureTestWithCoreCompiled
 {
     private static final String SOURCE_ID = "/test/pathInferenceTest.pure";
 
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getFunctionExecution(), new CompositeCodeStorage(new ClassLoaderCodeStorage(getCodeRepositories())), getFactoryRegistryOverride(), getOptions(), getExtra());
@@ -46,7 +46,7 @@ public class TestFunctionTypeInferenceInPath extends AbstractPureTestWithCoreCom
         return codeRepositories;
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete(SOURCE_ID);
@@ -57,143 +57,149 @@ public class TestFunctionTypeInferenceInPath extends AbstractPureTestWithCoreCom
     public void inferTypeParameterUpAndDownWithNestedFunctionArray()
     {
         compileTestSource(SOURCE_ID,
-                "import meta::pure::tests::model::simple::*;\n" +
-                        "Class meta::pure::tests::model::simple::Product\n" +
-                        "{\n" +
-                        "   name : String[1];\n" +
-                        "}\n" +
-                        "\n" +
-                        "Class meta::pure::tests::model::simple::Trade\n" +
-                        "{\n" +
-                        "   quantity : Float[1];\n" +
-                        "   product : Product[0..1];\n" +
-                        "}\n" +
-                        "Class meta::pure::tds::TabularDataSet\n" +
-                        "{\n" +
-                        "}\n" +
-                        "Class meta::pure::functions::collection::AggregateValue<A,B,C>\n" +
-                        "{\n" +
-                        "   name : String[1];\n" +
-                        "   mapFn : FunctionDefinition<{A[1]->B[1]}>[1];\n" +
-                        "   aggregateFn : FunctionDefinition<{B[*]->C[1]}>[1];\n" +
-                        "}\n" +
-                        "\n" +
-                        "function meta::pure::functions::collection::agg<K,L,M>(name:String[1], mapFn:FunctionDefinition<{K[1]->L[1]}>[1], aggregateFn:FunctionDefinition<{L[*]->M[1]}>[1]):meta::pure::functions::collection::AggregateValue<K,L,M>[1]\n" +
-                        "{\n" +
-                        "   ^meta::pure::functions::collection::AggregateValue<K,L,M>(name = $name, mapFn=$mapFn, aggregateFn=$aggregateFn);\n" +
-                        "}\n" +
-                        "\n" +
-                        "function meta::pure::functions::collection::groupBy<T,V,U>(set:T[*], functions:Function<{T[1]->Any[*]}>[*], ids:String[*], aggValues:meta::pure::functions::collection::AggregateValue<T,V,U>[*]):TabularDataSet[1]\n" +
-                        "{\n" +
-                        "   fail('ee');\n" +
-                        "   ^TabularDataSet();\n" +
-                        "}\n" +
-                        "\n" +
-                        "function meta::pure::functions::math::sum(numbers:Float[*]):Float[1]\n" +
-                        "{\n" +
-                        "    $numbers->plus();\n" +
-                        "}\n" +
-                        "\n" +
-                        "function test::go():Any[*]\n" +
-                        "{\n" +
-                        "   Trade.all()->groupBy([#/Trade/product/name#],\n" +
-                        "                        ['prodName'],\n" +
-                        "                        [\n" +
-                        "                           meta::pure::functions::collection::agg('cnt', x|$x.quantity, y|$y->sum()),\n" +
-                        "                           meta::pure::functions::collection::agg('cnt2', x|$x.quantity, y|$y->sum())\n" +
-                        "                        ]);\n" +
-                        "}");
+                """
+                import meta::pure::tests::model::simple::*;
+                Class meta::pure::tests::model::simple::Product
+                {
+                   name : String[1];
+                }
+                
+                Class meta::pure::tests::model::simple::Trade
+                {
+                   quantity : Float[1];
+                   product : Product[0..1];
+                }
+                Class meta::pure::tds::TabularDataSet
+                {
+                }
+                Class meta::pure::functions::collection::AggregateValue<A,B,C>
+                {
+                   name : String[1];
+                   mapFn : FunctionDefinition<{A[1]->B[1]}>[1];
+                   aggregateFn : FunctionDefinition<{B[*]->C[1]}>[1];
+                }
+                
+                function meta::pure::functions::collection::agg<K,L,M>(name:String[1], mapFn:FunctionDefinition<{K[1]->L[1]}>[1], aggregateFn:FunctionDefinition<{L[*]->M[1]}>[1]):meta::pure::functions::collection::AggregateValue<K,L,M>[1]
+                {
+                   ^meta::pure::functions::collection::AggregateValue<K,L,M>(name = $name, mapFn=$mapFn, aggregateFn=$aggregateFn);
+                }
+                
+                function meta::pure::functions::collection::groupBy<T,V,U>(set:T[*], functions:Function<{T[1]->Any[*]}>[*], ids:String[*], aggValues:meta::pure::functions::collection::AggregateValue<T,V,U>[*]):TabularDataSet[1]
+                {
+                   fail('ee');
+                   ^TabularDataSet();
+                }
+                
+                function meta::pure::functions::math::sum(numbers:Float[*]):Float[1]
+                {
+                    $numbers->plus();
+                }
+                
+                function test::go():Any[*]
+                {
+                   Trade.all()->groupBy([#/Trade/product/name#],
+                                        ['prodName'],
+                                        [
+                                           meta::pure::functions::collection::agg('cnt', x|$x.quantity, y|$y->sum()),
+                                           meta::pure::functions::collection::agg('cnt2', x|$x.quantity, y|$y->sum())
+                                        ]);
+                }\
+                """);
     }
 
     @Test
     public void inferTypeParameterUpAndDownWithNestedFunction_Success()
     {
-        compileTestSource(SOURCE_ID, "import meta::pure::tests::model::simple::*;\n" +
-                "Class meta::pure::tests::model::simple::Product\n" +
-                "{\n" +
-                "   name : String[1];\n" +
-                "}\n" +
-                "\n" +
-                "Class meta::pure::tests::model::simple::Trade\n" +
-                "{\n" +
-                "   quantity : Float[1];\n" +
-                "   product : Product[0..1];\n" +
-                "}\n" +
-                "Class meta::pure::tds::TabularDataSet\n" +
-                "{\n" +
-                "}\n" +
-                "Class meta::pure::functions::collection::AggregateValue<A,B,C>\n" +
-                "{\n" +
-                "   name : String[1];\n" +
-                "   mapFn : FunctionDefinition<{A[1]->B[1]}>[1];\n" +
-                "   aggregateFn : FunctionDefinition<{B[*]->C[1]}>[1];\n" +
-                "}\n" +
-                "\n" +
-                "function meta::pure::functions::collection::agg<K,L,M>(name:String[1], mapFn:FunctionDefinition<{K[1]->L[1]}>[1], aggregateFn:FunctionDefinition<{L[*]->M[1]}>[1]):meta::pure::functions::collection::AggregateValue<K,L,M>[1]\n" +
-                "{\n" +
-                "   ^meta::pure::functions::collection::AggregateValue<K,L,M>(name = $name, mapFn=$mapFn, aggregateFn=$aggregateFn);\n" +
-                "}\n" +
-                "\n" +
-                "function meta::pure::functions::collection::groupBy<T,V,U>(set:T[*], functions:Function<{T[1]->Any[*]}>[*], ids:String[*], aggValues:meta::pure::functions::collection::AggregateValue<T,V,U>[*]):TabularDataSet[1]\n" +
-                "{\n" +
-                "   fail('ee');\n" +
-                "   ^TabularDataSet();   \n" +
-                "}\n" +
-                "\n" +
-                "function meta::pure::functions::math::sum(numbers:Float[*]):Float[1]\n" +
-                "{\n" +
-                "    $numbers->plus();\n" +
-                "}\n" +
-                "\n" +
-                "function test::go():Any[*]\n" +
-                "{\n" +
-                "   Trade.all()->groupBy([#/Trade/product/name#], ['prodName'], meta::pure::functions::collection::agg('cnt', x|$x.quantity, y|$y->sum()));\n" +
-                "   'ok';\n" +
-                "}");
+        compileTestSource(SOURCE_ID, """
+                import meta::pure::tests::model::simple::*;
+                Class meta::pure::tests::model::simple::Product
+                {
+                   name : String[1];
+                }
+                
+                Class meta::pure::tests::model::simple::Trade
+                {
+                   quantity : Float[1];
+                   product : Product[0..1];
+                }
+                Class meta::pure::tds::TabularDataSet
+                {
+                }
+                Class meta::pure::functions::collection::AggregateValue<A,B,C>
+                {
+                   name : String[1];
+                   mapFn : FunctionDefinition<{A[1]->B[1]}>[1];
+                   aggregateFn : FunctionDefinition<{B[*]->C[1]}>[1];
+                }
+                
+                function meta::pure::functions::collection::agg<K,L,M>(name:String[1], mapFn:FunctionDefinition<{K[1]->L[1]}>[1], aggregateFn:FunctionDefinition<{L[*]->M[1]}>[1]):meta::pure::functions::collection::AggregateValue<K,L,M>[1]
+                {
+                   ^meta::pure::functions::collection::AggregateValue<K,L,M>(name = $name, mapFn=$mapFn, aggregateFn=$aggregateFn);
+                }
+                
+                function meta::pure::functions::collection::groupBy<T,V,U>(set:T[*], functions:Function<{T[1]->Any[*]}>[*], ids:String[*], aggValues:meta::pure::functions::collection::AggregateValue<T,V,U>[*]):TabularDataSet[1]
+                {
+                   fail('ee');
+                   ^TabularDataSet();  \s
+                }
+                
+                function meta::pure::functions::math::sum(numbers:Float[*]):Float[1]
+                {
+                    $numbers->plus();
+                }
+                
+                function test::go():Any[*]
+                {
+                   Trade.all()->groupBy([#/Trade/product/name#], ['prodName'], meta::pure::functions::collection::agg('cnt', x|$x.quantity, y|$y->sum()));
+                   'ok';
+                }\
+                """);
     }
 
     @Test
     public void inferTypeParameterUpAndDownWithNestedFunction_Failure()
     {
-        PureCompilationException e = Assert.assertThrows(PureCompilationException.class, () ->
-                compileTestSource(SOURCE_ID, "import meta::pure::tests::model::simple::*;\n" +
-                        "Class meta::pure::tests::model::simple::Product\n" +
-                        "{\n" +
-                        "   name : String[1];\n" +
-                        "}\n" +
-                        "\n" +
-                        "Class meta::pure::tests::model::simple::Trade\n" +
-                        "{\n" +
-                        "   quantity : Float[1];\n" +
-                        "   product : Product[0..1];\n" +
-                        "}\n" +
-                        "Class meta::pure::tds::TabularDataSet\n" +
-                        "{\n" +
-                        "}\n" +
-                        "Class meta::pure::functions::collection::AggregateValue<A,B,C>\n" +
-                        "{\n" +
-                        "   name : String[1];\n" +
-                        "   mapFn : FunctionDefinition<{A[1]->B[1]}>[1];\n" +
-                        "   aggregateFn : FunctionDefinition<{B[*]->C[1]}>[1];\n" +
-                        "}\n" +
-                        "\n" +
-                        "function meta::pure::functions::collection::agg<K,L,M>(name:String[1], mapFn:FunctionDefinition<{K[1]->L[1]}>[1], aggregateFn:FunctionDefinition<{L[*]->M[1]}>[1]):meta::pure::functions::collection::AggregateValue<K,L,M>[1]\n" +
-                        "{\n" +
-                        "   ^meta::pure::functions::collection::AggregateValue<K,L,M>(name = $name, mapFn=$mapFn, aggregateFn=$aggregateFn);\n" +
-                        "}\n" +
-                        "\n" +
-                        "function meta::pure::functions::collection::groupBy<T,V,U>(set:T[*], functions:Function<{T[1]->Any[*]}>[*], ids:String[*], aggValues:meta::pure::functions::collection::AggregateValue<T,V,U>[*]):TabularDataSet[1]\n" +
-                        "{\n" +
-                        "   fail('ee');\n" +
-                        "   ^TabularDataSet();   \n" +
-                        "}\n" +
-                        "\n" +
-                        "\n" +
-                        "function test::go():Any[*]\n" +
-                        "{\n" +
-                        "   Trade.all()->groupBy([#/Trade/product/name#], ['prodName'], meta::pure::functions::collection::agg('cnt', x|$x.name, y|$y->sum()));\n" +
-                        "   'ok';\n" +
-                        "}"));
+        PureCompilationException e = Assertions.assertThrows(PureCompilationException.class, () ->
+                compileTestSource(SOURCE_ID, """
+                        import meta::pure::tests::model::simple::*;
+                        Class meta::pure::tests::model::simple::Product
+                        {
+                           name : String[1];
+                        }
+                        
+                        Class meta::pure::tests::model::simple::Trade
+                        {
+                           quantity : Float[1];
+                           product : Product[0..1];
+                        }
+                        Class meta::pure::tds::TabularDataSet
+                        {
+                        }
+                        Class meta::pure::functions::collection::AggregateValue<A,B,C>
+                        {
+                           name : String[1];
+                           mapFn : FunctionDefinition<{A[1]->B[1]}>[1];
+                           aggregateFn : FunctionDefinition<{B[*]->C[1]}>[1];
+                        }
+                        
+                        function meta::pure::functions::collection::agg<K,L,M>(name:String[1], mapFn:FunctionDefinition<{K[1]->L[1]}>[1], aggregateFn:FunctionDefinition<{L[*]->M[1]}>[1]):meta::pure::functions::collection::AggregateValue<K,L,M>[1]
+                        {
+                           ^meta::pure::functions::collection::AggregateValue<K,L,M>(name = $name, mapFn=$mapFn, aggregateFn=$aggregateFn);
+                        }
+                        
+                        function meta::pure::functions::collection::groupBy<T,V,U>(set:T[*], functions:Function<{T[1]->Any[*]}>[*], ids:String[*], aggValues:meta::pure::functions::collection::AggregateValue<T,V,U>[*]):TabularDataSet[1]
+                        {
+                           fail('ee');
+                           ^TabularDataSet();  \s
+                        }
+                        
+                        
+                        function test::go():Any[*]
+                        {
+                           Trade.all()->groupBy([#/Trade/product/name#], ['prodName'], meta::pure::functions::collection::agg('cnt', x|$x.name, y|$y->sum()));
+                           'ok';
+                        }\
+                        """));
         assertPureException(PureCompilationException.class, "Can't find the property 'name' in the class meta::pure::tests::model::simple::Trade", SOURCE_ID, 36, 115, e);
     }
 
@@ -201,33 +207,37 @@ public class TestFunctionTypeInferenceInPath extends AbstractPureTestWithCoreCom
     public void inferTheTypeOfACollectionOfLambdaAndPath_Success()
     {
         compileTestSource(SOURCE_ID,
-                "import test::*;\n" +
-                        "Class test::Person\n" +
-                        "{\n" +
-                        "   age:Integer[1];\n" +
-                        "}\n" +
-                        "function test::a(k:FunctionExpression[1]):Any[*]\n" +
-                        "{\n" +
-                        "   let f = [f:Person[1]|2, #/Person/age#];\n" +
-                        "   let z = $f->at(0)->eval(^Person(age=3))+4;\n" +
-                        "}\n");
+                """
+                import test::*;
+                Class test::Person
+                {
+                   age:Integer[1];
+                }
+                function test::a(k:FunctionExpression[1]):Any[*]
+                {
+                   let f = [f:Person[1]|2, #/Person/age#];
+                   let z = $f->at(0)->eval(^Person(age=3))+4;
+                }
+                """);
     }
 
     @Test
     public void inferTheTypeOfACollectionOfLambdaAndPath_Failure()
     {
-        PureCompilationException e = Assert.assertThrows(PureCompilationException.class, () ->
+        PureCompilationException e = Assertions.assertThrows(PureCompilationException.class, () ->
                 compileTestSource(SOURCE_ID,
-                        "import test::*;\n" +
-                                "Class test::Person\n" +
-                                "{\n" +
-                                "   age:Integer[1];\n" +
-                                "}\n" +
-                                "function test::a(k:FunctionExpression[1]):Any[*]\n" +
-                                "{\n" +
-                                "   let f = [f:Person[1]|'2', #/Person/age#];\n" +
-                                "   let z = $f->at(0)->eval(^Person(age=3))+4;\n" +
-                                "}\n"));
+                        """
+                        import test::*;
+                        Class test::Person
+                        {
+                           age:Integer[1];
+                        }
+                        function test::a(k:FunctionExpression[1]):Any[*]
+                        {
+                           let f = [f:Person[1]|'2', #/Person/age#];
+                           let z = $f->at(0)->eval(^Person(age=3))+4;
+                        }
+                        """));
         assertPureException(PureCompilationException.class, PureUnmatchedFunctionException.FUNCTION_UNMATCHED_MESSAGE + "plus(_:Any[2])\n" +
                 PureUnmatchedFunctionException.EMPTY_CANDIDATES_WITH_PACKAGE_IMPORTED_MESSAGE +
                 PureUnmatchedFunctionException.NONEMPTY_CANDIDATES_WITH_PACKAGE_NOT_IMPORTED_MESSAGE +

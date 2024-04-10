@@ -118,7 +118,7 @@ public class DateFunctions extends TimeFunctions
             }
             case Calendar.MILLISECOND:
             {
-                return DateWithSubsecond.newDateWithSubsecond(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), calendar.get(Calendar.SECOND), String.format("%03d", calendar.get(Calendar.MILLISECOND)));
+                return DateWithSubsecond.newDateWithSubsecond(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), calendar.get(Calendar.SECOND), "%03d".formatted(calendar.get(Calendar.MILLISECOND)));
             }
             default:
             {
@@ -146,13 +146,13 @@ public class DateFunctions extends TimeFunctions
 
     public static PureDate fromDate(Date date)
     {
-        if (date instanceof java.sql.Date)
+        if (date instanceof java.sql.Date date1)
         {
-            return fromSQLDate((java.sql.Date)date);
+            return fromSQLDate(date1);
         }
-        if (date instanceof java.sql.Timestamp)
+        if (date instanceof java.sql.Timestamp timestamp)
         {
-            return fromSQLTimestamp((java.sql.Timestamp)date);
+            return fromSQLTimestamp(timestamp);
         }
         GregorianCalendar calendar = new GregorianCalendar(GMT_TIME_ZONE);
         calendar.setTime(date);

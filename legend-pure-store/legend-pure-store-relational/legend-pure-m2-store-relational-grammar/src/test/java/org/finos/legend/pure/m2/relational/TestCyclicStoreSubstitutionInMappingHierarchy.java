@@ -16,7 +16,7 @@ package org.finos.legend.pure.m2.relational;
 
 import org.finos.legend.pure.m3.tests.RuntimeTestScriptBuilder;
 import org.finos.legend.pure.m3.tests.RuntimeVerifier;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class TestCyclicStoreSubstitutionInMappingHierarchy extends AbstractPureRelationalTestWithCoreCompiled
 {
@@ -24,56 +24,62 @@ public class TestCyclicStoreSubstitutionInMappingHierarchy extends AbstractPureR
     private static final String STORE_SOURCE_ID = "store.pure";
     private static final String MAPPING_SOURCE_ID = "mapping.pure";
 
-    private static final String MODEL_SOURCE_CODE = "###Pure\n" +
-            "\n" +
-            "Class test::A\n" +
-            "{\n" +
-            "   id : Integer[1];\n" +
-            "}\n" +
-            "\n" +
-            "Class test::C extends test::A\n" +
-            "{\n" +
-            "}\n";
+    private static final String MODEL_SOURCE_CODE = """
+            ###Pure
+            
+            Class test::A
+            {
+               id : Integer[1];
+            }
+            
+            Class test::C extends test::A
+            {
+            }
+            """;
 
-    private static final String STORE_SOURCE_CODE = "###Relational\n" +
-            "\n" +
-            "Database test::ADatabase\n" +
-            "(\n" +
-            "   Table ATable(id INT PRIMARY KEY)\n" +
-            ")\n" +
-            "\n" +
-            "###Relational\n" +
-            "\n" +
-            "Database test::CDatabase\n" +
-            "(\n" +
-            "   include test::ADatabase\n" +
-            ")\n";
+    private static final String STORE_SOURCE_CODE = """
+            ###Relational
+            
+            Database test::ADatabase
+            (
+               Table ATable(id INT PRIMARY KEY)
+            )
+            
+            ###Relational
+            
+            Database test::CDatabase
+            (
+               include test::ADatabase
+            )
+            """;
 
     @Test
     public void testAcyclicStoreSubstitutionAllowedInMappingHierarchy()
     {
-        String mappingSourceCode = "###Mapping\n" +
-                "\n" +
-                "Mapping test::AMapping\n" +
-                "(      \n" +
-                "   test::A : Relational\n" +
-                "   {\n" +
-                "      id : [test::ADatabase]ATable.id\n" +
-                "   }\n" +
-                ")\n" +
-                "\n" +
-                "Mapping test::BMapping\n" +
-                "(      \n" +
-                "   include test::AMapping" +
-                ")\n" +
-                "\n" +
-                "Mapping test::CMapping\n" +
-                "(      \n" +
-                "   include test::BMapping[test::ADatabase->test::CDatabase]\n" +
-                "   test::C extends [test_A] : Relational\n" +
-                "   { \n" +
-                "   }\n" +
-                ")\n";
+        String mappingSourceCode = """
+                ###Mapping
+                
+                Mapping test::AMapping
+                (     \s
+                   test::A : Relational
+                   {
+                      id : [test::ADatabase]ATable.id
+                   }
+                )
+                
+                Mapping test::BMapping
+                (     \s
+                   include test::AMapping\
+                )
+                
+                Mapping test::CMapping
+                (     \s
+                   include test::BMapping[test::ADatabase->test::CDatabase]
+                   test::C extends [test_A] : Relational
+                   {\s
+                   }
+                )
+                """;
 
         RuntimeVerifier.verifyOperationIsStable(
                 new RuntimeTestScriptBuilder()
@@ -94,28 +100,30 @@ public class TestCyclicStoreSubstitutionInMappingHierarchy extends AbstractPureR
     @Test
     public void testCyclicStoreSubstitutionNotAllowedInMappingHierarchy()
     {
-        String mappingSourceCode = "###Mapping\n" +
-                "\n" +
-                "Mapping test::AMapping\n" +
-                "(      \n" +
-                "   test::A : Relational\n" +
-                "   {\n" +
-                "      id : [test::ADatabase]ATable.id\n" +
-                "   }\n" +
-                ")\n" +
-                "\n" +
-                "Mapping test::BMapping\n" +
-                "(      \n" +
-                "   include test::AMapping[test::ADatabase->test::CDatabase]\n" +
-                ")\n" +
-                "\n" +
-                "Mapping test::CMapping\n" +
-                "(      \n" +
-                "   include test::BMapping[test::CDatabase->test::ADatabase]\n" +
-                "   test::C extends [test_A] : Relational\n" +
-                "   { \n" +
-                "   }\n" +
-                ")\n";
+        String mappingSourceCode = """
+                ###Mapping
+                
+                Mapping test::AMapping
+                (     \s
+                   test::A : Relational
+                   {
+                      id : [test::ADatabase]ATable.id
+                   }
+                )
+                
+                Mapping test::BMapping
+                (     \s
+                   include test::AMapping[test::ADatabase->test::CDatabase]
+                )
+                
+                Mapping test::CMapping
+                (     \s
+                   include test::BMapping[test::CDatabase->test::ADatabase]
+                   test::C extends [test_A] : Relational
+                   {\s
+                   }
+                )
+                """;
 
         RuntimeVerifier.verifyOperationIsStable(
                 new RuntimeTestScriptBuilder()

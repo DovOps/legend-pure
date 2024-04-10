@@ -2729,11 +2729,13 @@ public class M3ToJavaGenerator
 
     private static String getPrimitiveImports()
     {
-        return "import org.finos.legend.pure.m4.coreinstance.primitive.BooleanCoreInstance;\n" +
-                "import org.finos.legend.pure.m4.coreinstance.primitive.DateCoreInstance;\n" +
-                "import org.finos.legend.pure.m4.coreinstance.primitive.FloatCoreInstance;\n" +
-                "import org.finos.legend.pure.m4.coreinstance.primitive.IntegerCoreInstance;\n" +
-                "import org.finos.legend.pure.m4.coreinstance.primitive.StringCoreInstance;\n";
+        return """
+                import org.finos.legend.pure.m4.coreinstance.primitive.BooleanCoreInstance;
+                import org.finos.legend.pure.m4.coreinstance.primitive.DateCoreInstance;
+                import org.finos.legend.pure.m4.coreinstance.primitive.FloatCoreInstance;
+                import org.finos.legend.pure.m4.coreinstance.primitive.IntegerCoreInstance;
+                import org.finos.legend.pure.m4.coreinstance.primitive.StringCoreInstance;
+                """;
     }
 
     private static String nullSafe(String variable, String expression)

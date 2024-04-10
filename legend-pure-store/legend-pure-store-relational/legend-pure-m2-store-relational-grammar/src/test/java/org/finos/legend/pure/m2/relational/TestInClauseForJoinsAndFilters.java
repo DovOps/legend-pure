@@ -17,125 +17,140 @@ package org.finos.legend.pure.m2.relational;
 import org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.Filter;
 import org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.join.Join;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class TestInClauseForJoinsAndFilters extends AbstractPureRelationalTestWithCoreCompiled
 {
     @Test
     public void testSimpleJoin()
     {
-        String dbDef = "###Relational\n " +
-                "Database db\n" +
-                "(\n" +
-                "   Table persontable(firstName VARCHAR(200) PRIMARY KEY, firmId INTEGER)\n" +
-                "   Table firmtable(legalName VARCHAR(200) PRIMARY KEY, id INTEGER)\n" +
-                "   Join firm_person(firmtable.id = persontable.firmId)\n" +
-                ")";
+        String dbDef = """
+                ###Relational
+                 \
+                Database db
+                (
+                   Table persontable(firstName VARCHAR(200) PRIMARY KEY, firmId INTEGER)
+                   Table firmtable(legalName VARCHAR(200) PRIMARY KEY, id INTEGER)
+                   Join firm_person(firmtable.id = persontable.firmId)
+                )\
+                """;
 
         this.runtime.createInMemorySource("sourceId.pure", dbDef);
         this.runtime.createInMemorySource("userId.pure", "function test():Boolean[1]{assert(1 == db->meta::relational::metamodel::schema('default').tables->size(), |'');}");
         this.runtime.compile();
 
         CoreInstance db = processorSupport.package_getByUserPath("db");
-        Assert.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).size());
-        Assert.assertEquals(2, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).size());
+        Assertions.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).size());
+        Assertions.assertEquals(2, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).size());
 
         Join join = (Join) db.getValueForMetaPropertyToMany(M2RelationalProperties.joins).getFirst();
-        Assert.assertEquals("firm_person", join.getName());
+        Assertions.assertEquals("firm_person", join.getName());
     }
 
     @Test
     public void testJoinWithIds()
     {
-        String dbDef = "###Relational\n " +
-                "Database db\n" +
-                "(\n" +
-                "   Table persontable(firstName VARCHAR(200) PRIMARY KEY, firmId INTEGER)\n" +
-                "   Table firmtable(legalName VARCHAR(200) PRIMARY KEY, id INTEGER)\n" +
-                "   Join firm_person(firmtable.id = persontable.firmId and firmtable.id = 1 or firmtable.id = 2)\n" +
-                ")";
+        String dbDef = """
+                ###Relational
+                 \
+                Database db
+                (
+                   Table persontable(firstName VARCHAR(200) PRIMARY KEY, firmId INTEGER)
+                   Table firmtable(legalName VARCHAR(200) PRIMARY KEY, id INTEGER)
+                   Join firm_person(firmtable.id = persontable.firmId and firmtable.id = 1 or firmtable.id = 2)
+                )\
+                """;
 
         this.runtime.createInMemorySource("sourceId.pure", dbDef);
         this.runtime.createInMemorySource("userId.pure", "function test():Boolean[1]{assert(1 == db->meta::relational::metamodel::schema('default').tables->size(), |'');}");
         this.runtime.compile();
 
         CoreInstance db = processorSupport.package_getByUserPath("db");
-        Assert.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).size());
-        Assert.assertEquals(2, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).size());
+        Assertions.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).size());
+        Assertions.assertEquals(2, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).size());
 
         Join join = (Join) db.getValueForMetaPropertyToMany(M2RelationalProperties.joins).getFirst();
-        Assert.assertEquals("firm_person", join.getName());
+        Assertions.assertEquals("firm_person", join.getName());
     }
 
     @Test
     public void testJoinWithPreixInClause()
     {
-        String dbDef = "###Relational\n " +
-                "Database db\n" +
-                "(\n" +
-                "   Table persontable(firstName VARCHAR(200) PRIMARY KEY, firmId INTEGER)\n" +
-                "   Table firmtable(legalName VARCHAR(200) PRIMARY KEY, id INTEGER)\n" +
-                "   Join firm_personNumber(firmtable.id = persontable.firmId and in(firmtable.id, [1,2]))\n" +
-                "   Join firm_personString(firmtable.id = persontable.firmId and in(firmtable.legalName, ['Google', 'Apple']))\n" +
-                ")";
+        String dbDef = """
+                ###Relational
+                 \
+                Database db
+                (
+                   Table persontable(firstName VARCHAR(200) PRIMARY KEY, firmId INTEGER)
+                   Table firmtable(legalName VARCHAR(200) PRIMARY KEY, id INTEGER)
+                   Join firm_personNumber(firmtable.id = persontable.firmId and in(firmtable.id, [1,2]))
+                   Join firm_personString(firmtable.id = persontable.firmId and in(firmtable.legalName, ['Google', 'Apple']))
+                )\
+                """;
 
         this.runtime.createInMemorySource("sourceId.pure", dbDef);
         this.runtime.createInMemorySource("userId.pure", "function test():Boolean[1]{assert(1 == db->meta::relational::metamodel::schema('default').tables->size(), |'');}");
         this.runtime.compile();
 
         CoreInstance db = processorSupport.package_getByUserPath("db");
-        Assert.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).size());
-        Assert.assertEquals(2, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).size());
+        Assertions.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).size());
+        Assertions.assertEquals(2, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).size());
 
         Join firstJoin = (Join) db.getValueForMetaPropertyToMany(M2RelationalProperties.joins).get(0);
         Join secondJoin = (Join) db.getValueForMetaPropertyToMany(M2RelationalProperties.joins).get(1);
-        Assert.assertEquals("firm_personNumber", firstJoin.getName());
-        Assert.assertEquals("firm_personString", secondJoin.getName());
+        Assertions.assertEquals("firm_personNumber", firstJoin.getName());
+        Assertions.assertEquals("firm_personString", secondJoin.getName());
     }
 
     @Test
     public void testFilterWithIds()
     {
-        String dbDef = "###Relational\n " +
-                "Database db\n" +
-                "(\n" +
-                "   Table persontable(firstName VARCHAR(200) PRIMARY KEY, age INTEGER)\n" +
-                "   Filter young_adults(persontable.age = 18 or persontable.age = 19)\n" +
-                ")";
+        String dbDef = """
+                ###Relational
+                 \
+                Database db
+                (
+                   Table persontable(firstName VARCHAR(200) PRIMARY KEY, age INTEGER)
+                   Filter young_adults(persontable.age = 18 or persontable.age = 19)
+                )\
+                """;
 
         this.runtime.createInMemorySource("sourceId.pure", dbDef);
         this.runtime.createInMemorySource("userId.pure", "function test():Boolean[1]{assert(1 == db->meta::relational::metamodel::schema('default').tables->size(), |'');}");
         this.runtime.compile();
 
         CoreInstance db = processorSupport.package_getByUserPath("db");
-        Assert.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).size());
-        Assert.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).size());
+        Assertions.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).size());
+        Assertions.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).size());
 
         Filter filter = (Filter) db.getValueForMetaPropertyToMany(M2RelationalProperties.filters).getFirst();
-        Assert.assertEquals("young_adults", filter.getName());
+        Assertions.assertEquals("young_adults", filter.getName());
     }
 
     @Test
     public void testFilterWithPrefixInClause()
     {
-        String dbDef = "###Relational\n " +
-                "Database db\n" +
-                "(\n" +
-                "   Table persontable(firstName VARCHAR(200) PRIMARY KEY, age INTEGER)\n" +
-                "   Filter young_adults(in(persontable.age, [18, 19]))\n" +
-                ")";
+        String dbDef = """
+                ###Relational
+                 \
+                Database db
+                (
+                   Table persontable(firstName VARCHAR(200) PRIMARY KEY, age INTEGER)
+                   Filter young_adults(in(persontable.age, [18, 19]))
+                )\
+                """;
 
         this.runtime.createInMemorySource("sourceId.pure", dbDef);
         this.runtime.createInMemorySource("userId.pure", "function test():Boolean[1]{assert(1 == db->meta::relational::metamodel::schema('default').tables->size(), |'');}");
         this.runtime.compile();
 
         CoreInstance db = processorSupport.package_getByUserPath("db");
-        Assert.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).size());
-        Assert.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).size());
+        Assertions.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).size());
+        Assertions.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).size());
 
         Filter filter = (Filter) db.getValueForMetaPropertyToMany(M2RelationalProperties.filters).getFirst();
-        Assert.assertEquals("young_adults", filter.getName());
+        Assertions.assertEquals("young_adults", filter.getName());
     }
 
 }

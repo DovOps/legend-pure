@@ -25,7 +25,7 @@ public class PropertyStubHelper
 
     public static CoreInstance fromPropertyStub(CoreInstance instance)
     {
-        return (instance instanceof PropertyStub) ? fromPropertyStub((PropertyStub) instance) : instance;
+        return (instance instanceof PropertyStub ps) ? fromPropertyStub(ps) : instance;
     }
 
     public static CoreInstance fromPropertyStub(PropertyStub propertyStub)

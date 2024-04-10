@@ -17,70 +17,76 @@ package org.finos.legend.pure.m2.relational.incremental;
 import org.finos.legend.pure.m2.relational.AbstractPureRelationalTestWithCoreCompiled;
 import org.finos.legend.pure.m3.tests.RuntimeTestScriptBuilder;
 import org.finos.legend.pure.m3.tests.RuntimeVerifier;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class TestIncludedMappingOwnerUnloaderUnbind extends AbstractPureRelationalTestWithCoreCompiled
 {
     private static final String MAIN_SOURCE_ID = "main.pure";
     private static final String TEST_SOURCE_ID = "test.pure";
 
-    private static final String MAIN_SOURCE_CODE = "###Pure\n" +
-            "import test::*;\n" +
-            "\n" +
-            "Class test::Vehicle\n" +
-            "{\n" +
-            "   vehicleId : Integer[1];\n" +
-            "   vehicleName : String[1];\n" +
-            "}\n" +
-            "\n" +
-            "Class test::RoadVehicle extends Vehicle\n" +
-            "{\n" +
-            "   \n" +
-            "}\n" +
-            "\n" +
-            "###Relational\n" +
-            "Database test::MainDatabase\n" +
-            "(\n" +
-            "   Table VehicleTable(vehicleId INT PRIMARY KEY, vehicleName VARCHAR(20))\n" +
-            "   Filter VehicleFilter(VehicleTable.vehicleId = 1)\n" +
-            ")\n" +
-            "\n" +
-            "###Mapping\n" +
-            "import test::*;\n" +
-            "\n" +
-            "Mapping test::RoadVehicleMapping\n" +
-            "(   \n" +
-            "   include MainMapping\n" +
-            "   \n" +
-            "   RoadVehicle extends [test_Vehicle]: Relational\n" +
-            "   {\n" +
-            "      \n" +
-            "   }\n" +
-            ")\n";
+    private static final String MAIN_SOURCE_CODE = """
+            ###Pure
+            import test::*;
+            
+            Class test::Vehicle
+            {
+               vehicleId : Integer[1];
+               vehicleName : String[1];
+            }
+            
+            Class test::RoadVehicle extends Vehicle
+            {
+              \s
+            }
+            
+            ###Relational
+            Database test::MainDatabase
+            (
+               Table VehicleTable(vehicleId INT PRIMARY KEY, vehicleName VARCHAR(20))
+               Filter VehicleFilter(VehicleTable.vehicleId = 1)
+            )
+            
+            ###Mapping
+            import test::*;
+            
+            Mapping test::RoadVehicleMapping
+            (  \s
+               include MainMapping
+              \s
+               RoadVehicle extends [test_Vehicle]: Relational
+               {
+                 \s
+               }
+            )
+            """;
 
-    private static final String TEST_V1_SOURCE_CODE = "###Mapping\n" +
-            "import test::*;\n" +
-            "\n" +
-            "Mapping test::MainMapping\n" +
-            "(   \n" +
-            "   Vehicle: Relational\n" +
-            "   {\n" +
-            "      vehicleId : [MainDatabase]VehicleTable.vehicleId,\n" +
-            "      vehicleName : [MainDatabase]VehicleTable.vehicleName\n" +
-            "   }\n" +
-            ")\n";
+    private static final String TEST_V1_SOURCE_CODE = """
+            ###Mapping
+            import test::*;
+            
+            Mapping test::MainMapping
+            (  \s
+               Vehicle: Relational
+               {
+                  vehicleId : [MainDatabase]VehicleTable.vehicleId,
+                  vehicleName : [MainDatabase]VehicleTable.vehicleName
+               }
+            )
+            """;
 
-    private static final String TEST_V2_SOURCE_CODE = "###Mapping\n" +
-            "import test::*;\n" +
-            "\n" +
-            "Mapping test::MainMapping\n" +
-            "(   \n" +
-            "   Vehicle[newId]: Relational\n" +
-            "   {\n" +
-            "      vehicleId : [MainDatabase]VehicleTable.vehicleId,\n" +
-            "      vehicleName : [MainDatabase]VehicleTable.vehicleName\n" +
-            "   }\n" +
-            ")\n";
+    private static final String TEST_V2_SOURCE_CODE = """
+            ###Mapping
+            import test::*;
+            
+            Mapping test::MainMapping
+            (  \s
+               Vehicle[newId]: Relational
+               {
+                  vehicleId : [MainDatabase]VehicleTable.vehicleId,
+                  vehicleName : [MainDatabase]VehicleTable.vehicleName
+               }
+            )
+            """;
 
     @Test
     public void testIncludedMappingUnloaderUnbind()

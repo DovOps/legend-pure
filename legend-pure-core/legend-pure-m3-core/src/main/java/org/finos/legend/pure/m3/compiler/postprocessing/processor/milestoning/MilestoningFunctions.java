@@ -115,8 +115,8 @@ public class MilestoningFunctions
     @SuppressWarnings("unchecked")
     public static ListIterable<CoreInstance> toInstanceValues(CoreInstance instance)
     {
-        return (instance instanceof InstanceValue) ?
-                (ListIterable<CoreInstance>) ((InstanceValue) instance)._valuesCoreInstance() :
+        return (instance instanceof InstanceValue iv) ?
+                (ListIterable<CoreInstance>) iv._valuesCoreInstance() :
                 Lists.immutable.with(instance);
     }
 
@@ -127,9 +127,9 @@ public class MilestoningFunctions
 
     private static String getStereotypeName(CoreInstance stereotype)
     {
-        if (stereotype instanceof ImportStub)
+        if (stereotype instanceof ImportStub stub)
         {
-            String idOrPath = ((ImportStub) stereotype)._idOrPath();
+            String idOrPath = stub._idOrPath();
             return idOrPath.substring(idOrPath.indexOf('@') + 1);
         }
         return stereotype.getName();
@@ -149,14 +149,14 @@ public class MilestoningFunctions
 
     public static boolean isGeneratedMilestoningProperty(CoreInstance property, ProcessorSupport processorSupport, String stereotype, String milestoningPathSuffix)
     {
-        if (property instanceof ElementWithStereotypes)
+        if (property instanceof ElementWithStereotypes withStereotypes)
         {
-            RichIterable<? extends CoreInstance> stereotypes = ((ElementWithStereotypes) property)._stereotypesCoreInstance();
+            RichIterable<? extends CoreInstance> stereotypes = withStereotypes._stereotypesCoreInstance();
             if (stereotypes.notEmpty())
             {
                 CoreInstance profile = processorSupport.package_getByUserPath(M3Paths.Milestoning);
                 CoreInstance milestoningStereotype = Profile.findStereotype(profile, stereotype);
-                return stereotypes.anySatisfy(st -> (st instanceof ImportStub) ? ((ImportStub) st)._idOrPath().endsWith(milestoningPathSuffix) : milestoningStereotype.equals(st));
+                return stereotypes.anySatisfy(st -> (st instanceof ImportStub is) ? is._idOrPath().endsWith(milestoningPathSuffix) : milestoningStereotype.equals(st));
             }
         }
         return false;

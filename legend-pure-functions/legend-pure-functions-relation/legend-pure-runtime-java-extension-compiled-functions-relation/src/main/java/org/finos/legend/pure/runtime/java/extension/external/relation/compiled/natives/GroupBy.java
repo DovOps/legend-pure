@@ -47,16 +47,20 @@ public class GroupBy extends AbstractNative implements Native
     static void processAggColSpec(ListIterable<String> transformedParams, StringBuilder result)
     {
         result.append(".collect(");
-        result.append("new DefendedFunction<org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.relation.AggColSpec<? extends Object, ? extends Object, ? extends Object>, org.finos.legend.pure.runtime.java.extension.external.relation.compiled.RelationNativeImplementation.AggColSpecTrans>()\n" +
-                "{\n" +
-                "    @Override\n" +
-                "    public  org.finos.legend.pure.runtime.java.extension.external.relation.compiled.RelationNativeImplementation.AggColSpecTrans valueOf(org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.relation.AggColSpec<?, ?, ?> c)\n" +
-                "    {\n");
+        result.append("""
+                new DefendedFunction<org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.relation.AggColSpec<? extends Object, ? extends Object, ? extends Object>, org.finos.legend.pure.runtime.java.extension.external.relation.compiled.RelationNativeImplementation.AggColSpecTrans>()
+                {
+                    @Override
+                    public  org.finos.legend.pure.runtime.java.extension.external.relation.compiled.RelationNativeImplementation.AggColSpecTrans valueOf(org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.relation.AggColSpec<?, ?, ?> c)
+                    {
+                """);
         result.append("return new org.finos.legend.pure.runtime.java.extension.external.relation.compiled.RelationNativeImplementation.AggColSpecTrans(c._name(),");
         result.append("(Function2)PureCompiledLambda.getPureFunction(c._map(),es),");
         result.append("(Function2)PureCompiledLambda.getPureFunction(c._reduce(),es),");
         result.append("((org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.type.FunctionType)c._reduce()._classifierGenericType()._typeArguments().toList().get(0)._rawType())._returnType()._rawType()._name());");
-        result.append("    }\n" +
-                "})");
+        result.append("""
+                    }
+                })\
+                """);
     }
 }

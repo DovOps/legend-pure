@@ -15,20 +15,20 @@
 package org.finos.legend.pure.m3.tests.incremental;
 
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiledPlatform;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestIdem extends AbstractPureTestWithCoreCompiledPlatform
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getExtra());
     }
 
-    @After
+    @AfterEach
     public void clearRuntime()
     {
         runtime.delete("sourceId.pure");
@@ -44,7 +44,7 @@ public class TestIdem extends AbstractPureTestWithCoreCompiledPlatform
             runtime.compile();
             runtime.delete("sourceId.pure");
             runtime.compile();
-            Assert.assertEquals("Failed on iteration #" + i, size, repository.serialize().length);
+            Assertions.assertEquals(size, repository.serialize().length, "Failed on iteration #" + i);
         }
     }
 
@@ -58,7 +58,7 @@ public class TestIdem extends AbstractPureTestWithCoreCompiledPlatform
             runtime.compile();
             runtime.delete("sourceId.pure");
             runtime.compile();
-            Assert.assertEquals("Failed on iteration #" + i, size, repository.serialize().length);
+            Assertions.assertEquals(size, repository.serialize().length, "Failed on iteration #" + i);
         }
     }
 
@@ -72,7 +72,7 @@ public class TestIdem extends AbstractPureTestWithCoreCompiledPlatform
             runtime.compile();
             runtime.delete("sourceId.pure");
             runtime.compile();
-            Assert.assertEquals("Failed on iteration #" + i, size, repository.serialize().length);
+            Assertions.assertEquals(size, repository.serialize().length, "Failed on iteration #" + i);
         }
     }
 
@@ -86,7 +86,7 @@ public class TestIdem extends AbstractPureTestWithCoreCompiledPlatform
             runtime.compile();
             runtime.delete("sourceId.pure");
             runtime.compile();
-            Assert.assertEquals("Failed on iteration #" + i, size, repository.serialize().length);
+            Assertions.assertEquals(size, repository.serialize().length, "Failed on iteration #" + i);
         }
     }
 
@@ -100,7 +100,7 @@ public class TestIdem extends AbstractPureTestWithCoreCompiledPlatform
             runtime.compile();
             runtime.delete("sourceId.pure");
             runtime.compile();
-            Assert.assertEquals("Failed on iteration #" + i, size, repository.serialize().length);
+            Assertions.assertEquals(size, repository.serialize().length, "Failed on iteration #" + i);
         }
     }
 
@@ -110,13 +110,15 @@ public class TestIdem extends AbstractPureTestWithCoreCompiledPlatform
         int size = repository.serialize().length;
         for (int i = 0; i < 10; i++)
         {
-            runtime.createInMemorySource("sourceId.pure", "Class A{}\n" +
-                    "Class B{}\n" +
-                    "Association a {a:A[1];b:B[1];}");
+            runtime.createInMemorySource("sourceId.pure", """
+                    Class A{}
+                    Class B{}
+                    Association a {a:A[1];b:B[1];}\
+                    """);
             runtime.compile();
             runtime.delete("sourceId.pure");
             runtime.compile();
-            Assert.assertEquals("Failed on iteration #" + i, size, repository.serialize().length);
+            Assertions.assertEquals(size, repository.serialize().length, "Failed on iteration #" + i);
         }
     }
 
@@ -130,7 +132,7 @@ public class TestIdem extends AbstractPureTestWithCoreCompiledPlatform
             runtime.compile();
             runtime.delete("sourceId.pure");
             runtime.compile();
-            Assert.assertEquals("Failed on iteration #" + i, size, repository.serialize().length);
+            Assertions.assertEquals(size, repository.serialize().length, "Failed on iteration #" + i);
         }
     }
 }

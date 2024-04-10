@@ -241,7 +241,7 @@ public class MappingValidator implements MatchRunner<Mapping>
         }
     }
 
-    private static final Function<EnumValueMapping, RichIterable<? extends CoreInstance>> GET_SOURCE_TYPES = enumValueMapping -> enumValueMapping._sourceValuesCoreInstance().collect(sourceValue -> sourceValue instanceof EnumStub ? ((EnumStub) sourceValue)._enumeration() : sourceValue.getClassifier());
+    private static final Function<EnumValueMapping, RichIterable<? extends CoreInstance>> GET_SOURCE_TYPES = enumValueMapping -> enumValueMapping._sourceValuesCoreInstance().collect(sourceValue -> sourceValue instanceof EnumStub es ? es._enumeration() : sourceValue.getClassifier());
 
     public static SetImplementation validateId(AssociationImplementation associationMapping, PropertyMapping propertyMapping, MapIterable<String, ? extends SetImplementation> classMappingIndex, String setImplementationId, String sourceOrTarget, ProcessorSupport processorSupport)
     {
@@ -477,13 +477,13 @@ public class MappingValidator implements MatchRunner<Mapping>
             state.validateSetImplementation(mappedInstance, isClassMapping);
 
             Type src = null;
-            if (mappedInstance instanceof SetImplementation)
+            if (mappedInstance instanceof SetImplementation implementation)
             {
-                src = (Class<?>) ImportStub.withImportStubByPass(((SetImplementation) mappedInstance)._classCoreInstance(), processorSupport);
+                src = (Class<?>) ImportStub.withImportStubByPass(implementation._classCoreInstance(), processorSupport);
             }
-            else if (mappedInstance instanceof EnumerationMapping)
+            else if (mappedInstance instanceof EnumerationMapping mapping)
             {
-                src = (Enumeration<?>) ImportStub.withImportStubByPass(((EnumerationMapping<?>) mappedInstance)._enumerationCoreInstance(), processorSupport);
+                src = (Enumeration<?>) ImportStub.withImportStubByPass(mapping._enumerationCoreInstance(), processorSupport);
             }
             setImplementationsByClass.put(src, mappedInstance);
         }

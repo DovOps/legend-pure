@@ -79,10 +79,10 @@ public class PureJarGenerator
         }
         catch (Exception e)
         {
-            log.error(String.format("  -> Pure PAR generation failed (%.9fs)", durationSinceInSeconds(start)), e);
+            log.error("  -> Pure PAR generation failed (%.9fs)".formatted(durationSinceInSeconds(start)), e);
             throw e;
         }
-        log.info(String.format("  -> Finished Pure PAR generation in %.9fs", durationSinceInSeconds(start)));
+        log.info("  -> Finished Pure PAR generation in %.9fs".formatted(durationSinceInSeconds(start)));
     }
 
     private static CodeRepositorySet resolveRepositories(Set<String> repositories, Set<String> excludedRepositories, Set<String> extraRepositories, Log log)

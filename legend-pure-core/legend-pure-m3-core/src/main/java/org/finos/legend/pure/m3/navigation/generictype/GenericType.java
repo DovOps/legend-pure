@@ -1270,7 +1270,7 @@ public class GenericType
 
     public static boolean isGenericTypeOperationEqual(org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.type.generics.GenericType genericType)
     {
-        return (genericType instanceof GenericTypeOperation) && isGenericTypeOperationEqual((GenericTypeOperation) genericType);
+        return (genericType instanceof GenericTypeOperation gto) && isGenericTypeOperationEqual(gto);
     }
 
     public static boolean isGenericTypeOperationEqual(GenericTypeOperation genericTypeOperation)
@@ -1286,7 +1286,7 @@ public class GenericType
 
     public static boolean isGenericTypeOperationSubset(org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.type.generics.GenericType genericType)
     {
-        return (genericType instanceof GenericTypeOperation) && isGenericTypeOperationSubset((GenericTypeOperation) genericType);
+        return (genericType instanceof GenericTypeOperation gto) && isGenericTypeOperationSubset(gto);
     }
 
     public static boolean isGenericTypeOperationSubset(GenericTypeOperation genericTypeOperation)
@@ -1296,7 +1296,7 @@ public class GenericType
 
     public static boolean isGenericTypeOperationUnion(org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.type.generics.GenericType genericType)
     {
-        return (genericType instanceof GenericTypeOperation) && isGenericTypeOperationUnion((GenericTypeOperation) genericType);
+        return (genericType instanceof GenericTypeOperation gto) && isGenericTypeOperationUnion(gto);
     }
 
     public static boolean isGenericTypeOperationUnion(GenericTypeOperation genericTypeOperation)

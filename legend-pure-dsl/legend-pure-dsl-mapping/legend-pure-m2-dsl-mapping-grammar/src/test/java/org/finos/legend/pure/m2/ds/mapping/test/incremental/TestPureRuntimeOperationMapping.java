@@ -18,20 +18,20 @@ import org.eclipse.collections.impl.factory.Lists;
 import org.finos.legend.pure.m2.ds.mapping.test.AbstractPureMappingTestWithCoreCompiled;
 import org.finos.legend.pure.m3.tests.RuntimeTestScriptBuilder;
 import org.finos.legend.pure.m3.tests.RuntimeVerifier;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestPureRuntimeOperationMapping extends AbstractPureMappingTestWithCoreCompiled
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime();
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("sourceId.pure");
@@ -44,18 +44,21 @@ public class TestPureRuntimeOperationMapping extends AbstractPureMappingTestWith
     public void testSimpleOperation() throws Exception
     {
         RuntimeVerifier.verifyOperationIsStable(new RuntimeTestScriptBuilder()
-                        .createInMemorySource("sourceId.pure", "Class Person{name:String[1];}\n" +
-                                "function a():meta::pure::mapping::SetImplementation[*]{[]}\n")
+                        .createInMemorySource("sourceId.pure", """
+                                Class Person{name:String[1];}
+                                function a():meta::pure::mapping::SetImplementation[*]{[]}
+                                """)
                         .compile(),
                 new RuntimeTestScriptBuilder()
-                        .createInMemorySource("userId.pure", "" +
-                                "###Mapping\n" +
-                                "Mapping myMap(\n" +
-                                "   Person[ppp]: Operation\n" +
-                                "           {\n" +
-                                "               a__SetImplementation_MANY_()\n" +
-                                "           }\n" +
-                                ")\n")
+                        .createInMemorySource("userId.pure", """
+                                ###Mapping
+                                Mapping myMap(
+                                   Person[ppp]: Operation
+                                           {
+                                               a__SetImplementation_MANY_()
+                                           }
+                                )
+                                """)
                         .compile()
                         .deleteSource("userId.pure")
                         .compile(),
@@ -68,14 +71,16 @@ public class TestPureRuntimeOperationMapping extends AbstractPureMappingTestWith
     @Test
     public void testSimpleOperationReverse() throws Exception
     {
-        runtime.createInMemorySource("userId.pure", "Class Person{name:String[1];}\n" +
-                "###Mapping\n" +
-                "Mapping myMap(\n" +
-                "   Person[ppp]: Operation\n" +
-                "           {\n" +
-                "               a__SetImplementation_MANY_()\n" +
-                "           }\n" +
-                ")\n"
+        runtime.createInMemorySource("userId.pure", """
+                Class Person{name:String[1];}
+                ###Mapping
+                Mapping myMap(
+                   Person[ppp]: Operation
+                           {
+                               a__SetImplementation_MANY_()
+                           }
+                )
+                """
         );
         runtime.createInMemorySource("sourceId.pure", "function a():meta::pure::mapping::SetImplementation[*]{[]}\n");
         runtime.compile();
@@ -88,18 +93,18 @@ public class TestPureRuntimeOperationMapping extends AbstractPureMappingTestWith
             try
             {
                 runtime.compile();
-                Assert.fail();
+                Assertions.fail();
             }
             catch (Exception e)
             {
-                Assert.assertEquals("Compilation error at (resource:userId.pure line:6 column:16), \"a__SetImplementation_MANY_ has not been defined!\"", e.getMessage());
+                Assertions.assertEquals("Compilation error at (resource:userId.pure line:6 column:16), \"a__SetImplementation_MANY_ has not been defined!\"", e.getMessage());
             }
 
             runtime.createInMemorySource("sourceId.pure", "function a():meta::pure::mapping::SetImplementation[*]{[]}\n");
             runtime.compile();
         }
 
-        Assert.assertEquals(size, repository.serialize().length);
+        Assertions.assertEquals(size, repository.serialize().length);
 
     }
 
@@ -107,23 +112,25 @@ public class TestPureRuntimeOperationMapping extends AbstractPureMappingTestWith
     @Test
     public void testSimpleOperationWithParameters() throws Exception
     {
-        runtime.createInMemorySource("userId.pure", "Class Person{name:String[1];}\n" +
-                "function a():meta::pure::mapping::SetImplementation[*]{[]}\n" +
-                "###Mapping\n" +
-                "Mapping myMap(\n" +
-                "   *Person[op]: Operation\n" +
-                "           {\n" +
-                "               a__SetImplementation_MANY_(rel1,rel2)\n" +
-                "           }\n" +
-                "   Person[rel1]: Operation\n" +
-                "           {\n" +
-                "               a__SetImplementation_MANY_()\n" +
-                "           }\n" +
-                "   Person[rel2]: Operation\n" +
-                "           {\n" +
-                "               a__SetImplementation_MANY_()\n" +
-                "           }\n" +
-                ")\n"
+        runtime.createInMemorySource("userId.pure", """
+                Class Person{name:String[1];}
+                function a():meta::pure::mapping::SetImplementation[*]{[]}
+                ###Mapping
+                Mapping myMap(
+                   *Person[op]: Operation
+                           {
+                               a__SetImplementation_MANY_(rel1,rel2)
+                           }
+                   Person[rel1]: Operation
+                           {
+                               a__SetImplementation_MANY_()
+                           }
+                   Person[rel2]: Operation
+                           {
+                               a__SetImplementation_MANY_()
+                           }
+                )
+                """
         );
         runtime.compile();
     }
@@ -132,32 +139,34 @@ public class TestPureRuntimeOperationMapping extends AbstractPureMappingTestWith
     @Test
     public void testSimpleOperationWithParametersWithError() throws Exception
     {
-        runtime.createInMemorySource("userId.pure", "Class Person{name:String[1];}\n" +
-                "function a():meta::pure::mapping::SetImplementation[*]{[]}\n" +
-                "###Mapping\n" +
-                "Mapping myMap(\n" +
-                "   Person[op]: Operation\n" +
-                "           {\n" +
-                "               a__SetImplementation_MANY_(rel1,rel3)\n" +
-                "           }\n" +
-                "   Person[rel1]: Operation\n" +
-                "           {\n" +
-                "               a__SetImplementation_MANY_()\n" +
-                "           }\n" +
-                "   Person[rel2]: Operation\n" +
-                "           {\n" +
-                "               a__SetImplementation_MANY_()\n" +
-                "           }\n" +
-                ")\n"
+        runtime.createInMemorySource("userId.pure", """
+                Class Person{name:String[1];}
+                function a():meta::pure::mapping::SetImplementation[*]{[]}
+                ###Mapping
+                Mapping myMap(
+                   Person[op]: Operation
+                           {
+                               a__SetImplementation_MANY_(rel1,rel3)
+                           }
+                   Person[rel1]: Operation
+                           {
+                               a__SetImplementation_MANY_()
+                           }
+                   Person[rel2]: Operation
+                           {
+                               a__SetImplementation_MANY_()
+                           }
+                )
+                """
         );
         try
         {
             runtime.compile();
-            Assert.fail();
+            Assertions.fail();
         }
         catch (Exception e)
         {
-            Assert.assertEquals("Compilation error at (resource:userId.pure lines:5c4-8c12), \"The SetImplementation 'rel3' can't be found in the mapping 'myMap'\"", e.getMessage());
+            Assertions.assertEquals("Compilation error at (resource:userId.pure lines:5c4-8c12), \"The SetImplementation 'rel3' can't be found in the mapping 'myMap'\"", e.getMessage());
         }
     }
 
@@ -165,27 +174,29 @@ public class TestPureRuntimeOperationMapping extends AbstractPureMappingTestWith
     @Test
     public void testSimpleOperationWithInclude() throws Exception
     {
-        runtime.createInMemorySource("userId.pure", "Class Person{name:String[1];}\n" +
-                "function a():meta::pure::mapping::SetImplementation[*]{[]}\n" +
-                "###Mapping\n" +
-                "Mapping myMapToInclude(\n" +
-                "   *Person[rel1]: Operation\n" +
-                "           {\n" +
-                "               a__SetImplementation_MANY_()\n" +
-                "           }\n" +
-                "   Person[rel2]: Operation\n" +
-                "           {\n" +
-                "               a__SetImplementation_MANY_()\n" +
-                "           }\n" +
-                ")\n" +
-                "###Mapping\n" +
-                "Mapping myMap(\n" +
-                "   include myMapToInclude" +
-                "   Person[op]: Operation\n" +
-                "           {\n" +
-                "               a__SetImplementation_MANY_(rel1,rel2)\n" +
-                "           }\n" +
-                ")\n"
+        runtime.createInMemorySource("userId.pure", """
+                Class Person{name:String[1];}
+                function a():meta::pure::mapping::SetImplementation[*]{[]}
+                ###Mapping
+                Mapping myMapToInclude(
+                   *Person[rel1]: Operation
+                           {
+                               a__SetImplementation_MANY_()
+                           }
+                   Person[rel2]: Operation
+                           {
+                               a__SetImplementation_MANY_()
+                           }
+                )
+                ###Mapping
+                Mapping myMap(
+                   include myMapToInclude\
+                   Person[op]: Operation
+                           {
+                               a__SetImplementation_MANY_(rel1,rel2)
+                           }
+                )
+                """
         );
         runtime.compile();
     }
@@ -193,26 +204,31 @@ public class TestPureRuntimeOperationMapping extends AbstractPureMappingTestWith
     @Test
     public void testSimpleOperationWithIncludeDelta() throws Exception
     {
-        runtime.createInMemorySource("userId.pure", "Class Person{name:String[1];}\n" +
-                "function a():meta::pure::mapping::SetImplementation[*]{[]}\n" + "###Mapping\n" +
-                "Mapping myMap(\n" +
-                "   include myMapToInclude" +
-                "   Person[op]: Operation\n" +
-                "           {\n" +
-                "               a__SetImplementation_MANY_(rel1,rel2)\n" +
-                "           }\n" +
-                ")\n");
-        String content = "###Mapping\n" +
-                "Mapping myMapToInclude(\n" +
-                "   *Person[rel1]: Operation\n" +
-                "           {\n" +
-                "               a__SetImplementation_MANY_()\n" +
-                "           }\n" +
-                "   Person[rel2]: Operation\n" +
-                "           {\n" +
-                "               a__SetImplementation_MANY_()\n" +
-                "           }\n" +
-                ")\n";
+        runtime.createInMemorySource("userId.pure", """
+                Class Person{name:String[1];}
+                function a():meta::pure::mapping::SetImplementation[*]{[]}
+                ###Mapping
+                Mapping myMap(
+                   include myMapToInclude\
+                   Person[op]: Operation
+                           {
+                               a__SetImplementation_MANY_(rel1,rel2)
+                           }
+                )
+                """);
+        String content = """
+                ###Mapping
+                Mapping myMapToInclude(
+                   *Person[rel1]: Operation
+                           {
+                               a__SetImplementation_MANY_()
+                           }
+                   Person[rel2]: Operation
+                           {
+                               a__SetImplementation_MANY_()
+                           }
+                )
+                """;
         runtime.createInMemorySource("sourceId.pure", content);
         runtime.compile();
 
@@ -224,17 +240,17 @@ public class TestPureRuntimeOperationMapping extends AbstractPureMappingTestWith
             try
             {
                 runtime.compile();
-                Assert.fail();
+                Assertions.fail();
             }
             catch (Exception e)
             {
-                Assert.assertEquals("Compilation error at (resource:userId.pure line:5 column:12), \"myMapToInclude has not been defined!\"", e.getMessage());
+                Assertions.assertEquals("Compilation error at (resource:userId.pure line:5 column:12), \"myMapToInclude has not been defined!\"", e.getMessage());
             }
 
             runtime.createInMemorySource("sourceId.pure", content);
             runtime.compile();
         }
 
-        Assert.assertEquals(size, repository.serialize().length);
+        Assertions.assertEquals(size, repository.serialize().length);
     }
 }

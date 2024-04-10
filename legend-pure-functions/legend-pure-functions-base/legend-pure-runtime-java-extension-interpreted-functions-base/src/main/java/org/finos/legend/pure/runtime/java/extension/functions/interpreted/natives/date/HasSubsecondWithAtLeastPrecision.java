@@ -52,6 +52,6 @@ public class HasSubsecondWithAtLeastPrecision extends NativePredicate
 
         int precision = date.getSubsecond().length();
         Number minPrecision = PrimitiveUtilities.getIntegerValue(Instance.getValueForMetaPropertyToOneResolved(params.get(1), M3Properties.values, processorSupport));
-        return (minPrecision instanceof BigInteger) ? ((BigInteger)minPrecision).compareTo(BigInteger.valueOf(precision)) >= 0 : precision >= minPrecision.longValue();
+        return (minPrecision instanceof BigInteger bi) ? bi.compareTo(BigInteger.valueOf(precision)) >= 0 : precision >= minPrecision.longValue();
     }
 }

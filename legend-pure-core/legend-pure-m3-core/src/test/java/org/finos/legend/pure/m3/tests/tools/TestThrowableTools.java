@@ -18,8 +18,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.finos.legend.pure.m3.tools.ThrowableTools;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class TestThrowableTools
 {
@@ -27,13 +27,13 @@ public class TestThrowableTools
     public void testFindRootThrowable()
     {
         Throwable t0 = new RuntimeException();
-        Assert.assertSame(t0, ThrowableTools.findRootThrowable(t0));
+        Assertions.assertSame(t0, ThrowableTools.findRootThrowable(t0));
 
         Throwable t1 = new Exception(t0);
-        Assert.assertSame(t0, ThrowableTools.findRootThrowable(t1));
+        Assertions.assertSame(t0, ThrowableTools.findRootThrowable(t1));
 
         Throwable t2 = new Error(t1);
-        Assert.assertSame(t0, ThrowableTools.findRootThrowable(t2));
+        Assertions.assertSame(t0, ThrowableTools.findRootThrowable(t2));
     }
 
     @Test
@@ -44,12 +44,12 @@ public class TestThrowableTools
         Throwable t1 = new IOException(t2);
         Throwable t0 = new Error(t1);
 
-        Assert.assertSame(t3, ThrowableTools.findTopThrowableOfClass(t0, IllegalArgumentException.class));
-        Assert.assertSame(t2, ThrowableTools.findTopThrowableOfClass(t0, RuntimeException.class));
-        Assert.assertSame(t1, ThrowableTools.findTopThrowableOfClass(t0, IOException.class));
-        Assert.assertSame(t1, ThrowableTools.findTopThrowableOfClass(t0, Exception.class));
-        Assert.assertSame(t0, ThrowableTools.findTopThrowableOfClass(t0, Error.class));
-        Assert.assertSame(t0, ThrowableTools.findTopThrowableOfClass(t0, Throwable.class));
-        Assert.assertNull(ThrowableTools.findTopThrowableOfClass(t0, FileNotFoundException.class));
+        Assertions.assertSame(t3, ThrowableTools.findTopThrowableOfClass(t0, IllegalArgumentException.class));
+        Assertions.assertSame(t2, ThrowableTools.findTopThrowableOfClass(t0, RuntimeException.class));
+        Assertions.assertSame(t1, ThrowableTools.findTopThrowableOfClass(t0, IOException.class));
+        Assertions.assertSame(t1, ThrowableTools.findTopThrowableOfClass(t0, Exception.class));
+        Assertions.assertSame(t0, ThrowableTools.findTopThrowableOfClass(t0, Error.class));
+        Assertions.assertSame(t0, ThrowableTools.findTopThrowableOfClass(t0, Throwable.class));
+        Assertions.assertNull(ThrowableTools.findTopThrowableOfClass(t0, FileNotFoundException.class));
     }
 }

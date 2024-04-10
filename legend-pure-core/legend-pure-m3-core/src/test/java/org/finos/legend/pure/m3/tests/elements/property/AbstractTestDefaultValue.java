@@ -15,40 +15,39 @@
 package org.finos.legend.pure.m3.tests.elements.property;
 
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiledPlatform;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public abstract class AbstractTestDefaultValue extends AbstractPureTestWithCoreCompiledPlatform
 {
-    public static final String DECLARATION = "import test::long::path::*;\n"
-            + "Class my::exampleRootType\n"
-            + "{\n"
-            + "}\n"
-
-            + "Class my::exampleSubType extends my::exampleRootType\n"
-            + "{\n"
-            + "}\n"
-
-            + "Enum test::long::path::EnumWithDefault\n"
-            + "{\n"
-            + "   DefaultValue,\n"
-            + "   AnotherValue\n"
-            + "}\n"
-
-            + "Class test::long::path::A\n"
-            + "{\n"
-            + "   stringProperty:String[1] = 'default';\n"
-            + "   classProperty:my::exampleRootType[1] = ^my::exampleRootType();\n"
-            + "   enumProperty:EnumWithDefault[1] = EnumWithDefault.DefaultValue;\n"
-            + "   floatProperty:Float[1] = 0.12;\n"
-            + "   inheritProperty:Number[1] = 0.12;\n"
-            + "   booleanProperty:Boolean[1] = false;\n"
-            + "   integerProperty:Integer[1] = 0;\n"
-            + "   collectionProperty:String[1..*] = ['one', 'two'];\n"
-            + "   enumCollection:test::long::path::EnumWithDefault[1..*] = [test::long::path::EnumWithDefault.DefaultValue, test::long::path::EnumWithDefault.AnotherValue];\n"
-            + "   classCollection:my::exampleRootType[1..4] = [^my::exampleRootType(), ^my::exampleSubType()];\n"
-            + "   singleProperty:String[1] = ['one'];\n"
-            + "   anyProperty:Any[1] = 'anyString';\n"
-            + "}\n";
+    public static final String DECLARATION = """
+import test::long::path::*;
+Class my::exampleRootType
+{
+}
+Class my::exampleSubType extends my::exampleRootType
+{
+}
+Enum test::long::path::EnumWithDefault
+{
+   DefaultValue,
+   AnotherValue
+}
+Class test::long::path::A
+{
+   stringProperty:String[1] = 'default';
+   classProperty:my::exampleRootType[1] = ^my::exampleRootType();
+   enumProperty:EnumWithDefault[1] = EnumWithDefault.DefaultValue;
+   floatProperty:Float[1] = 0.12;
+   inheritProperty:Number[1] = 0.12;
+   booleanProperty:Boolean[1] = false;
+   integerProperty:Integer[1] = 0;
+   collectionProperty:String[1..*] = ['one', 'two'];
+   enumCollection:test::long::path::EnumWithDefault[1..*] = [test::long::path::EnumWithDefault.DefaultValue, test::long::path::EnumWithDefault.AnotherValue];
+   classCollection:my::exampleRootType[1..4] = [^my::exampleRootType(), ^my::exampleSubType()];
+   singleProperty:String[1] = ['one'];
+   anyProperty:Any[1] = 'anyString';
+}
+""";
 
     @Test
     public void testDefaultValue()
@@ -97,16 +96,18 @@ public abstract class AbstractTestDefaultValue extends AbstractPureTestWithCoreC
     @Test
     public void testDefaultValueOverridden()
     {
-        compileTestSource("defaultValueSource.pure", "import test::*;\n"
-                + "Class test::A\n"
-                + "{\n"
-                + "   stringProperty:String[1] = 'default';\n"
-                + "   booleanProperty:Boolean[1] = false;\n"
-                + "}\n"
-                + "function testDefaultValueOverridden():Any[*]\n"
-                + "{\n"
-                + "   assertEquals('override', ^test::A(stringProperty = 'override').stringProperty);\n"
-                + "}\n"
+        compileTestSource("defaultValueSource.pure", """
+                import test::*;
+                Class test::A
+                {
+                   stringProperty:String[1] = 'default';
+                   booleanProperty:Boolean[1] = false;
+                }
+                function testDefaultValueOverridden():Any[*]
+                {
+                   assertEquals('override', ^test::A(stringProperty = 'override').stringProperty);
+                }
+                """
         );
         execute("testDefaultValueOverridden():Any[*]");
     }
@@ -114,16 +115,18 @@ public abstract class AbstractTestDefaultValue extends AbstractPureTestWithCoreC
     @Test
     public void testDefaultValueWithQualifiedProperty()
     {
-        compileTestSource("defaultValueSource.pure", "import test::*;\n"
-                + "Class test::A\n"
-                + "{\n"
-                + "   stringProperty:String[1] = 'default';\n"
-                + "   prop(){$this.stringProperty + 'Value'}:String[1];\n"
-                + "}\n"
-                + "function test():Boolean[1]\n"
-                + "{"
-                + "   assertEquals('defaultValue', ^test::A().prop());\n"
-                + "}\n"
+        compileTestSource("defaultValueSource.pure", """
+                import test::*;
+                Class test::A
+                {
+                   stringProperty:String[1] = 'default';
+                   prop(){$this.stringProperty + 'Value'}:String[1];
+                }
+                function test():Boolean[1]
+                {\
+                   assertEquals('defaultValue', ^test::A().prop());
+                }
+                """
         );
         execute("test():Boolean[1]");
      }

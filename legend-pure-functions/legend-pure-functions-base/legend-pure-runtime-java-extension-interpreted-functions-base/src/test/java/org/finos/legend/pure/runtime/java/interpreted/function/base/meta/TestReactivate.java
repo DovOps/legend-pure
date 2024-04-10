@@ -18,13 +18,13 @@ import org.finos.legend.pure.m3.exception.PureExecutionException;
 import org.finos.legend.pure.m3.execution.FunctionExecution;
 import org.finos.legend.pure.m3.tests.function.base.meta.AbstractTestReactivate;
 import org.finos.legend.pure.runtime.java.interpreted.FunctionExecutionInterpreted;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestReactivate extends AbstractTestReactivate
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getFunctionExecution());
@@ -33,7 +33,7 @@ public class TestReactivate extends AbstractTestReactivate
     @Test
     public void testVariableScopeFail()
     {
-        PureExecutionException e = Assert.assertThrows(PureExecutionException.class, this::compileAndExecuteVariableScopeFailure);
+        PureExecutionException e = Assertions.assertThrows(PureExecutionException.class, this::compileAndExecuteVariableScopeFailure);
         assertOriginatingPureException("Variable 'a' is not defined in the current variable context", e);
     }
 

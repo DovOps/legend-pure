@@ -19,20 +19,20 @@ import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiledPlatform;
 import org.finos.legend.pure.m3.tests.RuntimeTestScriptBuilder;
 import org.finos.legend.pure.m3.tests.RuntimeVerifier;
 import org.finos.legend.pure.m3.tools.test.ToFix;
-import org.junit.After;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 public class TestPureRuntimeClass_InGeneralization extends AbstractPureTestWithCoreCompiledPlatform
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getExtra());
     }
 
-    @After
+    @AfterEach
     public void clearRuntime()
     {
         runtime.delete("sourceId.pure");
@@ -44,8 +44,10 @@ public class TestPureRuntimeClass_InGeneralization extends AbstractPureTestWithC
     public void testPureRuntimeClassGeneralization() throws Exception
     {
         RuntimeVerifier.verifyOperationIsStable(new RuntimeTestScriptBuilder().createInMemorySource("sourceId.pure", "Class B{}")
-                        .createInMemorySource("userId.pure", "Class A extends B{}" +
-                                "function test():Boolean[1]{assert('A' == A->id(), |'');}")
+                        .createInMemorySource("userId.pure", """
+                                Class A extends B{}\
+                                function test():Boolean[1]{assert('A' == A->id(), |'');}\
+                                """)
                         .compile(),
                 new RuntimeTestScriptBuilder()
                         .deleteSource("sourceId.pure")
@@ -58,7 +60,7 @@ public class TestPureRuntimeClass_InGeneralization extends AbstractPureTestWithC
 
     @Test
     @ToFix
-    @Ignore
+    @Disabled
     public void testPureRuntimeClassRemoveSpecialization()
     {
         String generalSourceId = "/test/generalModel.pure";
@@ -83,8 +85,10 @@ public class TestPureRuntimeClass_InGeneralization extends AbstractPureTestWithC
     public void testPureRuntimeClassGeneralizationError() throws Exception
     {
         RuntimeVerifier.verifyOperationIsStable(new RuntimeTestScriptBuilder().createInMemorySource("sourceId.pure", "Class B{}")
-                        .createInMemorySource("userId.pure", "Class A extends B{}" +
-                                "function test():Boolean[1]{assert('A' == A->id(), |'');}")
+                        .createInMemorySource("userId.pure", """
+                                Class A extends B{}\
+                                function test():Boolean[1]{assert('A' == A->id(), |'');}\
+                                """)
                         .compile(),
                 new RuntimeTestScriptBuilder()
                         .deleteSource("sourceId.pure")
@@ -101,9 +105,11 @@ public class TestPureRuntimeClass_InGeneralization extends AbstractPureTestWithC
     public void testPureRuntimeClassGeneralizationPropertyError() throws Exception
     {
         RuntimeVerifier.verifyOperationIsStable(new RuntimeTestScriptBuilder().createInMemorySource("sourceId.pure", "Class test::B{property:String[1];}")
-                        .createInMemorySource("userId.pure", "import test::*;\n" +
-                                "Class test::A extends B{}\n" +
-                                "function test():Boolean[1]{assert('test' == ^A(property='test').property, |'')}")
+                        .createInMemorySource("userId.pure", """
+                                import test::*;
+                                Class test::A extends B{}
+                                function test():Boolean[1]{assert('test' == ^A(property='test').property, |'')}\
+                                """)
                         .compile(),
                 new RuntimeTestScriptBuilder()
                         .deleteSource("sourceId.pure")
@@ -119,9 +125,11 @@ public class TestPureRuntimeClass_InGeneralization extends AbstractPureTestWithC
     public void testPureRuntimeClassGeneralizationFunctionMatchingParameter() throws Exception
     {
         RuntimeVerifier.verifyOperationIsStable(new RuntimeTestScriptBuilder().createInMemorySource("sourceId.pure", "Class A extends B{}")
-                        .createInMemorySource("userId.pure", "Class B{}" +
-                                "function myFunc(b:B[1]):String[1]{'ok'}" +
-                                "function test():Boolean[1]{assert('ok' == myFunc(^A()), |'')}")
+                        .createInMemorySource("userId.pure", """
+                                Class B{}\
+                                function myFunc(b:B[1]):String[1]{'ok'}\
+                                function test():Boolean[1]{assert('ok' == myFunc(^A()), |'')}\
+                                """)
                         .compile(),
                 new RuntimeTestScriptBuilder()
                         .deleteSource("sourceId.pure")
@@ -136,9 +144,11 @@ public class TestPureRuntimeClass_InGeneralization extends AbstractPureTestWithC
     public void testPureRuntimeClassGeneralizationFunctionMatchingParameterError() throws Exception
     {
         RuntimeVerifier.verifyOperationIsStable(new RuntimeTestScriptBuilder().createInMemorySource("sourceId.pure", "Class A extends B{}")
-                        .createInMemorySource("userId.pure", "Class B{}" +
-                                "function myFunc(b:B[1]):String[1]{'ok'}" +
-                                "function test():Boolean[1]{assert('ok' == myFunc(^A()), |'')}")
+                        .createInMemorySource("userId.pure", """
+                                Class B{}\
+                                function myFunc(b:B[1]):String[1]{'ok'}\
+                                function test():Boolean[1]{assert('ok' == myFunc(^A()), |'')}\
+                                """)
                         .compile(),
                 new RuntimeTestScriptBuilder()
                         .deleteSource("sourceId.pure")
@@ -159,11 +169,13 @@ public class TestPureRuntimeClass_InGeneralization extends AbstractPureTestWithC
     {
 
         RuntimeVerifier.verifyOperationIsStable(new RuntimeTestScriptBuilder().createInMemorySource("sourceId.pure", "Class B extends C{}")
-                        .createInMemorySource("userId.pure", "Class D{}" +
-                                "Class C extends D{}" +
-                                "Class A extends B{}" +
-                                "function myFunc():D[1]{^A()}" +
-                                "function test():Boolean[1]{assert(A == myFunc()->genericType().rawType, |'')}")
+                        .createInMemorySource("userId.pure", """
+                                Class D{}\
+                                Class C extends D{}\
+                                Class A extends B{}\
+                                function myFunc():D[1]{^A()}\
+                                function test():Boolean[1]{assert(A == myFunc()->genericType().rawType, |'')}\
+                                """)
                         .compile(),
                 new RuntimeTestScriptBuilder()
                         .deleteSource("sourceId.pure")
@@ -178,11 +190,13 @@ public class TestPureRuntimeClass_InGeneralization extends AbstractPureTestWithC
     public void testPureRuntimeClassGeneralizationFunctionMatchingOtherReturnError() throws Exception
     {
         RuntimeVerifier.verifyOperationIsStable(new RuntimeTestScriptBuilder().createInMemorySource("sourceId.pure", "Class B extends C{}")
-                        .createInMemorySource("userId.pure", "Class D{}" +
-                                "Class C extends D{}" +
-                                "Class A extends B{}" +
-                                "function myFunc():D[1]{^A()}" +
-                                "function test():Boolean[1]{assert(A == myFunc()->genericType().rawType, |'')}")
+                        .createInMemorySource("userId.pure", """
+                                Class D{}\
+                                Class C extends D{}\
+                                Class A extends B{}\
+                                function myFunc():D[1]{^A()}\
+                                function test():Boolean[1]{assert(A == myFunc()->genericType().rawType, |'')}\
+                                """)
                         .compile(),
                 new RuntimeTestScriptBuilder()
                         .deleteSource("sourceId.pure")

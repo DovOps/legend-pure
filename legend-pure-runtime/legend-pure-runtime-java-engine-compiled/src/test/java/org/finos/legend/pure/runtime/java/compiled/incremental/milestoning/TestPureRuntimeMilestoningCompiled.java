@@ -26,13 +26,13 @@ import org.finos.legend.pure.runtime.java.compiled.CompiledClassloaderStateVerif
 import org.finos.legend.pure.runtime.java.compiled.CompiledMetadataStateVerifier;
 import org.finos.legend.pure.runtime.java.compiled.execution.FunctionExecutionCompiledBuilder;
 import org.finos.legend.pure.runtime.java.compiled.factory.JavaModelFactoryRegistryLoader;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 public class TestPureRuntimeMilestoningCompiled extends TestMilestoning
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getFunctionExecution(), new CompositeCodeStorage(new ClassLoaderCodeStorage(getCodeRepositories())), JavaModelFactoryRegistryLoader.loader(), getOptions(), getExtra());
@@ -50,7 +50,7 @@ public class TestPureRuntimeMilestoningCompiled extends TestMilestoning
     }
 
     @ToFix
-    @Ignore
+    @Disabled
     @Test
     @Override
     public void testStabilityOnTemporalStereotypeRemovalWithAssociation()

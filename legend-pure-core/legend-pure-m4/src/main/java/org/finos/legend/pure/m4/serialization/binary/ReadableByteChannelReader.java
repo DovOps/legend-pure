@@ -110,9 +110,8 @@ class ReadableByteChannelReader extends AbstractBinaryReader
         }
 
         // If this is a SeekableByteChannel, there's an efficient method for skipping
-        if (this.byteChannel instanceof SeekableByteChannel)
+        if (this.byteChannel instanceof SeekableByteChannel seekableByteChannel)
         {
-            SeekableByteChannel seekableByteChannel = (SeekableByteChannel) this.byteChannel;
             try
             {
                 long currentPosition = seekableByteChannel.position();

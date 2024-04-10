@@ -64,7 +64,7 @@ public class JsonSerializer
     {
         if (pureObject instanceof CoreInstance)
         {
-            Type baseClassType = (pureObject instanceof InstanceValue && Measure.isUnitOrMeasureInstance((CoreInstance) pureObject, processorSupport)) ? (Type) Instance.getValueForMetaPropertyToOneResolved((CoreInstance) pureObject, M3Properties.genericType, M3Properties.rawType, processorSupport) : (Type) processorSupport.getClassifier((CoreInstance) pureObject);
+            Type baseClassType = (pureObject instanceof InstanceValue iv && Measure.isUnitOrMeasureInstance(iv, processorSupport)) ? (Type) Instance.getValueForMetaPropertyToOneResolved(iv, M3Properties.genericType, M3Properties.rawType, processorSupport) : (Type) processorSupport.getClassifier((CoreInstance) pureObject);
             Conversion conversion = jsonSerializationContext.getConversionCache().getConversion(baseClassType, jsonSerializationContext);
             return conversion.apply((baseClassType instanceof PrimitiveType) ? jsonSerializationContext.extractPrimitiveValue(pureObject) : pureObject, jsonSerializationContext);
         }

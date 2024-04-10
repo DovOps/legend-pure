@@ -19,20 +19,20 @@ import org.finos.legend.pure.m3.execution.FunctionExecution;
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
 import org.finos.legend.pure.m4.exception.PureCompilationException;
 import org.finos.legend.pure.runtime.java.interpreted.FunctionExecutionInterpreted;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestParameters extends AbstractPureTestWithCoreCompiled
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getFunctionExecution());
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("fromString.pure");
@@ -44,15 +44,17 @@ public class TestParameters extends AbstractPureTestWithCoreCompiled
     {
         try
         {
-            compileTestSource("fromString.pure", "function called(param:Integer[1]):Nil[0]\n" +
-                    "{\n" +
-                    "   print($param, 1);\n" +
-                    "}\n" +
-                    "function test():Nil[0]\n" +
-                    "{\n" +
-                    "    called('aaa');\n" +
-                    "}\n");
-            Assert.fail();
+            compileTestSource("fromString.pure", """
+                    function called(param:Integer[1]):Nil[0]
+                    {
+                       print($param, 1);
+                    }
+                    function test():Nil[0]
+                    {
+                        called('aaa');
+                    }
+                    """);
+            Assertions.fail();
         }
         catch (Exception e)
         {
@@ -69,20 +71,22 @@ public class TestParameters extends AbstractPureTestWithCoreCompiled
     {
         try
         {
-            compileTestSource("fromString.pure", "Class Employee\n" +
-                    "{\n" +
-                    "    name:String[1];\n" +
-                    "}\n" +
-                    "function called(employee:Employee[1]):Nil[0]\n" +
-                    "{\n" +
-                    "   print($employee, 1);\n" +
-                    "}\n" +
-                    "function test():Nil[0]\n" +
-                    "{\n" +
-                    "    called(^Employee(name=['ee','err']));\n" +
-                    "}\n");
+            compileTestSource("fromString.pure", """
+                    Class Employee
+                    {
+                        name:String[1];
+                    }
+                    function called(employee:Employee[1]):Nil[0]
+                    {
+                       print($employee, 1);
+                    }
+                    function test():Nil[0]
+                    {
+                        called(^Employee(name=['ee','err']));
+                    }
+                    """);
             this.execute("test():Nil[0]");
-            Assert.fail();
+            Assertions.fail();
         }
         catch (Exception e)
         {
@@ -95,11 +99,13 @@ public class TestParameters extends AbstractPureTestWithCoreCompiled
     {
         try
         {
-            compileTestSource("fromString.pure", "function test():Nil[0]\n" +
-                    "{\n" +
-                    "    print(a:String[1]|'a'+$a->eval('errre'));\n" +
-                    "}\n");
-            Assert.fail();
+            compileTestSource("fromString.pure", """
+                    function test():Nil[0]
+                    {
+                        print(a:String[1]|'a'+$a->eval('errre'));
+                    }
+                    """);
+            Assertions.fail();
         }
         catch (Exception e)
         {

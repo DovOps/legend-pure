@@ -54,9 +54,8 @@ public class ValueSpecificationUnbind implements MatchRunner<ValueSpecification>
     // Keep for empty InstanceValues (such as those used for cast) and Unit instances
     private boolean shouldKeepGenericTypeAndMultiplicity(ValueSpecification valueSpecification)
     {
-        if (valueSpecification instanceof InstanceValue)
+        if (valueSpecification instanceof InstanceValue instanceValue)
         {
-            InstanceValue instanceValue = (InstanceValue) valueSpecification;
             return instanceValue._valuesCoreInstance().isEmpty() || Measure.isUnitInstanceValueNoResolution(instanceValue);
         }
         return false;

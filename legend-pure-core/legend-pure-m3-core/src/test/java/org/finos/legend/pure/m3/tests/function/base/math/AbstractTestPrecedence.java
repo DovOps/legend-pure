@@ -15,7 +15,7 @@
 package org.finos.legend.pure.m3.tests.function.base.math;
 
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public abstract class AbstractTestPrecedence extends AbstractPureTestWithCoreCompiled
 {
@@ -23,10 +23,12 @@ public abstract class AbstractTestPrecedence extends AbstractPureTestWithCoreCom
     public void testBasic()
     {
         compileTestSource("fromString.pure",
-                "function test():Boolean[1]\n" +
-                        "{\n" +
-                        "   assert(14 == 2+3*4, |'');\n" +
-                        "}\n");
+                """
+                function test():Boolean[1]
+                {
+                   assert(14 == 2+3*4, |'');
+                }
+                """);
         this.execute("test():Boolean[1]");
     }
 
@@ -34,10 +36,12 @@ public abstract class AbstractTestPrecedence extends AbstractPureTestWithCoreCom
     public void testWithTimes()
     {
         compileTestSource("fromString.pure",
-                "function test():Boolean[1]\n" +
-                        "{\n" +
-                        "   assert(32 == (2+3*4) + 3*2*2 + 1*6, |'');\n" +
-                        "}\n");
+                """
+                function test():Boolean[1]
+                {
+                   assert(32 == (2+3*4) + 3*2*2 + 1*6, |'');
+                }
+                """);
         this.execute("test():Boolean[1]");
     }
 
@@ -45,10 +49,12 @@ public abstract class AbstractTestPrecedence extends AbstractPureTestWithCoreCom
     public void testWithTimesAndDivide()
     {
         compileTestSource("fromString.pure",
-                "function test():Boolean[1]\n" +
-                        "{\n" +
-                        "   assert(12.0 == (2+3*4/2) + 12/2/2/3 + 1*6/2, |'');\n" +
-                        "}\n");
+                """
+                function test():Boolean[1]
+                {
+                   assert(12.0 == (2+3*4/2) + 12/2/2/3 + 1*6/2, |'');
+                }
+                """);
         this.execute("test():Boolean[1]");
     }
 
@@ -56,10 +62,12 @@ public abstract class AbstractTestPrecedence extends AbstractPureTestWithCoreCom
     public void testWithTimesAndRelational()
     {
         compileTestSource("fromString.pure",
-                "function test():Boolean[1]\n" +
-                        "{\n" +
-                        "   assert(false == 1 + 2 * 3 > 4 * 5 + 6, |'');\n" +
-                        "}\n");
+                """
+                function test():Boolean[1]
+                {
+                   assert(false == 1 + 2 * 3 > 4 * 5 + 6, |'');
+                }
+                """);
         this.execute("test():Boolean[1]");
     }
 
@@ -67,10 +75,12 @@ public abstract class AbstractTestPrecedence extends AbstractPureTestWithCoreCom
     public void testWithTimesAndRelationalComplex()
     {
         compileTestSource("fromString.pure",
-                "function test():Boolean[1]\n" +
-                        "{\n" +
-                        "   assert(false == 1 + 2 + 3*4/5 -9 > 1 + 2*2, |'');\n" +
-                        "}\n");
+                """
+                function test():Boolean[1]
+                {
+                   assert(false == 1 + 2 + 3*4/5 -9 > 1 + 2*2, |'');
+                }
+                """);
         this.execute("test():Boolean[1]");
     }
 }

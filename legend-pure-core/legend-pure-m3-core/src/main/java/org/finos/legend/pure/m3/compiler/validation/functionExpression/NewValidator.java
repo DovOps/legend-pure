@@ -103,10 +103,10 @@ public class NewValidator
             {
                 for (CoreInstance keyValue : ((InstanceValue) parametersValues.get(2))._valuesCoreInstance())
                 {
-                    if (keyValue instanceof KeyExpression)
+                    if (keyValue instanceof KeyExpression keyExpression)
                     {
                         // Validate key is an actual property
-                        InstanceValue keyInstance = ((KeyExpression) keyValue)._key();
+                        InstanceValue keyInstance = keyExpression._key();
                         RichIterable<? extends CoreInstance> keys = keyInstance._valuesCoreInstance();
                         if (keys.size() != 1)
                         {
@@ -126,7 +126,7 @@ public class NewValidator
                         }
                         remainingProperties.remove(propertyName);
 
-                        validatePropertyValue(matcher, state, expression, (KeyExpression) keyValue, genericType, property, processorSupport);
+                        validatePropertyValue(matcher, state, expression, keyExpression, genericType, property, processorSupport);
                     }
                 }
             }

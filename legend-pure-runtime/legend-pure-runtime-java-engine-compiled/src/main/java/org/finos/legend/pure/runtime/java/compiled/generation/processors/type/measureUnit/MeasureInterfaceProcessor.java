@@ -26,14 +26,16 @@ import org.finos.legend.pure.runtime.java.compiled.generation.processors.type.Ty
 
 public class MeasureInterfaceProcessor
 {
-    private static final String IMPORTS = "import org.eclipse.collections.api.RichIterable;\n" +
-            "import org.finos.legend.pure.m4.coreinstance.CoreInstance;\n" +
-            "import org.finos.legend.pure.runtime.java.compiled.generation.processors.support.function.*;\n" +
-            "import org.finos.legend.pure.runtime.java.compiled.execution.*;\n" +
-            "import org.finos.legend.pure.runtime.java.compiled.execution.sourceInformation.*;\n" +
-            "import org.finos.legend.pure.runtime.java.compiled.generation.processors.support.*;\n" +
-            "import org.finos.legend.pure.runtime.java.compiled.generation.processors.support.function.defended.*;\n" +
-            "import org.finos.legend.pure.m3.execution.ExecutionSupport;\n";
+    private static final String IMPORTS = """
+            import org.eclipse.collections.api.RichIterable;
+            import org.finos.legend.pure.m4.coreinstance.CoreInstance;
+            import org.finos.legend.pure.runtime.java.compiled.generation.processors.support.function.*;
+            import org.finos.legend.pure.runtime.java.compiled.execution.*;
+            import org.finos.legend.pure.runtime.java.compiled.execution.sourceInformation.*;
+            import org.finos.legend.pure.runtime.java.compiled.generation.processors.support.*;
+            import org.finos.legend.pure.runtime.java.compiled.generation.processors.support.function.defended.*;
+            import org.finos.legend.pure.m3.execution.ExecutionSupport;
+            """;
 
     public static StringJavaSource buildInterface(String _package, String imports, CoreInstance classGenericType, ProcessorContext processorContext, ProcessorSupport processorSupport, boolean useJavaInheritance)
     {

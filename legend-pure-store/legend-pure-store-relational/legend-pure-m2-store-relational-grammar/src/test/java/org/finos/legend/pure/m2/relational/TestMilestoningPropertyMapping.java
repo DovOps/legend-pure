@@ -32,8 +32,8 @@ import org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.TableAlia
 import org.finos.legend.pure.m3.coreinstance.meta.relational.metamodel.relation.Table;
 import org.finos.legend.pure.m3.navigation.ProcessorSupport;
 import org.finos.legend.pure.m4.exception.PureCompilationException;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import static org.finos.legend.pure.m2.relational.MilestoningPropertyMappingTestSourceCodes.BI_TEMPORAL_MILESTONING_MODEL_CODE;
 import static org.finos.legend.pure.m2.relational.MilestoningPropertyMappingTestSourceCodes.BUSINESS_MILESTONING_EXTENDED_MODEL_CODE;
@@ -72,11 +72,11 @@ public class TestMilestoningPropertyMapping extends AbstractPureRelationalTestWi
         RootRelationalInstanceSetImplementation rootRelationalInstanceSetImplementation = mapping._classMappings().selectInstancesOf(RootRelationalInstanceSetImplementation.class).getFirst();
 
         EmbeddedRelationalInstanceSetImplementation milestoningEmbeddedRelationalInstance = (EmbeddedRelationalInstanceSetImplementation)rootRelationalInstanceSetImplementation._propertyMappings().detectWith(MILESTONING_PROPERTY_MAPPING, this.processorSupport);
-        Assert.assertNotNull(milestoningEmbeddedRelationalInstance);
+        Assertions.assertNotNull(milestoningEmbeddedRelationalInstance);
         validateProperty(milestoningEmbeddedRelationalInstance._property(), "milestoning", "milestoning::A");
 
         MutableList<RelationalPropertyMapping> relationalPropertyMappings = (MutableList<RelationalPropertyMapping>)milestoningEmbeddedRelationalInstance._propertyMappings().toList();
-        Assert.assertEquals(2, relationalPropertyMappings.size());
+        Assertions.assertEquals(2, relationalPropertyMappings.size());
 
         RelationalPropertyMapping inPropertyMapping = relationalPropertyMappings.get(0);
         validateProperty(inPropertyMapping._property(), "in", "meta::pure::milestoning::ProcessingDateMilestoning");
@@ -99,11 +99,11 @@ public class TestMilestoningPropertyMapping extends AbstractPureRelationalTestWi
         RootRelationalInstanceSetImplementation rootRelationalInstanceSetImplementation = mapping._classMappings().selectInstancesOf(RootRelationalInstanceSetImplementation.class).getFirst();
 
         EmbeddedRelationalInstanceSetImplementation milestoningEmbeddedRelationalInstance = (EmbeddedRelationalInstanceSetImplementation)rootRelationalInstanceSetImplementation._propertyMappings().detectWith(MILESTONING_PROPERTY_MAPPING, this.processorSupport);
-        Assert.assertNotNull(milestoningEmbeddedRelationalInstance);
+        Assertions.assertNotNull(milestoningEmbeddedRelationalInstance);
         validateProperty(milestoningEmbeddedRelationalInstance._property(), "milestoning", "milestoning::A");
 
         MutableList<RelationalPropertyMapping> relationalPropertyMappings = (MutableList<RelationalPropertyMapping>)milestoningEmbeddedRelationalInstance._propertyMappings().toList();
-        Assert.assertEquals(2, relationalPropertyMappings.size());
+        Assertions.assertEquals(2, relationalPropertyMappings.size());
 
         RelationalPropertyMapping fromPropertyMapping = relationalPropertyMappings.get(0);
         validateProperty(fromPropertyMapping._property(), "from", "meta::pure::milestoning::BusinessDateMilestoning");
@@ -126,11 +126,11 @@ public class TestMilestoningPropertyMapping extends AbstractPureRelationalTestWi
         RootRelationalInstanceSetImplementation rootRelationalInstanceSetImplementation = mapping._classMappings().selectInstancesOf(RootRelationalInstanceSetImplementation.class).getFirst();
 
         EmbeddedRelationalInstanceSetImplementation milestoningEmbeddedRelationalInstance = (EmbeddedRelationalInstanceSetImplementation)rootRelationalInstanceSetImplementation._propertyMappings().detectWith(MILESTONING_PROPERTY_MAPPING, this.processorSupport);
-        Assert.assertNotNull(milestoningEmbeddedRelationalInstance);
+        Assertions.assertNotNull(milestoningEmbeddedRelationalInstance);
         validateProperty(milestoningEmbeddedRelationalInstance._property(), "milestoning", "milestoning::A");
 
         MutableList<RelationalPropertyMapping> relationalPropertyMappings = (MutableList<RelationalPropertyMapping>)milestoningEmbeddedRelationalInstance._propertyMappings().toList();
-        Assert.assertEquals(4, relationalPropertyMappings.size());
+        Assertions.assertEquals(4, relationalPropertyMappings.size());
 
         RelationalPropertyMapping inPropertyMapping = relationalPropertyMappings.get(0);
         validateProperty(inPropertyMapping._property(), "in", "meta::pure::milestoning::ProcessingDateMilestoning");
@@ -161,11 +161,11 @@ public class TestMilestoningPropertyMapping extends AbstractPureRelationalTestWi
         RootRelationalInstanceSetImplementation rootRelationalInstanceSetImplementation = mapping._classMappings().selectInstancesOf(RootRelationalInstanceSetImplementation.class).getFirst();
 
         EmbeddedRelationalInstanceSetImplementation milestoningEmbeddedRelationalInstance = (EmbeddedRelationalInstanceSetImplementation)rootRelationalInstanceSetImplementation._propertyMappings().detectWith(MILESTONING_PROPERTY_MAPPING, this.processorSupport);
-        Assert.assertNotNull(milestoningEmbeddedRelationalInstance);
+        Assertions.assertNotNull(milestoningEmbeddedRelationalInstance);
         validateProperty(milestoningEmbeddedRelationalInstance._property(), "milestoning", "milestoning::A");
 
         MutableList<RelationalPropertyMapping> relationalPropertyMappings = (MutableList<RelationalPropertyMapping>)milestoningEmbeddedRelationalInstance._propertyMappings().toList();
-        Assert.assertEquals(2, relationalPropertyMappings.size());
+        Assertions.assertEquals(2, relationalPropertyMappings.size());
 
         RelationalPropertyMapping inPropertyMapping = relationalPropertyMappings.get(0);
         validateProperty(inPropertyMapping._property(), "in", "meta::pure::milestoning::ProcessingDateMilestoning");
@@ -188,11 +188,11 @@ public class TestMilestoningPropertyMapping extends AbstractPureRelationalTestWi
         RootRelationalInstanceSetImplementation rootRelationalInstanceSetImplementation = mapping._classMappings().selectInstancesOf(RootRelationalInstanceSetImplementation.class).getFirst();
 
         EmbeddedRelationalInstanceSetImplementation milestoningEmbeddedRelationalInstance = (EmbeddedRelationalInstanceSetImplementation)rootRelationalInstanceSetImplementation._propertyMappings().detectWith(MILESTONING_PROPERTY_MAPPING, this.processorSupport);
-        Assert.assertNotNull(milestoningEmbeddedRelationalInstance);
+        Assertions.assertNotNull(milestoningEmbeddedRelationalInstance);
         validateProperty(milestoningEmbeddedRelationalInstance._property(), "milestoning", "milestoning::A");
 
         MutableList<RelationalPropertyMapping> relationalPropertyMappings = (MutableList<RelationalPropertyMapping>)milestoningEmbeddedRelationalInstance._propertyMappings().toList();
-        Assert.assertEquals(2, relationalPropertyMappings.size());
+        Assertions.assertEquals(2, relationalPropertyMappings.size());
 
         RelationalPropertyMapping fromPropertyMapping = relationalPropertyMappings.get(0);
         validateProperty(fromPropertyMapping._property(), "from", "meta::pure::milestoning::BusinessDateMilestoning");
@@ -215,11 +215,11 @@ public class TestMilestoningPropertyMapping extends AbstractPureRelationalTestWi
         RootRelationalInstanceSetImplementation rootRelationalInstanceSetImplementation = mapping._classMappings().selectInstancesOf(RootRelationalInstanceSetImplementation.class).getFirst();
 
         EmbeddedRelationalInstanceSetImplementation milestoningEmbeddedRelationalInstance = (EmbeddedRelationalInstanceSetImplementation)rootRelationalInstanceSetImplementation._propertyMappings().detectWith(MILESTONING_PROPERTY_MAPPING, this.processorSupport);
-        Assert.assertNotNull(milestoningEmbeddedRelationalInstance);
+        Assertions.assertNotNull(milestoningEmbeddedRelationalInstance);
         validateProperty(milestoningEmbeddedRelationalInstance._property(), "milestoning", "milestoning::A");
 
         MutableList<RelationalPropertyMapping> relationalPropertyMappings = (MutableList<RelationalPropertyMapping>)milestoningEmbeddedRelationalInstance._propertyMappings().toList();
-        Assert.assertEquals(4, relationalPropertyMappings.size());
+        Assertions.assertEquals(4, relationalPropertyMappings.size());
 
         RelationalPropertyMapping inPropertyMapping = relationalPropertyMappings.get(0);
         validateProperty(inPropertyMapping._property(), "in", "meta::pure::milestoning::ProcessingDateMilestoning");
@@ -252,11 +252,11 @@ public class TestMilestoningPropertyMapping extends AbstractPureRelationalTestWi
         RootRelationalInstanceSetImplementation rootRelationalInstanceSetImplementation = mapping._classMappings().selectInstancesOf(RootRelationalInstanceSetImplementation.class).getFirst();
 
         EmbeddedRelationalInstanceSetImplementation milestoningEmbeddedRelationalInstance = (EmbeddedRelationalInstanceSetImplementation)rootRelationalInstanceSetImplementation._propertyMappings().detectWith(MILESTONING_PROPERTY_MAPPING, this.processorSupport);
-        Assert.assertNotNull(milestoningEmbeddedRelationalInstance);
+        Assertions.assertNotNull(milestoningEmbeddedRelationalInstance);
         validateProperty(milestoningEmbeddedRelationalInstance._property(), "milestoning", "milestoning::A");
 
         MutableList<RelationalPropertyMapping> relationalPropertyMappings = (MutableList<RelationalPropertyMapping>)milestoningEmbeddedRelationalInstance._propertyMappings().toList();
-        Assert.assertEquals(2, relationalPropertyMappings.size());
+        Assertions.assertEquals(2, relationalPropertyMappings.size());
 
         RelationalPropertyMapping fromPropertyMapping = relationalPropertyMappings.get(0);
         validateProperty(fromPropertyMapping._property(), "from", "meta::pure::milestoning::BusinessDateMilestoning");
@@ -270,7 +270,7 @@ public class TestMilestoningPropertyMapping extends AbstractPureRelationalTestWi
         RootRelationalInstanceSetImplementation subRootRelationalInstanceSetImplementation = subMapping._classMappings().selectInstancesOf(RootRelationalInstanceSetImplementation.class).getFirst();
 
         EmbeddedRelationalInstanceSetImplementation subMilestoningEmbeddedRelationalInstance = (EmbeddedRelationalInstanceSetImplementation)subRootRelationalInstanceSetImplementation._propertyMappings().detectWith(MILESTONING_PROPERTY_MAPPING, this.processorSupport);
-        Assert.assertNull(subMilestoningEmbeddedRelationalInstance);
+        Assertions.assertNull(subMilestoningEmbeddedRelationalInstance);
     }
 
     @Test
@@ -287,11 +287,11 @@ public class TestMilestoningPropertyMapping extends AbstractPureRelationalTestWi
         EmbeddedRelationalInstanceSetImplementation embeddedRelationalInstance = rootRelationalInstance._propertyMappings().selectInstancesOf(EmbeddedRelationalInstanceSetImplementation.class).getFirst();
 
         EmbeddedRelationalInstanceSetImplementation milestoningEmbeddedRelationalInstance = (EmbeddedRelationalInstanceSetImplementation)embeddedRelationalInstance._propertyMappings().detectWith(MILESTONING_PROPERTY_MAPPING, this.processorSupport);
-        Assert.assertNotNull(milestoningEmbeddedRelationalInstance);
+        Assertions.assertNotNull(milestoningEmbeddedRelationalInstance);
         validateProperty(milestoningEmbeddedRelationalInstance._property(), "milestoning", "milestoning::A");
 
         MutableList<RelationalPropertyMapping> relationalPropertyMappings = (MutableList<RelationalPropertyMapping>)milestoningEmbeddedRelationalInstance._propertyMappings().toList();
-        Assert.assertEquals(2, relationalPropertyMappings.size());
+        Assertions.assertEquals(2, relationalPropertyMappings.size());
 
         RelationalPropertyMapping fromPropertyMapping = relationalPropertyMappings.get(0);
         validateProperty(fromPropertyMapping._property(), "from", "meta::pure::milestoning::BusinessDateMilestoning");
@@ -315,11 +315,11 @@ public class TestMilestoningPropertyMapping extends AbstractPureRelationalTestWi
         RootRelationalInstanceSetImplementation rootRelationalInstance = mapping._classMappings().selectInstancesOf(RootRelationalInstanceSetImplementation.class).getFirst();
 
         EmbeddedRelationalInstanceSetImplementation milestoningEmbeddedRelationalInstance = (EmbeddedRelationalInstanceSetImplementation)rootRelationalInstance._propertyMappings().detectWith(MILESTONING_PROPERTY_MAPPING, this.processorSupport);
-        Assert.assertNotNull(milestoningEmbeddedRelationalInstance);
+        Assertions.assertNotNull(milestoningEmbeddedRelationalInstance);
         validateProperty(milestoningEmbeddedRelationalInstance._property(), "milestoning", "milestoning::B");
 
         MutableList<RelationalPropertyMapping> relationalPropertyMappings = (MutableList<RelationalPropertyMapping>)milestoningEmbeddedRelationalInstance._propertyMappings().toList();
-        Assert.assertEquals(2, relationalPropertyMappings.size());
+        Assertions.assertEquals(2, relationalPropertyMappings.size());
 
         RelationalPropertyMapping fromPropertyMapping = relationalPropertyMappings.get(0);
         validateProperty(fromPropertyMapping._property(), "from", "meta::pure::milestoning::BusinessDateMilestoning");
@@ -332,11 +332,11 @@ public class TestMilestoningPropertyMapping extends AbstractPureRelationalTestWi
         EmbeddedRelationalInstanceSetImplementation embeddedRelationalInstance = rootRelationalInstance._propertyMappings().selectInstancesOf(EmbeddedRelationalInstanceSetImplementation.class).getFirst();
 
         milestoningEmbeddedRelationalInstance = (EmbeddedRelationalInstanceSetImplementation)embeddedRelationalInstance._propertyMappings().detectWith(MILESTONING_PROPERTY_MAPPING, this.processorSupport);
-        Assert.assertNotNull(milestoningEmbeddedRelationalInstance);
+        Assertions.assertNotNull(milestoningEmbeddedRelationalInstance);
         validateProperty(milestoningEmbeddedRelationalInstance._property(), "milestoning", "milestoning::A");
 
         relationalPropertyMappings = (MutableList<RelationalPropertyMapping>)milestoningEmbeddedRelationalInstance._propertyMappings().toList();
-        Assert.assertEquals(2, relationalPropertyMappings.size());
+        Assertions.assertEquals(2, relationalPropertyMappings.size());
 
         fromPropertyMapping = relationalPropertyMappings.get(0);
         validateProperty(fromPropertyMapping._property(), "from", "meta::pure::milestoning::BusinessDateMilestoning");
@@ -361,11 +361,11 @@ public class TestMilestoningPropertyMapping extends AbstractPureRelationalTestWi
         EmbeddedRelationalInstanceSetImplementation embeddedRelationalInstance = rootRelationalInstance._propertyMappings().selectInstancesOf(EmbeddedRelationalInstanceSetImplementation.class).getFirst();
 
         EmbeddedRelationalInstanceSetImplementation milestoningEmbeddedRelationalInstance = (EmbeddedRelationalInstanceSetImplementation)embeddedRelationalInstance._propertyMappings().detectWith(MILESTONING_PROPERTY_MAPPING, this.processorSupport);
-        Assert.assertNotNull(milestoningEmbeddedRelationalInstance);
+        Assertions.assertNotNull(milestoningEmbeddedRelationalInstance);
         validateProperty(milestoningEmbeddedRelationalInstance._property(), "milestoning", "milestoning::A");
 
         MutableList<RelationalPropertyMapping> relationalPropertyMappings = (MutableList<RelationalPropertyMapping>)milestoningEmbeddedRelationalInstance._propertyMappings().toList();
-        Assert.assertEquals(2, relationalPropertyMappings.size());
+        Assertions.assertEquals(2, relationalPropertyMappings.size());
 
         RelationalPropertyMapping fromPropertyMapping = relationalPropertyMappings.get(0);
         validateProperty(fromPropertyMapping._property(), "from", "meta::pure::milestoning::BusinessDateMilestoning");
@@ -389,11 +389,11 @@ public class TestMilestoningPropertyMapping extends AbstractPureRelationalTestWi
         RootRelationalInstanceSetImplementation rootRelationalInstance = mapping._classMappings().selectInstancesOf(RootRelationalInstanceSetImplementation.class).getFirst();
 
         EmbeddedRelationalInstanceSetImplementation milestoningEmbeddedRelationalInstance = (EmbeddedRelationalInstanceSetImplementation)rootRelationalInstance._propertyMappings().detectWith(MILESTONING_PROPERTY_MAPPING, this.processorSupport);
-        Assert.assertNotNull(milestoningEmbeddedRelationalInstance);
+        Assertions.assertNotNull(milestoningEmbeddedRelationalInstance);
         validateProperty(milestoningEmbeddedRelationalInstance._property(), "milestoning", "milestoning::B");
 
         MutableList<RelationalPropertyMapping> relationalPropertyMappings = (MutableList<RelationalPropertyMapping>)milestoningEmbeddedRelationalInstance._propertyMappings().toList();
-        Assert.assertEquals(2, relationalPropertyMappings.size());
+        Assertions.assertEquals(2, relationalPropertyMappings.size());
 
         RelationalPropertyMapping fromPropertyMapping = relationalPropertyMappings.get(0);
         validateProperty(fromPropertyMapping._property(), "from", "meta::pure::milestoning::BusinessDateMilestoning");
@@ -406,11 +406,11 @@ public class TestMilestoningPropertyMapping extends AbstractPureRelationalTestWi
         EmbeddedRelationalInstanceSetImplementation embeddedRelationalInstance = rootRelationalInstance._propertyMappings().selectInstancesOf(EmbeddedRelationalInstanceSetImplementation.class).getFirst();
 
         milestoningEmbeddedRelationalInstance = (EmbeddedRelationalInstanceSetImplementation)embeddedRelationalInstance._propertyMappings().detectWith(MILESTONING_PROPERTY_MAPPING, this.processorSupport);
-        Assert.assertNotNull(milestoningEmbeddedRelationalInstance);
+        Assertions.assertNotNull(milestoningEmbeddedRelationalInstance);
         validateProperty(milestoningEmbeddedRelationalInstance._property(), "milestoning", "milestoning::A");
 
         relationalPropertyMappings = (MutableList<RelationalPropertyMapping>)milestoningEmbeddedRelationalInstance._propertyMappings().toList();
-        Assert.assertEquals(2, relationalPropertyMappings.size());
+        Assertions.assertEquals(2, relationalPropertyMappings.size());
 
         fromPropertyMapping = relationalPropertyMappings.get(0);
         validateProperty(fromPropertyMapping._property(), "from", "meta::pure::milestoning::BusinessDateMilestoning");
@@ -430,7 +430,7 @@ public class TestMilestoningPropertyMapping extends AbstractPureRelationalTestWi
         try
         {
             this.runtime.compile();
-            Assert.fail();
+            Assertions.fail();
         }
         catch (Exception e)
         {
@@ -449,7 +449,7 @@ public class TestMilestoningPropertyMapping extends AbstractPureRelationalTestWi
         try
         {
             this.runtime.compile();
-            Assert.fail();
+            Assertions.fail();
         }
         catch (Exception e)
         {
@@ -467,7 +467,7 @@ public class TestMilestoningPropertyMapping extends AbstractPureRelationalTestWi
         try
         {
             this.runtime.compile();
-            Assert.fail();
+            Assertions.fail();
         }
         catch (Exception e)
         {
@@ -485,7 +485,7 @@ public class TestMilestoningPropertyMapping extends AbstractPureRelationalTestWi
         try
         {
             this.runtime.compile();
-            Assert.fail();
+            Assertions.fail();
         }
         catch (Exception e)
         {
@@ -495,26 +495,26 @@ public class TestMilestoningPropertyMapping extends AbstractPureRelationalTestWi
 
     private static void validateProperty(Property property, String propertyName, String owner)
     {
-        Assert.assertNotNull(property);
-        Assert.assertEquals(propertyName, property._name());
-        Assert.assertEquals(owner, PackageableElement.getUserPathForPackageableElement(property._owner()));
+        Assertions.assertNotNull(property);
+        Assertions.assertEquals(propertyName, property._name());
+        Assertions.assertEquals(owner, PackageableElement.getUserPathForPackageableElement(property._owner()));
     }
 
     private static void validateTableAliasColumn(RelationalOperationElement relationalOperationElement, String columnName)
     {
-        Assert.assertTrue(relationalOperationElement instanceof TableAliasColumn);
+        Assertions.assertTrue(relationalOperationElement instanceof TableAliasColumn);
         Column column = ((TableAliasColumn)relationalOperationElement)._column();
-        Assert.assertNotNull(column);
-        Assert.assertEquals(columnName, column._name());
-        Assert.assertEquals("myTable", ((Table)column._owner())._name());
-        Assert.assertEquals("default", ((Table)column._owner())._schema()._name());
-        Assert.assertEquals("myDB", ((Table)column._owner())._schema()._database()._name());
+        Assertions.assertNotNull(column);
+        Assertions.assertEquals(columnName, column._name());
+        Assertions.assertEquals("myTable", ((Table)column._owner())._name());
+        Assertions.assertEquals("default", ((Table)column._owner())._schema()._name());
+        Assertions.assertEquals("myDB", ((Table)column._owner())._schema()._database()._name());
     }
 
     private static void validateLiteral(RelationalOperationElement relationalOperationElement)
     {
-        Assert.assertTrue(relationalOperationElement instanceof Literal);
-        Assert.assertTrue(((Literal)relationalOperationElement)._value() instanceof SQLNull);
+        Assertions.assertTrue(relationalOperationElement instanceof Literal);
+        Assertions.assertTrue(((Literal)relationalOperationElement)._value() instanceof SQLNull);
     }
 
     private static final Predicate2<PropertyMapping, ProcessorSupport> MILESTONING_PROPERTY_MAPPING = new Predicate2<PropertyMapping, ProcessorSupport>()

@@ -81,9 +81,9 @@ class StreamBinaryReader extends AbstractSimpleBinaryReader
     {
         try
         {
-            if (this.stream instanceof ZipInputStream)
+            if (this.stream instanceof ZipInputStream inputStream)
             {
-                ((ZipInputStream) this.stream).closeEntry();
+                inputStream.closeEntry();
             }
             else
             {

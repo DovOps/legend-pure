@@ -15,7 +15,7 @@
 package org.finos.legend.pure.m3.tests.function.base.collection;
 
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public abstract class AbstractTestMapCollection extends AbstractPureTestWithCoreCompiled
 {
@@ -23,13 +23,15 @@ public abstract class AbstractTestMapCollection extends AbstractPureTestWithCore
     public void testGetIfAbsentPutWithKey()
     {
         compileTestSource("fromString.pure",
-                "function testGetIfAbsentPutWithKey():Any[*]\n" +
-                "{\n" +
-                "   let m = newMap([pair(1,'_1'), pair(2,'_2')]);\n" +
-                "   assert($m->get(3)->isEmpty(), |'');\n" +
-                "   assert('_3' == $m->getIfAbsentPutWithKey(3, {k:Integer[1]|'_'+$k->toString()}), |'');\n" +
-                "   assert('_3' == $m->get(3), |'');" +
-                "}\n");
+                """
+                function testGetIfAbsentPutWithKey():Any[*]
+                {
+                   let m = newMap([pair(1,'_1'), pair(2,'_2')]);
+                   assert($m->get(3)->isEmpty(), |'');
+                   assert('_3' == $m->getIfAbsentPutWithKey(3, {k:Integer[1]|'_'+$k->toString()}), |'');
+                   assert('_3' == $m->get(3), |'');\
+                }
+                """);
 
         this.execute("testGetIfAbsentPutWithKey():Any[*]");
     }
@@ -38,16 +40,18 @@ public abstract class AbstractTestMapCollection extends AbstractPureTestWithCore
     public void testGetMapStats()
     {
         compileTestSource("fromString.pure",
-                "function testGetMapStats():Any[*]\n" +
-                        "{\n" +
-                        "   let m = newMap([pair(1,'_1'), pair(2,'_2')]);\n" +
-                        "   assert($m->get(3)->isEmpty(), |'');\n" +
-                        "   assert(0 == $m->getMapStats().getIfAbsentCounter, |'');\n" +
-                        "   assert('_3'== $m->getIfAbsentPutWithKey(3, {k:Integer[1]|'_'+$k->toString()}), |'');\n" +
-                        "   assert(1== $m->getMapStats().getIfAbsentCounter, |'');\n" +
-                        "   assert('_3'== $m->get(3), |'');" +
-                        "   assert(1== $m->getMapStats().getIfAbsentCounter, |'');\n" +
-                        "}\n");
+                """
+                function testGetMapStats():Any[*]
+                {
+                   let m = newMap([pair(1,'_1'), pair(2,'_2')]);
+                   assert($m->get(3)->isEmpty(), |'');
+                   assert(0 == $m->getMapStats().getIfAbsentCounter, |'');
+                   assert('_3'== $m->getIfAbsentPutWithKey(3, {k:Integer[1]|'_'+$k->toString()}), |'');
+                   assert(1== $m->getMapStats().getIfAbsentCounter, |'');
+                   assert('_3'== $m->get(3), |'');\
+                   assert(1== $m->getMapStats().getIfAbsentCounter, |'');
+                }
+                """);
 
         this.execute("testGetMapStats():Any[*]");
     }

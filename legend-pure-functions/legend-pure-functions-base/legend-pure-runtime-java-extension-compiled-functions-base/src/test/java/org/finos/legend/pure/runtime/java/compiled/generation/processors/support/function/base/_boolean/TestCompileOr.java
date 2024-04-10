@@ -18,11 +18,11 @@ import org.finos.legend.pure.m3.execution.FunctionExecution;
 import org.finos.legend.pure.m3.tests.function.base._boolean.AbstractTestOr;
 import org.finos.legend.pure.runtime.java.compiled.execution.FunctionExecutionCompiledBuilder;
 import org.finos.legend.pure.runtime.java.compiled.factory.JavaModelFactoryRegistryLoader;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.BeforeAll;
 
 public class TestCompileOr extends AbstractTestOr
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getFunctionExecution(), JavaModelFactoryRegistryLoader.loader());

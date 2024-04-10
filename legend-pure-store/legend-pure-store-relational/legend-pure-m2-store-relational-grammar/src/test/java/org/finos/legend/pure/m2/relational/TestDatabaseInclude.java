@@ -23,14 +23,14 @@ import org.finos.legend.pure.m3.serialization.filesystem.repository.CodeReposito
 import org.finos.legend.pure.m3.serialization.filesystem.repository.GenericCodeRepository;
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
 import org.finos.legend.pure.m4.exception.PureCompilationException;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestDatabaseInclude extends AbstractPureTestWithCoreCompiled
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getFunctionExecution(), new CompositeCodeStorage(new ClassLoaderCodeStorage(getCodeRepositories())), getFactoryRegistryOverride(), getOptions(), getExtra());
@@ -43,7 +43,7 @@ public class TestDatabaseInclude extends AbstractPureTestWithCoreCompiled
         return repositories;
     }
 
-    @After
+    @AfterEach
     public void clearRuntime()
     {
         runtime.delete("/test/testDB.pure");
@@ -56,54 +56,62 @@ public class TestDatabaseInclude extends AbstractPureTestWithCoreCompiled
     public void testDoubleInclude()
     {
         compileTestSource("/test/testDB1.pure",
-                "###Relational\n" +
-                        "Database test::TestDB1 ()");
-        PureCompilationException e = Assert.assertThrows(PureCompilationException.class, () -> compileTestSource(
+                """
+                ###Relational
+                Database test::TestDB1 ()\
+                """);
+        PureCompilationException e = Assertions.assertThrows(PureCompilationException.class, () -> compileTestSource(
                 "/test/testDB2.pure",
-                "###Relational\n" +
-                        "Database test::TestDB2\n" +
-                        "(\n" +
-                        "    include test::TestDB1\n" +
-                        "    include test::TestDB1\n" +
-                        ")\n"));
+                """
+                ###Relational
+                Database test::TestDB2
+                (
+                    include test::TestDB1
+                    include test::TestDB1
+                )
+                """));
         assertPureException(PureCompilationException.class, "test::TestDB1 is included multiple times in test::TestDB2", "/test/testDB2.pure", 2, 1, 2, 16, 6, 1, e);
     }
 
     @Test
     public void testSelfInclude()
     {
-        PureCompilationException e = Assert.assertThrows(PureCompilationException.class, () -> compileTestSource(
+        PureCompilationException e = Assertions.assertThrows(PureCompilationException.class, () -> compileTestSource(
                 "/test/testDB.pure",
-                    "###Relational\n" +
-                            "Database test::TestDB\n" +
-                            "(\n" +
-                            "    include test::TestDB\n" +
-                            ")\n"));
+                    """
+                    ###Relational
+                    Database test::TestDB
+                    (
+                        include test::TestDB
+                    )
+                    """));
         assertPureException(PureCompilationException.class, "Circular include in test::TestDB: test::TestDB -> test::TestDB", "/test/testDB.pure", 2, 1, 2, 16, 5, 1, e);
     }
 
     @Test
     public void testIncludeLoop()
     {
-        PureCompilationException e = Assert.assertThrows(PureCompilationException.class, () -> compileTestSource(
+        PureCompilationException e = Assertions.assertThrows(PureCompilationException.class, () -> compileTestSource(
                 "/test/testDB.pure",
-                    "###Relational\n" +
-                            "Database test::TestDB1\n" +
-                            "(\n" +
-                            "    include test::TestDB2\n" +
-                            ")\n" +
-                            "\n" +
-                            "###Relational\n" +
-                            "Database test::TestDB2\n" +
-                            "(\n" +
-                            "    include test::TestDB3\n" +
-                            ")\n" +
-                            "\n" +
-                            "###Relational\n" +
-                            "Database test::TestDB3\n" +
-                            "(\n" +
-                            "    include test::TestDB1\n" +
-                            ")\n"));
+                    """
+                    ###Relational
+                    Database test::TestDB1
+                    (
+                        include test::TestDB2
+                    )
+                    
+                    ###Relational
+                    Database test::TestDB2
+                    (
+                        include test::TestDB3
+                    )
+                    
+                    ###Relational
+                    Database test::TestDB3
+                    (
+                        include test::TestDB1
+                    )
+                    """));
         switch (e.getInfo())
         {
             case "Circular include in test::TestDB1: test::TestDB1 -> test::TestDB2 -> test::TestDB3 -> test::TestDB1":
@@ -123,7 +131,7 @@ public class TestDatabaseInclude extends AbstractPureTestWithCoreCompiled
             }
             default:
             {
-                Assert.assertEquals("Circular include in test::TestDB1: test::TestDB1 -> test::TestDB2 -> test::TestDB3 -> test::TestDB1", e.getInfo());
+                Assertions.assertEquals("Circular include in test::TestDB1: test::TestDB1 -> test::TestDB2 -> test::TestDB3 -> test::TestDB1", e.getInfo());
             }
         }
     }

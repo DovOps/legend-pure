@@ -183,9 +183,9 @@ public class TestRunner implements Runnable
             catch (Throwable t)
             {
                 PureException exception = PureException.findPureException(t);
-                if ((exception != null) && (exception instanceof PureAssertFailException))
+                if ((exception != null) && (exception instanceof PureAssertFailException failException))
                 {
-                    this.testCallBack.executedTest(test, testCollection.getTestParameterizationId(), stream.toString(), new AssertFailTestStatus((PureAssertFailException)exception));
+                    this.testCallBack.executedTest(test, testCollection.getTestParameterizationId(), stream.toString(), new AssertFailTestStatus(failException));
                 }
                 else
                 {

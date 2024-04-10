@@ -16,20 +16,20 @@ package org.finos.legend.pure.m3.serialization.grammar.v1;
 
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiledPlatform;
 import org.finos.legend.pure.m4.exception.PureCompilationException;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestByteCompilation extends AbstractPureTestWithCoreCompiledPlatform
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime();
     }
 
-    @After
+    @AfterEach
     public void clearRuntime()
     {
         runtime.delete("fromString.pure");
@@ -39,20 +39,24 @@ public class TestByteCompilation extends AbstractPureTestWithCoreCompiledPlatfor
     public void testByteUsageAsFunctionParameter()
     {
         compileTestSource("fromString.pure",
-                "function myByteFunction(a:Byte[1], b:Byte[*]):String[1]\n" +
-                        "{\n" +
-                        "   'aa';\n" +
-                        "}");
+                """
+                function myByteFunction(a:Byte[1], b:Byte[*]):String[1]
+                {
+                   'aa';
+                }\
+                """);
     }
 
     @Test
     public void testByteUsageAsClassProperty()
     {
-        PureCompilationException e = Assert.assertThrows(PureCompilationException.class, () -> compileTestSource("fromString.pure",
-                    "Class myClassWithByteProperty\n" +
-                            "{\n" +
-                            "   prop: Byte[1];\n" +
-                            "}"));
-        Assert.assertEquals("Compilation error at (resource:fromString.pure line:3 column:4), \"The property 'prop' has type of 'Byte'. 'Byte' type is not supported for property.\"", e.getMessage());
+        PureCompilationException e = Assertions.assertThrows(PureCompilationException.class, () -> compileTestSource("fromString.pure",
+                    """
+                    Class myClassWithByteProperty
+                    {
+                       prop: Byte[1];
+                    }\
+                    """));
+        Assertions.assertEquals("Compilation error at (resource:fromString.pure line:3 column:4), \"The property 'prop' has type of 'Byte'. 'Byte' type is not supported for property.\"", e.getMessage());
     }
 }

@@ -81,12 +81,12 @@ public class AssociationUnbind implements MatchRunner<Association>
 
         undoMilestoningProcessing(association, state, context);
 
-        if (association instanceof AssociationProjection)
+        if (association instanceof AssociationProjection projection)
         {
-            Shared.cleanUpReferenceUsage(((AssociationProjection) association)._projectedAssociationCoreInstance(), association, processorSupport);
-            Shared.cleanImportStub(((AssociationProjection) association)._projectedAssociationCoreInstance(), processorSupport);
+            Shared.cleanUpReferenceUsage(projection._projectedAssociationCoreInstance(), association, processorSupport);
+            Shared.cleanImportStub(projection._projectedAssociationCoreInstance(), processorSupport);
             association._propertiesRemove();
-            RichIterable<? extends CoreInstance> projections = ((AssociationProjection) association)._projectionsCoreInstance();
+            RichIterable<? extends CoreInstance> projections = projection._projectionsCoreInstance();
             projections.forEach(projection -> Shared.cleanImportStub(projection, processorSupport));
         }
     }

@@ -15,7 +15,7 @@
 package org.finos.legend.pure.m2.inlinedsl.path;
 
 import org.finos.legend.pure.m3.tests.function.base.PureExpressionTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.regex.Pattern;
 

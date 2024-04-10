@@ -36,13 +36,15 @@ public class Http extends AbstractNative
     public String buildBody()
     {
 
-        return "new SharedPureFunction<Object>()\n" +
-                "        {\n" +
-                "            @Override\n" +
-                "            public Object execute(ListIterable<?> vars, final ExecutionSupport es)\n" +
-                "            {\n" +
-                "                return FunctionsGen.executeHttpRaw((Root_meta_pure_functions_io_http_URL) vars.get(0), vars.get(1), (String) vars.get(2), (String) vars.get(3), es);" +
-                "            }\n" +
-                "        }";
+        return """
+                new SharedPureFunction<Object>()
+                        {
+                            @Override
+                            public Object execute(ListIterable<?> vars, final ExecutionSupport es)
+                            {
+                                return FunctionsGen.executeHttpRaw((Root_meta_pure_functions_io_http_URL) vars.get(0), vars.get(1), (String) vars.get(2), (String) vars.get(3), es);\
+                            }
+                        }\
+                """;
     }
 }

@@ -67,75 +67,73 @@ public final class JavaSourceCodeGenerator
     public static final String EXTERNAL_FUNCTIONS_CLASS_NAME = "PureExternal";
 
     public static final String imports =
-            "import org.eclipse.collections.api.LazyIterable;\n" +
-                    "import org.eclipse.collections.api.block.function.Function0;\n" +
-                    "import org.eclipse.collections.api.block.function.Function;\n" +
-                    "import org.eclipse.collections.api.block.function.Function2;\n" +
-                    "import org.eclipse.collections.api.block.predicate.Predicate;\n" +
-                    "import org.eclipse.collections.api.block.procedure.Procedure;\n" +
-                    "import org.eclipse.collections.api.map.ImmutableMap;\n" +
-                    "import org.eclipse.collections.api.map.MutableMap;\n" +
-                    "import org.eclipse.collections.api.map.MutableMapIterable;\n" +
-                    "import org.eclipse.collections.api.map.MapIterable;\n" +
-                    "import org.eclipse.collections.api.map.primitive.IntObjectMap;\n" +
-                    "import org.eclipse.collections.api.set.MutableSet;\n" +
-                    "import org.eclipse.collections.api.set.SetIterable;\n" +
-                    "import org.eclipse.collections.api.list.MutableList;\n" +
-                    "import org.eclipse.collections.api.list.ListIterable;\n" +
-                    "import org.eclipse.collections.api.RichIterable;\n" +
-                    "import org.eclipse.collections.api.tuple.Pair;\n" +
-                    "import org.eclipse.collections.impl.factory.Lists;\n" +
-                    "import org.eclipse.collections.impl.factory.Maps;\n" +
-                    "import org.eclipse.collections.impl.map.mutable.UnifiedMap;\n" +
-                    "import org.eclipse.collections.impl.map.strategy.mutable.UnifiedMapWithHashingStrategy;\n" +
-                    "import org.eclipse.collections.impl.set.mutable.UnifiedSet;\n" +
-                    "import org.eclipse.collections.impl.set.strategy.mutable.UnifiedSetWithHashingStrategy;\n" +
-                    "import org.eclipse.collections.impl.list.mutable.FastList;\n" +
-                    "import org.eclipse.collections.impl.factory.Sets;\n" +
-                    "import org.eclipse.collections.impl.block.function.checked.CheckedFunction0;\n" +
-                    "import org.eclipse.collections.impl.utility.Iterate;\n" +
-                    "import org.eclipse.collections.impl.utility.LazyIterate;\n" +
-                    "import org.eclipse.collections.impl.utility.StringIterate;\n" +
-                    "import org.finos.legend.pure.m3.navigation.generictype.GenericType;\n" +
-                    "import org.finos.legend.pure.m3.navigation.ProcessorSupport;\n" +
-                    "import org.finos.legend.pure.m3.execution.ExecutionSupport;\n" +
+            """
+import org.eclipse.collections.api.LazyIterable;
+import org.eclipse.collections.api.block.function.Function0;
+import org.eclipse.collections.api.block.function.Function;
+import org.eclipse.collections.api.block.function.Function2;
+import org.eclipse.collections.api.block.predicate.Predicate;
+import org.eclipse.collections.api.block.procedure.Procedure;
+import org.eclipse.collections.api.map.ImmutableMap;
+import org.eclipse.collections.api.map.MutableMap;
+import org.eclipse.collections.api.map.MutableMapIterable;
+import org.eclipse.collections.api.map.MapIterable;
+import org.eclipse.collections.api.map.primitive.IntObjectMap;
+import org.eclipse.collections.api.set.MutableSet;
+import org.eclipse.collections.api.set.SetIterable;
+import org.eclipse.collections.api.list.MutableList;
+import org.eclipse.collections.api.list.ListIterable;
+import org.eclipse.collections.api.RichIterable;
+import org.eclipse.collections.api.tuple.Pair;
+import org.eclipse.collections.impl.factory.Lists;
+import org.eclipse.collections.impl.factory.Maps;
+import org.eclipse.collections.impl.map.mutable.UnifiedMap;
+import org.eclipse.collections.impl.map.strategy.mutable.UnifiedMapWithHashingStrategy;
+import org.eclipse.collections.impl.set.mutable.UnifiedSet;
+import org.eclipse.collections.impl.set.strategy.mutable.UnifiedSetWithHashingStrategy;
+import org.eclipse.collections.impl.list.mutable.FastList;
+import org.eclipse.collections.impl.factory.Sets;
+import org.eclipse.collections.impl.block.function.checked.CheckedFunction0;
+import org.eclipse.collections.impl.utility.Iterate;
+import org.eclipse.collections.impl.utility.LazyIterate;
+import org.eclipse.collections.impl.utility.StringIterate;
+import org.finos.legend.pure.m3.navigation.generictype.GenericType;
+import org.finos.legend.pure.m3.navigation.ProcessorSupport;
+import org.finos.legend.pure.m3.execution.ExecutionSupport;
+import org.finos.legend.pure.m3.exception.PureExecutionException;
+import org.finos.legend.pure.m4.coreinstance.CoreInstance;
+import org.finos.legend.pure.m4.coreinstance.primitive.date.PureDate;
+import org.finos.legend.pure.m4.coreinstance.primitive.date.DateFunctions;
+import org.finos.legend.pure.runtime.java.compiled.generation.processors.support.coreinstance.*;
+import org.finos.legend.pure.runtime.java.compiled.metadata.*;
+import org.finos.legend.pure.runtime.java.compiled.generation.processors.support.map.*;
+import org.finos.legend.pure.m3.serialization.filesystem.usercodestorage.vcs.ChangeType;
+import org.finos.legend.pure.m3.serialization.filesystem.usercodestorage.vcs.ChangedPath;
+import org.finos.legend.pure.m3.serialization.filesystem.usercodestorage.vcs.Revision;
+import org.finos.legend.pure.m3.navigation.PackageableElement.PackageableElement;
+import org.finos.legend.pure.m3.tools.ListHelper;
+import org.finos.legend.pure.runtime.java.compiled.generation.processors.support.*;
+import org.finos.legend.pure.runtime.java.compiled.generation.processors.support.function.defended.*;
+import org.finos.legend.pure.runtime.java.compiled.generation.processors.support.function.*;
+import org.finos.legend.pure.runtime.java.compiled.execution.*;
+import org.finos.legend.pure.runtime.java.compiled.execution.sourceInformation.*;
+import org.finos.legend.pure.runtime.java.compiled.serialization.model.*;
+import org.finos.legend.pure.runtime.java.compiled.metadata.*;
+import java.lang.reflect.Method;
+import java.math.BigInteger;
+import java.sql.DatabaseMetaData;
+import java.sql.PreparedStatement;
+import java.sql.ResultSetMetaData;
+import java.util.Iterator;
+import java.util.Calendar;
+import java.util.Map;
+import java.util.ArrayDeque;
+import java.util.Deque;
+import org.json.simple.JSONObject;
+import org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.relationship.Generalization;
+import org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.type.Type;
 
-                    "import org.finos.legend.pure.m3.exception.PureExecutionException;\n" +
-                    "import org.finos.legend.pure.m4.coreinstance.CoreInstance;\n" +
-                    "import org.finos.legend.pure.m4.coreinstance.primitive.date.PureDate;\n" +
-                    "import org.finos.legend.pure.m4.coreinstance.primitive.date.DateFunctions;\n" +
-                    "import org.finos.legend.pure.runtime.java.compiled.generation.processors.support.coreinstance.*;\n" +
-                    "import org.finos.legend.pure.runtime.java.compiled.metadata.*;\n" +
-                    "import org.finos.legend.pure.runtime.java.compiled.generation.processors.support.map.*;\n" +
-
-                    "import org.finos.legend.pure.m3.serialization.filesystem.usercodestorage.vcs.ChangeType;\n" +
-                    "import org.finos.legend.pure.m3.serialization.filesystem.usercodestorage.vcs.ChangedPath;\n" +
-                    "import org.finos.legend.pure.m3.serialization.filesystem.usercodestorage.vcs.Revision;\n" +
-                    "import org.finos.legend.pure.m3.navigation.PackageableElement.PackageableElement;\n" +
-                    "import org.finos.legend.pure.m3.tools.ListHelper;\n" +
-
-                    "import org.finos.legend.pure.runtime.java.compiled.generation.processors.support.*;\n" +
-                    "import org.finos.legend.pure.runtime.java.compiled.generation.processors.support.function.defended.*;\n" +
-                    "import org.finos.legend.pure.runtime.java.compiled.generation.processors.support.function.*;\n" +
-                    "import org.finos.legend.pure.runtime.java.compiled.execution.*;\n" +
-                    "import org.finos.legend.pure.runtime.java.compiled.execution.sourceInformation.*;\n" +
-                    "import org.finos.legend.pure.runtime.java.compiled.serialization.model.*;\n" +
-                    "import org.finos.legend.pure.runtime.java.compiled.metadata.*;\n" +
-
-                    "import java.lang.reflect.Method;\n" +
-                    "import java.math.BigInteger;\n" +
-                    "import java.sql.DatabaseMetaData;\n" +
-                    "import java.sql.PreparedStatement;\n" +
-                    "import java.sql.ResultSetMetaData;\n" +
-                    "import java.util.Iterator;\n" +
-                    "import java.util.Calendar;\n" +
-                    "import java.util.Map;\n" +
-                    "import java.util.ArrayDeque;\n" +
-                    "import java.util.Deque;\n" +
-                    "import org.json.simple.JSONObject;\n" +
-                    "import org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.relationship.Generalization;\n" +
-                    "import org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.type.Type;\n" +
-                    "\n";
+""";
 
     private final ProcessorSupport processorSupport;
     private final IdBuilder idBuilder;
@@ -685,10 +683,12 @@ public final class JavaSourceCodeGenerator
 
     private String buildLambdaZero()
     {
-        return "public interface LambdaZero<T>\n" +
-                "{\n" +
-                "    T execute();\n" +
-                "}\n";
+        return """
+                public interface LambdaZero<T>
+                {
+                    T execute();
+                }
+                """;
     }
 
     private static String toFactoryRegistryEntry(CoreInstance _class, ProcessorSupport processorSupport)

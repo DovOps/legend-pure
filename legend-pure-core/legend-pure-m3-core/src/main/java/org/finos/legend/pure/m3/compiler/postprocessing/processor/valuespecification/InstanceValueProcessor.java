@@ -66,21 +66,21 @@ public class InstanceValueProcessor extends Processor<InstanceValue>
             {
                 typeInferenceContext.addStateForCollectionElement();
             }
-            if (child instanceof ValueSpecification)
+            if (child instanceof ValueSpecification specification)
             {
                 InstanceValueSpecificationContext usageContext = (InstanceValueSpecificationContext) processorSupport.newAnonymousCoreInstance(null, M3Paths.InstanceValueSpecificationContext);
                 usageContext._offset(i);
                 usageContext._instanceValue(instance);
-                ((ValueSpecification) child)._usageContext(usageContext);
+                specification._usageContext(usageContext);
             }
-            else if (child instanceof RootRouteNode)
+            else if (child instanceof RootRouteNode node)
             {
-                ((RootRouteNode) child)._owner(instance);
+                node._owner(instance);
             }
 
-            if (child instanceof org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel._import.ImportStub)
+            if (child instanceof org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel._import.ImportStub stub)
             {
-                ImportStub.processImportStub((org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel._import.ImportStub) child, repository, processorSupport);
+                ImportStub.processImportStub(stub, repository, processorSupport);
             }
             // TODO Is this check necessary? The post-processor keeps track of what has been processed.
             else if (!(child instanceof Class))

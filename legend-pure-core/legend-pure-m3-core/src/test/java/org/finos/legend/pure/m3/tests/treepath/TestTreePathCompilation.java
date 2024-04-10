@@ -21,21 +21,21 @@ import org.finos.legend.pure.m3.navigation.M3Paths;
 import org.finos.legend.pure.m3.navigation.M3Properties;
 import org.finos.legend.pure.m3.navigation.Instance;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 // TODO: Investigate tests with setUp() added, those are causing other tests fail when runtime is shared
 public class TestTreePathCompilation extends AbstractPureTestWithCoreCompiledPlatform
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getExtra());
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("file.pure");
@@ -48,16 +48,18 @@ public class TestTreePathCompilation extends AbstractPureTestWithCoreCompiledPla
     {
         try
         {
-            runtime.createInMemorySource("file.pure", "Class Person{address:Address[1];} Class Firm<T> {employees : Person[1];address:Address[1];} Class Address{}\n" +
-                    "function test():Any[*]\n" +
-                    "{\n" +
-                    "    print(#UnknownFirm" +
-                    "          { " +
-                    "             *" +
-                    "          }#,2);\n" +
-                    "}\n");
+            runtime.createInMemorySource("file.pure", """
+                    Class Person{address:Address[1];} Class Firm<T> {employees : Person[1];address:Address[1];} Class Address{}
+                    function test():Any[*]
+                    {
+                        print(#UnknownFirm\
+                              { \
+                                 *\
+                              }#,2);
+                    }
+                    """);
             runtime.compile();
-            Assert.fail();
+            Assertions.fail();
         }
         catch (Exception e)
         {
@@ -66,16 +68,18 @@ public class TestTreePathCompilation extends AbstractPureTestWithCoreCompiledPla
 
         try
         {
-            runtime.modify("file.pure", "Class Person{address:Address[1];} Class Firm<T> {employees : Person[1];address:Address[1];} Class Address{}\n" +
-                    "function test():Any[*]\n" +
-                    "{\n" +
-                    "    print(#Firm" +
-                    "          {" +
-                    "               *" +
-                    "          }#,1)\n" +
-                    "}\n");
+            runtime.modify("file.pure", """
+                    Class Person{address:Address[1];} Class Firm<T> {employees : Person[1];address:Address[1];} Class Address{}
+                    function test():Any[*]
+                    {
+                        print(#Firm\
+                              {\
+                                   *\
+                              }#,1)
+                    }
+                    """);
             runtime.compile();
-            Assert.fail();
+            Assertions.fail();
         }
         catch (Exception e)
         {
@@ -85,15 +89,17 @@ public class TestTreePathCompilation extends AbstractPureTestWithCoreCompiledPla
 
         try
         {
-            runtime.modify("file.pure", "Class Person{address:Address[1];} Class Firm<T> {employees : Person[1];address:Address[1];} Class Address{}\n" +
-                    "function test():Any[*]\n" +
-                    "{\n" +
-                    "    print(#Firm<BlaBla>{" +
-                    "   *" +
-                    "}#,2);\n" +
-                    "}\n");
+            runtime.modify("file.pure", """
+                    Class Person{address:Address[1];} Class Firm<T> {employees : Person[1];address:Address[1];} Class Address{}
+                    function test():Any[*]
+                    {
+                        print(#Firm<BlaBla>{\
+                       *\
+                    }#,2);
+                    }
+                    """);
             runtime.compile();
-            Assert.fail();
+            Assertions.fail();
         }
         catch (Exception e)
         {
@@ -102,16 +108,18 @@ public class TestTreePathCompilation extends AbstractPureTestWithCoreCompiledPla
 
         try
         {
-            final String code = "Class Person{address:Address[1];} Class Firm {employees : Person[1];address:Address[1];} Class Address{}\n" +
-                    "function test():Any[*]\n" +
-                    "{\n" +
-                    "    print(#Firm{\n" +
-                    "                 +[employee]  \n" +
-                    "               }#,2);\n" +
-                    "}\n";
+            final String code = """
+                    Class Person{address:Address[1];} Class Firm {employees : Person[1];address:Address[1];} Class Address{}
+                    function test():Any[*]
+                    {
+                        print(#Firm{
+                                     +[employee] \s
+                                   }#,2);
+                    }
+                    """;
             runtime.modify("file.pure", code);
             runtime.compile();
-            Assert.fail();
+            Assertions.fail();
         }
         catch (Exception e)
         {
@@ -121,21 +129,23 @@ public class TestTreePathCompilation extends AbstractPureTestWithCoreCompiledPla
 
         try
         {
-            runtime.modify("file.pure", "Class Person{address:Address[1];} Class Firm {employees : Person[1];address:Address[1];} Class Address{}\n" +
-                    "function test():Any[*]\n" +
-                    "{\n" +
-                    "    print(#\n" +
-                    "           Firm\n" +
-                    "           {\n" +
-                    "               employees \n" +
-                    "               {\n" +
-                    "                   address2 {} \n" +
-                    "               }" +
-                    "           }" +
-                    "          #,2);\n" +
-                    "}\n");
+            runtime.modify("file.pure", """
+                    Class Person{address:Address[1];} Class Firm {employees : Person[1];address:Address[1];} Class Address{}
+                    function test():Any[*]
+                    {
+                        print(#
+                               Firm
+                               {
+                                   employees\s
+                                   {
+                                       address2 {}\s
+                                   }\
+                               }\
+                              #,2);
+                    }
+                    """);
             runtime.compile();
-            Assert.fail();
+            Assertions.fail();
         }
         catch (Exception e)
         {
@@ -146,37 +156,39 @@ public class TestTreePathCompilation extends AbstractPureTestWithCoreCompiledPla
     @Test
     public void testSimpleTreePath() throws Exception
     {
-        runtime.createInMemorySource("file.pure", "Class Person{ name: String[1];address:Address[1]; firm: Firm[1];} Class Firm {employees : Person[1];address:Address[1];} Class Address{ street:String[1]; }\n" +
-                "function test():Any[*]\n" +
-                "{\n" +
-                " let t = " +
-                "#Person" +
-                "{ \n" +
-                "             *   " +
-                "             firm { employees as Person }" +
-                "             address as MyKingdom { * }" +
-                "}#;" +
-                "}\n");
+        runtime.createInMemorySource("file.pure", """
+                Class Person{ name: String[1];address:Address[1]; firm: Firm[1];} Class Firm {employees : Person[1];address:Address[1];} Class Address{ street:String[1]; }
+                function test():Any[*]
+                {
+                 let t = \
+                #Person\
+                {\s
+                             *   \
+                             firm { employees as Person }\
+                             address as MyKingdom { * }\
+                }#;\
+                }
+                """);
         runtime.compile();
         CoreInstance func = runtime.getCoreInstance("test__Any_MANY_");
         CoreInstance tree = func.getValueForMetaPropertyToMany("expressionSequence").getFirst().getValueForMetaPropertyToMany("parametersValues").getLast().getValueForMetaPropertyToMany("values").getFirst();
 
-        Assert.assertNotNull(tree);
+        Assertions.assertNotNull(tree);
         RichIterable<? extends CoreInstance> children = Instance.getValueForMetaPropertyToManyResolved(tree, M3Properties.children, processorSupport);
-        Assert.assertEquals("Missing children", 2, children.size());
+        Assertions.assertEquals(2, children.size(), "Missing children");
 
         RichIterable<? extends CoreInstance> simpleProperties = Instance.getValueForMetaPropertyToManyResolved(tree, M3Properties.resolvedProperties, processorSupport);
-        Assert.assertEquals("Missing simpleProperties", 1, simpleProperties.size());
+        Assertions.assertEquals(1, simpleProperties.size(), "Missing simpleProperties");
 
         CoreInstance firm = children.getFirst();
         RichIterable<? extends CoreInstance> firmChildren = Instance.getValueForMetaPropertyToManyResolved(firm, M3Properties.children, processorSupport);
-        Assert.assertEquals("Missing children", 1, firmChildren.size());
+        Assertions.assertEquals(1, firmChildren.size(), "Missing children");
         CoreInstance address = children.getLast();
         RichIterable<? extends CoreInstance> addressChildren = Instance.getValueForMetaPropertyToManyResolved(address, M3Properties.children, processorSupport);
-        Assert.assertEquals(0, addressChildren.size());
+        Assertions.assertEquals(0, addressChildren.size());
 
         RichIterable<? extends CoreInstance> simpleAddressProperties = Instance.getValueForMetaPropertyToManyResolved(address, M3Properties.resolvedProperties, processorSupport);
-        Assert.assertEquals("Missing simpleProperties", 1, simpleAddressProperties.size());
+        Assertions.assertEquals(1, simpleAddressProperties.size(), "Missing simpleProperties");
 
         setUp();
     }
@@ -185,38 +197,40 @@ public class TestTreePathCompilation extends AbstractPureTestWithCoreCompiledPla
     @Test
     public void testTreePathIncludeAll() throws Exception
     {
-        String code = "Class Person{ name: String[1];address:Address[1]; firm: Firm[1];} Class Firm {employees : Person[1];address:Address[1];} Class Address{ street:String[1]; }\n" +
-                "function test():Any[*]\n" +
-                "{\n" +
-                " let t = " +
-                "#Person" +
-                "{ \n" +
-                "             *   " +
-                "             firm { employees as Person }" +
-                "             address as MyKingdom {  }" +
-                "}#;" +
-                "}\n";
+        String code = """
+                Class Person{ name: String[1];address:Address[1]; firm: Firm[1];} Class Firm {employees : Person[1];address:Address[1];} Class Address{ street:String[1]; }
+                function test():Any[*]
+                {
+                 let t = \
+                #Person\
+                {\s
+                             *   \
+                             firm { employees as Person }\
+                             address as MyKingdom {  }\
+                }#;\
+                }
+                """;
         runtime.createInMemorySource("file.pure", code);
         runtime.compile();
         CoreInstance func = runtime.getCoreInstance("test__Any_MANY_");
         CoreInstance tree = func.getValueForMetaPropertyToMany("expressionSequence").getFirst().getValueForMetaPropertyToMany("parametersValues").getLast().getValueForMetaPropertyToMany("values").getFirst();
 
-        Assert.assertNotNull(tree);
+        Assertions.assertNotNull(tree);
         RichIterable<? extends CoreInstance> children = Instance.getValueForMetaPropertyToManyResolved(tree, M3Properties.children, processorSupport);
-        Assert.assertEquals("Missing children", 2, children.size());
+        Assertions.assertEquals(2, children.size(), "Missing children");
 
         RichIterable<? extends CoreInstance> simpleProperties = Instance.getValueForMetaPropertyToManyResolved(tree, M3Properties.resolvedProperties, processorSupport);
-        Assert.assertEquals("Invalid simpleProperties", 1, simpleProperties.size());
+        Assertions.assertEquals(1, simpleProperties.size(), "Invalid simpleProperties");
 
         CoreInstance firm = children.getFirst();
         RichIterable<? extends CoreInstance> firmChildren = Instance.getValueForMetaPropertyToManyResolved(firm, M3Properties.children, processorSupport);
-        Assert.assertEquals("Missing children", 1, firmChildren.size());
+        Assertions.assertEquals(1, firmChildren.size(), "Missing children");
         CoreInstance address = children.getLast();
         RichIterable<? extends CoreInstance> addressChildren = Instance.getValueForMetaPropertyToManyResolved(address, M3Properties.children, processorSupport);
-        Assert.assertEquals(0, addressChildren.size());
+        Assertions.assertEquals(0, addressChildren.size());
 
         RichIterable<? extends CoreInstance> simpleAddressProperties = Instance.getValueForMetaPropertyToManyResolved(address, M3Properties.resolvedProperties, processorSupport);
-        Assert.assertEquals("Invalid simpleProperties", 0, simpleAddressProperties.size());
+        Assertions.assertEquals(0, simpleAddressProperties.size(), "Invalid simpleProperties");
 
         setUp();
     }
@@ -224,140 +238,154 @@ public class TestTreePathCompilation extends AbstractPureTestWithCoreCompiledPla
     @Test
     public void testSimpleTreePathWithDerivedProperties() throws Exception
     {
-        runtime.createInMemorySource("file.pure", "Class Person{ name: String[1];address:Address[1]; firm: Firm[1];} Class Firm {employees : Person[1];address:Address[1];} Class Address{ street:String[1]; }\n" +
-                "function test():Any[*]\n" +
-                "{\n" +
-                " let t = " +
-                "#Person" +
-                "{ \n" +
-                "      >theName[ $this.name ]   " +
-                "}#;" +
-                "}\n");
+        runtime.createInMemorySource("file.pure", """
+                Class Person{ name: String[1];address:Address[1]; firm: Firm[1];} Class Firm {employees : Person[1];address:Address[1];} Class Address{ street:String[1]; }
+                function test():Any[*]
+                {
+                 let t = \
+                #Person\
+                {\s
+                      >theName[ $this.name ]   \
+                }#;\
+                }
+                """);
         runtime.compile();
         CoreInstance func = runtime.getCoreInstance("test__Any_MANY_");
         CoreInstance tree = func.getValueForMetaPropertyToMany("expressionSequence").getFirst().getValueForMetaPropertyToMany("parametersValues").getLast().getValueForMetaPropertyToMany("values").getFirst();
 
-        Assert.assertNotNull(tree);
+        Assertions.assertNotNull(tree);
         RichIterable<? extends CoreInstance> children = Instance.getValueForMetaPropertyToManyResolved(tree, M3Properties.children, processorSupport);
-        Assert.assertEquals("Missing children", 1, children.size());
+        Assertions.assertEquals(1, children.size(), "Missing children");
         CoreInstance derivedProperty = children.getFirst();
-        Assert.assertEquals("theName", derivedProperty.getValueForMetaPropertyToOne("name").getName());
-        Assert.assertEquals("theName", derivedProperty.getValueForMetaPropertyToOne("propertyName").getName());
+        Assertions.assertEquals("theName", derivedProperty.getValueForMetaPropertyToOne("name").getName());
+        Assertions.assertEquals("theName", derivedProperty.getValueForMetaPropertyToOne("propertyName").getName());
     }
 
     @Test
     public void testSimpleTreePathWithDerivedLiteralProperties() throws Exception
     {
-        runtime.createInMemorySource("file.pure", "Class Person{ name: String[1];address:Address[1]; firm: Firm[1];} Class Firm {employees : Person[1];address:Address[1];} Class Address{ street:String[1]; }\n" +
-                "function test():Any[*]\n" +
-                "{\n" +
-                " let t = " +
-                "#Person" +
-                "{ \n" +
-                "      >theName[ $this.name ]   " +
-                "      >lit[ 'string' ]   " +
-                "      >street[ $this.address.street ]   " +
-                "}#;" +
-                "}\n");
+        runtime.createInMemorySource("file.pure", """
+                Class Person{ name: String[1];address:Address[1]; firm: Firm[1];} Class Firm {employees : Person[1];address:Address[1];} Class Address{ street:String[1]; }
+                function test():Any[*]
+                {
+                 let t = \
+                #Person\
+                {\s
+                      >theName[ $this.name ]   \
+                      >lit[ 'string' ]   \
+                      >street[ $this.address.street ]   \
+                }#;\
+                }
+                """);
         runtime.compile();
         CoreInstance func = runtime.getCoreInstance("test__Any_MANY_");
         CoreInstance tree = func.getValueForMetaPropertyToMany("expressionSequence").getFirst().getValueForMetaPropertyToMany("parametersValues").getLast().getValueForMetaPropertyToMany("values").getFirst();
 
-        Assert.assertNotNull(tree);
+        Assertions.assertNotNull(tree);
         ListIterable<? extends CoreInstance> children = Instance.getValueForMetaPropertyToManyResolved(tree, M3Properties.children, processorSupport).toList();
-        Assert.assertEquals("Missing children", 3, children.size());
+        Assertions.assertEquals(3, children.size(), "Missing children");
         CoreInstance derivedProperty = children.getFirst();
-        Assert.assertEquals("theName", derivedProperty.getValueForMetaPropertyToOne("name").getName());
-        Assert.assertEquals("theName", derivedProperty.getValueForMetaPropertyToOne("propertyName").getName());
+        Assertions.assertEquals("theName", derivedProperty.getValueForMetaPropertyToOne("name").getName());
+        Assertions.assertEquals("theName", derivedProperty.getValueForMetaPropertyToOne("propertyName").getName());
 
-        Assert.assertEquals("lit", children.get(1).getValueForMetaPropertyToOne("name").getName());
+        Assertions.assertEquals("lit", children.get(1).getValueForMetaPropertyToOne("name").getName());
         final CoreInstance street = children.get(2);
-        Assert.assertEquals("street", street.getValueForMetaPropertyToOne("name").getName());
+        Assertions.assertEquals("street", street.getValueForMetaPropertyToOne("name").getName());
         CoreInstance streetGT = Instance.getValueForMetaPropertyToOneResolved(Instance.getValueForMetaPropertyToManyResolved(street, M3Properties.specifications, processorSupport).getFirst(), M3Properties.genericType, processorSupport);
         CoreInstance streetRawType = Instance.getValueForMetaPropertyToOneResolved(streetGT, M3Properties.rawType, processorSupport);
-        Assert.assertEquals("String", streetRawType.getName());
+        Assertions.assertEquals("String", streetRawType.getName());
     }
 
     @Test
     public void testTreePathWithSameTypeMultipleDefinitions() throws Exception
     {
-        runtime.createInMemorySource("file.pure", "Class Person{ name: String[1];address:Address[1]; firm: Firm[1]; manager: Person[0..1]; } Class Firm {employees : Person[1];address:Address[1];} Class Address{ street:String[1]; }\n" +
-                "function test():Any[*]\n" +
-                "{\n" +
-                " let t = " +
-                "#Person as SP" +
-                "{ \n" +
-                "      * \n" +
-                "      manager as Manager\n " +
-                "      {     \n " +
-                "         +[name]    \n " +
-                "         address as BigHome \n " +
-                "      }     \n " +
-                "      address as Home \n" +
-                "}#;" +
-                "}\n");
+        runtime.createInMemorySource("file.pure", """
+                Class Person{ name: String[1];address:Address[1]; firm: Firm[1]; manager: Person[0..1]; } Class Firm {employees : Person[1];address:Address[1];} Class Address{ street:String[1]; }
+                function test():Any[*]
+                {
+                 let t = \
+                #Person as SP\
+                {\s
+                      *\s
+                      manager as Manager
+                 \
+                      {    \s
+                 \
+                         +[name]   \s
+                 \
+                         address as BigHome\s
+                 \
+                      }    \s
+                 \
+                      address as Home\s
+                }#;\
+                }
+                """);
         runtime.compile();
         CoreInstance func = runtime.getCoreInstance("test__Any_MANY_");
         CoreInstance tree = func.getValueForMetaPropertyToMany("expressionSequence").getFirst().getValueForMetaPropertyToMany("parametersValues").getLast().getValueForMetaPropertyToMany("values").getFirst();
 
-        Assert.assertNotNull(tree);
+        Assertions.assertNotNull(tree);
         RichIterable<? extends CoreInstance> children = Instance.getValueForMetaPropertyToManyResolved(tree, M3Properties.children, processorSupport);
-        Assert.assertEquals("Missing children", 2, children.size());
+        Assertions.assertEquals(2, children.size(), "Missing children");
         CoreInstance manager = children.getFirst();
         CoreInstance rootAddress = children.getLast();
 
-        Assert.assertEquals("Home", rootAddress.getValueForMetaPropertyToOne("name").getName());
-        Assert.assertEquals("address", rootAddress.getValueForMetaPropertyToOne("propertyName").getName());
+        Assertions.assertEquals("Home", rootAddress.getValueForMetaPropertyToOne("name").getName());
+        Assertions.assertEquals("address", rootAddress.getValueForMetaPropertyToOne("propertyName").getName());
 
-        Assert.assertEquals("Manager", manager.getValueForMetaPropertyToOne("name").getName());
-        Assert.assertEquals("manager", manager.getValueForMetaPropertyToOne("propertyName").getName());
+        Assertions.assertEquals("Manager", manager.getValueForMetaPropertyToOne("name").getName());
+        Assertions.assertEquals("manager", manager.getValueForMetaPropertyToOne("propertyName").getName());
 
         RichIterable<? extends CoreInstance> managersChildren = Instance.getValueForMetaPropertyToManyResolved(manager, M3Properties.children, processorSupport);
-        Assert.assertEquals("Wrong number of children", 1, managersChildren.size());
+        Assertions.assertEquals(1, managersChildren.size(), "Wrong number of children");
 
         CoreInstance address = managersChildren.getFirst();
-        Assert.assertEquals("BigHome", address.getValueForMetaPropertyToOne("name").getName());
+        Assertions.assertEquals("BigHome", address.getValueForMetaPropertyToOne("name").getName());
     }
 
     @Test
     public void testTreePathWithSameTypeReferenced() throws Exception
     {
-        runtime.createInMemorySource("file.pure", "Class Person{ name: String[1];address:Address[1]; firm: Firm[1]; manager: Person[0..1]; } Class Firm {employees : Person[1];address:Address[1];} Class Address{ street:String[1]; }\n" +
-                "function test():Any[*]\n" +
-                "{\n" +
-                " let t = " +
-                "#Person as SP" +
-                "{ \n" +
-                "      * \n" +
-                "      manager as SP\n " +
-                "      address as Home \n" +
-                "}#;" +
-                "}\n");
+        runtime.createInMemorySource("file.pure", """
+                Class Person{ name: String[1];address:Address[1]; firm: Firm[1]; manager: Person[0..1]; } Class Firm {employees : Person[1];address:Address[1];} Class Address{ street:String[1]; }
+                function test():Any[*]
+                {
+                 let t = \
+                #Person as SP\
+                {\s
+                      *\s
+                      manager as SP
+                 \
+                      address as Home\s
+                }#;\
+                }
+                """);
         runtime.compile();
         CoreInstance func = runtime.getCoreInstance("test__Any_MANY_");
         CoreInstance tree = func.getValueForMetaPropertyToMany("expressionSequence").getFirst().getValueForMetaPropertyToMany("parametersValues").getLast().getValueForMetaPropertyToMany("values").getFirst();
 
-        Assert.assertNotNull(tree);
+        Assertions.assertNotNull(tree);
         RichIterable<? extends CoreInstance> children = Instance.getValueForMetaPropertyToManyResolved(tree, M3Properties.children, processorSupport);
-        Assert.assertEquals("Missing children", 2, children.size());
+        Assertions.assertEquals(2, children.size(), "Missing children");
         CoreInstance manager = children.getFirst();
         CoreInstance rootAddress = children.getLast();
 
-        Assert.assertEquals("Home", rootAddress.getValueForMetaPropertyToOne("name").getName());
-        Assert.assertEquals("address", rootAddress.getValueForMetaPropertyToOne("propertyName").getName());
+        Assertions.assertEquals("Home", rootAddress.getValueForMetaPropertyToOne("name").getName());
+        Assertions.assertEquals("address", rootAddress.getValueForMetaPropertyToOne("propertyName").getName());
 
-        Assert.assertEquals("SP", manager.getValueForMetaPropertyToOne("name").getName());
-        Assert.assertEquals("manager", manager.getValueForMetaPropertyToOne("propertyName").getName());
+        Assertions.assertEquals("SP", manager.getValueForMetaPropertyToOne("name").getName());
+        Assertions.assertEquals("manager", manager.getValueForMetaPropertyToOne("propertyName").getName());
 
         RichIterable<? extends CoreInstance> managersChildren = Instance.getValueForMetaPropertyToManyResolved(manager, M3Properties.children, processorSupport);
-        Assert.assertEquals("Wrong number of children", 2, managersChildren.size());
+        Assertions.assertEquals(2, managersChildren.size(), "Wrong number of children");
 
         CoreInstance managersManager = managersChildren.getFirst();
-        Assert.assertEquals("SP", managersManager.getValueForMetaPropertyToOne("name").getName());
-        Assert.assertEquals("manager", managersManager.getValueForMetaPropertyToOne("propertyName").getName());
+        Assertions.assertEquals("SP", managersManager.getValueForMetaPropertyToOne("name").getName());
+        Assertions.assertEquals("manager", managersManager.getValueForMetaPropertyToOne("propertyName").getName());
 
         CoreInstance address = managersChildren.getLast();
-        Assert.assertEquals("Home", address.getValueForMetaPropertyToOne("name").getName());
+        Assertions.assertEquals("Home", address.getValueForMetaPropertyToOne("name").getName());
 
         setUp();
     }
@@ -366,33 +394,37 @@ public class TestTreePathCompilation extends AbstractPureTestWithCoreCompiledPla
     public void testParameters() throws Exception
     {
         runtime.createInMemorySource("file.pure",
-                "Class Person\n" +
-                        "{\n" +
-                        "    firstName : String[1];\n" +
-                        "    lastName : String[1];\n" +
-                        "    nameWithTitle(title:String[1]){$title+' '+$this.firstName+' '+$this.lastName}:String[1];" +
-                        "nameWithPrefixAndSuffix(prefix:String[0..1], suffixes:String[*])\n" +
-                        "    {\n" +
-                        "        if($prefix->isEmpty(),\n" +
-                        "           | if($suffixes->isEmpty(),\n" +
-                        "                | $this.firstName + ' ' + $this.lastName,\n" +
-                        "                | $this.firstName + ' ' + $this.lastName + ', ' + $suffixes->joinStrings(', ')),\n" +
-                        "           | if($suffixes->isEmpty(),\n" +
-                        "                | $prefix->toOne() + ' ' + $this.firstName + ' ' + $this.lastName,\n" +
-                        "                | $prefix->toOne() + ' ' + $this.firstName + ' ' + $this.lastName + ', ' + $suffixes->joinStrings(', ')))\n" +
-                        "    }:String[1];" +
-                        "}\n");
+                """
+                Class Person
+                {
+                    firstName : String[1];
+                    lastName : String[1];
+                    nameWithTitle(title:String[1]){$title+' '+$this.firstName+' '+$this.lastName}:String[1];\
+                nameWithPrefixAndSuffix(prefix:String[0..1], suffixes:String[*])
+                    {
+                        if($prefix->isEmpty(),
+                           | if($suffixes->isEmpty(),
+                                | $this.firstName + ' ' + $this.lastName,
+                                | $this.firstName + ' ' + $this.lastName + ', ' + $suffixes->joinStrings(', ')),
+                           | if($suffixes->isEmpty(),
+                                | $prefix->toOne() + ' ' + $this.firstName + ' ' + $this.lastName,
+                                | $prefix->toOne() + ' ' + $this.firstName + ' ' + $this.lastName + ', ' + $suffixes->joinStrings(', ')))
+                    }:String[1];\
+                }
+                """);
 
 
         try
         {
             runtime.createInMemorySource("function.pure",
-                    "function test():Any[*]\n" +
-                            "{\n" +
-                            "    print(#Person {+[nameWithTitle()]}#,2);\n" +
-                            "}\n");
+                    """
+                    function test():Any[*]
+                    {
+                        print(#Person {+[nameWithTitle()]}#,2);
+                    }
+                    """);
             runtime.compile();
-            Assert.fail();
+            Assertions.fail();
         }
         catch (Exception e)
         {
@@ -402,12 +434,14 @@ public class TestTreePathCompilation extends AbstractPureTestWithCoreCompiledPla
         try
         {
             runtime.modify("function.pure",
-                    "function test():Any[*]\n" +
-                            "{\n" +
-                            "    print(#Person{+[nameWithTitle(Integer[1])]}#,2);\n" +
-                            "}\n");
+                    """
+                    function test():Any[*]
+                    {
+                        print(#Person{+[nameWithTitle(Integer[1])]}#,2);
+                    }
+                    """);
             runtime.compile();
-            Assert.fail();
+            Assertions.fail();
         }
         catch (Exception e)
         {
@@ -415,10 +449,12 @@ public class TestTreePathCompilation extends AbstractPureTestWithCoreCompiledPla
         }
 
         runtime.modify("function.pure",
-                "function test():Any[*]\n" +
-                        "{\n" +
-                        "    print(#Person{+[nameWithTitle(String[1])]}#,2);\n" +
-                        "}\n");
+                """
+                function test():Any[*]
+                {
+                    print(#Person{+[nameWithTitle(String[1])]}#,2);
+                }
+                """);
         runtime.compile();
     }
 
@@ -426,60 +462,68 @@ public class TestTreePathCompilation extends AbstractPureTestWithCoreCompiledPla
     public void testMultipleParameters() throws Exception
     {
         runtime.createInMemorySource("file.pure",
-                "Class Person\n" +
-                        "{\n" +
-                        "    firstName : String[1];\n" +
-                        "    lastName : String[1];\n" +
-                        "    nameWithTitle(title:String[1]){$title+' '+$this.firstName+' '+$this.lastName}:String[1];" +
-                        "    nameWithPrefixAndSuffix(prefix:String[0..1], suffixes:String[*])\n" +
-                        "    {\n" +
-                        "        if($prefix->isEmpty(),\n" +
-                        "           | if($suffixes->isEmpty(),\n" +
-                        "                | $this.firstName + ' ' + $this.lastName,\n" +
-                        "                | $this.firstName + ' ' + $this.lastName + ', ' + $suffixes->joinStrings(', ')),\n" +
-                        "           | if($suffixes->isEmpty(),\n" +
-                        "                | $prefix->toOne() + ' ' + $this.firstName + ' ' + $this.lastName,\n" +
-                        "                | $prefix->toOne() + ' ' + $this.firstName + ' ' + $this.lastName + ', ' + $suffixes->joinStrings(', ')))\n" +
-                        "    }:String[1];" +
-                        "    memberOf(org:Organization[1]){true}:Boolean[1];" +
-                        "}\n" +
-                        "Class Organization\n" +
-                        "{\n" +
-                        "}" +
-                        "Class Team extends Organization\n" +
-                        "{\n" +
-                        "}");
+                """
+                Class Person
+                {
+                    firstName : String[1];
+                    lastName : String[1];
+                    nameWithTitle(title:String[1]){$title+' '+$this.firstName+' '+$this.lastName}:String[1];\
+                    nameWithPrefixAndSuffix(prefix:String[0..1], suffixes:String[*])
+                    {
+                        if($prefix->isEmpty(),
+                           | if($suffixes->isEmpty(),
+                                | $this.firstName + ' ' + $this.lastName,
+                                | $this.firstName + ' ' + $this.lastName + ', ' + $suffixes->joinStrings(', ')),
+                           | if($suffixes->isEmpty(),
+                                | $prefix->toOne() + ' ' + $this.firstName + ' ' + $this.lastName,
+                                | $prefix->toOne() + ' ' + $this.firstName + ' ' + $this.lastName + ', ' + $suffixes->joinStrings(', ')))
+                    }:String[1];\
+                    memberOf(org:Organization[1]){true}:Boolean[1];\
+                }
+                Class Organization
+                {
+                }\
+                Class Team extends Organization
+                {
+                }\
+                """);
 
         runtime.createInMemorySource("function.pure",
-                "function test():Any[*]\n" +
-                        "{\n" +
-                        "   let t = #Person{-[nameWithPrefixAndSuffix(String[0..1], String[*])]}#;\n" +
-                        "}\n");
+                """
+                function test():Any[*]
+                {
+                   let t = #Person{-[nameWithPrefixAndSuffix(String[0..1], String[*])]}#;
+                }
+                """);
         runtime.compile();
         CoreInstance func = runtime.getCoreInstance("test__Any_MANY_");
         CoreInstance tree = func.getValueForMetaPropertyToMany("expressionSequence").getFirst().getValueForMetaPropertyToMany("parametersValues").getLast().getValueForMetaPropertyToMany("values").getFirst();
 
-        Assert.assertNotNull(tree);
+        Assertions.assertNotNull(tree);
         RichIterable<? extends CoreInstance> properties = Instance.getValueForMetaPropertyToManyResolved(tree, M3Properties.resolvedProperties, processorSupport);
-        Assert.assertEquals(4, properties.size());
+        Assertions.assertEquals(4, properties.size());
 
 
         runtime.modify("function.pure",
-                "function test():Any[*]\n" +
-                        "{\n" +
-                        "    print(#Person{-[nameWithPrefixAndSuffix(String[0..1], String[*])]}#,2);\n" +
-                        "}\n");
+                """
+                function test():Any[*]
+                {
+                    print(#Person{-[nameWithPrefixAndSuffix(String[0..1], String[*])]}#,2);
+                }
+                """);
         runtime.compile();
 
         try
         {
             runtime.modify("function.pure",
-                    "function test():Any[*]\n" +
-                            "{\n" +
-                            "    print(#Person{+[nameWithPrefixAndSuffix(String[0..1], Integer[*])]}#,2);\n" +
-                            "}\n");
+                    """
+                    function test():Any[*]
+                    {
+                        print(#Person{+[nameWithPrefixAndSuffix(String[0..1], Integer[*])]}#,2);
+                    }
+                    """);
             runtime.compile();
-            Assert.fail();
+            Assertions.fail();
         }
         catch (Exception e)
         {
@@ -489,12 +533,14 @@ public class TestTreePathCompilation extends AbstractPureTestWithCoreCompiledPla
         try
         {
             runtime.modify("function.pure",
-                    "function test():Any[*]\n" +
-                            "{\n" +
-                            "    print(#Person{-[nameWithPrefixAndSuffix(String[0..1], Any[*])]}#,2);\n" +
-                            "}\n");
+                    """
+                    function test():Any[*]
+                    {
+                        print(#Person{-[nameWithPrefixAndSuffix(String[0..1], Any[*])]}#,2);
+                    }
+                    """);
             runtime.compile();
-            Assert.fail();
+            Assertions.fail();
         }
         catch (Exception e)
         {
@@ -504,12 +550,14 @@ public class TestTreePathCompilation extends AbstractPureTestWithCoreCompiledPla
         try
         {
             runtime.modify("function.pure",
-                    "function test():Any[*]\n" +
-                            "{\n" +
-                            "    print(#Person{+[nameWithPrefixAndSuffix(String[0..1])]}#,2);\n" +
-                            "}\n");
+                    """
+                    function test():Any[*]
+                    {
+                        print(#Person{+[nameWithPrefixAndSuffix(String[0..1])]}#,2);
+                    }
+                    """);
             runtime.compile();
-            Assert.fail();
+            Assertions.fail();
         }
         catch (Exception e)
         {
@@ -517,10 +565,12 @@ public class TestTreePathCompilation extends AbstractPureTestWithCoreCompiledPla
         }
 
         runtime.modify("function.pure",
-                "function test():Any[*]\n" +
-                        "{\n" +
-                        "    print(#Person{+[nameWithPrefixAndSuffix(String[0..1], String[*])]}#,2);\n" +
-                        "}\n");
+                """
+                function test():Any[*]
+                {
+                    print(#Person{+[nameWithPrefixAndSuffix(String[0..1], String[*])]}#,2);
+                }
+                """);
         runtime.compile();
     }
 
@@ -528,66 +578,74 @@ public class TestTreePathCompilation extends AbstractPureTestWithCoreCompiledPla
     public void testSimplePropertiesWithStereotypesAndTaggedValues() throws Exception
     {
         runtime.createInMemorySource("file.pure",
-                "Profile m::p::TestProfile\n" +
-                        "{\n" +
-                        "   stereotypes : [ Root, NewProp, ExistingProp ];\n" +
-                        "   tags : [ Id, Name, Description ];\n" +
-                        "}\n" +
-                        "Class Person\n" +
-                        "{\n" +
-                        "    firstName : String[1];\n" +
-                        "    lastName : String[1];\n" +
-                        "    nameWithTitle(title:String[1]){$title+' '+$this.firstName+' '+$this.lastName}:String[1];" +
-                        "    nameWithPrefixAndSuffix(prefix:String[0..1], suffixes:String[*])\n" +
-                        "    {\n" +
-                        "        if($prefix->isEmpty(),\n" +
-                        "           | if($suffixes->isEmpty(),\n" +
-                        "                | $this.firstName + ' ' + $this.lastName,\n" +
-                        "                | $this.firstName + ' ' + $this.lastName + ', ' + $suffixes->joinStrings(', ')),\n" +
-                        "           | if($suffixes->isEmpty(),\n" +
-                        "                | $prefix->toOne() + ' ' + $this.firstName + ' ' + $this.lastName,\n" +
-                        "                | $prefix->toOne() + ' ' + $this.firstName + ' ' + $this.lastName + ', ' + $suffixes->joinStrings(', ')))\n" +
-                        "    }:String[1];" +
-                        "    memberOf(org:Organization[1]){true}:Boolean[1];" +
-                        "}\n" +
-                        "Class Organization\n" +
-                        "{\n" +
-                        "}" +
-                        "Class Team extends Organization\n" +
-                        "{\n" +
-                        "}");
+                """
+                Profile m::p::TestProfile
+                {
+                   stereotypes : [ Root, NewProp, ExistingProp ];
+                   tags : [ Id, Name, Description ];
+                }
+                Class Person
+                {
+                    firstName : String[1];
+                    lastName : String[1];
+                    nameWithTitle(title:String[1]){$title+' '+$this.firstName+' '+$this.lastName}:String[1];\
+                    nameWithPrefixAndSuffix(prefix:String[0..1], suffixes:String[*])
+                    {
+                        if($prefix->isEmpty(),
+                           | if($suffixes->isEmpty(),
+                                | $this.firstName + ' ' + $this.lastName,
+                                | $this.firstName + ' ' + $this.lastName + ', ' + $suffixes->joinStrings(', ')),
+                           | if($suffixes->isEmpty(),
+                                | $prefix->toOne() + ' ' + $this.firstName + ' ' + $this.lastName,
+                                | $prefix->toOne() + ' ' + $this.firstName + ' ' + $this.lastName + ', ' + $suffixes->joinStrings(', ')))
+                    }:String[1];\
+                    memberOf(org:Organization[1]){true}:Boolean[1];\
+                }
+                Class Organization
+                {
+                }\
+                Class Team extends Organization
+                {
+                }\
+                """);
 
         runtime.createInMemorySource("function.pure",
-                "function test():Any[*]\n" +
-                        "{\n" +
-                        "    let t = #Person <<m::p::TestProfile.Root>> {m::p::TestProfile.Name = 'Stub_Person'} {+[nameWithPrefixAndSuffix(String[0..1], String[*]) <<m::p::TestProfile.ExistingProp>>]}#;\n" +
-                        "}\n");
+                """
+                function test():Any[*]
+                {
+                    let t = #Person <<m::p::TestProfile.Root>> {m::p::TestProfile.Name = 'Stub_Person'} {+[nameWithPrefixAndSuffix(String[0..1], String[*]) <<m::p::TestProfile.ExistingProp>>]}#;
+                }
+                """);
         runtime.compile();
         CoreInstance func = runtime.getCoreInstance("test__Any_MANY_");
         CoreInstance tree = func.getValueForMetaPropertyToMany("expressionSequence").getFirst().getValueForMetaPropertyToMany("parametersValues").getLast().getValueForMetaPropertyToMany("values").getFirst();
 
-        Assert.assertNotNull(tree);
+        Assertions.assertNotNull(tree);
         this.assertContainsStereoType(tree, "Root");
         this.assertContainsTaggedValue(tree, "Stub_Person");
         this.assertContainsStereoType(tree.getValueForMetaPropertyToMany(M3Properties.included).getFirst(), "ExistingProp");
 
 
         runtime.modify("function.pure",
-                "function test():Any[*]\n" +
-                        "{\n" +
-                        "    print(#Person{-[nameWithPrefixAndSuffix(String[0..1], String[*])]}#,2);\n" +
-                        "}\n");
+                """
+                function test():Any[*]
+                {
+                    print(#Person{-[nameWithPrefixAndSuffix(String[0..1], String[*])]}#,2);
+                }
+                """);
         runtime.compile();
 
         try
         {
             runtime.modify("function.pure",
-                    "function test():Any[*]\n" +
-                            "{\n" +
-                            "    print(#Person{+[nameWithPrefixAndSuffix(String[0..1], Integer[*])]}#,2);\n" +
-                            "}\n");
+                    """
+                    function test():Any[*]
+                    {
+                        print(#Person{+[nameWithPrefixAndSuffix(String[0..1], Integer[*])]}#,2);
+                    }
+                    """);
             runtime.compile();
-            Assert.fail();
+            Assertions.fail();
         }
         catch (Exception e)
         {
@@ -597,12 +655,14 @@ public class TestTreePathCompilation extends AbstractPureTestWithCoreCompiledPla
         try
         {
             runtime.modify("function.pure",
-                    "function test():Any[*]\n" +
-                            "{\n" +
-                            "    print(#Person{-[nameWithPrefixAndSuffix(String[0..1], Any[*])]}#,2);\n" +
-                            "}\n");
+                    """
+                    function test():Any[*]
+                    {
+                        print(#Person{-[nameWithPrefixAndSuffix(String[0..1], Any[*])]}#,2);
+                    }
+                    """);
             runtime.compile();
-            Assert.fail();
+            Assertions.fail();
         }
         catch (Exception e)
         {
@@ -612,12 +672,14 @@ public class TestTreePathCompilation extends AbstractPureTestWithCoreCompiledPla
         try
         {
             runtime.modify("function.pure",
-                    "function test():Any[*]\n" +
-                            "{\n" +
-                            "    print(#Person{+[nameWithPrefixAndSuffix(String[0..1])]}#,2);\n" +
-                            "}\n");
+                    """
+                    function test():Any[*]
+                    {
+                        print(#Person{+[nameWithPrefixAndSuffix(String[0..1])]}#,2);
+                    }
+                    """);
             runtime.compile();
-            Assert.fail();
+            Assertions.fail();
         }
         catch (Exception e)
         {
@@ -625,10 +687,12 @@ public class TestTreePathCompilation extends AbstractPureTestWithCoreCompiledPla
         }
 
         runtime.modify("function.pure",
-                "function test():Any[*]\n" +
-                        "{\n" +
-                        "    print(#Person{+[nameWithPrefixAndSuffix(String[0..1], String[*])]}#,2);\n" +
-                        "}\n");
+                """
+                function test():Any[*]
+                {
+                    print(#Person{+[nameWithPrefixAndSuffix(String[0..1], String[*])]}#,2);
+                }
+                """);
         runtime.compile();
     }
 
@@ -636,53 +700,57 @@ public class TestTreePathCompilation extends AbstractPureTestWithCoreCompiledPla
     public void testIncludedPropertiesHaveOwnerNode() throws Exception
     {
         runtime.createInMemorySource("file.pure",
-                "Profile m::p::TestProfile\n" +
-                        "{\n" +
-                        "   stereotypes : [ Root, NewProp, ExistingProp ];\n" +
-                        "   tags : [ Id, Name, Description ];\n" +
-                        "}\n" +
-                        "Class Person\n" +
-                        "{\n" +
-                        "    firstName : String[1];\n" +
-                        "    lastName : String[1];\n" +
-                        "    nameWithTitle(title:String[1]){$title+' '+$this.firstName+' '+$this.lastName}:String[1];" +
-                        "    nameWithPrefixAndSuffix(prefix:String[0..1], suffixes:String[*])\n" +
-                        "    {\n" +
-                        "        if($prefix->isEmpty(),\n" +
-                        "           | if($suffixes->isEmpty(),\n" +
-                        "                | $this.firstName + ' ' + $this.lastName,\n" +
-                        "                | $this.firstName + ' ' + $this.lastName + ', ' + $suffixes->joinStrings(', ')),\n" +
-                        "           | if($suffixes->isEmpty(),\n" +
-                        "                | $prefix->toOne() + ' ' + $this.firstName + ' ' + $this.lastName,\n" +
-                        "                | $prefix->toOne() + ' ' + $this.firstName + ' ' + $this.lastName + ', ' + $suffixes->joinStrings(', ')))\n" +
-                        "    }:String[1];" +
-                        "    memberOf(org:Organization[1]){true}:Boolean[1];" +
-                        "    employer: Organization[1];" +
-                        "}\n" +
-                        "Class Organization\n" +
-                        "{\n" +
-                        "   legalName: String[1];" +
-                        "}" +
-                        "Class Team extends Organization\n" +
-                        "{\n" +
-                        "}");
+                """
+                Profile m::p::TestProfile
+                {
+                   stereotypes : [ Root, NewProp, ExistingProp ];
+                   tags : [ Id, Name, Description ];
+                }
+                Class Person
+                {
+                    firstName : String[1];
+                    lastName : String[1];
+                    nameWithTitle(title:String[1]){$title+' '+$this.firstName+' '+$this.lastName}:String[1];\
+                    nameWithPrefixAndSuffix(prefix:String[0..1], suffixes:String[*])
+                    {
+                        if($prefix->isEmpty(),
+                           | if($suffixes->isEmpty(),
+                                | $this.firstName + ' ' + $this.lastName,
+                                | $this.firstName + ' ' + $this.lastName + ', ' + $suffixes->joinStrings(', ')),
+                           | if($suffixes->isEmpty(),
+                                | $prefix->toOne() + ' ' + $this.firstName + ' ' + $this.lastName,
+                                | $prefix->toOne() + ' ' + $this.firstName + ' ' + $this.lastName + ', ' + $suffixes->joinStrings(', ')))
+                    }:String[1];\
+                    memberOf(org:Organization[1]){true}:Boolean[1];\
+                    employer: Organization[1];\
+                }
+                Class Organization
+                {
+                   legalName: String[1];\
+                }\
+                Class Team extends Organization
+                {
+                }\
+                """);
 
         runtime.createInMemorySource("function.pure",
-                "function test():Any[*]\n" +
-                        "{\n" +
-                        "    let t = #Person <<m::p::TestProfile.Root>> {m::p::TestProfile.Name = 'Stub_Person'} " +
-                        "{ +[ firstName <<m::p::TestProfile.ExistingProp>> {m::p::TestProfile.Description = 'firstName'} , lastName <<m::p::TestProfile.ExistingProp>> {m::p::TestProfile.Description = 'lastName'} ]\n" +
-                        "   employer " +
-                        "   {" +
-                        "       +[ legalName <<m::p::TestProfile.ExistingProp>> {m::p::TestProfile.Description = 'legalName'} ]" +
-                        "   }" +
-                        "}#;" +
-                        "}\n");
+                """
+                function test():Any[*]
+                {
+                    let t = #Person <<m::p::TestProfile.Root>> {m::p::TestProfile.Name = 'Stub_Person'} \
+                { +[ firstName <<m::p::TestProfile.ExistingProp>> {m::p::TestProfile.Description = 'firstName'} , lastName <<m::p::TestProfile.ExistingProp>> {m::p::TestProfile.Description = 'lastName'} ]
+                   employer \
+                   {\
+                       +[ legalName <<m::p::TestProfile.ExistingProp>> {m::p::TestProfile.Description = 'legalName'} ]\
+                   }\
+                }#;\
+                }
+                """);
         runtime.compile();
         CoreInstance func = runtime.getCoreInstance("test__Any_MANY_");
         CoreInstance tree = func.getValueForMetaPropertyToMany("expressionSequence").getFirst().getValueForMetaPropertyToMany("parametersValues").getLast().getValueForMetaPropertyToMany("values").getFirst();
 
-        Assert.assertNotNull(tree);
+        Assertions.assertNotNull(tree);
         this.assertContainsStereoType(tree, "Root");
         this.assertContainsTaggedValue(tree, "Stub_Person");
         ListIterable<? extends CoreInstance> includedProperties = tree.getValueForMetaPropertyToMany(M3Properties.included);
@@ -690,39 +758,41 @@ public class TestTreePathCompilation extends AbstractPureTestWithCoreCompiledPla
         this.assertContainsStereoType(firstName, "ExistingProp");
         this.assertContainsTaggedValue(firstName, "firstName");
         CoreInstance owner = firstName.getValueForMetaPropertyToOne(M3Properties.owner);
-        Assert.assertTrue(Instance.instanceOf(owner, M3Paths.RootRouteNode, processorSupport));
+        Assertions.assertTrue(Instance.instanceOf(owner, M3Paths.RootRouteNode, processorSupport));
     }
 
     @Test
     public void testComplexPropertiesWithStereoTypesAndTaggedValues() throws Exception
     {
         runtime.createInMemorySource("file.pure",
-                "Profile TestProfile\n" +
-                        "{\n" +
-                        "   stereotypes : [ Root, NewProp, ExistingProp ];\n" +
-                        "   tags : [ Id, Name, Description ];\n" +
-                        "}\n" +
-                        "Class Person{ name: String[1];address:Address[1]; firm: Firm[1];} Class Firm {employees : Person[1];address:Address[1];} Class Address{ street:String[1]; }\n" +
-                        "function test():Any[*]\n" +
-                        "{\n" +
-                        " let t = " +
-                        "#Person<<TestProfile.Root>>{TestProfile.Name='Stub_Person'}" +
-                        "{ \n" +
-                        "             *   " +
-                        "             firm <<TestProfile.ExistingProp>>{TestProfile.Name='Stub_Firm'} { employees as Person <<TestProfile.ExistingProp>>{TestProfile.Name='Stub_Person'} }" +
-                        "             >myAddress [$this.address] <<TestProfile.ExistingProp>>{TestProfile.Name='MyKingdom'}{ * }" +
-                        "}#;" +
-                        "}\n");
+                """
+                Profile TestProfile
+                {
+                   stereotypes : [ Root, NewProp, ExistingProp ];
+                   tags : [ Id, Name, Description ];
+                }
+                Class Person{ name: String[1];address:Address[1]; firm: Firm[1];} Class Firm {employees : Person[1];address:Address[1];} Class Address{ street:String[1]; }
+                function test():Any[*]
+                {
+                 let t = \
+                #Person<<TestProfile.Root>>{TestProfile.Name='Stub_Person'}\
+                {\s
+                             *   \
+                             firm <<TestProfile.ExistingProp>>{TestProfile.Name='Stub_Firm'} { employees as Person <<TestProfile.ExistingProp>>{TestProfile.Name='Stub_Person'} }\
+                             >myAddress [$this.address] <<TestProfile.ExistingProp>>{TestProfile.Name='MyKingdom'}{ * }\
+                }#;\
+                }
+                """);
         runtime.compile();
         CoreInstance func = runtime.getCoreInstance("test__Any_MANY_");
         CoreInstance tree = func.getValueForMetaPropertyToMany("expressionSequence").getFirst().getValueForMetaPropertyToMany("parametersValues").getLast().getValueForMetaPropertyToMany("values").getFirst();
 
-        Assert.assertNotNull(tree);
+        Assertions.assertNotNull(tree);
         this.assertContainsStereoType(tree, "Root");
         this.assertContainsTaggedValue(tree, "Stub_Person");
 
         RichIterable<? extends CoreInstance> children = Instance.getValueForMetaPropertyToManyResolved(tree, M3Properties.children, processorSupport);
-        Assert.assertEquals("Missing children", 2, children.size());
+        Assertions.assertEquals(2, children.size(), "Missing children");
         for (CoreInstance child : children)
         {
             this.assertContainsStereoType(child, "ExistingProp");
@@ -731,21 +801,21 @@ public class TestTreePathCompilation extends AbstractPureTestWithCoreCompiledPla
         this.assertContainsTaggedValue(children.getLast(), "MyKingdom");
 
         RichIterable<? extends CoreInstance> simpleProperties = Instance.getValueForMetaPropertyToManyResolved(tree, M3Properties.resolvedProperties, processorSupport);
-        Assert.assertEquals("Missing simpleProperties", 1, simpleProperties.size());
+        Assertions.assertEquals(1, simpleProperties.size(), "Missing simpleProperties");
 
         CoreInstance firm = children.getFirst();
         RichIterable<? extends CoreInstance> firmChildren = Instance.getValueForMetaPropertyToManyResolved(firm, M3Properties.children, processorSupport);
-        Assert.assertEquals("Missing children", 1, firmChildren.size());
+        Assertions.assertEquals(1, firmChildren.size(), "Missing children");
         CoreInstance employees = firmChildren.getFirst();
         this.assertContainsStereoType(employees, "ExistingProp");
         this.assertContainsTaggedValue(employees, "Stub_Person");
 
         CoreInstance address = children.getLast();
         RichIterable<? extends CoreInstance> addressChildren = Instance.getValueForMetaPropertyToManyResolved(address, M3Properties.children, processorSupport);
-        Assert.assertEquals(0, addressChildren.size());
+        Assertions.assertEquals(0, addressChildren.size());
 
         RichIterable<? extends CoreInstance> simpleAddressProperties = Instance.getValueForMetaPropertyToManyResolved(address, M3Properties.resolvedProperties, processorSupport);
-        Assert.assertEquals("Missing simpleProperties", 1, simpleAddressProperties.size());
+        Assertions.assertEquals(1, simpleAddressProperties.size(), "Missing simpleProperties");
 
         setUp();
     }
@@ -753,15 +823,15 @@ public class TestTreePathCompilation extends AbstractPureTestWithCoreCompiledPla
     private void assertContainsTaggedValue(CoreInstance element, String tag)
     {
         RichIterable<? extends CoreInstance> taggedValues = Instance.getValueForMetaPropertyToManyResolved(element, M3Properties.taggedValues, processorSupport);
-        Assert.assertTrue("Missing Tagged Values", taggedValues.size() > 0);
+        Assertions.assertTrue(taggedValues.size() > 0, "Missing Tagged Values");
         CoreInstance tv = taggedValues.getFirst();
-        Assert.assertEquals(tag, tv.getValueForMetaPropertyToOne(M3Properties.value).getName());
+        Assertions.assertEquals(tag, tv.getValueForMetaPropertyToOne(M3Properties.value).getName());
     }
 
     private void assertContainsStereoType(CoreInstance element, String stereoType)
     {
         RichIterable<? extends CoreInstance> stereoTypes = Instance.getValueForMetaPropertyToManyResolved(element, M3Properties.stereotypes, processorSupport);
-        Assert.assertTrue("Missing Stereotypes", stereoTypes.size() > 0);
-        Assert.assertEquals(stereoType, stereoTypes.getFirst().getValueForMetaPropertyToOne(M3Properties.value).getName());
+        Assertions.assertTrue(stereoTypes.size() > 0, "Missing Stereotypes");
+        Assertions.assertEquals(stereoType, stereoTypes.getFirst().getValueForMetaPropertyToOne(M3Properties.value).getName());
     }
 }

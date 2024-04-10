@@ -542,9 +542,9 @@ public class GraphPathIterable extends AbstractLazyIterable<GraphPath>
         MutableList<SearchFilter> result = Lists.mutable.empty();
         searchFilters.forEach(filter ->
         {
-            if (filter instanceof JoinSearchFilter)
+            if (filter instanceof JoinSearchFilter searchFilter)
             {
-                result.addAll(((JoinSearchFilter) filter).searchFilters.castToList());
+                result.addAll(searchFilter.searchFilters.castToList());
             }
             else
             {

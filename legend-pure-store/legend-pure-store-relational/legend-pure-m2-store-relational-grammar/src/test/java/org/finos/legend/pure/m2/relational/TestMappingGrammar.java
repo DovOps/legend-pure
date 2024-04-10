@@ -22,9 +22,9 @@ import org.finos.legend.pure.m3.navigation.M3Properties;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
 import org.finos.legend.pure.m4.exception.PureCompilationException;
 import org.finos.legend.pure.m4.serialization.grammar.antlr.PureParserException;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.regex.Pattern;
 
@@ -32,7 +32,7 @@ public class TestMappingGrammar extends AbstractPureRelationalTestWithCoreCompil
 {
     RelationalGraphWalker graphWalker;
 
-    @Before
+    @BeforeEach
     public void setUpRelational()
     {
         this.graphWalker = new RelationalGraphWalker(runtime, processorSupport);
@@ -43,28 +43,34 @@ public class TestMappingGrammar extends AbstractPureRelationalTestWithCoreCompil
     public void testColumnWithNoTable()
     {
         compileTestSource("model.pure",
-                "Class Firm\n" +
-                        "{\n" +
-                        "  legalName : String[1];\n" +
-                        "}");
+                """
+                Class Firm
+                {
+                  legalName : String[1];
+                }\
+                """);
         compileTestSource("store.pure",
-                "###Relational\n" +
-                        "Database FirmDb\n" +
-                        "(\n" +
-                        "  Table FirmTable (legal_name VARCHAR(200))\n" +
-                        ")");
+                """
+                ###Relational
+                Database FirmDb
+                (
+                  Table FirmTable (legal_name VARCHAR(200))
+                )\
+                """);
         try
         {
             compileTestSource("mapping.pure",
-                    "###Mapping\n" +
-                            "Mapping FirmMapping\n" +
-                            "(\n" +
-                            "  Firm : Relational\n" +
-                            "         {\n" +
-                            "            legalName : legal_name\n" +
-                            "         }\n" +
-                            ")");
-            Assert.fail("Expected a parser error");
+                    """
+                    ###Mapping
+                    Mapping FirmMapping
+                    (
+                      Firm : Relational
+                             {
+                                legalName : legal_name
+                             }
+                    )\
+                    """);
+            Assertions.fail("Expected a parser error");
         }
         catch (Exception e)
         {
@@ -76,91 +82,103 @@ public class TestMappingGrammar extends AbstractPureRelationalTestWithCoreCompil
     public void testCombinationOfDistinctWithEmbeddedPropertyMappings()
     {
         compileTestSource("model.pure",
-                "Class Firm\n" +
-                        "{\n" +
-                        "  legalName : String[1];\n" +
-                        "  details : FirmDetails[0..1];\n" +
-                        "}\n" +
-                        "Class FirmDetails\n" +
-                        "{\n" +
-                        "  taxLocation : String[1];\n" +
-                        "  extraDetails : FirmExtraDetails[1];\n" +
-                        "}" +
-                        "Class FirmExtraDetails\n" +
-                        "{\n" +
-                        "  employeeCount : Integer[1];\n" +
-                        "  taxLocation : String[1];\n" +
-                        "}");
+                """
+                Class Firm
+                {
+                  legalName : String[1];
+                  details : FirmDetails[0..1];
+                }
+                Class FirmDetails
+                {
+                  taxLocation : String[1];
+                  extraDetails : FirmExtraDetails[1];
+                }\
+                Class FirmExtraDetails
+                {
+                  employeeCount : Integer[1];
+                  taxLocation : String[1];
+                }\
+                """);
 
         compileTestSource("store.pure",
-                "###Relational\n" +
-                        "Database FirmDb\n" +
-                        "(\n" +
-                        "  Table FirmTable (legal_name VARCHAR(200) PRIMARY KEY, tax_location VARCHAR(100), employee_count INTEGER)\n" +
-                        ")");
+                """
+                ###Relational
+                Database FirmDb
+                (
+                  Table FirmTable (legal_name VARCHAR(200) PRIMARY KEY, tax_location VARCHAR(100), employee_count INTEGER)
+                )\
+                """);
 
         compileTestSource("mapping.pure",
-                "###Mapping\n" +
-                        "Mapping FirmMapping\n" +
-                        "(\n" +
-                        "  Firm : Relational\n" +
-                        "         {\n" +
-                        "            ~distinct\n" +
-                        "            scope([FirmDb]FirmTable)\n" +
-                        "            (\n" +
-                        "               legalName : legal_name,\n" +
-                        "               details(taxLocation : tax_location, extraDetails(employeeCount : employee_count, taxLocation : tax_location))\n" +
-                        "            )\n" +
-                        "         }\n" +
-                        ")");
+                """
+                ###Mapping
+                Mapping FirmMapping
+                (
+                  Firm : Relational
+                         {
+                            ~distinct
+                            scope([FirmDb]FirmTable)
+                            (
+                               legalName : legal_name,
+                               details(taxLocation : tax_location, extraDetails(employeeCount : employee_count, taxLocation : tax_location))
+                            )
+                         }
+                )\
+                """);
         CoreInstance mapping = this.graphWalker.getMapping("FirmMapping");
         CoreInstance firmSetImpl = mapping.getValueForMetaPropertyToMany(M2MappingProperties.classMappings).getFirst();
         ListIterable<? extends CoreInstance> primaryKeys = firmSetImpl.getValueForMetaPropertyToMany(M2RelationalProperties.primaryKey);
-        Assert.assertEquals(3, primaryKeys.size());
-        Assert.assertFalse(primaryKeys.contains(null));
+        Assertions.assertEquals(3, primaryKeys.size());
+        Assertions.assertFalse(primaryKeys.contains(null));
     }
 
     @Test
     public void testMappingWithIncludeError() throws Exception
     {
         compileTestSource("model.pure",
-                "Class Person\n" +
-                        "{\n" +
-                        "  name:String[1];\n" +
-                        "  firm:Firm[1];\n" +
-                        "}\n" +
-                        "Class Firm\n" +
-                        "{\n" +
-                        "  name:String[1];\n" +
-                        "}");
+                """
+                Class Person
+                {
+                  name:String[1];
+                  firm:Firm[1];
+                }
+                Class Firm
+                {
+                  name:String[1];
+                }\
+                """);
         compileTestSource("store.pure",
-                "###Relational\n" +
-                        "Database subDb\n" +
-                        "(\n" +
-                        "  Table personTb(name VARCHAR(200), firm VARCHAR(200))\n" +
-                        "  Table firmTb(name VARCHAR(200))\n" +
-                        ")\n" +
-                        "###Relational\n" +
-                        "Database db\n" +
-                        "(\n" +
-                        "  include subDb\n" +
-                        ")");
+                """
+                ###Relational
+                Database subDb
+                (
+                  Table personTb(name VARCHAR(200), firm VARCHAR(200))
+                  Table firmTb(name VARCHAR(200))
+                )
+                ###Relational
+                Database db
+                (
+                  include subDb
+                )\
+                """);
         try
         {
             compileTestSource("mapping.pure",
-                    "###Mapping\n" +
-                            "Mapping myMap\n" +
-                            "(\n" +
-                            "    Firm[m1]: Relational\n" +
-                            "              {\n" +
-                            "                 name : [db]firmTb.name\n" +
-                            "              }\n" +
-                            "    Firm[m2]: Relational\n" +
-                            "              {\n" +
-                            "                 name : [db]firmTb.name\n" +
-                            "              }\n" +
-                            ")\n");
-            Assert.fail("Expected compile error");
+                    """
+                    ###Mapping
+                    Mapping myMap
+                    (
+                        Firm[m1]: Relational
+                                  {
+                                     name : [db]firmTb.name
+                                  }
+                        Firm[m2]: Relational
+                                  {
+                                     name : [db]firmTb.name
+                                  }
+                    )
+                    """);
+            Assertions.fail("Expected compile error");
         }
         catch (Exception e)
         {
@@ -173,43 +191,49 @@ public class TestMappingGrammar extends AbstractPureRelationalTestWithCoreCompil
     public void testMappingWithIncludeErrorTooMany() throws Exception
     {
         compileTestSource("model.pure",
-                "Class Person\n" +
-                        "{\n" +
-                        "  name:String[1];\n" +
-                        "  firm:Firm[1];\n" +
-                        "}\n" +
-                        "Class Firm\n" +
-                        "{\n" +
-                        "  name:String[1];\n" +
-                        "}");
+                """
+                Class Person
+                {
+                  name:String[1];
+                  firm:Firm[1];
+                }
+                Class Firm
+                {
+                  name:String[1];
+                }\
+                """);
         compileTestSource("store.pure",
-                "###Relational\n" +
-                        "Database subDb\n" +
-                        "(\n" +
-                        "  Table personTb(name VARCHAR(200), firm VARCHAR(200))\n" +
-                        "  Table firmTb(name VARCHAR(200))\n" +
-                        ")\n" +
-                        "###Relational\n" +
-                        "Database db\n" +
-                        "(\n" +
-                        "  include subDb\n" +
-                        ")");
+                """
+                ###Relational
+                Database subDb
+                (
+                  Table personTb(name VARCHAR(200), firm VARCHAR(200))
+                  Table firmTb(name VARCHAR(200))
+                )
+                ###Relational
+                Database db
+                (
+                  include subDb
+                )\
+                """);
         try
         {
             compileTestSource("mapping.pure",
-                    "###Mapping\n" +
-                            "Mapping myMap\n" +
-                            "(\n" +
-                            "    *Firm[m1]: Relational\n" +
-                            "               {\n" +
-                            "                  name : [db]firmTb.name\n" +
-                            "               }\n" +
-                            "    *Firm[m2]: Relational\n" +
-                            "               {\n" +
-                            "                  name : [db]firmTb.name\n" +
-                            "               }\n" +
-                            ")\n");
-            Assert.fail("Expected compile error");
+                    """
+                    ###Mapping
+                    Mapping myMap
+                    (
+                        *Firm[m1]: Relational
+                                   {
+                                      name : [db]firmTb.name
+                                   }
+                        *Firm[m2]: Relational
+                                   {
+                                      name : [db]firmTb.name
+                                   }
+                    )
+                    """);
+            Assertions.fail("Expected compile error");
         }
         catch (Exception e)
         {
@@ -221,33 +245,39 @@ public class TestMappingGrammar extends AbstractPureRelationalTestWithCoreCompil
     public void testMappingDataTypeShouldNotMapToJoinError() throws Exception
     {
         compileTestSource("model.pure",
-                "Class Person\n" +
-                        "{" +
-                        "   bla : String[1];\n" +
-                        "   name : String[1];\n" +
-                        "}\n");
+                """
+                Class Person
+                {\
+                   bla : String[1];
+                   name : String[1];
+                }
+                """);
         compileTestSource("store.pure",
-                "###Relational\n" +
-                        "Database db\n" +
-                        "(\n" +
-                        "   Table personTb(name VARCHAR(200),firm VARCHAR(200))\n" +
-                        "   Table firmTb(name VARCHAR(200))\n" +
-                        "   Table otherTb(name VARCHAR(200))\n" +
-                        "   Join myJoin(personTb.firm = otherTb.name)\n" +
-                        ")");
+                """
+                ###Relational
+                Database db
+                (
+                   Table personTb(name VARCHAR(200),firm VARCHAR(200))
+                   Table firmTb(name VARCHAR(200))
+                   Table otherTb(name VARCHAR(200))
+                   Join myJoin(personTb.firm = otherTb.name)
+                )\
+                """);
         try
         {
             compileTestSource("mapping.pure",
-                    "###Mapping\n" +
-                            "Mapping myMap\n" +
-                            "(\n" +
-                            "    Person: Relational\n" +
-                            "            {\n" +
-                            "                bla : [db]personTb.name," +
-                            "                name : [db]@myJoin\n" +
-                            "            }\n" +
-                            ")\n");
-            Assert.fail("Expected compile error");
+                    """
+                    ###Mapping
+                    Mapping myMap
+                    (
+                        Person: Relational
+                                {
+                                    bla : [db]personTb.name,\
+                                    name : [db]@myJoin
+                                }
+                    )
+                    """);
+            Assertions.fail("Expected compile error");
         }
         catch (Exception e)
         {
@@ -259,37 +289,43 @@ public class TestMappingGrammar extends AbstractPureRelationalTestWithCoreCompil
     public void testMappingNonDataTypeShouldNotMapToColumn() throws Exception
     {
         compileTestSource("model.pure",
-                "Class Person\n" +
-                        "{\n" +
-                        "   name:String[1];\n" +
-                        "   other:Other[1];\n" +
-                        "}\n" +
-                        "Class Other\n" +
-                        "{\n" +
-                        "   name:String[1];\n" +
-                        "}");
+                """
+                Class Person
+                {
+                   name:String[1];
+                   other:Other[1];
+                }
+                Class Other
+                {
+                   name:String[1];
+                }\
+                """);
 
         compileTestSource("store.pure",
-                "###Relational\n" +
-                        "Database db\n" +
-                        "(\n" +
-                        "   Table personTb(name VARCHAR(200),firm VARCHAR(200))\n" +
-                        "   Table otherTb(name VARCHAR(200))\n" +
-                        "   Join myJoin(personTb.firm = otherTb.name)\n" +
-                        ")\n");
+                """
+                ###Relational
+                Database db
+                (
+                   Table personTb(name VARCHAR(200),firm VARCHAR(200))
+                   Table otherTb(name VARCHAR(200))
+                   Join myJoin(personTb.firm = otherTb.name)
+                )
+                """);
         try
         {
             compileTestSource("mapping.pure",
-                    "###Mapping\n" +
-                            "Mapping myMap\n" +
-                            "(\n" +
-                            "    Person: Relational\n" +
-                            "            {\n" +
-                            "                other:[db]@myJoin|otherTb.name,\n" +
-                            "                name:[db]personTb.name\n" +
-                            "            }\n" +
-                            ")\n");
-            Assert.fail("Expected compile error");
+                    """
+                    ###Mapping
+                    Mapping myMap
+                    (
+                        Person: Relational
+                                {
+                                    other:[db]@myJoin|otherTb.name,
+                                    name:[db]personTb.name
+                                }
+                    )
+                    """);
+            Assertions.fail("Expected compile error");
         }
         catch (Exception e)
         {
@@ -301,29 +337,33 @@ public class TestMappingGrammar extends AbstractPureRelationalTestWithCoreCompil
     public void testMappingJoinError() throws Exception
     {
         compileTestSource("model.pure",
-                "Class Person\n" +
-                        "{\n" +
-                        "   name:String[1];\n" +
-                        "   firm:Firm[1];\n" +
-                        "   other:Other[1];\n" +
-                        "}\n" +
-                        "Class Firm\n" +
-                        "{\n" +
-                        "   name:String[1];\n" +
-                        "}\n" +
-                        "Class Other\n" +
-                        "{\n" +
-                        "   name:String[1];\n" +
-                        "}");
+                """
+                Class Person
+                {
+                   name:String[1];
+                   firm:Firm[1];
+                   other:Other[1];
+                }
+                Class Firm
+                {
+                   name:String[1];
+                }
+                Class Other
+                {
+                   name:String[1];
+                }\
+                """);
         compileTestSource("store.pure",
-                "###Relational\n" +
-                        "Database db\n" +
-                        "(\n" +
-                        "   Table personTb(name VARCHAR(200),firm VARCHAR(200))\n" +
-                        "   Table firmTb(name VARCHAR(200))\n" +
-                        "   Table otherTb(name VARCHAR(200))\n" +
-                        "   Join myJoin(personTb.firm = otherTb.name)\n" +
-                        ")\n");
+                """
+                ###Relational
+                Database db
+                (
+                   Table personTb(name VARCHAR(200),firm VARCHAR(200))
+                   Table firmTb(name VARCHAR(200))
+                   Table otherTb(name VARCHAR(200))
+                   Join myJoin(personTb.firm = otherTb.name)
+                )
+                """);
 
 //        compileTestSource("mapping.pure",
 //                "###Mapping\n" +
@@ -351,25 +391,27 @@ public class TestMappingGrammar extends AbstractPureRelationalTestWithCoreCompil
         try
         {
             compileTestSource("mapping.pure",
-                    "###Mapping\n" +
-                            "Mapping myMap\n" +
-                            "(\n" +
-                            "    Firm[targetId]: Relational\n" +
-                            "          {\n" +
-                            "             name : [db]firmTb.name\n" +
-                            "          }\n" +
-                            "    Other: Relational\n" +
-                            "          {\n" +
-                            "             name : [db]otherTb.name\n" +
-                            "          }\n" +
-                            "    Person: Relational\n" +
-                            "            {\n" +
-                            "                firm[targetId]:[db]@myJoin,\n" +
-                            "                other:[db]@myJoin,\n" +
-                            "                name:[db]personTb.name\n" +
-                            "            }\n" +
-                            ")\n");
-            Assert.fail("Expected compile error");
+                    """
+                    ###Mapping
+                    Mapping myMap
+                    (
+                        Firm[targetId]: Relational
+                              {
+                                 name : [db]firmTb.name
+                              }
+                        Other: Relational
+                              {
+                                 name : [db]otherTb.name
+                              }
+                        Person: Relational
+                                {
+                                    firm[targetId]:[db]@myJoin,
+                                    other:[db]@myJoin,
+                                    name:[db]personTb.name
+                                }
+                    )
+                    """);
+            Assertions.fail("Expected compile error");
         }
         catch (Exception e)
         {
@@ -381,86 +423,94 @@ public class TestMappingGrammar extends AbstractPureRelationalTestWithCoreCompil
     public void testMappingMultipleJoins() throws Exception
     {
         compileTestSource("mapping.pure",
-                "Class Person{name:String[1];firm:Firm[1];other:Other[1];}" +
-                        "Class Firm{name:String[1];}" +
-                        "Class Other{name:String[1];}\n" +
-                        "###Relational\n" +
-                        "Database db(Table personTb(name VARCHAR(200),firm VARCHAR(200))" +
-                        "            Table firmTb(name VARCHAR(200))" +
-                        "            Table otherTb(name VARCHAR(200))" +
-                        "            Join myJoin(personTb.firm = otherTb.name)\n" +
-                        "            Join otherJoin(otherTb.name = firmTb.name))\n" +
-                        "###Mapping\n" +
-                        "Mapping myMap(" +
-                        "    Firm: Relational\n" +
-                        "          {" +
-                        "             name : [db]firmTb.name\n" +
-                        "          }\n" +
-                        "    Person: Relational" +
-                        "            {" +
-                        "                firm:[db]@myJoin > @otherJoin,\n" +
-                        "                name:[db]personTb.name\n" +
-                        "            }\n" +
-                        ")\n");
+                """
+                Class Person{name:String[1];firm:Firm[1];other:Other[1];}\
+                Class Firm{name:String[1];}\
+                Class Other{name:String[1];}
+                ###Relational
+                Database db(Table personTb(name VARCHAR(200),firm VARCHAR(200))\
+                            Table firmTb(name VARCHAR(200))\
+                            Table otherTb(name VARCHAR(200))\
+                            Join myJoin(personTb.firm = otherTb.name)
+                            Join otherJoin(otherTb.name = firmTb.name))
+                ###Mapping
+                Mapping myMap(\
+                    Firm: Relational
+                          {\
+                             name : [db]firmTb.name
+                          }
+                    Person: Relational\
+                            {\
+                                firm:[db]@myJoin > @otherJoin,
+                                name:[db]personTb.name
+                            }
+                )
+                """);
         // TODO add asserts
         CoreInstance mapping = this.graphWalker.getMapping("myMap");
-        Assert.assertNotNull(mapping);
-        Assert.assertNotNull(mapping.getSourceInformation());
-        Assert.assertEquals(6, mapping.getSourceInformation().getStartLine());
-        Assert.assertEquals(12, mapping.getSourceInformation().getEndLine());
+        Assertions.assertNotNull(mapping);
+        Assertions.assertNotNull(mapping.getSourceInformation());
+        Assertions.assertEquals(6, mapping.getSourceInformation().getStartLine());
+        Assertions.assertEquals(12, mapping.getSourceInformation().getEndLine());
         CoreInstance classMapping = this.graphWalker.getClassMapping(mapping, "Firm");
-        Assert.assertNotNull(classMapping);
-        Assert.assertNotNull(classMapping.getSourceInformation());
-        Assert.assertEquals(6, classMapping.getSourceInformation().getStartLine());
-        Assert.assertEquals(8, classMapping.getSourceInformation().getEndLine());
+        Assertions.assertNotNull(classMapping);
+        Assertions.assertNotNull(classMapping.getSourceInformation());
+        Assertions.assertEquals(6, classMapping.getSourceInformation().getStartLine());
+        Assertions.assertEquals(8, classMapping.getSourceInformation().getEndLine());
     }
 
     @Test
     public void testMappingMultipleJoinsError() throws Exception
     {
         compileTestSource("model.pure",
-                "Class Person\n" +
-                        "{\n" +
-                        "   name:String[1];\n" +
-                        "   firm:Firm[1];\n" +
-                        "   other:Other[1];\n" +
-                        "}\n" +
-                        "Class Firm\n" +
-                        "{\n" +
-                        "   name:String[1];\n" +
-                        "}\n" +
-                        "Class Other\n" +
-                        "{\n" +
-                        "   name:String[1];\n" +
-                        "}\n");
+                """
+                Class Person
+                {
+                   name:String[1];
+                   firm:Firm[1];
+                   other:Other[1];
+                }
+                Class Firm
+                {
+                   name:String[1];
+                }
+                Class Other
+                {
+                   name:String[1];
+                }
+                """);
         compileTestSource("store.pure",
-                "###Relational\n" +
-                        "Database db\n" +
-                        "(\n" +
-                        "   Table personTb(name VARCHAR(200), firm VARCHAR(200))\n" +
-                        "   Table firmTb(name VARCHAR(200))\n" +
-                        "   Table otherTb(name VARCHAR(200))\n" +
-                        "   Table otherTb2(name VARCHAR(200))\n" +
-                        "   Join myJoin(personTb.firm = otherTb.name)\n" +
-                        "   Join otherJoin(otherTb2.name = firmTb.name)\n" +
-                        ")\n");
+                """
+                ###Relational
+                Database db
+                (
+                   Table personTb(name VARCHAR(200), firm VARCHAR(200))
+                   Table firmTb(name VARCHAR(200))
+                   Table otherTb(name VARCHAR(200))
+                   Table otherTb2(name VARCHAR(200))
+                   Join myJoin(personTb.firm = otherTb.name)
+                   Join otherJoin(otherTb2.name = firmTb.name)
+                )
+                """);
         try
         {
             compileTestSource("mapping.pure",
-                    "###Mapping\n" +
-                            "Mapping myMap\n" +
-                            "(\n" +
-                            "    Firm: Relational\n" +
-                            "          {\n" +
-                            "             name : [db]firmTb.name\n" +
-                            "          }\n" +
-                            "    Person: Relational\n" +
-                            "            {\n" +
-                            "                firm:[db]@myJoin > @otherJoin,\n" +
-                            "                name:[db]personTb.name\n" +
-                            "            }\n" +
-                            ")\n");
-            Assert.fail("Expected compile error");
+                    """
+                    ###Mapping
+                    Mapping myMap
+                    (
+                        Firm: Relational
+                              {
+                                 name : [db]firmTb.name
+                              }
+                        Person: Relational
+                                {
+                                    firm:[db]@myJoin > @otherJoin,
+                                    name:[db]personTb.name
+                                }
+                    )
+                    """);
+            Assertions.fail("Expected compile error");
         }
         catch (Exception e)
         {
@@ -472,54 +522,60 @@ public class TestMappingGrammar extends AbstractPureRelationalTestWithCoreCompil
     public void testErrorInCrossMapping()
     {
         compileTestSource("model.pure",
-                "Class Person\n" +
-                        "{\n" +
-                        "   name:String[1];\n" +
-                        "}\n" +
-                        "Class Firm\n" +
-                        "{\n" +
-                        "   name:String[1];\n" +
-                        "}\n" +
-                        "Association aa\n" +
-                        "{\n" +
-                        "   firm:Firm[1];\n" +
-                        "   employees:Person[*];\n" +
-                        "}");
+                """
+                Class Person
+                {
+                   name:String[1];
+                }
+                Class Firm
+                {
+                   name:String[1];
+                }
+                Association aa
+                {
+                   firm:Firm[1];
+                   employees:Person[*];
+                }\
+                """);
         compileTestSource("store.pure",
-                "###Relational\n" +
-                        "Database db\n" +
-                        "(\n" +
-                        "   Table personTb(name VARCHAR(200),firmId INT)\n" +
-                        "   Table firmTb(id INT, name VARCHAR(200))\n" +
-                        "   Table otherTb(id INT, name VARCHAR(200))\n" +
-                        "   Join myJoin(personTb.firmId = otherTb.id)\n" +
-                        ")");
+                """
+                ###Relational
+                Database db
+                (
+                   Table personTb(name VARCHAR(200),firmId INT)
+                   Table firmTb(id INT, name VARCHAR(200))
+                   Table otherTb(id INT, name VARCHAR(200))
+                   Join myJoin(personTb.firmId = otherTb.id)
+                )\
+                """);
         try
         {
             compileTestSource("mapping.pure",
-                    "###Mapping\n" +
-                            "Mapping myMap1\n" +
-                            "(\n" +
-                            "    Firm: Relational\n" +
-                            "          {\n" +
-                            "             name : [db]firmTb.name,\n" +
-                            "             employees : [db]@myJoin\n" +
-                            "          }\n" +
-                            ")\n" +
-                            "Mapping myMap2\n" +
-                            "(\n" +
-                            "    Person: Relational\n" +
-                            "            {\n" +
-                            "                firm:[db]@myJoin,\n" +
-                            "                name:[db]personTb.name\n" +
-                            "            }\n" +
-                            ")\n" +
-                            "###Mapping\n" +
-                            "Mapping myMap3(" +
-                            "  include myMap1" +
-                            "  include myMap2" +
-                            ")");
-            Assert.fail("Expected compile exception");
+                    """
+                    ###Mapping
+                    Mapping myMap1
+                    (
+                        Firm: Relational
+                              {
+                                 name : [db]firmTb.name,
+                                 employees : [db]@myJoin
+                              }
+                    )
+                    Mapping myMap2
+                    (
+                        Person: Relational
+                                {
+                                    firm:[db]@myJoin,
+                                    name:[db]personTb.name
+                                }
+                    )
+                    ###Mapping
+                    Mapping myMap3(\
+                      include myMap1\
+                      include myMap2\
+                    )\
+                    """);
+            Assertions.fail("Expected compile exception");
         }
         catch (Exception e)
         {
@@ -531,64 +587,70 @@ public class TestMappingGrammar extends AbstractPureRelationalTestWithCoreCompil
     public void testGoodCrossMapping()
     {
         compileTestSource("model.pure",
-                "Class Person\n" +
-                        "{\n" +
-                        "   name:String[1];\n" +
-                        "}\n" +
-                        "Class Firm\n" +
-                        "{\n" +
-                        "   name:String[1];\n" +
-                        "}\n" +
-                        "Association aa\n" +
-                        "{\n" +
-                        "   firm:Firm[1];" +
-                        "   employees:Person[*];\n" +
-                        "}");
+                """
+                Class Person
+                {
+                   name:String[1];
+                }
+                Class Firm
+                {
+                   name:String[1];
+                }
+                Association aa
+                {
+                   firm:Firm[1];\
+                   employees:Person[*];
+                }\
+                """);
         compileTestSource("store.pure",
-                "###Relational\n" +
-                        "Database db\n" +
-                        "(\n" +
-                        "   Table personTb(name VARCHAR(200),firmId INT)\n" +
-                        "   Table firmTb(id INT, name VARCHAR(200))\n" +
-                        "   Join myJoin(personTb.firmId = firmTb.id)\n" +
-                        ")");
+                """
+                ###Relational
+                Database db
+                (
+                   Table personTb(name VARCHAR(200),firmId INT)
+                   Table firmTb(id INT, name VARCHAR(200))
+                   Join myJoin(personTb.firmId = firmTb.id)
+                )\
+                """);
         compileTestSource("mapping.pure",
-                "###Mapping\n" +
-                        "Mapping myMap1\n" +
-                        "(\n" +
-                        "    Firm: Relational\n" +
-                        "          {\n" +
-                        "             name : [db]firmTb.name,\n" +
-                        "             employees : [db]@myJoin\n" +
-                        "          }\n" +
-                        ")\n" +
-                        "Mapping myMap2\n" +
-                        "(\n" +
-                        "    Person: Relational\n" +
-                        "            {\n" +
-                        "                firm:[db]@myJoin,\n" +
-                        "                name:[db]personTb.name\n" +
-                        "            }\n" +
-                        ")\n" +
-                        "Mapping myMap3\n" +
-                        "(\n" +
-                        "  include myMap1\n" +
-                        "  include myMap2\n" +
-                        ")\n");
+                """
+                ###Mapping
+                Mapping myMap1
+                (
+                    Firm: Relational
+                          {
+                             name : [db]firmTb.name,
+                             employees : [db]@myJoin
+                          }
+                )
+                Mapping myMap2
+                (
+                    Person: Relational
+                            {
+                                firm:[db]@myJoin,
+                                name:[db]personTb.name
+                            }
+                )
+                Mapping myMap3
+                (
+                  include myMap1
+                  include myMap2
+                )
+                """);
 
         CoreInstance myMap1 = runtime.getCoreInstance("myMap1");
-        Assert.assertNotNull(myMap1);
+        Assertions.assertNotNull(myMap1);
 
         CoreInstance myMap2 = runtime.getCoreInstance("myMap2");
-        Assert.assertNotNull(myMap2);
+        Assertions.assertNotNull(myMap2);
 
         CoreInstance myMap3 = runtime.getCoreInstance("myMap3");
-        Assert.assertNotNull(myMap3);
+        Assertions.assertNotNull(myMap3);
 
         ListIterable<? extends CoreInstance> myMap3Includes = Instance.getValueForMetaPropertyToManyResolved(myMap3, M3Properties.includes, processorSupport);
         Verify.assertSize(2, myMap3Includes);
-        Assert.assertSame(myMap1, Instance.getValueForMetaPropertyToOneResolved(myMap3Includes.get(0), M3Properties.included, processorSupport));
-        Assert.assertSame(myMap2, Instance.getValueForMetaPropertyToOneResolved(myMap3Includes.get(1), M3Properties.included, processorSupport));
+        Assertions.assertSame(myMap1, Instance.getValueForMetaPropertyToOneResolved(myMap3Includes.get(0), M3Properties.included, processorSupport));
+        Assertions.assertSame(myMap2, Instance.getValueForMetaPropertyToOneResolved(myMap3Includes.get(1), M3Properties.included, processorSupport));
     }
 
     @Test
@@ -597,14 +659,16 @@ public class TestMappingGrammar extends AbstractPureRelationalTestWithCoreCompil
         try
         {
             compileTestSource("mapping.pure",
-                    "###Mapping\n" +
-                            "import test::*;\n" +
-                            "\n" +
-                            "Mapping test::A\n" +
-                            "(\n" +
-                            "  include A\n" +
-                            ")");
-            Assert.fail("Expected compilation exception");
+                    """
+                    ###Mapping
+                    import test::*;
+                    
+                    Mapping test::A
+                    (
+                      include A
+                    )\
+                    """);
+            Assertions.fail("Expected compilation exception");
         }
         catch (Exception e)
         {
@@ -618,22 +682,24 @@ public class TestMappingGrammar extends AbstractPureRelationalTestWithCoreCompil
         try
         {
             compileTestSource("mapping.pure",
-                    "###Mapping\n" +
-                            "import test::*;\n" +
-                            "\n" +
-                            "Mapping test::A\n" +
-                            "(\n" +
-                            "  include C\n" +
-                            ")\n" +
-                            "Mapping test::B\n" +
-                            "(\n" +
-                            "  include A\n" +
-                            ")\n" +
-                            "Mapping test::C\n" +
-                            "(\n" +
-                            "  include B\n" +
-                            ")");
-            Assert.fail("Expected compilation exception");
+                    """
+                    ###Mapping
+                    import test::*;
+                    
+                    Mapping test::A
+                    (
+                      include C
+                    )
+                    Mapping test::B
+                    (
+                      include A
+                    )
+                    Mapping test::C
+                    (
+                      include B
+                    )\
+                    """);
+            Assertions.fail("Expected compilation exception");
         }
         catch (Exception e)
         {
@@ -647,18 +713,20 @@ public class TestMappingGrammar extends AbstractPureRelationalTestWithCoreCompil
         try
         {
             compileTestSource("mapping.pure",
-                    "###Mapping\n" +
-                            "import test::*;\n" +
-                            "\n" +
-                            "Mapping test::A\n" +
-                            "(\n" +
-                            ")\n" +
-                            "Mapping test::B\n" +
-                            "(\n" +
-                            "  include A\n" +
-                            "  include A\n" +
-                            ")");
-            Assert.fail("Expected compilation exception");
+                    """
+                    ###Mapping
+                    import test::*;
+                    
+                    Mapping test::A
+                    (
+                    )
+                    Mapping test::B
+                    (
+                      include A
+                      include A
+                    )\
+                    """);
+            Assertions.fail("Expected compilation exception");
         }
         catch (Exception e)
         {
@@ -670,128 +738,140 @@ public class TestMappingGrammar extends AbstractPureRelationalTestWithCoreCompil
     public void testIncludeWithStoreSubstitution()
     {
         compileTestSource("model.pure",
-                "###Pure\n" +
-                        "\n" +
-                        "Class class1\n" +
-                        "{\n" +
-                        "   id : Integer[1];\n" +
-                        "}\n" +
-                        "\n" +
-                        "Class class2\n" +
-                        "{\n" +
-                        "   id : Integer[1];\n" +
-                        "}\n"
+                """
+                ###Pure
+                
+                Class class1
+                {
+                   id : Integer[1];
+                }
+                
+                Class class2
+                {
+                   id : Integer[1];
+                }
+                """
         );
 
         compileTestSource("store.pure",
-                "###Relational\n" +
-                        "Database test::db1\n" +
-                        "(\n" +
-                        "  Table T1 (id INT)\n" +
-                        ")\n" +
-                        "\n" +
-                        "###Relational\n" +
-                        "Database test::db2\n" +
-                        "(\n" +
-                        "  Table T2 (id INT)\n" +
-                        ")\n" +
-                        "\n" +
-                        "###Relational\n" +
-                        "Database test::db3\n" +
-                        "(\n" +
-                        "  include test::db1\n" +
-                        "  include test::db2\n" +
-                        ")\n");
+                """
+                ###Relational
+                Database test::db1
+                (
+                  Table T1 (id INT)
+                )
+                
+                ###Relational
+                Database test::db2
+                (
+                  Table T2 (id INT)
+                )
+                
+                ###Relational
+                Database test::db3
+                (
+                  include test::db1
+                  include test::db2
+                )
+                """);
 
         CoreInstance db1 = runtime.getCoreInstance("test::db1");
-        Assert.assertNotNull(db1);
+        Assertions.assertNotNull(db1);
 
         CoreInstance db2 = runtime.getCoreInstance("test::db2");
-        Assert.assertNotNull(db2);
+        Assertions.assertNotNull(db2);
 
         CoreInstance db3 = runtime.getCoreInstance("test::db3");
-        Assert.assertNotNull(db3);
+        Assertions.assertNotNull(db3);
 
         compileTestSource("mapping.pure",
-                "###Mapping\n" +
-                        "import test::*;\n" +
-                        "\n" +
-                        "Mapping test::mapping12\n" +
-                        "(\n" +
-                        "   class1 : Relational\n" +
-                        "   {\n" +
-                        "      scope([db1]T1)\n" +
-                        "      (\n" +
-                        "         id : id\n" +
-                        "      )\n" +
-                        "   }\n" +
-                        "   \n" +
-                        "   class2 : Relational\n" +
-                        "   {\n" +
-                        "      scope([db2]T2)\n" +
-                        "      (\n" +
-                        "         id : id\n" +
-                        "      )\n" +
-                        "   }\n" +
-                        ")\n" +
-                        "\n" +
-                        "Mapping test::mapping3\n" +
-                        "(\n" +
-                        "   include mapping12[db1 -> db3, db2 -> db3]\n" +
-                        ")\n");
+                """
+                ###Mapping
+                import test::*;
+                
+                Mapping test::mapping12
+                (
+                   class1 : Relational
+                   {
+                      scope([db1]T1)
+                      (
+                         id : id
+                      )
+                   }
+                  \s
+                   class2 : Relational
+                   {
+                      scope([db2]T2)
+                      (
+                         id : id
+                      )
+                   }
+                )
+                
+                Mapping test::mapping3
+                (
+                   include mapping12[db1 -> db3, db2 -> db3]
+                )
+                """);
 
         CoreInstance mapping12 = runtime.getCoreInstance("test::mapping12");
-        Assert.assertNotNull(mapping12);
+        Assertions.assertNotNull(mapping12);
         Verify.assertEmpty(Instance.getValueForMetaPropertyToManyResolved(mapping12, M3Properties.includes, processorSupport));
 
         CoreInstance mapping3 = runtime.getCoreInstance("test::mapping3");
-        Assert.assertNotNull(mapping3);
+        Assertions.assertNotNull(mapping3);
 
         ListIterable<? extends CoreInstance> includes = Instance.getValueForMetaPropertyToManyResolved(mapping3, M3Properties.includes, processorSupport);
         Verify.assertSize(1, includes);
         CoreInstance include = includes.get(0);
-        Assert.assertSame(mapping12, Instance.getValueForMetaPropertyToOneResolved(include, M3Properties.included, processorSupport));
+        Assertions.assertSame(mapping12, Instance.getValueForMetaPropertyToOneResolved(include, M3Properties.included, processorSupport));
 
         ListIterable<? extends CoreInstance> storeSubstitutions = Instance.getValueForMetaPropertyToManyResolved(include, M2MappingProperties.storeSubstitutions, processorSupport);
         Verify.assertSize(2, storeSubstitutions);
         CoreInstance storeSub1 = storeSubstitutions.get(0);
-        Assert.assertSame(db1, Instance.getValueForMetaPropertyToOneResolved(storeSub1, M2MappingProperties.original, processorSupport));
-        Assert.assertSame(db3, Instance.getValueForMetaPropertyToOneResolved(storeSub1, M2MappingProperties.substitute, processorSupport));
+        Assertions.assertSame(db1, Instance.getValueForMetaPropertyToOneResolved(storeSub1, M2MappingProperties.original, processorSupport));
+        Assertions.assertSame(db3, Instance.getValueForMetaPropertyToOneResolved(storeSub1, M2MappingProperties.substitute, processorSupport));
 
         CoreInstance storeSub2 = storeSubstitutions.get(1);
-        Assert.assertSame(db2, Instance.getValueForMetaPropertyToOneResolved(storeSub2, M2MappingProperties.original, processorSupport));
-        Assert.assertSame(db3, Instance.getValueForMetaPropertyToOneResolved(storeSub2, M2MappingProperties.substitute, processorSupport));
+        Assertions.assertSame(db2, Instance.getValueForMetaPropertyToOneResolved(storeSub2, M2MappingProperties.original, processorSupport));
+        Assertions.assertSame(db3, Instance.getValueForMetaPropertyToOneResolved(storeSub2, M2MappingProperties.substitute, processorSupport));
     }
 
     @Test
     public void testIncludeWithStoreSubstitutionToNonStore()
     {
         compileTestSource("stores.pure",
-                "###Relational\n" +
-                        "Database test::db1\n" +
-                        "(\n" +
-                        "  Table T1 (id INT)\n" +
-                        ")\n" +
-                        "\n" +
-                        "###Pure\n" +
-                        "Class test::db2\n" +
-                        "{\n" +
-                        "}");
+                """
+                ###Relational
+                Database test::db1
+                (
+                  Table T1 (id INT)
+                )
+                
+                ###Pure
+                Class test::db2
+                {
+                }\
+                """);
         compileTestSource("mapping1.pure",
-                "###Mapping\n" +
-                        "Mapping test::mapping1\n" +
-                        "(\n" +
-                        ")\n");
+                """
+                ###Mapping
+                Mapping test::mapping1
+                (
+                )
+                """);
         try
         {
             compileTestSource("mapping2.pure",
-                    "###Mapping\n" +
-                            "import test::*;\n" +
-                            "Mapping test::mapping2\n" +
-                            "(\n" +
-                            "   include mapping1[db1 -> db2]\n" +
-                            ")");
-            Assert.fail("Expected compilation exception");
+                    """
+                    ###Mapping
+                    import test::*;
+                    Mapping test::mapping2
+                    (
+                       include mapping1[db1 -> db2]
+                    )\
+                    """);
+            Assertions.fail("Expected compilation exception");
         }
         catch (Exception e)
         {
@@ -803,31 +883,37 @@ public class TestMappingGrammar extends AbstractPureRelationalTestWithCoreCompil
     public void testIncludeWithStoreSubstitutionFromNonStore()
     {
         compileTestSource("stores.pure",
-                "###Relational\n" +
-                        "Database test::db1\n" +
-                        "(\n" +
-                        "  Table T1 (id INT)\n" +
-                        ")\n" +
-                        "\n" +
-                        "###Pure\n" +
-                        "Class test::db2\n" +
-                        "{\n" +
-                        "}");
+                """
+                ###Relational
+                Database test::db1
+                (
+                  Table T1 (id INT)
+                )
+                
+                ###Pure
+                Class test::db2
+                {
+                }\
+                """);
         compileTestSource("mapping1.pure",
-                "###Mapping\n" +
-                        "Mapping test::mapping1\n" +
-                        "(\n" +
-                        ")\n");
+                """
+                ###Mapping
+                Mapping test::mapping1
+                (
+                )
+                """);
         try
         {
             compileTestSource("mapping2.pure",
-                    "###Mapping\n" +
-                            "import test::*;\n" +
-                            "Mapping test::mapping2\n" +
-                            "(\n" +
-                            "   include mapping1[db2 -> db1]\n" +
-                            ")");
-            Assert.fail("Expected compilation exception");
+                    """
+                    ###Mapping
+                    import test::*;
+                    Mapping test::mapping2
+                    (
+                       include mapping1[db2 -> db1]
+                    )\
+                    """);
+            Assertions.fail("Expected compilation exception");
         }
         catch (Exception e)
         {
@@ -839,32 +925,38 @@ public class TestMappingGrammar extends AbstractPureRelationalTestWithCoreCompil
     public void testIncludeWithStoreSubstitutionWithoutStoreInclude()
     {
         compileTestSource("stores.pure",
-                "###Relational\n" +
-                        "Database test::db1\n" +
-                        "(\n" +
-                        "  Table T1 (id INT)\n" +
-                        ")\n" +
-                        "\n" +
-                        "###Relational\n" +
-                        "Database test::db2\n" +
-                        "(\n" +
-                        "  Table T2 (id INT)\n" +
-                        ")");
+                """
+                ###Relational
+                Database test::db1
+                (
+                  Table T1 (id INT)
+                )
+                
+                ###Relational
+                Database test::db2
+                (
+                  Table T2 (id INT)
+                )\
+                """);
         compileTestSource("mapping1.pure",
-                "###Mapping\n" +
-                        "Mapping test::mapping1\n" +
-                        "(\n" +
-                        ")\n");
+                """
+                ###Mapping
+                Mapping test::mapping1
+                (
+                )
+                """);
         try
         {
             compileTestSource("mapping2.pure",
-                    "###Mapping\n" +
-                            "import test::*;\n" +
-                            "Mapping test::mapping2\n" +
-                            "(\n" +
-                            "   include mapping1[db1 -> db2]\n" +
-                            ")");
-            Assert.fail("Expected compilation exception");
+                    """
+                    ###Mapping
+                    import test::*;
+                    Mapping test::mapping2
+                    (
+                       include mapping1[db1 -> db2]
+                    )\
+                    """);
+            Assertions.fail("Expected compilation exception");
         }
         catch (Exception e)
         {
@@ -876,40 +968,46 @@ public class TestMappingGrammar extends AbstractPureRelationalTestWithCoreCompil
     public void testIncludeWithMultipleSubstitutionsForOneStore()
     {
         compileTestSource("stores.pure",
-                "###Relational\n" +
-                        "Database test::db1\n" +
-                        "(\n" +
-                        "  Table T1 (id INT)\n" +
-                        ")\n" +
-                        "\n" +
-                        "###Relational\n" +
-                        "Database test::db2\n" +
-                        "(\n" +
-                        "  include test::db1\n" +
-                        "  Table T2 (id INT)\n" +
-                        ")\n" +
-                        "\n" +
-                        "###Relational\n" +
-                        "Database test::db3\n" +
-                        "(\n" +
-                        "  include test::db1\n" +
-                        "  Table T3 (id INT)\n" +
-                        ")");
+                """
+                ###Relational
+                Database test::db1
+                (
+                  Table T1 (id INT)
+                )
+                
+                ###Relational
+                Database test::db2
+                (
+                  include test::db1
+                  Table T2 (id INT)
+                )
+                
+                ###Relational
+                Database test::db3
+                (
+                  include test::db1
+                  Table T3 (id INT)
+                )\
+                """);
         compileTestSource("mapping1.pure",
-                "###Mapping\n" +
-                        "Mapping test::mapping1\n" +
-                        "(\n" +
-                        ")\n");
+                """
+                ###Mapping
+                Mapping test::mapping1
+                (
+                )
+                """);
         try
         {
             compileTestSource("mapping2.pure",
-                    "###Mapping\n" +
-                            "import test::*;\n" +
-                            "Mapping test::mapping2\n" +
-                            "(\n" +
-                            "   include mapping1[db1 -> db2, db1 -> db3]\n" +
-                            ")");
-            Assert.fail("Expected compilation exception");
+                    """
+                    ###Mapping
+                    import test::*;
+                    Mapping test::mapping2
+                    (
+                       include mapping1[db1 -> db2, db1 -> db3]
+                    )\
+                    """);
+            Assertions.fail("Expected compilation exception");
         }
         catch (Exception e)
         {
@@ -921,40 +1019,46 @@ public class TestMappingGrammar extends AbstractPureRelationalTestWithCoreCompil
     public void testIncludeWithStoreSubstitutionsForSubstitutedStore()
     {
         compileTestSource("stores.pure",
-                "###Relational\n" +
-                        "Database test::db1\n" +
-                        "(\n" +
-                        "  Table T1 (id INT)\n" +
-                        ")\n" +
-                        "\n" +
-                        "###Relational\n" +
-                        "Database test::db2\n" +
-                        "(\n" +
-                        "  include test::db1\n" +
-                        "  Table T2 (id INT)\n" +
-                        ")\n" +
-                        "\n" +
-                        "###Relational\n" +
-                        "Database test::db3\n" +
-                        "(\n" +
-                        "  include test::db2\n" +
-                        "  Table T3 (id INT)\n" +
-                        ")");
+                """
+                ###Relational
+                Database test::db1
+                (
+                  Table T1 (id INT)
+                )
+                
+                ###Relational
+                Database test::db2
+                (
+                  include test::db1
+                  Table T2 (id INT)
+                )
+                
+                ###Relational
+                Database test::db3
+                (
+                  include test::db2
+                  Table T3 (id INT)
+                )\
+                """);
         compileTestSource("mapping1.pure",
-                "###Mapping\n" +
-                        "Mapping test::mapping1\n" +
-                        "(\n" +
-                        ")\n");
+                """
+                ###Mapping
+                Mapping test::mapping1
+                (
+                )
+                """);
         try
         {
             compileTestSource("mapping2.pure",
-                    "###Mapping\n" +
-                            "import test::*;\n" +
-                            "Mapping test::mapping2\n" +
-                            "(\n" +
-                            "   include mapping1[db1 -> db2, db2 -> db3]\n" +
-                            ")");
-            Assert.fail("Expected compilation exception");
+                    """
+                    ###Mapping
+                    import test::*;
+                    Mapping test::mapping2
+                    (
+                       include mapping1[db1 -> db2, db2 -> db3]
+                    )\
+                    """);
+            Assertions.fail("Expected compilation exception");
         }
         catch (Exception e)
         {
@@ -965,42 +1069,48 @@ public class TestMappingGrammar extends AbstractPureRelationalTestWithCoreCompil
     @Test
     public void testFiltersAreAvailableFromIncludedStore()
     {
-        compileTestSource("stores.pure", "###Relational\n" +
-                "Database test::db1\n" +
-                "(\n" +
-                "  Table T1 (id INT)\n" +
-                "  Filter idFilter(T1.id = 0)" +
-                ")\n" +
-                "###Relational\n" +
-                "Database test::db2\n" +
-                "(\n" +
-                "  include test::db1\n" +
-                "  Table T2 (id INT)\n" +
-                "  Filter idFilter(T1.id != 0)" +
-                ")\n" +
-                "###Relational\n" +
-                "Database test::db3\n" +
-                "(\n" +
-                "  include test::db2\n" +
-                ")");
-        compileTestSource("domain.pure", "###Pure\n" +
-                "Class T1{id:Integer[1];}");
-        compileTestSource("mapping1.pure", "###Mapping\n" +
-                "import test::*;\n" +
-                "Mapping test::mapping\n" +
-                "(\n" +
-                " T1[db3]: Relational{" +
-                " ~filter [db3]idFilter" +
-                "~mainTable[db3]T1" +
-                " id : [db3]T1.id" +
-                "}" +
-                ")\n");
+        compileTestSource("stores.pure", """
+                ###Relational
+                Database test::db1
+                (
+                  Table T1 (id INT)
+                  Filter idFilter(T1.id = 0)\
+                )
+                ###Relational
+                Database test::db2
+                (
+                  include test::db1
+                  Table T2 (id INT)
+                  Filter idFilter(T1.id != 0)\
+                )
+                ###Relational
+                Database test::db3
+                (
+                  include test::db2
+                )\
+                """);
+        compileTestSource("domain.pure", """
+                ###Pure
+                Class T1{id:Integer[1];}\
+                """);
+        compileTestSource("mapping1.pure", """
+                ###Mapping
+                import test::*;
+                Mapping test::mapping
+                (
+                 T1[db3]: Relational{\
+                 ~filter [db3]idFilter\
+                ~mainTable[db3]T1\
+                 id : [db3]T1.id\
+                }\
+                )
+                """);
         CoreInstance testMapping = runtime.getCoreInstance("test::mapping");
         CoreInstance classMapping = Instance.getValueForMetaPropertyToOneResolved(testMapping, M2MappingProperties.classMappings, processorSupport);
         CoreInstance mainTableAlias = Instance.getValueForMetaPropertyToOneResolved(classMapping, M2RelationalProperties.mainTableAlias, processorSupport);
         CoreInstance filterMapping = Instance.getValueForMetaPropertyToOneResolved(classMapping, M2RelationalProperties.filter, processorSupport);
         CoreInstance op = Instance.getValueForMetaPropertyToOneResolved(filterMapping, M2RelationalProperties.filter, M2RelationalProperties.operation, processorSupport);
-        Assert.assertTrue(Instance.instanceOf(op, "meta::relational::metamodel::DynaFunction", processorSupport));
+        Assertions.assertTrue(Instance.instanceOf(op, "meta::relational::metamodel::DynaFunction", processorSupport));
 
 
     }
@@ -1009,34 +1119,40 @@ public class TestMappingGrammar extends AbstractPureRelationalTestWithCoreCompil
     @Test
     public void testDefaultMainTableForIncludedStore()
     {
-        compileTestSource("stores.pure", "###Relational\n" +
-                "Database test::db1\n" +
-                "(\n" +
-                "  Table T1 (id INT)\n" +
-                "  Filter idFilter(T1.id = 0)" +
-                ")\n" +
-                "###Relational\n" +
-                "Database test::db2\n" +
-                "(\n" +
-                "  include test::db1\n" +
-                "  Table T2 (id INT)\n" +
-                "  Filter idFilter(T1.id != 0)" +
-                ")\n" +
-                "###Relational\n" +
-                "Database test::db3\n" +
-                "(\n" +
-                "  include test::db2\n" +
-                ")");
-        compileTestSource("domain.pure", "###Pure\n" +
-                "Class T1{id:Integer[1];}");
-        compileTestSource("mapping1.pure", "###Mapping\n" +
-                "import test::*;\n" +
-                "Mapping test::mapping\n" +
-                "(\n" +
-                " T1[db3]: Relational{" +
-                " id : [db3]T1.id" +
-                "}" +
-                ")\n");
+        compileTestSource("stores.pure", """
+                ###Relational
+                Database test::db1
+                (
+                  Table T1 (id INT)
+                  Filter idFilter(T1.id = 0)\
+                )
+                ###Relational
+                Database test::db2
+                (
+                  include test::db1
+                  Table T2 (id INT)
+                  Filter idFilter(T1.id != 0)\
+                )
+                ###Relational
+                Database test::db3
+                (
+                  include test::db2
+                )\
+                """);
+        compileTestSource("domain.pure", """
+                ###Pure
+                Class T1{id:Integer[1];}\
+                """);
+        compileTestSource("mapping1.pure", """
+                ###Mapping
+                import test::*;
+                Mapping test::mapping
+                (
+                 T1[db3]: Relational{\
+                 id : [db3]T1.id\
+                }\
+                )
+                """);
         CoreInstance testMapping = runtime.getCoreInstance("test::mapping");
         CoreInstance classMapping = Instance.getValueForMetaPropertyToOneResolved(testMapping, M2MappingProperties.classMappings, processorSupport);
         CoreInstance mainTableAlias = Instance.getValueForMetaPropertyToOneResolved(classMapping, M2RelationalProperties.mainTableAlias, processorSupport);
@@ -1044,6 +1160,6 @@ public class TestMappingGrammar extends AbstractPureRelationalTestWithCoreCompil
         CoreInstance db3 = runtime.getCoreInstance("test::db3");
         CoreInstance database = Instance.getValueForMetaPropertyToOneResolved(mainTableAlias, M2RelationalProperties.database, processorSupport);
 
-        Assert.assertEquals(db3, database);
+        Assertions.assertEquals(db3, database);
     }
 }

@@ -23,9 +23,9 @@ import org.finos.legend.pure.runtime.java.compiled.execution.FunctionExecutionCo
 import org.finos.legend.pure.runtime.java.compiled.execution.FunctionExecutionCompiledBuilder;
 import org.finos.legend.pure.runtime.java.compiled.factory.JavaModelFactoryRegistry;
 import org.finos.legend.pure.runtime.java.compiled.factory.JavaModelFactoryRegistryLoader;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -38,7 +38,7 @@ import javax.tools.ToolProvider;
 
 public class TestMemoryFileManager extends AbstractPureTestWithCoreCompiled
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getFunctionExecution(), JavaModelFactoryRegistryLoader.loader());
@@ -47,18 +47,20 @@ public class TestMemoryFileManager extends AbstractPureTestWithCoreCompiled
     @Test
     public void testLoadClassesFromZipInputStream() throws IOException
     {
-        compileTestSource("Class Person\n" +
-                "{\n" +
-                "   lastName:String[1];\n" +
-                "}\n" +
-                "function testPrint():Nil[0]\n" +
-                "{\n" +
-                "    s(Person);\n" +
-                "}\n" +
-                "function s(a:Any[1]):Nil[0]" +
-                "{" +
-                "   []" +
-                "}");
+        compileTestSource("""
+                Class Person
+                {
+                   lastName:String[1];
+                }
+                function testPrint():Nil[0]
+                {
+                    s(Person);
+                }
+                function s(a:Any[1]):Nil[0]\
+                {\
+                   []\
+                }\
+                """);
 
         PureJavaCompiler compiler = ((FunctionExecutionCompiled) functionExecution).getJavaCompiler();
         MutableMap<URI, ClassJavaSource> expectedSourcesByURI = compiler.getFileManager().getAllClassJavaSources(true).groupByUniqueKey(SimpleJavaFileObject::toUri, Maps.mutable.empty());
@@ -82,7 +84,7 @@ public class TestMemoryFileManager extends AbstractPureTestWithCoreCompiled
         {
             ClassJavaSource expectedSource = expectedSourcesByURI.get(uri);
             ClassJavaSource actualSource = actualSourcesByURI.get(uri);
-            Assert.assertArrayEquals(uri.toString(), expectedSource.getBytes(), actualSource.getBytes());
+            Assertions.assertArrayEquals(expectedSource.getBytes(), actualSource.getBytes(), uri.toString());
         }
     }
 

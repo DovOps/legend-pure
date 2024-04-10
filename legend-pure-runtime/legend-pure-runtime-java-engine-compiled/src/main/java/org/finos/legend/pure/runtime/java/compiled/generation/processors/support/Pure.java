@@ -284,9 +284,8 @@ public class Pure
         {
             return genericTypeBuilder.get()._rawType(ma.getBottomType());
         }
-        if (val instanceof Any)
+        if (val instanceof Any a)
         {
-            Any a = (Any) val;
             org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.type.generics.GenericType genericType = a._classifierGenericType();
             return (genericType == null) ? genericTypeBuilder.get()._rawType(CompiledSupport.getType(a, ma)) : genericType;
         }
@@ -305,9 +304,9 @@ public class Pure
             Type type = ma.getPrimitiveType("Boolean");
             return genericTypeBuilder.get()._rawType(type);
         }
-        if (val instanceof PureDate)
+        if (val instanceof PureDate date)
         {
-            Type type = ma.getPrimitiveType(DateFunctions.datePrimitiveType((PureDate) val));
+            Type type = ma.getPrimitiveType(DateFunctions.datePrimitiveType(date));
             return genericTypeBuilder.get()._rawType(type);
         }
         if (val instanceof Double)
@@ -320,9 +319,8 @@ public class Pure
             Type type = ma.getPrimitiveType("Decimal");
             return genericTypeBuilder.get()._rawType(type);
         }
-        if (val instanceof RichIterable)
+        if (val instanceof RichIterable l)
         {
-            RichIterable<?> l = (RichIterable<?>) val;
             if (l.isEmpty())
             {
                 return genericTypeBuilder.get()._rawType(ma.getBottomType());
@@ -380,17 +378,16 @@ public class Pure
         {
             throw new RuntimeException("Error");
         }
-        if (func instanceof Property)
+        if (func instanceof Property property)
         {
-            return ces.getFunctionCache().getIfAbsentPutFunctionForClassProperty((Property<?, ?>) func, ces.getClassLoader());
+            return ces.getFunctionCache().getIfAbsentPutFunctionForClassProperty(property, ces.getClassLoader());
         }
-        if (func instanceof LambdaCompiledExtended)
+        if (func instanceof LambdaCompiledExtended extended)
         {
-            return ((LambdaCompiledExtended) func).pureFunction();
+            return extended.pureFunction();
         }
-        if (func instanceof LambdaFunction)
+        if (func instanceof LambdaFunction lambda)
         {
-            LambdaFunction<?> lambda = (LambdaFunction<?>) func;
             if (canFindNativeOrLambdaFunction(es, func))
             {
                 return getNativeOrLambdaFunction(es, func);
@@ -402,7 +399,7 @@ public class Pure
             }
             return ((LambdaCompiledExtended) CompiledSupport.dynamicallyBuildLambdaFunction(func, es)).pureFunction();
         }
-        if (func instanceof ConcreteFunctionDefinition)
+        if (func instanceof ConcreteFunctionDefinition definition)
         {
             if (func.getSourceInformation() != null)
             {
@@ -432,7 +429,7 @@ public class Pure
                 PureMap openVars = new PureMap(Maps.mutable.empty());
                 if (Reactivator.canReactivateWithoutJavaCompilation(func, es, openVars, bridge))
                 {
-                    return DynamicPureFunctionImpl.createPureFunction((FunctionDefinition<?>) func, openVars.getMap(), bridge);
+                    return DynamicPureFunctionImpl.createPureFunction(definition, openVars.getMap(), bridge);
                 }
             }
         }
@@ -458,17 +455,16 @@ public class Pure
         if (func instanceof ConcreteFunctionDefinition)
         {
             SharedPureFunction<?> pureFunc = getSharedPureFunction(func, bridge, es);
-            if (pureFunc instanceof JavaMethodWithParamsSharedPureFunction)
+            if (pureFunc instanceof JavaMethodWithParamsSharedPureFunction p)
             {
-                JavaMethodWithParamsSharedPureFunction<?> p = (JavaMethodWithParamsSharedPureFunction<?>) pureFunc;
                 Class<?>[] paramClasses = p.getParametersTypes();
                 int l = paramClasses.length;
                 MutableList<Object> paramInstances = Lists.mutable.ofInitialCapacity(l - 1);
                 for (int i = 0; i < (l - 1); i++)
                 {
-                    if (instances[i] instanceof RichIterable && paramClasses[i] != RichIterable.class)
+                    if (instances[i] instanceof RichIterable iterable && paramClasses[i] != RichIterable.class)
                     {
-                        paramInstances.add(CompiledSupport.toOne(((RichIterable<?>) instances[i]), null));
+                        paramInstances.add(CompiledSupport.toOne(iterable, null));
                     }
                     else
                     {
@@ -502,13 +498,13 @@ public class Pure
             catch (InvocationTargetException e)
             {
                 Throwable cause = e.getCause();
-                if (cause instanceof Error)
+                if (cause instanceof Error error)
                 {
-                    throw (Error) cause;
+                    throw error;
                 }
-                if (cause instanceof PureException)
+                if (cause instanceof PureException exception)
                 {
-                    throw (PureException) cause;
+                    throw exception;
                 }
                 throw new PureExecutionException(func.getSourceInformation(), "Error invoking property '" + func.getName() + "'", cause);
             }
@@ -588,12 +584,12 @@ public class Pure
         if (paramInputs.notEmpty())
         {
             Object first = paramInputs.get(0);
-            if (first instanceof Iterable)
+            if (first instanceof Iterable iterable)
             {
-                Object instance = Iterate.getFirst((Iterable<?>) first);
+                Object instance = Iterate.getFirst(iterable);
                 if (instance != null)
                 {
-                    int size = Iterate.sizeOf((Iterable<?>) first);
+                    int size = Iterate.sizeOf(iterable);
                     if (size > 1)
                     {
                         throw new PureExecutionException(sourceInfo, "Error accessing property '" + name + "': got too many instances (expected 1, got " + size + ")");
@@ -643,16 +639,16 @@ public class Pure
     public static org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.type.Class<?> genericTypeClass(org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.type.generics.GenericType genericType)
     {
         Type t = genericType._rawType();
-        if (t instanceof org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.type.Class)
+        if (t instanceof org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.type.Class class1)
         {
-            return (org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.type.Class<?>) t;
+            return class1;
         }
         return null;
     }
 
     public static String manageId(Object obj)
     {
-        return (obj instanceof Any) ? ((Any) obj).getName() : String.valueOf(obj);
+        return (obj instanceof Any a) ? a.getName() : String.valueOf(obj);
     }
 
 
@@ -664,21 +660,21 @@ public class Pure
             //In the case of LambdaFunction_Impl, we do not need to concern with OpenVariables
             //(Is this because you can't dynamically create an instance of LambdaFunction_Impl with
             //any open variables?)
-            if (func instanceof LambdaCompiledExtended)
+            if (func instanceof LambdaCompiledExtended extended)
             {
-                SharedPureFunction<?> pureFunction = ((LambdaCompiledExtended) func).pureFunction();
-                if (pureFunction instanceof PureLambdaFunction)
+                SharedPureFunction<?> pureFunction = extended.pureFunction();
+                if (pureFunction instanceof PureLambdaFunction function)
                 {
-                    MutableMap<String, Object> __vars = ((PureLambdaFunction<?>) pureFunction).getOpenVariables();
+                    MutableMap<String, Object> __vars = function.getOpenVariables();
                     if (__vars != null)
                     {
                         __vars.forEachKeyValue((key, value) -> map.put(key, bridge.buildList()._valuesAddAll(CompiledSupport.toPureCollection(value))));
                     }
                 }
             }
-            else if (func instanceof PureLambdaFunction)
+            else if (func instanceof PureLambdaFunction function)
             {
-                map.putAll(((PureLambdaFunction) func).getOpenVariables());
+                map.putAll(function.getOpenVariables());
             }
             // This can be helpful for debugging, but perhaps should actually
             // be checked inside 'evaluate' on a lambda instead?
@@ -699,9 +695,8 @@ public class Pure
         }
         Any returnObject = (Any) input;
         ElementOverride elementOverride = returnObject._elementOverride();
-        if (elementOverride instanceof ConstraintsOverride)
+        if (elementOverride instanceof ConstraintsOverride constraintsOverride)
         {
-            ConstraintsOverride constraintsOverride = (ConstraintsOverride) elementOverride;
             if (constraintsOverride._constraintsManager() != null)
             {
                 return CompiledSupport.executeFunction(constraintsOverride._constraintsManager(), new Class[]{Object.class}, new Object[]{input}, es);
@@ -780,7 +775,7 @@ public class Pure
     {
         if (type instanceof Enumeration)
         {
-            return (obj instanceof Enum) && type.equals(((CompiledExecutionSupport) es).getMetadataAccessor().getEnumeration(((Enum) obj).getFullSystemPath()));
+            return (obj instanceof Enum e) && type.equals(((CompiledExecutionSupport) es).getMetadataAccessor().getEnumeration(e.getFullSystemPath()));
         }
 
         Class<?> javaClass;
@@ -790,9 +785,9 @@ public class Pure
         }
         catch (Exception e)
         {
-            if (obj instanceof CoreInstance)
+            if (obj instanceof CoreInstance instance)
             {
-                return Instance.instanceOf((CoreInstance) obj, type, ((CompiledExecutionSupport) es).getProcessorSupport());
+                return Instance.instanceOf(instance, type, ((CompiledExecutionSupport) es).getProcessorSupport());
             }
             throw e;
         }
@@ -809,7 +804,7 @@ public class Pure
 
     public static boolean instanceOfEnumeration(Object obj, String enumerationSystemPath)
     {
-        return (obj instanceof Enum) && enumerationSystemPath.equals(((Enum) obj).getFullSystemPath());
+        return (obj instanceof Enum e) && enumerationSystemPath.equals(e.getFullSystemPath());
     }
 
     public static boolean matches(Object obj, Type type, int lowerBound, int upperBound, ExecutionSupport es)
@@ -833,15 +828,14 @@ public class Pure
         }
         if ((javaClass == Object.class) || (javaClass == Any.class))
         {
-            return numberMatchesMultiplicity((obj instanceof Iterable) ? Iterate.sizeOf((Iterable<?>) obj) : 1, lowerBound, upperBound);
+            return numberMatchesMultiplicity((obj instanceof Iterable i) ? Iterate.sizeOf(i) : 1, lowerBound, upperBound);
         }
         if (javaClass == Nil.class)
         {
-            return (lowerBound == 0) && (obj instanceof Iterable) && Iterate.isEmpty((Iterable<?>) obj);
+            return (lowerBound == 0) && (obj instanceof Iterable i) && Iterate.isEmpty(i);
         }
-        if (obj instanceof Iterable)
+        if (obj instanceof Iterable collection)
         {
-            Iterable<?> collection = (Iterable<?>) obj;
             if (!numberMatchesMultiplicity(Iterate.sizeOf(collection), lowerBound, upperBound))
             {
                 return false;
@@ -864,9 +858,8 @@ public class Pure
         {
             return numberMatchesMultiplicity(0, lowerBound, upperBound);
         }
-        if (obj instanceof Iterable)
+        if (obj instanceof Iterable collection)
         {
-            Iterable<?> collection = (Iterable<?>) obj;
             if (!numberMatchesMultiplicity(Iterate.sizeOf(collection), lowerBound, upperBound))
             {
                 return false;
@@ -1043,9 +1036,9 @@ public class Pure
 
     public static Object reactivate(ValueSpecification valueSpecification, PureMap lambdaOpenVariablesMap, boolean allowJavaCompilation, Bridge bridge, ExecutionSupport es)
     {
-        if (valueSpecification instanceof RoutedValueSpecification)
+        if (valueSpecification instanceof RoutedValueSpecification specification)
         {
-            return reactivate(((RoutedValueSpecification) valueSpecification)._value(), lambdaOpenVariablesMap, allowJavaCompilation, bridge, es);
+            return reactivate(specification._value(), lambdaOpenVariablesMap, allowJavaCompilation, bridge, es);
         }
         //Determine if the whole expression can be evaluated using the fast path
         //If any of the sub-expressions can't be evaluated then it is faster to use the slow path for the whole

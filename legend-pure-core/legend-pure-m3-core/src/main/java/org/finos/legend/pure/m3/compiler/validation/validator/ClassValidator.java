@@ -87,7 +87,7 @@ public class ClassValidator implements MatchRunner<Class<?>>
         CoreInstance superRawType = ImportStub.withImportStubByPass(superGenericType._rawTypeCoreInstance(), processorSupport);
         if (superRawType instanceof ClassProjection)
         {
-            throw new PureCompilationException(superGenericType.getSourceInformation(), String.format("Class '%s' is a projection and cannot be extended.", superRawType.getName()));
+            throw new PureCompilationException(superGenericType.getSourceInformation(), "Class '%s' is a projection and cannot be extended.".formatted(superRawType.getName()));
         }
 
         // Check for loops in type arguments

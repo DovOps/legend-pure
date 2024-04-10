@@ -155,17 +155,17 @@ public class Compare extends NativeFunction
 
     private static Number getNumberValue(CoreInstance instance, ProcessorSupport processorSupport)
     {
-        if (instance instanceof IntegerCoreInstance)
+        if (instance instanceof IntegerCoreInstance coreInstance)
         {
-            return ((IntegerCoreInstance)instance).getValue();
+            return coreInstance.getValue();
         }
-        if (instance instanceof FloatCoreInstance)
+        if (instance instanceof FloatCoreInstance coreInstance)
         {
-            return ((FloatCoreInstance)instance).getValue();
+            return coreInstance.getValue();
         }
-        if (instance instanceof DecimalCoreInstance)
+        if (instance instanceof DecimalCoreInstance coreInstance)
         {
-            return ((DecimalCoreInstance)instance).getValue();
+            return coreInstance.getValue();
         }
         if (Instance.instanceOf(instance, M3Paths.Integer, processorSupport))
         {
@@ -184,9 +184,9 @@ public class Compare extends NativeFunction
 
     private static PureDate getDateValue(CoreInstance instance, ProcessorSupport processorSupport)
     {
-        if (instance instanceof DateCoreInstance)
+        if (instance instanceof DateCoreInstance coreInstance)
         {
-            return ((DateCoreInstance)instance).getValue();
+            return coreInstance.getValue();
         }
         if (Instance.instanceOf(instance, M3Paths.Date, processorSupport))
         {

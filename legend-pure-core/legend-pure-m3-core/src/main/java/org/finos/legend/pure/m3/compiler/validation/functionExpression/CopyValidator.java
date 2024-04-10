@@ -47,20 +47,20 @@ public class CopyValidator
             {
                 for (CoreInstance keyValue : ((InstanceValue)parametersValues.get(2))._valuesCoreInstance())
                 {
-                    if (keyValue instanceof KeyExpression)
+                    if (keyValue instanceof KeyExpression keyExpression)
                     {
                         // Validate key is an actual property
                         GenericType previousGenericType = genericType;
                         GenericType currentGenericType = null;
                         Type currentClassifier = classifier;
                         AbstractProperty property = null;
-                        RichIterable<? extends CoreInstance> keys = ((KeyExpression)keyValue)._key()._valuesCoreInstance();
+                        RichIterable<? extends CoreInstance> keys = keyExpression._key()._valuesCoreInstance();
                         for (CoreInstance key : keys)
                         {
                             property = (AbstractProperty)processorSupport.class_findPropertyUsingGeneralization(currentClassifier, key.getName());
                             if (property == null)
                             {
-                                throw new PureCompilationException(((KeyExpression)keyValue)._key().getSourceInformation(), "The property '" + key.getName() + "' can't be found in the type '" + classifier.getName() + "' or in its hierarchy.");
+                                throw new PureCompilationException(keyExpression._key().getSourceInformation(), "The property '" + key.getName() + "' can't be found in the type '" + classifier.getName() + "' or in its hierarchy.");
                             }
                             if (currentGenericType != null)
                             {
@@ -70,7 +70,7 @@ public class CopyValidator
                             currentClassifier = (Type)ImportStub.withImportStubByPass(currentGenericType._rawTypeCoreInstance(), processorSupport);
                         }
 
-                        NewValidator.validatePropertyValue(matcher, state, expression, (KeyExpression)keyValue, previousGenericType, property, processorSupport);
+                        NewValidator.validatePropertyValue(matcher, state, expression, keyExpression, previousGenericType, property, processorSupport);
                     }
                 }
             }

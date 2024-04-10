@@ -57,14 +57,14 @@ public class RootRouteNodeUnbind implements MatchRunner<RootRouteNode>
 
     public void unbindTreePathNode(RouteNode treeNode, UnbindState state, Matcher matcher, ProcessorSupport processorSupport)
     {
-        if (treeNode instanceof ExistingPropertyRouteNode)
+        if (treeNode instanceof ExistingPropertyRouteNode node)
         {
-            unbindExistingPropertyNode((ExistingPropertyRouteNode)treeNode, state, processorSupport);
+            unbindExistingPropertyNode(node, state, processorSupport);
         }
 
-        if (treeNode instanceof NewPropertyRouteNode)
+        if (treeNode instanceof NewPropertyRouteNode node)
         {
-            unbindNewPropertyNode((NewPropertyRouteNode)treeNode, state, matcher, processorSupport);
+            unbindNewPropertyNode(node, state, matcher, processorSupport);
         }
 
         unbindResolvedProperties(treeNode, processorSupport);

@@ -35,8 +35,8 @@ import org.finos.legend.pure.m4.coreinstance.CoreInstance;
 import org.finos.legend.pure.m4.tools.GraphNodeIterable;
 import org.finos.legend.pure.runtime.java.compiled.execution.FunctionExecutionCompiledBuilder;
 import org.finos.legend.pure.runtime.java.compiled.metadata.MetadataBuilder;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;
 import java.util.Formatter;
@@ -64,7 +64,7 @@ public class TestGraphIsSerialized
 
         runtime = new PureRuntimeBuilder(getCodeStorage()).withCache(cache).buildAndTryToInitializeFromCache();
         new FunctionExecutionCompiledBuilder().build().init(runtime, new Message(""));
-        Assert.assertTrue(cache.getCacheState().getLastStackTrace(), runtime.isInitialized());
+        Assertions.assertTrue(runtime.isInitialized(), cache.getCacheState().getLastStackTrace());
         assertAllInstancesMarkedSerialized(runtime);
     }
 
@@ -80,7 +80,7 @@ public class TestGraphIsSerialized
         runtime = new PureRuntimeBuilder(getCodeStorage())
                 .withCache(cache).buildAndTryToInitializeFromCache();
         new FunctionExecutionCompiledBuilder().build().init(runtime, new Message(""));
-        Assert.assertTrue(cache.getCacheState().getLastStackTrace(), runtime.isInitialized());
+        Assertions.assertTrue(runtime.isInitialized(), cache.getCacheState().getLastStackTrace());
         assertAllInstancesMarkedSerialized(runtime);
     }
 
@@ -110,7 +110,7 @@ public class TestGraphIsSerialized
             {
                 formatter.format("%n\t...");
             }
-            Assert.fail(message.toString());
+            Assertions.fail(message.toString());
         }
     }
 

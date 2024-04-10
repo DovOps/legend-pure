@@ -115,22 +115,22 @@ public class DatabaseUnloadUnbind implements MatchRunner<Database>
 
     private void scanOperation(RelationalOperationElement element, TableAlias joinTarget, ProcessorSupport processorSupport)
     {
-        if (element instanceof TableAliasColumn)
+        if (element instanceof TableAliasColumn column)
         {
-            processTableAliasColumn((TableAliasColumn)element, joinTarget, processorSupport);
+            processTableAliasColumn(column, joinTarget, processorSupport);
         }
-        else if (element instanceof BinaryOperation)
+        else if (element instanceof BinaryOperation operation)
         {
-            scanOperation(((BinaryOperation)element)._left(), joinTarget, processorSupport);
-            scanOperation(((BinaryOperation)element)._right(), joinTarget, processorSupport);
+            scanOperation(operation._left(), joinTarget, processorSupport);
+            scanOperation(operation._right(), joinTarget, processorSupport);
         }
-        else if (element instanceof UnaryOperation)
+        else if (element instanceof UnaryOperation operation)
         {
-            scanOperation(((UnaryOperation)element)._nested(), joinTarget, processorSupport);
+            scanOperation(operation._nested(), joinTarget, processorSupport);
         }
-        else if (element instanceof DynaFunction)
+        else if (element instanceof DynaFunction function)
         {
-            for (RelationalOperationElement param : ((DynaFunction)element)._parameters())
+            for (RelationalOperationElement param : function._parameters())
             {
                 scanOperation(param, joinTarget, processorSupport);
             }

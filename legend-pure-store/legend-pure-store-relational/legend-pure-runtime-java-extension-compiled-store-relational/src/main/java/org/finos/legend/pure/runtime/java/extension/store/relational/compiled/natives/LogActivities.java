@@ -30,6 +30,6 @@ public class LogActivities extends AbstractNative
     @Override
     public String build(CoreInstance topLevelElement, CoreInstance functionExpression, ListIterable<String> transformedParams, ProcessorContext processorContext)
     {
-        return String.format("RelationalGen.logActivities(%s, es)", transformedParams.get(0));
+        return "RelationalGen.logActivities(%s, es)".formatted(transformedParams.get(0));
     }
 }

@@ -17,11 +17,11 @@ package org.finos.legend.pure.runtime.java.extension.external.json.interpreted.n
 import org.finos.legend.pure.m3.execution.FunctionExecution;
 import org.finos.legend.pure.m3.tests.function.base.asserts.AbstractTestAssertJsonStringsEqual;
 import org.finos.legend.pure.runtime.java.interpreted.FunctionExecutionInterpreted;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.BeforeAll;
 
 public class TestAssertJsonStringsEqual extends AbstractTestAssertJsonStringsEqual
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getFunctionExecution());

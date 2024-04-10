@@ -71,11 +71,11 @@ abstract class AbstractDateWithSubsecond extends AbstractDateWithSecond
         }
         if (milliseconds < 0)
         {
-            copy.decrementSubsecond(String.format("%03d", -milliseconds), 0, 3);
+            copy.decrementSubsecond("%03d".formatted(-milliseconds), 0, 3);
         }
         else if (milliseconds != 0)
         {
-            copy.incrementSubsecond(String.format("%03d", milliseconds), 0, 3);
+            copy.incrementSubsecond("%03d".formatted(milliseconds), 0, 3);
         }
         return copy;
     }
@@ -103,11 +103,11 @@ abstract class AbstractDateWithSubsecond extends AbstractDateWithSecond
         }
         if (microseconds < 0)
         {
-            copy.decrementSubsecond(String.format("%06d", -microseconds), 0, 6);
+            copy.decrementSubsecond("%06d".formatted(-microseconds), 0, 6);
         }
         else if (microseconds != 0)
         {
-            copy.incrementSubsecond(String.format("%06d", microseconds), 0, 6);
+            copy.incrementSubsecond("%06d".formatted(microseconds), 0, 6);
         }
         return copy;
     }
@@ -135,7 +135,7 @@ abstract class AbstractDateWithSubsecond extends AbstractDateWithSecond
                 long days = seconds / 86_400;
                 if ((days > Integer.MAX_VALUE) || (days < Integer.MIN_VALUE))
                 {
-                    throw new IllegalArgumentException(String.format("Cannot add %,d nanoseconds: too large", nanoseconds));
+                    throw new IllegalArgumentException("Cannot add %,d nanoseconds: too large".formatted(nanoseconds));
                 }
                 copy.incrementDay((int)days);
                 seconds %= 86_400;
@@ -145,11 +145,11 @@ abstract class AbstractDateWithSubsecond extends AbstractDateWithSecond
         }
         if (nanoseconds < 0)
         {
-            copy.decrementSubsecond(String.format("%09d", -nanoseconds), 0, 9);
+            copy.decrementSubsecond("%09d".formatted(-nanoseconds), 0, 9);
         }
         else if (nanoseconds != 0)
         {
-            copy.incrementSubsecond(String.format("%09d", nanoseconds), 0, 9);
+            copy.incrementSubsecond("%09d".formatted(nanoseconds), 0, 9);
         }
         return copy;
     }

@@ -66,7 +66,7 @@ public class SetImplementationProcessor extends Processor<SetImplementation>
 
         ensureSetImplementationHasId(classMapping, repository, processorSupport);
 
-        for (PropertyMapping propertyMapping : classMapping instanceof InstanceSetImplementation ? ((InstanceSetImplementation) classMapping)._propertyMappings() : Lists.immutable.<PropertyMapping>empty())
+        for (PropertyMapping propertyMapping : classMapping instanceof InstanceSetImplementation isi ? isi._propertyMappings() : Lists.immutable.<PropertyMapping>empty())
         {
             PropertyMappingProcessor.processPropertyMapping(propertyMapping, repository, processorSupport, _class, (PropertyMappingsImplementation) classMapping);
         }
@@ -76,11 +76,11 @@ public class SetImplementationProcessor extends Processor<SetImplementation>
 
     private void buildMappingClassOutOfLocalProperties(final ModelRepository repository, SetImplementation classMapping, ProcessorState state, Matcher matcher, final ProcessorSupport processorSupport)
     {
-        RichIterable<? extends PropertyMapping> localProperties = classMapping instanceof InstanceSetImplementation ? ((InstanceSetImplementation) classMapping)._propertyMappings().select(propertyMapping -> propertyMapping._localMappingProperty() != null ? propertyMapping._localMappingProperty() : false) : Lists.immutable.empty();
+        RichIterable<? extends PropertyMapping> localProperties = classMapping instanceof InstanceSetImplementation isi ? isi._propertyMappings().select(propertyMapping -> propertyMapping._localMappingProperty() != null ? propertyMapping._localMappingProperty() : false) : Lists.immutable.empty();
 
         CoreInstance _class = ImportStub.withImportStubByPass(classMapping._classCoreInstance(), processorSupport);
 
-        boolean hasAggregateSpecification = classMapping instanceof InstanceSetImplementation && ((InstanceSetImplementation) classMapping)._aggregateSpecification() != null;
+        boolean hasAggregateSpecification = classMapping instanceof InstanceSetImplementation isi && isi._aggregateSpecification() != null;
 
         if (localProperties.notEmpty() || hasAggregateSpecification)
         {
@@ -125,7 +125,7 @@ public class SetImplementationProcessor extends Processor<SetImplementation>
     public void populateReferenceUsages(SetImplementation classMapping, ModelRepository repository, ProcessorSupport processorSupport)
     {
         addReferenceUsageForToOneProperty(classMapping, classMapping._classCoreInstance(), M3Properties._class, repository, processorSupport);
-        for (PropertyMapping propertyMapping : classMapping instanceof InstanceSetImplementation ? ((InstanceSetImplementation) classMapping)._propertyMappings() : Lists.immutable.<PropertyMapping>empty())
+        for (PropertyMapping propertyMapping : classMapping instanceof InstanceSetImplementation isi ? isi._propertyMappings() : Lists.immutable.<PropertyMapping>empty())
         {
             PropertyMappingProcessor.populateReferenceUsagesForPropertyMapping(propertyMapping, repository, processorSupport);
         }

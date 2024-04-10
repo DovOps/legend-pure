@@ -63,10 +63,8 @@ public class OpenVariableValues extends NativeFunction
         Instance.addValueToProperty(classifierGenericType, M3Properties.typeArguments, listGenericType, processorSupport);
         Instance.addValueToProperty(map, M3Properties.classifierGenericType, classifierGenericType, processorSupport);
 
-        if (Instance.instanceOf(f, M3Paths.LambdaFunction, processorSupport) && f instanceof LambdaWithContext)
+        if (Instance.instanceOf(f, M3Paths.LambdaFunction, processorSupport) && f instanceof LambdaWithContext l)
         {
-
-            LambdaWithContext l = (LambdaWithContext)f;
             ListIterable<? extends CoreInstance> vars = l.getValueForMetaPropertyToMany(M3Properties.openVariables);
             VariableContext lambdaVariableContext = l.getVariableContext();
             for (CoreInstance var : vars)

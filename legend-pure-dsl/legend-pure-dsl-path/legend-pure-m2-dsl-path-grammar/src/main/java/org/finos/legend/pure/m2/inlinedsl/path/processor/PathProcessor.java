@@ -71,9 +71,8 @@ public class PathProcessor extends Processor<Path<?, ?>>
         for (PathElement pathElement : instance._path())
         {
             PostProcessor.processElement(matcher, _class, state, processorSupport);
-            if (pathElement instanceof PropertyPathElement)
+            if (pathElement instanceof PropertyPathElement propertyPathElement)
             {
-                PropertyPathElement propertyPathElement = (PropertyPathElement) pathElement;
                 PropertyStub propertyStubNonResolved = (PropertyStub) propertyPathElement._propertyCoreInstance();
                 propertyStubNonResolved._ownerCoreInstance(_class);
                 AbstractProperty<?> property = (AbstractProperty<?>) ImportStub.withImportStubByPass(propertyPathElement._propertyCoreInstance(), processorSupport);
@@ -114,9 +113,9 @@ public class PathProcessor extends Processor<Path<?, ?>>
         int i = 0;
         for (PathElement pathElement : path._path())
         {
-            if (pathElement instanceof PropertyPathElement)
+            if (pathElement instanceof PropertyPathElement element)
             {
-                AbstractProperty<?> property = (AbstractProperty<?>) ImportStub.withImportStubByPass(((PropertyPathElement) pathElement)._propertyCoreInstance(), processorSupport);
+                AbstractProperty<?> property = (AbstractProperty<?>) ImportStub.withImportStubByPass(element._propertyCoreInstance(), processorSupport);
                 this.addReferenceUsage(path, property, "path", i, repository, processorSupport, pathElement.getSourceInformation());
             }
             i++;

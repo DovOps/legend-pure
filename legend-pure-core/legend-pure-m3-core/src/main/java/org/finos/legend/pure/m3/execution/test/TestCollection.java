@@ -430,7 +430,7 @@ public class TestCollection
         TestCollection testCollection = new TestCollection(pkg);
 
         CoreInstance testParameterizationId = Instance.getValueForMetaPropertyToOneResolved(pureTestCollection, TestTools.TEST_COLLECTION_TEST_PARAMETERIZATION_ID, processorSupport);
-        testCollection.testParameterizationId = testParameterizationId instanceof StringCoreInstance ? ((StringCoreInstance) testParameterizationId).getValue() : null;
+        testCollection.testParameterizationId = testParameterizationId instanceof StringCoreInstance sci ? sci.getValue() : null;
 
         testCollection.testFunctionParam = Instance.getValueForMetaPropertyToOneResolved(pureTestCollection, TestTools.TEST_COLLECTION_TEST_FUNCTION_PARAM, processorSupport);
         testCollection.testFunctionParamCustomizer = Instance.getValueForMetaPropertyToOneResolved(pureTestCollection, TestTools.TEST_COLLECTION_TEST_FUNCTION_PARAM_CUSTOMIZER, processorSupport);

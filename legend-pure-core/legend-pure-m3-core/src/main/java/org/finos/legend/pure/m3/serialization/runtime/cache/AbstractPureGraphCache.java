@@ -142,7 +142,7 @@ abstract class AbstractPureGraphCache implements PureGraphCache
             updateCacheState();
             if (message != null)
             {
-                message.setMessage(String.format("Cache found (size=%,dB)", getCacheSize()));
+                message.setMessage("Cache found (size=%,dB)".formatted(getCacheSize()));
             }
         }
         else if (message != null)

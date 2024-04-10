@@ -58,14 +58,16 @@ public class ExternalClassBuilder
         builder.append("    private static volatile ExecutionSupport EXECUTION_SUPPORT = null;\n");
         builder.append("    private static boolean disableConsole = true;\n");
         builder.append("    private static org.finos.legend.pure.m3.statelistener.ExecutionActivityListener EXECUTION_ACTIVITY_LISTENER;\n");
-        builder.append("    private static MutableMap<String, CodeRepository> repoByName = CodeRepositoryProviderHelper.findCodeRepositories().groupByUniqueKey(new DefendedFunction<CodeRepository, String>()\n" +
-                "        {\n" +
-                "            @Override\n" +
-                "            public String valueOf(CodeRepository codeRepository)\n" +
-                "            {\n" +
-                "                return codeRepository.getName();\n" +
-                "            }\n" +
-                "        }, Maps.mutable.<String, CodeRepository>empty());\n");
+        builder.append("""
+                    private static MutableMap<String, CodeRepository> repoByName = CodeRepositoryProviderHelper.findCodeRepositories().groupByUniqueKey(new DefendedFunction<CodeRepository, String>()
+                        {
+                            @Override
+                            public String valueOf(CodeRepository codeRepository)
+                            {
+                                return codeRepository.getName();
+                            }
+                        }, Maps.mutable.<String, CodeRepository>empty());
+                """);
         builder.append("\n");
         builder.append("    private ").append(externalFunctionClass).append("()\n");
         builder.append("    {\n");
@@ -101,28 +103,30 @@ public class ExternalClassBuilder
         builder.append("                {\n");
         classLoaderRepos = Lists.mutable.withAll(classLoaderRepos).sortThis();
         vcsRepos = Lists.mutable.withAll(vcsRepos).sortThis();
-        classLoaderRepos.appendString(builder, "                    ClassLoaderCodeStorage classLoaderCodeStorage = new ClassLoaderCodeStorage(Lists.immutable.with(\"", "\", \"", "\").collect(new DefendedFunction<String, CodeRepository>()\n" +
-                "        {\n" +
-                "            @Override\n" +
-                "            public CodeRepository valueOf(String name)\n" +
-                "            {\n" +
-                "                 if (repoByName.get(name) == null)" +
-                "                   {" +
-                "                       System.out.println(\"WARNING! The repository '\" + name + \"' has not been found on the classpath\");" +
-                "                   }" +
-                "                return repoByName.get(name);\n" +
-                "            }\n" +
-                "        }).select(new Predicate<CodeRepository>()\n" +
-                "        {\n" +
-                "            @Override\n" +
-                "            public boolean accept(CodeRepository codeRepository)\n" +
-                "            {\n" +
-                "                return codeRepository != null;\n" +
-                "            }\n" +
-                "            public boolean test(CodeRepository each) {\n" +
-                "                return this.accept(each);\n" +
-                "            }\n" +
-                "        }));\n");
+        classLoaderRepos.appendString(builder, "                    ClassLoaderCodeStorage classLoaderCodeStorage = new ClassLoaderCodeStorage(Lists.immutable.with(\"", "\", \"", """
+                ").collect(new DefendedFunction<String, CodeRepository>()
+                        {
+                            @Override
+                            public CodeRepository valueOf(String name)
+                            {
+                                 if (repoByName.get(name) == null)\
+                                   {\
+                                       System.out.println("WARNING! The repository '" + name + "' has not been found on the classpath");\
+                                   }\
+                                return repoByName.get(name);
+                            }
+                        }).select(new Predicate<CodeRepository>()
+                        {
+                            @Override
+                            public boolean accept(CodeRepository codeRepository)
+                            {
+                                return codeRepository != null;
+                            }
+                            public boolean test(CodeRepository each) {
+                                return this.accept(each);
+                            }
+                        }));
+                """);
         if (vcsRepos.isEmpty())
         {
             builder.append("                    CompositeCodeStorage codeStorage = new CompositeCodeStorage(classLoaderCodeStorage);\n");

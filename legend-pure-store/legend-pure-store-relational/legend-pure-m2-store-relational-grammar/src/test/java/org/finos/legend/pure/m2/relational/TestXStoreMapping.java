@@ -14,8 +14,8 @@
 
 package org.finos.legend.pure.m2.relational;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class TestXStoreMapping extends AbstractPureRelationalTestWithCoreCompiled
 {
@@ -23,48 +23,50 @@ public class TestXStoreMapping extends AbstractPureRelationalTestWithCoreCompile
     public void testXStoreMapping()
     {
         this.runtime.createInMemorySource("mapping.pure",
-                "Class Firm\n" +
-                        "{\n" +
-                        "   legalName : String[1];\n" +
-                        "}\n" +
-                        "\n" +
-                        "Class Person\n" +
-                        "{\n" +
-                        "   lastName : String[1];\n" +
-                        "}\n" +
-                        "\n" +
-                        "Association Firm_Person\n" +
-                        "{\n" +
-                        "   firm : Firm[1];\n" +
-                        "   employees : Person[*];\n" +
-                        "}\n" +
-                        "###Mapping\n" +
-                        "Mapping FirmMapping\n" +
-                        "(\n" +
-                        "   Firm[f1] : Relational\n" +
-                        "   {\n" +
-                        "      +id:String[1] : [db]FirmTable.id,\n" +
-                        "      legalName : [db]FirmTable.legal_name\n" +
-                        "   }\n" +
-                        "   \n" +
-                        "   Person[e] : Relational\n" +
-                        "   {\n" +
-                        "      +firmId:String[1] : [db]PersonTable.firmId,\n" +
-                        "      lastName : [db]PersonTable.lastName\n" +
-                        "   }\n" +
-                        "   \n" +
-                        "   Firm_Person : XStore\n" +
-                        "   {\n" +
-                        "      firm[e, f1] : $this.firmId == $that.id,\n" +
-                        "      employees[f1, e] : $this.id == $that.firmId\n" +
-                        "   }\n" +
-                        ")\n" +
-                        "###Relational\n" +
-                        "Database db\n" +
-                        "(\n" +
-                        "   Table FirmTable (id INTEGER, legal_name VARCHAR(200))\n" +
-                        "   Table PersonTable (firmId INTEGER, lastName VARCHAR(200))\n" +
-                        ")");
+                """
+                Class Firm
+                {
+                   legalName : String[1];
+                }
+                
+                Class Person
+                {
+                   lastName : String[1];
+                }
+                
+                Association Firm_Person
+                {
+                   firm : Firm[1];
+                   employees : Person[*];
+                }
+                ###Mapping
+                Mapping FirmMapping
+                (
+                   Firm[f1] : Relational
+                   {
+                      +id:String[1] : [db]FirmTable.id,
+                      legalName : [db]FirmTable.legal_name
+                   }
+                  \s
+                   Person[e] : Relational
+                   {
+                      +firmId:String[1] : [db]PersonTable.firmId,
+                      lastName : [db]PersonTable.lastName
+                   }
+                  \s
+                   Firm_Person : XStore
+                   {
+                      firm[e, f1] : $this.firmId == $that.id,
+                      employees[f1, e] : $this.id == $that.firmId
+                   }
+                )
+                ###Relational
+                Database db
+                (
+                   Table FirmTable (id INTEGER, legal_name VARCHAR(200))
+                   Table PersonTable (firmId INTEGER, lastName VARCHAR(200))
+                )\
+                """);
         this.runtime.compile();
     }
 
@@ -72,77 +74,81 @@ public class TestXStoreMapping extends AbstractPureRelationalTestWithCoreCompile
     public void testXStoreMappingTypeError()
     {
         this.runtime.createInMemorySource("mapping.pure",
-                "Class Firm\n" +
-                        "{\n" +
-                        "   legalName : String[1];\n" +
-                        "}\n" +
-                        "\n" +
-                        "Class Person\n" +
-                        "{\n" +
-                        "   lastName : String[1];\n" +
-                        "}\n" +
-                        "\n" +
-                        "Association Firm_Person\n" +
-                        "{\n" +
-                        "   firm : Firm[1];\n" +
-                        "   employees : Person[*];\n" +
-                        "}\n" +
-                        "###Mapping\n" +
-                        "Mapping FirmMapping\n" +
-                        "(\n" +
-                        "   Firm[f1] : Relational\n" +
-                        "   {\n" +
-                        "      +id:String[1] : [db]FirmTable.id,\n" +
-                        "      legalName : [db]FirmTable.legal_name\n" +
-                        "   }\n" +
-                        "   \n" +
-                        "   Person[e] : Relational\n" +
-                        "   {\n" +
-                        "      +firmId:Strixng[1] : [db]PersonTable.firmId,\n" +
-                        "      lastName : [db]PersonTable.lastName\n" +
-                        "   }\n" +
-                        "   \n" +
-                        "   Firm_Person : XStore\n" +
-                        "   {\n" +
-                        "      firm[e, f1] : $this.firmId == $that.id,\n" +
-                        "      employees[f1, e] : $this.id == $that.firmId\n" +
-                        "   }\n" +
-                        ")\n" +
-                        "###Relational\n" +
-                        "Database db\n" +
-                        "(\n" +
-                        "   Table FirmTable (id INTEGER, legal_name VARCHAR(200))\n" +
-                        "   Table PersonTable (firmId INTEGER, lastName VARCHAR(200))\n" +
-                        ")");
+                """
+                Class Firm
+                {
+                   legalName : String[1];
+                }
+                
+                Class Person
+                {
+                   lastName : String[1];
+                }
+                
+                Association Firm_Person
+                {
+                   firm : Firm[1];
+                   employees : Person[*];
+                }
+                ###Mapping
+                Mapping FirmMapping
+                (
+                   Firm[f1] : Relational
+                   {
+                      +id:String[1] : [db]FirmTable.id,
+                      legalName : [db]FirmTable.legal_name
+                   }
+                  \s
+                   Person[e] : Relational
+                   {
+                      +firmId:Strixng[1] : [db]PersonTable.firmId,
+                      lastName : [db]PersonTable.lastName
+                   }
+                  \s
+                   Firm_Person : XStore
+                   {
+                      firm[e, f1] : $this.firmId == $that.id,
+                      employees[f1, e] : $this.id == $that.firmId
+                   }
+                )
+                ###Relational
+                Database db
+                (
+                   Table FirmTable (id INTEGER, legal_name VARCHAR(200))
+                   Table PersonTable (firmId INTEGER, lastName VARCHAR(200))
+                )\
+                """);
         try
         {
             this.runtime.compile();
-            Assert.fail();
+            Assertions.fail();
         }
         catch (Exception e)
         {
-            Assert.assertEquals("Parser error at (resource:mapping.pure line:14), (Not Found: Strixng) in\n" +
-                    "'\n" +
-                    "Mapping FirmMapping\n" +
-                    "(\n" +
-                    "   Firm[f1] : Relational\n" +
-                    "   {\n" +
-                    "      +id:String[1] : [db]FirmTable.id,\n" +
-                    "      legalName : [db]FirmTable.legal_name\n" +
-                    "   }\n" +
-                    "   \n" +
-                    "   Person[e] : Relational\n" +
-                    "   {\n" +
-                    "      +firmId:Strixng[1] : [db]PersonTable.firmId,\n" +
-                    "      lastName : [db]PersonTable.lastName\n" +
-                    "   }\n" +
-                    "   \n" +
-                    "   Firm_Person : XStore\n" +
-                    "   {\n" +
-                    "      firm[e, f1] : $this.firmId == $that.id,\n" +
-                    "      employees[f1, e] : $this.id == $that.firmId\n" +
-                    "   }\n" +
-                    ")'", e.getMessage());
+            Assertions.assertEquals("""
+                    Parser error at (resource:mapping.pure line:14), (Not Found: Strixng) in
+                    '
+                    Mapping FirmMapping
+                    (
+                       Firm[f1] : Relational
+                       {
+                          +id:String[1] : [db]FirmTable.id,
+                          legalName : [db]FirmTable.legal_name
+                       }
+                      \s
+                       Person[e] : Relational
+                       {
+                          +firmId:Strixng[1] : [db]PersonTable.firmId,
+                          lastName : [db]PersonTable.lastName
+                       }
+                      \s
+                       Firm_Person : XStore
+                       {
+                          firm[e, f1] : $this.firmId == $that.id,
+                          employees[f1, e] : $this.id == $that.firmId
+                       }
+                    )'\
+                    """, e.getMessage());
         }
     }
 
@@ -150,48 +156,50 @@ public class TestXStoreMapping extends AbstractPureRelationalTestWithCoreCompile
     public void testXStoreMappingDiffMul()
     {
         this.runtime.createInMemorySource("mapping.pure",
-                "Class Firm\n" +
-                        "{\n" +
-                        "   legalName : String[1];\n" +
-                        "}\n" +
-                        "\n" +
-                        "Class Person\n" +
-                        "{\n" +
-                        "   lastName : String[1];\n" +
-                        "}\n" +
-                        "\n" +
-                        "Association Firm_Person\n" +
-                        "{\n" +
-                        "   firm : Firm[1];\n" +
-                        "   employees : Person[*];\n" +
-                        "}\n" +
-                        "###Mapping\n" +
-                        "Mapping FirmMapping\n" +
-                        "(\n" +
-                        "   Firm[f1] : Relational\n" +
-                        "   {\n" +
-                        "      +id:String[*] : [db]FirmTable.id,\n" +
-                        "      legalName : [db]FirmTable.legal_name\n" +
-                        "   }\n" +
-                        "   \n" +
-                        "   Person[e] : Relational\n" +
-                        "   {\n" +
-                        "      +firmId:String[0..1] : [db]PersonTable.firmId,\n" +
-                        "      lastName : [db]PersonTable.lastName\n" +
-                        "   }\n" +
-                        "   \n" +
-                        "   Firm_Person : XStore\n" +
-                        "   {\n" +
-                        "      firm[e, f1] : $this.firmId == $that.id->toOne(),\n" +
-                        "      employees[f1, e] : $this.id->toOne() == $that.firmId\n" +
-                        "   }\n" +
-                        ")\n" +
-                        "###Relational\n" +
-                        "Database db\n" +
-                        "(\n" +
-                        "   Table FirmTable (id INTEGER, legal_name VARCHAR(200))\n" +
-                        "   Table PersonTable (firmId INTEGER, lastName VARCHAR(200))\n" +
-                        ")");
+                """
+                Class Firm
+                {
+                   legalName : String[1];
+                }
+                
+                Class Person
+                {
+                   lastName : String[1];
+                }
+                
+                Association Firm_Person
+                {
+                   firm : Firm[1];
+                   employees : Person[*];
+                }
+                ###Mapping
+                Mapping FirmMapping
+                (
+                   Firm[f1] : Relational
+                   {
+                      +id:String[*] : [db]FirmTable.id,
+                      legalName : [db]FirmTable.legal_name
+                   }
+                  \s
+                   Person[e] : Relational
+                   {
+                      +firmId:String[0..1] : [db]PersonTable.firmId,
+                      lastName : [db]PersonTable.lastName
+                   }
+                  \s
+                   Firm_Person : XStore
+                   {
+                      firm[e, f1] : $this.firmId == $that.id->toOne(),
+                      employees[f1, e] : $this.id->toOne() == $that.firmId
+                   }
+                )
+                ###Relational
+                Database db
+                (
+                   Table FirmTable (id INTEGER, legal_name VARCHAR(200))
+                   Table PersonTable (firmId INTEGER, lastName VARCHAR(200))
+                )\
+                """);
         this.runtime.compile();
     }
 
@@ -199,48 +207,50 @@ public class TestXStoreMapping extends AbstractPureRelationalTestWithCoreCompile
     public void testXStoreMappingNotSetId()
     {
         this.runtime.createInMemorySource("mapping.pure",
-                "Class Firm\n" +
-                        "{\n" +
-                        "   legalName : String[1];\n" +
-                        "}\n" +
-                        "\n" +
-                        "Class Person\n" +
-                        "{\n" +
-                        "   lastName : String[1];\n" +
-                        "}\n" +
-                        "\n" +
-                        "Association Firm_Person\n" +
-                        "{\n" +
-                        "   firm : Firm[1];\n" +
-                        "   employees : Person[*];\n" +
-                        "}\n" +
-                        "###Mapping\n" +
-                        "Mapping FirmMapping\n" +
-                        "(\n" +
-                        "   Firm : Relational\n" +
-                        "   {\n" +
-                        "      +id:Integer[1] : [db]FirmTable.id,\n" +
-                        "      legalName : [db]FirmTable.legal_name\n" +
-                        "   }\n" +
-                        "   \n" +
-                        "   Person : Relational\n" +
-                        "   {\n" +
-                        "      +firmId:Integer[1] : [db]PersonTable.firmId,\n" +
-                        "      lastName : [db]PersonTable.lastName\n" +
-                        "   }\n" +
-                        "   \n" +
-                        "   Firm_Person : XStore\n" +
-                        "   {\n" +
-                        "      firm : $this.firmId == $that.id,\n" +
-                        "      employees : $this.id == $that.firmId\n" +
-                        "   }\n" +
-                        ")\n" +
-                        "###Relational\n" +
-                        "Database db\n" +
-                        "(\n" +
-                        "   Table FirmTable (id INTEGER, legal_name VARCHAR(200))\n" +
-                        "   Table PersonTable (firmId INTEGER, lastName VARCHAR(200))\n" +
-                        ")");
+                """
+                Class Firm
+                {
+                   legalName : String[1];
+                }
+                
+                Class Person
+                {
+                   lastName : String[1];
+                }
+                
+                Association Firm_Person
+                {
+                   firm : Firm[1];
+                   employees : Person[*];
+                }
+                ###Mapping
+                Mapping FirmMapping
+                (
+                   Firm : Relational
+                   {
+                      +id:Integer[1] : [db]FirmTable.id,
+                      legalName : [db]FirmTable.legal_name
+                   }
+                  \s
+                   Person : Relational
+                   {
+                      +firmId:Integer[1] : [db]PersonTable.firmId,
+                      lastName : [db]PersonTable.lastName
+                   }
+                  \s
+                   Firm_Person : XStore
+                   {
+                      firm : $this.firmId == $that.id,
+                      employees : $this.id == $that.firmId
+                   }
+                )
+                ###Relational
+                Database db
+                (
+                   Table FirmTable (id INTEGER, legal_name VARCHAR(200))
+                   Table PersonTable (firmId INTEGER, lastName VARCHAR(200))
+                )\
+                """);
         this.runtime.compile();
     }
 
@@ -248,49 +258,51 @@ public class TestXStoreMapping extends AbstractPureRelationalTestWithCoreCompile
     public void testXStoreMappingNaturalProperty()
     {
         this.runtime.createInMemorySource("mapping.pure",
-                "Class Firm\n" +
-                        "{\n" +
-                        "   id : Integer[1];\n" +
-                        "   legalName : String[1];\n" +
-                        "}\n" +
-                        "\n" +
-                        "Class Person\n" +
-                        "{\n" +
-                        "   lastName : String[1];\n" +
-                        "}\n" +
-                        "\n" +
-                        "Association Firm_Person\n" +
-                        "{\n" +
-                        "   firm : Firm[1];\n" +
-                        "   employees : Person[*];\n" +
-                        "}\n" +
-                        "###Mapping\n" +
-                        "Mapping FirmMapping\n" +
-                        "(\n" +
-                        "   Firm : Relational\n" +
-                        "   {\n" +
-                        "      id : [db]FirmTable.id,\n" +
-                        "      legalName : [db]FirmTable.legal_name\n" +
-                        "   }\n" +
-                        "   \n" +
-                        "   Person : Relational\n" +
-                        "   {\n" +
-                        "      +firmId:Integer[1] : [db]PersonTable.firmId,\n" +
-                        "      lastName : [db]PersonTable.lastName\n" +
-                        "   }\n" +
-                        "   \n" +
-                        "   Firm_Person : XStore\n" +
-                        "   {\n" +
-                        "      firm : $this.firmId == $that.id,\n" +
-                        "      employees : $this.id == $that.firmId\n" +
-                        "   }\n" +
-                        ")\n" +
-                        "###Relational\n" +
-                        "Database db\n" +
-                        "(\n" +
-                        "   Table FirmTable (id INTEGER, legal_name VARCHAR(200))\n" +
-                        "   Table PersonTable (firmId INTEGER, lastName VARCHAR(200))\n" +
-                        ")");
+                """
+                Class Firm
+                {
+                   id : Integer[1];
+                   legalName : String[1];
+                }
+                
+                Class Person
+                {
+                   lastName : String[1];
+                }
+                
+                Association Firm_Person
+                {
+                   firm : Firm[1];
+                   employees : Person[*];
+                }
+                ###Mapping
+                Mapping FirmMapping
+                (
+                   Firm : Relational
+                   {
+                      id : [db]FirmTable.id,
+                      legalName : [db]FirmTable.legal_name
+                   }
+                  \s
+                   Person : Relational
+                   {
+                      +firmId:Integer[1] : [db]PersonTable.firmId,
+                      lastName : [db]PersonTable.lastName
+                   }
+                  \s
+                   Firm_Person : XStore
+                   {
+                      firm : $this.firmId == $that.id,
+                      employees : $this.id == $that.firmId
+                   }
+                )
+                ###Relational
+                Database db
+                (
+                   Table FirmTable (id INTEGER, legal_name VARCHAR(200))
+                   Table PersonTable (firmId INTEGER, lastName VARCHAR(200))
+                )\
+                """);
         this.runtime.compile();
     }
 
@@ -298,57 +310,59 @@ public class TestXStoreMapping extends AbstractPureRelationalTestWithCoreCompile
     public void testXStoreMappingNaturalPropertyError()
     {
         this.runtime.createInMemorySource("mapping.pure",
-                "Class Firm\n" +
-                        "{\n" +
-                        "   id : Integer[1];\n" +
-                        "   legalName : String[1];\n" +
-                        "}\n" +
-                        "\n" +
-                        "Class Person\n" +
-                        "{\n" +
-                        "   lastName : String[1];\n" +
-                        "}\n" +
-                        "\n" +
-                        "Association Firm_Person\n" +
-                        "{\n" +
-                        "   firm : Firm[1];\n" +
-                        "   employees : Person[*];\n" +
-                        "}\n" +
-                        "###Mapping\n" +
-                        "Mapping FirmMapping\n" +
-                        "(\n" +
-                        "   Firm : Relational\n" +
-                        "   {\n" +
-                        "      id : [db]FirmTable.id,\n" +
-                        "      legalName : [db]FirmTable.legal_name\n" +
-                        "   }\n" +
-                        "   \n" +
-                        "   Person : Relational\n" +
-                        "   {\n" +
-                        "      +firmId:Integer[1] : [db]PersonTable.firmId,\n" +
-                        "      lastName : [db]PersonTable.lastName\n" +
-                        "   }\n" +
-                        "   \n" +
-                        "   Firm_Person : XStore\n" +
-                        "   {\n" +
-                        "      firm : $this.firmId == $that.ixd,\n" +
-                        "      employees : $this.id == $that.firmId\n" +
-                        "   }\n" +
-                        ")\n" +
-                        "###Relational\n" +
-                        "Database db\n" +
-                        "(\n" +
-                        "   Table FirmTable (id INTEGER, legal_name VARCHAR(200))\n" +
-                        "   Table PersonTable (firmId INTEGER, lastName VARCHAR(200))\n" +
-                        ")");
+                """
+                Class Firm
+                {
+                   id : Integer[1];
+                   legalName : String[1];
+                }
+                
+                Class Person
+                {
+                   lastName : String[1];
+                }
+                
+                Association Firm_Person
+                {
+                   firm : Firm[1];
+                   employees : Person[*];
+                }
+                ###Mapping
+                Mapping FirmMapping
+                (
+                   Firm : Relational
+                   {
+                      id : [db]FirmTable.id,
+                      legalName : [db]FirmTable.legal_name
+                   }
+                  \s
+                   Person : Relational
+                   {
+                      +firmId:Integer[1] : [db]PersonTable.firmId,
+                      lastName : [db]PersonTable.lastName
+                   }
+                  \s
+                   Firm_Person : XStore
+                   {
+                      firm : $this.firmId == $that.ixd,
+                      employees : $this.id == $that.firmId
+                   }
+                )
+                ###Relational
+                Database db
+                (
+                   Table FirmTable (id INTEGER, legal_name VARCHAR(200))
+                   Table PersonTable (firmId INTEGER, lastName VARCHAR(200))
+                )\
+                """);
         try
         {
             this.runtime.compile();
-            Assert.fail();
+            Assertions.fail();
         }
         catch (Exception e)
         {
-            Assert.assertEquals("Compilation error at (resource:mapping.pure line:34 column:36), \"Can't find the property 'ixd' in the class Firm\"", e.getMessage());
+            Assertions.assertEquals("Compilation error at (resource:mapping.pure line:34 column:36), \"Can't find the property 'ixd' in the class Firm\"", e.getMessage());
         }
 
     }
@@ -357,53 +371,55 @@ public class TestXStoreMapping extends AbstractPureRelationalTestWithCoreCompile
     public void testXStoreMappingNaturalPropertyUsingInheritance()
     {
         this.runtime.createInMemorySource("mapping.pure",
-                "Class SuperFirm" +
-                        "{" +
-                        "   id : Integer[1];\n" +
-                        "}" +
-                        "Class Firm extends SuperFirm\n" +
-                        "{\n" +
-                        "   legalName : String[1];\n" +
-                        "}\n" +
-                        "\n" +
-                        "Class Person\n" +
-                        "{\n" +
-                        "   lastName : String[1];\n" +
-                        "}\n" +
-                        "\n" +
-                        "Association Firm_Person\n" +
-                        "{\n" +
-                        "   firm : Firm[1];\n" +
-                        "   employees : Person[*];\n" +
-                        "}\n" +
-                        "###Mapping\n" +
-                        "Mapping FirmMapping\n" +
-                        "(\n" +
-                        "   Firm : Relational\n" +
-                        "   {\n" +
-                        "      id : [db]FirmTable.id,\n" +
-                        "      +xid:Integer[1] : [db]FirmTable.id,\n" +
-                        "      legalName : [db]FirmTable.legal_name\n" +
-                        "   }\n" +
-                        "   \n" +
-                        "   Person : Relational\n" +
-                        "   {\n" +
-                        "      +firmId:Integer[1] : [db]PersonTable.firmId,\n" +
-                        "      lastName : [db]PersonTable.lastName\n" +
-                        "   }\n" +
-                        "   \n" +
-                        "   Firm_Person : XStore\n" +
-                        "   {\n" +
-                        "      firm : $this.firmId == $that.id,\n" +
-                        "      employees : $this.id == $that.firmId\n" +
-                        "   }\n" +
-                        ")\n" +
-                        "###Relational\n" +
-                        "Database db\n" +
-                        "(\n" +
-                        "   Table FirmTable (id INTEGER, legal_name VARCHAR(200))\n" +
-                        "   Table PersonTable (firmId INTEGER, lastName VARCHAR(200))\n" +
-                        ")");
+                """
+                Class SuperFirm\
+                {\
+                   id : Integer[1];
+                }\
+                Class Firm extends SuperFirm
+                {
+                   legalName : String[1];
+                }
+                
+                Class Person
+                {
+                   lastName : String[1];
+                }
+                
+                Association Firm_Person
+                {
+                   firm : Firm[1];
+                   employees : Person[*];
+                }
+                ###Mapping
+                Mapping FirmMapping
+                (
+                   Firm : Relational
+                   {
+                      id : [db]FirmTable.id,
+                      +xid:Integer[1] : [db]FirmTable.id,
+                      legalName : [db]FirmTable.legal_name
+                   }
+                  \s
+                   Person : Relational
+                   {
+                      +firmId:Integer[1] : [db]PersonTable.firmId,
+                      lastName : [db]PersonTable.lastName
+                   }
+                  \s
+                   Firm_Person : XStore
+                   {
+                      firm : $this.firmId == $that.id,
+                      employees : $this.id == $that.firmId
+                   }
+                )
+                ###Relational
+                Database db
+                (
+                   Table FirmTable (id INTEGER, legal_name VARCHAR(200))
+                   Table PersonTable (firmId INTEGER, lastName VARCHAR(200))
+                )\
+                """);
         this.runtime.compile();
     }
 
@@ -412,48 +428,50 @@ public class TestXStoreMapping extends AbstractPureRelationalTestWithCoreCompile
     public void testXStoreMappingToMilestonedType()
     {
         this.runtime.createInMemorySource("mapping.pure",
-                        "Class Firm\n" +
-                        "{\n" +
-                        "   legalName : String[1];\n" +
-                        "}\n" +
-                        "\n" +
-                        "Class <<temporal.businesstemporal>>Person\n" +
-                        "{\n" +
-                        "   lastName : String[1];\n" +
-                        "}\n" +
-                        "\n" +
-                        "Association Firm_Person\n" +
-                        "{\n" +
-                        "   firm : Firm[1];\n" +
-                        "   employees : Person[*];\n" +
-                        "}\n" +
-                        "###Mapping\n" +
-                        "Mapping FirmMapping\n" +
-                        "(\n" +
-                        "   Firm : Relational\n" +
-                        "   {\n" +
-                        "      +id:Integer[1] : [db]FirmTable.id,\n" +
-                        "      legalName : [db]FirmTable.legal_name\n" +
-                        "   }\n" +
-                        "   \n" +
-                        "   Person : Relational\n" +
-                        "   {\n" +
-                        "      +firmId:Integer[1] : [db]PersonTable.firmId,\n" +
-                        "      lastName : [db]PersonTable.lastName\n" +
-                        "   }\n" +
-                        "   \n" +
-                        "   Firm_Person : XStore\n" +
-                        "   {\n" +
-                        "      firm : $this.firmId == $that.id,\n" +
-                        "      employees : $this.id == $that.firmId\n" +
-                        "   }\n" +
-                        ")\n" +
-                        "###Relational\n" +
-                        "Database db\n" +
-                        "(\n" +
-                        "   Table FirmTable (id INTEGER, legal_name VARCHAR(200))\n" +
-                        "   Table PersonTable (firmId INTEGER, lastName VARCHAR(200))\n" +
-                        ")");
+                        """
+                        Class Firm
+                        {
+                           legalName : String[1];
+                        }
+                        
+                        Class <<temporal.businesstemporal>>Person
+                        {
+                           lastName : String[1];
+                        }
+                        
+                        Association Firm_Person
+                        {
+                           firm : Firm[1];
+                           employees : Person[*];
+                        }
+                        ###Mapping
+                        Mapping FirmMapping
+                        (
+                           Firm : Relational
+                           {
+                              +id:Integer[1] : [db]FirmTable.id,
+                              legalName : [db]FirmTable.legal_name
+                           }
+                          \s
+                           Person : Relational
+                           {
+                              +firmId:Integer[1] : [db]PersonTable.firmId,
+                              lastName : [db]PersonTable.lastName
+                           }
+                          \s
+                           Firm_Person : XStore
+                           {
+                              firm : $this.firmId == $that.id,
+                              employees : $this.id == $that.firmId
+                           }
+                        )
+                        ###Relational
+                        Database db
+                        (
+                           Table FirmTable (id INTEGER, legal_name VARCHAR(200))
+                           Table PersonTable (firmId INTEGER, lastName VARCHAR(200))
+                        )\
+                        """);
         this.runtime.compile();
     }
 }

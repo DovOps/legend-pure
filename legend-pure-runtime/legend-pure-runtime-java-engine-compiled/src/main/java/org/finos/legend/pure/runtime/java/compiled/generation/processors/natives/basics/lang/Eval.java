@@ -53,16 +53,18 @@ public class Eval extends AbstractNative
     @Override
     public String buildBody()
     {
-        return "new SharedPureFunction<Object>()\n" +
-                "{\n" +
-                "        @Override\n" +
-                "        public Object execute(ListIterable<?> vars, final ExecutionSupport es)\n" +
-                "        {\n" +
-                "           org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.function.Function<?> func = (org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.function.Function<?>) vars.get(0);\n" +
-                "           Object[] params = vars.size() == 1 ? new Object[]{} : vars.drop(1).toArray();\n" +
-                "           Object value = CoreGen.evaluate(es, func, params);\n" +
-                "           return value instanceof Iterable ? CompiledSupport.toPureCollection(value) : value;\n" +
-                "        }\n" +
-                "}";
+        return """
+                new SharedPureFunction<Object>()
+                {
+                        @Override
+                        public Object execute(ListIterable<?> vars, final ExecutionSupport es)
+                        {
+                           org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.function.Function<?> func = (org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.function.Function<?>) vars.get(0);
+                           Object[] params = vars.size() == 1 ? new Object[]{} : vars.drop(1).toArray();
+                           Object value = CoreGen.evaluate(es, func, params);
+                           return value instanceof Iterable ? CompiledSupport.toPureCollection(value) : value;
+                        }
+                }\
+                """;
     }
 }

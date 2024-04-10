@@ -20,11 +20,11 @@ import org.finos.legend.pure.m3.execution.FunctionExecution;
 import org.finos.legend.pure.m3.tests.RuntimeVerifier;
 import org.finos.legend.pure.m3.tests.function.base.meta.AbstractTestCompileValueSpecification;
 import org.finos.legend.pure.runtime.java.interpreted.FunctionExecutionInterpreted;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.BeforeAll;
 
 public class TestCompileValueSpecification extends AbstractTestCompileValueSpecification
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getFunctionExecution());

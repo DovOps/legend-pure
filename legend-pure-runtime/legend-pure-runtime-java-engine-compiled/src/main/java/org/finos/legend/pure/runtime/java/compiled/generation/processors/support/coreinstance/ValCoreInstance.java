@@ -309,18 +309,18 @@ public class ValCoreInstance extends AbstractCompiledCoreInstance
         {
             return null;
         }
-        if (value instanceof CoreInstance)
+        if (value instanceof CoreInstance instance)
         {
-            return (CoreInstance)value;
+            return instance;
         }
         String type;
         if (value instanceof Boolean)
         {
             type = M3Paths.Boolean;
         }
-        else if (value instanceof PureDate)
+        else if (value instanceof PureDate date)
         {
-            type = DateFunctions.datePrimitiveType((PureDate)value);
+            type = DateFunctions.datePrimitiveType(date);
         }
         else if ((value instanceof Long) || (value instanceof Integer) || (value instanceof BigInteger))
         {

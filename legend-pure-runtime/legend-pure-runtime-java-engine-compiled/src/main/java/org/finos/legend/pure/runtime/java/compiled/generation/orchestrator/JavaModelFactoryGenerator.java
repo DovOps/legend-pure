@@ -58,9 +58,9 @@ public class JavaModelFactoryGenerator
             try
             {
                 Object parser = Class.forName(p.trim()).getConstructor().newInstance();
-                if (parser instanceof Parser)
+                if (parser instanceof Parser parser1)
                 {
-                    allTypes.addAll(((Parser) parser).getCoreInstanceFactoriesRegistry().flatCollect(CoreInstanceFactoryRegistry::allManagedTypes).toSet());
+                    allTypes.addAll(parser1.getCoreInstanceFactoriesRegistry().flatCollect(CoreInstanceFactoryRegistry::allManagedTypes).toSet());
                 }
                 else
                 {

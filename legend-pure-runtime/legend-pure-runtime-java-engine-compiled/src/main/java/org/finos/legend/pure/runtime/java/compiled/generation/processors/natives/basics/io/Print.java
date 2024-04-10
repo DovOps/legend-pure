@@ -34,13 +34,15 @@ public class Print extends AbstractNative
 
     public String buildBody()
     {
-        return "new DefendedPureFunction2<Object, Long, Object>()\n" +
-                "        {\n" +
-                "            @Override\n" +
-                "            public Object value(Object value, Long depth, ExecutionSupport es)\n" +
-                "            {\n" +
-                "                return CompiledSupport.print(((CompiledExecutionSupport)es).getConsole(), value, depth);" +
-                "            }\n" +
-                "        }";
+        return """
+                new DefendedPureFunction2<Object, Long, Object>()
+                        {
+                            @Override
+                            public Object value(Object value, Long depth, ExecutionSupport es)
+                            {
+                                return CompiledSupport.print(((CompiledExecutionSupport)es).getConsole(), value, depth);\
+                            }
+                        }\
+                """;
     }
 }

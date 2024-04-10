@@ -47,8 +47,8 @@ public class Mod extends NativeFunction
     {
         Number dividend = NumericUtilities.toJavaNumber(Instance.getValueForMetaPropertyToOneResolved(params.get(0), M3Properties.values, processorSupport), processorSupport);
         Number divisor = NumericUtilities.toJavaNumber(Instance.getValueForMetaPropertyToOneResolved(params.get(1), M3Properties.values, processorSupport), processorSupport);
-        BigInteger dividendBigInteger = dividend instanceof BigInteger ? (BigInteger)dividend : BigInteger.valueOf(dividend.longValue());
-        BigInteger divisorBigInteger = divisor instanceof BigInteger ? (BigInteger)divisor : BigInteger.valueOf(divisor.longValue());
+        BigInteger dividendBigInteger = dividend instanceof BigInteger bi ? bi : BigInteger.valueOf(dividend.longValue());
+        BigInteger divisorBigInteger = divisor instanceof BigInteger bi ? bi : BigInteger.valueOf(divisor.longValue());
         BigInteger result = dividendBigInteger.mod(divisorBigInteger);
         return NumericUtilities.toPureNumberValueExpression(result, false, repository, processorSupport);
     }

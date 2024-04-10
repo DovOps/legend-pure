@@ -16,10 +16,11 @@ package org.finos.legend.pure.runtime.java.compiled.testHelper;
 
 import junit.framework.AssertionFailedError;
 import junit.framework.Test;
-import junit.framework.TestCase;
 import junit.framework.TestListener;
 import org.finos.legend.pure.m4.exception.PureException;
+import org.junit.Assert;
 import org.junit.internal.runners.SuiteMethod;
+import org.junit.jupiter.api.Assertions;
 import org.junit.runner.Describable;
 import org.junit.runner.Description;
 import org.junit.runner.notification.Failure;
@@ -72,9 +73,9 @@ public class IgnoreUnsupportedApiPureTestSuiteRunner extends SuiteMethod
 
         private boolean isPureUnsupportedApiException(Throwable e)
         {
-            if (e instanceof PureException)
+            if (e instanceof PureException exception)
             {
-                String info = ((PureException) e).getInfo();
+                String info = exception.getInfo();
                 if (info != null)
                 {
                     String infoLowercase = info.toLowerCase();
@@ -86,9 +87,8 @@ public class IgnoreUnsupportedApiPureTestSuiteRunner extends SuiteMethod
 
         private Description asDescription(Test test)
         {
-            if (test instanceof Describable)
+            if (test instanceof Describable facade)
             {
-                Describable facade = (Describable) test;
                 return facade.getDescription();
             }
             return Description.createTestDescription(getEffectiveClass(test), getName(test));
@@ -101,9 +101,9 @@ public class IgnoreUnsupportedApiPureTestSuiteRunner extends SuiteMethod
 
         private String getName(Test test)
         {
-            if (test instanceof TestCase)
+            if (test instanceof Assert)
             {
-                return ((TestCase) test).getName();
+                return Assertions.getName();
             }
             else
             {

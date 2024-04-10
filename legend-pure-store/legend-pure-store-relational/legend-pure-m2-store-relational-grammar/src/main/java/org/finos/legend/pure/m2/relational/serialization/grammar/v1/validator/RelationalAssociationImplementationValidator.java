@@ -63,7 +63,7 @@ public class RelationalAssociationImplementationValidator implements MatchRunner
 
             RelationalInstanceSetImplementation targetSetImplementation = (RelationalInstanceSetImplementation)MappingValidator.validateId(associationMapping, propertyMapping, classMappingIndex, propertyMapping._targetSetImplementationId(), "target", processorSupport);
 
-            JoinTreeNode joinTreeNode = propertyMapping instanceof RelationalPropertyMapping && ((RelationalPropertyMapping)propertyMapping)._relationalOperationElement() instanceof RelationalOperationElementWithJoin ? ((RelationalOperationElementWithJoin)((RelationalPropertyMapping)propertyMapping)._relationalOperationElement())._joinTreeNode() : null;
+            JoinTreeNode joinTreeNode = propertyMapping instanceof RelationalPropertyMapping rpm && rpm._relationalOperationElement() instanceof RelationalOperationElementWithJoin ? ((RelationalOperationElementWithJoin)rpm._relationalOperationElement())._joinTreeNode() : null;
             if (joinTreeNode == null)
             {
                 throw new PureCompilationException(propertyMapping.getSourceInformation(), "Mapping Error: expected a join");
@@ -84,13 +84,13 @@ public class RelationalAssociationImplementationValidator implements MatchRunner
 
     private TableAlias findMainTableAlias(RelationalInstanceSetImplementation setImplementation)
     {
-        if (setImplementation instanceof RootRelationalInstanceSetImplementation)
+        if (setImplementation instanceof RootRelationalInstanceSetImplementation implementation)
         {
-            return ((RootRelationalInstanceSetImplementation)setImplementation)._mainTableAlias();
+            return implementation._mainTableAlias();
         }
-        if (setImplementation instanceof EmbeddedRelationalInstanceSetImplementation)
+        if (setImplementation instanceof EmbeddedRelationalInstanceSetImplementation implementation)
         {
-            RootRelationalInstanceSetImplementation owner = ((EmbeddedRelationalInstanceSetImplementation)setImplementation)._setMappingOwner();
+            RootRelationalInstanceSetImplementation owner = implementation._setMappingOwner();
             return findMainTableAlias(owner);
         }
         throw new RuntimeException("Unhandled set implementation type: " + PackageableElement.getUserPathForPackageableElement(setImplementation.getClassifier()));

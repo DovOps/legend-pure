@@ -79,9 +79,8 @@ class RelationalPropertyMappingProcessor
             propertyMapping._sourceSetImplementationId(sourceSetImplementationId.getName());
         }
 
-        if (propertyMapping instanceof EmbeddedRelationalInstanceSetImplementation)
+        if (propertyMapping instanceof EmbeddedRelationalInstanceSetImplementation embeddedRelationalInstanceSetImplementation)
         {
-            EmbeddedRelationalInstanceSetImplementation embeddedRelationalInstanceSetImplementation = (EmbeddedRelationalInstanceSetImplementation)propertyMapping;
 
             if (!(implementation instanceof EmbeddedRelationalInstanceSetImplementation))
             {
@@ -119,9 +118,8 @@ class RelationalPropertyMappingProcessor
 
             RelationalInstanceSetImplementationProcessor.processUserDefinedPrimaryKey(embeddedRelationalInstanceSetImplementation, topLevel, matcher, state, repository, processorSupport);
 
-            if (propertyMapping instanceof OtherwiseEmbeddedRelationalInstanceSetImplementation)
+            if (propertyMapping instanceof OtherwiseEmbeddedRelationalInstanceSetImplementation otherwiseEmbeddedRelationalInstanceSetImplementation)
             {
-                OtherwiseEmbeddedRelationalInstanceSetImplementation otherwiseEmbeddedRelationalInstanceSetImplementation = (OtherwiseEmbeddedRelationalInstanceSetImplementation)propertyMapping;
                 PropertyMapping otherwiseMapping = otherwiseEmbeddedRelationalInstanceSetImplementation._otherwisePropertyMapping();
                 otherwiseMapping._sourceSetImplementationId(sourceSetImplementationId.getName());
 
@@ -134,16 +132,16 @@ class RelationalPropertyMappingProcessor
         {
 
             //Transformer
-            if (propertyMapping instanceof RelationalPropertyMapping)
+            if (propertyMapping instanceof RelationalPropertyMapping mapping)
             {
-                GrammarInfoStub transformerStub = (GrammarInfoStub)((RelationalPropertyMapping)propertyMapping)._transformerCoreInstance();
+                GrammarInfoStub transformerStub = (GrammarInfoStub)mapping._transformerCoreInstance();
 
                 EnumerationMappingProcessor.processsEnumerationTransformer(transformerStub, propertyMapping, processorSupport);
 
                 //relationalOperationElement
-                RelationalOperationElement impl = ((RelationalPropertyMapping)propertyMapping)._relationalOperationElement();
+                RelationalOperationElement impl = mapping._relationalOperationElement();
                 RelationalOperationElementProcessor.processColumnExpr(impl, topLevel, topLevel, tableAliases, matcher, state, repository, processorSupport);
-                propertyMapping._store(impl instanceof RelationalOperationElementWithJoin ? ((RelationalOperationElementWithJoin)impl)._joinTreeNode()._database() : null);
+                propertyMapping._store(impl instanceof RelationalOperationElementWithJoin roewj ? roewj._joinTreeNode()._database() : null);
             }
         }
         return tableAliases;
@@ -159,9 +157,8 @@ class RelationalPropertyMappingProcessor
 
     static void populateReferenceUsagesForRelationalPropertyMapping(PropertyMapping propertyMapping, ModelRepository repository, ProcessorSupport processorSupport)
     {
-        if (propertyMapping instanceof EmbeddedRelationalInstanceSetImplementation)
+        if (propertyMapping instanceof EmbeddedRelationalInstanceSetImplementation embeddedRelationalInstanceSetImplementation)
         {
-            EmbeddedRelationalInstanceSetImplementation embeddedRelationalInstanceSetImplementation = (EmbeddedRelationalInstanceSetImplementation)propertyMapping;
             RichIterable<? extends PropertyMapping> embeddedPropertyMappings = embeddedRelationalInstanceSetImplementation._propertyMappings();
             populateReferenceUsagesForRelationalPropertyMappings(embeddedPropertyMappings, repository, processorSupport);
             RelationalInstanceSetImplementationProcessor.populateReferenceUsagesForUserDefinedPrimaryKey(propertyMapping, repository, processorSupport);
@@ -174,9 +171,9 @@ class RelationalPropertyMappingProcessor
         }
         else
         {
-            if (propertyMapping instanceof RelationalPropertyMapping)
+            if (propertyMapping instanceof RelationalPropertyMapping mapping)
             {
-                RelationalOperationElement columnExpression = ((RelationalPropertyMapping)propertyMapping)._relationalOperationElement();
+                RelationalOperationElement columnExpression = mapping._relationalOperationElement();
                 RelationalOperationElementProcessor.populateColumnExpressionReferenceUsages(columnExpression, repository, processorSupport);
             }
         }
@@ -201,19 +198,19 @@ class RelationalPropertyMappingProcessor
 
     private static void collectJoinTreeNodes(Collection<? super JoinTreeNode> targetCollection, PropertyMapping propertyMapping)
     {
-        if (propertyMapping instanceof RelationalPropertyMapping)
+        if (propertyMapping instanceof RelationalPropertyMapping mapping)
         {
-            RelationalOperationElement relationalOperationElement = ((RelationalPropertyMapping)propertyMapping)._relationalOperationElement();
+            RelationalOperationElement relationalOperationElement = mapping._relationalOperationElement();
             RelationalOperationElementProcessor.collectJoinTreeNodes(targetCollection, relationalOperationElement);
         }
-        if (propertyMapping instanceof OtherwiseEmbeddedRelationalInstanceSetImplementation)
+        if (propertyMapping instanceof OtherwiseEmbeddedRelationalInstanceSetImplementation implementation)
         {
-            PropertyMapping relationalOperationElement = ((OtherwiseEmbeddedRelationalInstanceSetImplementation)propertyMapping)._otherwisePropertyMapping();
+            PropertyMapping relationalOperationElement = implementation._otherwisePropertyMapping();
             collectJoinTreeNodes(targetCollection, relationalOperationElement);
         }
-        if (propertyMapping instanceof PropertyMappingsImplementation)
+        if (propertyMapping instanceof PropertyMappingsImplementation implementation)
         {
-            RichIterable<? extends PropertyMapping> propertyMappings = ((PropertyMappingsImplementation)propertyMapping)._propertyMappings();
+            RichIterable<? extends PropertyMapping> propertyMappings = implementation._propertyMappings();
             for (PropertyMapping subMapping : propertyMappings)
             {
                 collectJoinTreeNodes(targetCollection, subMapping);

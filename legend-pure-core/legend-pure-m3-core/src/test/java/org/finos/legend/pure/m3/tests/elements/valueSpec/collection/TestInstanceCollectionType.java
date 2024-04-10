@@ -22,22 +22,22 @@ import org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.valuespecificat
 import org.finos.legend.pure.m3.navigation.M3Paths;
 import org.finos.legend.pure.m3.navigation.generictype.GenericType;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
 
 public class TestInstanceCollectionType extends AbstractPureTestWithCoreCompiledPlatform
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getExtra());
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("fromString.pure");
@@ -63,13 +63,15 @@ public class TestInstanceCollectionType extends AbstractPureTestWithCoreCompiled
     @Test
     public void testClassesSameType()
     {
-        compileTestSource("fromString.pure", "import test::*;\n" +
-                "Class test::A {}\n" +
-                "Class test::B extends A {}\n" +
-                "Class test::C extends B {}\n" +
-                "Class test::D extends B {}\n" +
-                "Class test::E extends A {}\n" +
-                "Class test::F {}\n");
+        compileTestSource("fromString.pure", """
+                import test::*;
+                Class test::A {}
+                Class test::B extends A {}
+                Class test::C extends B {}
+                Class test::D extends B {}
+                Class test::E extends A {}
+                Class test::F {}
+                """);
 
         assertValueSpecificationGenericType("test::A", "[^A(), ^A()]");
         assertValueSpecificationGenericType("test::B", "[^B(), ^B()]");
@@ -82,13 +84,15 @@ public class TestInstanceCollectionType extends AbstractPureTestWithCoreCompiled
     @Test
     public void testClassesMixedTypes()
     {
-        compileTestSource("fromString.pure", "import test::*;\n" +
-                "Class test::A {}\n" +
-                "Class test::B extends A {}\n" +
-                "Class test::C extends B {}\n" +
-                "Class test::D extends B {}\n" +
-                "Class test::E extends A {}\n" +
-                "Class test::F {}\n");
+        compileTestSource("fromString.pure", """
+                import test::*;
+                Class test::A {}
+                Class test::B extends A {}
+                Class test::C extends B {}
+                Class test::D extends B {}
+                Class test::E extends A {}
+                Class test::F {}
+                """);
 
         assertValueSpecificationGenericType("test::A", "[^A(), ^B()]");
         assertValueSpecificationGenericType("test::A", "[^B(), ^A()]");
@@ -113,15 +117,17 @@ public class TestInstanceCollectionType extends AbstractPureTestWithCoreCompiled
     @Test
     public void testClassesWithGenerics()
     {
-        compileTestSource("fromString.pure", "import test::*;\n" +
-                "Class test::A<X|m> {}\n" +
-                "Class test::B<T|n> extends A<T|n> {}\n" +
-                "Class test::C<U|o> extends B<U|o> {}\n" +
-                "Class test::D<V, Y|p> extends B<V|p> {}\n" +
-                "Class test::E<W> extends A<W|1> {}\n" +
-                "Class test::F<Y|q> {}\n" +
-                "Class test::G<Z, S|r> extends F<Z|r> {}\n" +
-                "Class test::H<R> extends F<R|1> {}\n");
+        compileTestSource("fromString.pure", """
+                import test::*;
+                Class test::A<X|m> {}
+                Class test::B<T|n> extends A<T|n> {}
+                Class test::C<U|o> extends B<U|o> {}
+                Class test::D<V, Y|p> extends B<V|p> {}
+                Class test::E<W> extends A<W|1> {}
+                Class test::F<Y|q> {}
+                Class test::G<Z, S|r> extends F<Z|r> {}
+                Class test::H<R> extends F<R|1> {}
+                """);
 
         assertValueSpecificationGenericType("test::B<Integer|1>", "[^B<Integer|1>(), ^C<Integer|1>()]");
         assertValueSpecificationGenericType("test::B<Number|0..2>", "[^B<Integer|1..2>(), ^C<Float|0..1>()]");
@@ -140,13 +146,15 @@ public class TestInstanceCollectionType extends AbstractPureTestWithCoreCompiled
     @Test
     public void testClassesWithAndWithoutGenerics()
     {
-        compileTestSource("fromString.pure", "import test::*;\n" +
-                "Class test::A {}\n" +
-                "Class test::B<T|m> extends A {}\n" +
-                "Class test::C<U|n> extends B<U|o> {}\n" +
-                "Class test::D<V|o> extends B<V|o> {}\n" +
-                "Class test::E extends A {}\n" +
-                "Class test::F {}\n");
+        compileTestSource("fromString.pure", """
+                import test::*;
+                Class test::A {}
+                Class test::B<T|m> extends A {}
+                Class test::C<U|n> extends B<U|o> {}
+                Class test::D<V|o> extends B<V|o> {}
+                Class test::E extends A {}
+                Class test::F {}
+                """);
 
         assertValueSpecificationGenericType("test::A", "[^B<Integer|1>(), ^C<Float|0..1>(), ^D<String|*>(), ^A()]");
         assertValueSpecificationGenericType("test::A", "[^A(), ^B<Integer|*>()]");
@@ -155,12 +163,14 @@ public class TestInstanceCollectionType extends AbstractPureTestWithCoreCompiled
     @Test
     public void testFunctionTypes()
     {
-        compileTestSource("fromString.pure", "import test::*;\n" +
-                "Class test::A<X> {}\n" +
-                "Class test::B<T> extends A<T> {}\n" +
-                "Class test::C<U> extends B<U> {}\n" +
-                "Class test::D<V> extends B<V> {}\n" +
-                "Class test::E<W> extends A<W> {}\n");
+        compileTestSource("fromString.pure", """
+                import test::*;
+                Class test::A<X> {}
+                Class test::B<T> extends A<T> {}
+                Class test::C<U> extends B<U> {}
+                Class test::D<V> extends B<V> {}
+                Class test::E<W> extends A<W> {}
+                """);
 
         assertValueSpecificationGenericType("test::A<" + M3Paths.Function + "<{Integer[1]->Integer[1]}>>", "[^A<Function<{Integer[1]->Integer[1]}>>(), ^A<Function<{Integer[1]->Integer[1]}>>()]");
         assertValueSpecificationGenericType("test::B<" + M3Paths.Function + "<{Integer[1]->" + M3Paths.Any + "[1..*]}>>", "[^C<Function<{Integer[1]->Integer[1]}>>(), ^D<Function<{Integer[1]->Date[2..*]}>>()]");
@@ -171,13 +181,15 @@ public class TestInstanceCollectionType extends AbstractPureTestWithCoreCompiled
     @Test
     public void testClasses()
     {
-        compileTestSource("fromString.pure", "import test::*;\n" +
-                "Class test::A {}\n" +
-                "Class test::B extends A {}\n" +
-                "Class test::C extends B {}\n" +
-                "Class test::D extends B {}\n" +
-                "Class test::E extends A {}\n" +
-                "Class test::F {}\n");
+        compileTestSource("fromString.pure", """
+                import test::*;
+                Class test::A {}
+                Class test::B extends A {}
+                Class test::C extends B {}
+                Class test::D extends B {}
+                Class test::E extends A {}
+                Class test::F {}
+                """);
 
         assertValueSpecificationGenericType(M3Paths.Class + "<test::A>", "[A, A]");
         assertValueSpecificationGenericType(M3Paths.Class + "<test::A>", "[A, B]");
@@ -208,6 +220,6 @@ public class TestInstanceCollectionType extends AbstractPureTestWithCoreCompiled
     private void assertGenericTypesEqual(String message, String expectedGenericTypeString, CoreInstance actualGenericType)
     {
         String actualString = GenericType.print(actualGenericType, true, processorSupport);
-        Assert.assertEquals(message, expectedGenericTypeString, actualString);
+        Assertions.assertEquals(expectedGenericTypeString, actualString, message);
     }
 }

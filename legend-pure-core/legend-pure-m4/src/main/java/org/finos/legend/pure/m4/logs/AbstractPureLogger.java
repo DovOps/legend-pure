@@ -40,7 +40,7 @@ public abstract class AbstractPureLogger implements PureLogger
     {
         try
         {
-            return String.format(formatString, formatArgs);
+            return formatString.formatted(formatArgs);
         }
         catch (Exception e)
         {

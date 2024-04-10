@@ -36,9 +36,9 @@ import org.finos.legend.pure.m4.transaction.ModelRepositoryTransaction;
 import org.finos.legend.pure.m4.exception.PureCompilationException;
 import org.finos.legend.pure.m4.coreinstance.SourceInformation;
 import org.finos.legend.pure.m4.coreinstance.indexing.IndexSpecification;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
@@ -46,7 +46,7 @@ public class TestC3Linearization
 {
     private ProcessorSupport processorSupport;
 
-    @Before
+    @BeforeEach
     public void setUp()
     {
         this.processorSupport = new M3ProcessorSupport(null);
@@ -321,7 +321,7 @@ public class TestC3Linearization
 
     private void assertTypeLinearization(ImmutableList<CoreInstance> expected, CoreInstance type)
     {
-        Assert.assertEquals(expected, C3Linearization.getTypeGeneralizationLinearization(type, this.processorSupport));
+        Assertions.assertEquals(expected, C3Linearization.getTypeGeneralizationLinearization(type, this.processorSupport));
     }
 
     private void assertCompilationException(CoreInstance type)
@@ -329,11 +329,11 @@ public class TestC3Linearization
         try
         {
             ListIterable<CoreInstance> result = C3Linearization.getTypeGeneralizationLinearization(type, this.processorSupport);
-            Assert.fail("Expected compilation error for generalization linearization of " + type + ", got: " + result.makeString("[", ", ", "]"));
+            Assertions.fail("Expected compilation error for generalization linearization of " + type + ", got: " + result.makeString("[", ", ", "]"));
         }
         catch (PureCompilationException e)
         {
-            Assert.assertTrue(e.getInfo().startsWith("Inconsistent generalization hierarchy for " + type));
+            Assertions.assertTrue(e.getInfo().startsWith("Inconsistent generalization hierarchy for " + type));
         }
     }
 

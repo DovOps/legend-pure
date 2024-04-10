@@ -106,9 +106,9 @@ public abstract class AbstractLazyReflectiveCoreInstance extends PersistentRefle
             return null;
         }
 
-        if (value instanceof RValue)
+        if (value instanceof RValue rValue)
         {
-            return (T) this.metadataLazy.valueToObject((RValue) value);
+            return (T) this.metadataLazy.valueToObject(rValue);
         }
 
         ListIterable<RValue> rValues = (ListIterable<RValue>) value;
@@ -140,9 +140,9 @@ public abstract class AbstractLazyReflectiveCoreInstance extends PersistentRefle
             return Lists.immutable.empty();
         }
 
-        if (values instanceof RValue)
+        if (values instanceof RValue value)
         {
-            return Lists.mutable.with((T) this.metadataLazy.valueToObject((RValue) values));
+            return Lists.mutable.with((T) this.metadataLazy.valueToObject(value));
         }
 
         return (RichIterable<T>) this.metadataLazy.valuesToObjects((ListIterable<RValue>) values);

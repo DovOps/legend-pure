@@ -38,42 +38,42 @@ public class AnyStubHelper
 
     public static CoreInstance fromStub(CoreInstance instance)
     {
-        if (instance instanceof ImportStub)
+        if (instance instanceof ImportStub stub)
         {
-            return ImportStubHelper.fromImportStub((ImportStub) instance);
+            return ImportStubHelper.fromImportStub(stub);
         }
-        if (instance instanceof PropertyStub)
+        if (instance instanceof PropertyStub stub)
         {
-            return PropertyStubHelper.fromPropertyStub((PropertyStub) instance);
+            return PropertyStubHelper.fromPropertyStub(stub);
         }
-        if (instance instanceof EnumStub)
+        if (instance instanceof EnumStub stub)
         {
-            return EnumStubHelper.fromEnumStub((EnumStub) instance);
+            return EnumStubHelper.fromEnumStub(stub);
         }
-        if (instance instanceof GrammarInfoStub)
+        if (instance instanceof GrammarInfoStub stub)
         {
-            return GrammarInfoStubHelper.fromGrammarInfoStub((GrammarInfoStub) instance);
+            return GrammarInfoStubHelper.fromGrammarInfoStub(stub);
         }
         return instance;
     }
 
     public static boolean isUnresolvedStub(CoreInstance instance)
     {
-        if (instance instanceof ImportStub)
+        if (instance instanceof ImportStub stub)
         {
-            return ImportStubHelper.isUnresolved((ImportStub) instance);
+            return ImportStubHelper.isUnresolved(stub);
         }
-        if (instance instanceof PropertyStub)
+        if (instance instanceof PropertyStub stub)
         {
-            return PropertyStubHelper.isUnresolved((PropertyStub) instance);
+            return PropertyStubHelper.isUnresolved(stub);
         }
-        if (instance instanceof EnumStub)
+        if (instance instanceof EnumStub stub)
         {
-            return EnumStubHelper.isUnresolved((EnumStub) instance);
+            return EnumStubHelper.isUnresolved(stub);
         }
-        if (instance instanceof GrammarInfoStub)
+        if (instance instanceof GrammarInfoStub stub)
         {
-            return GrammarInfoStubHelper.isUnresolved((GrammarInfoStub) instance);
+            return GrammarInfoStubHelper.isUnresolved(stub);
         }
         return false;
     }

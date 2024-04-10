@@ -29,15 +29,15 @@ import org.finos.legend.pure.runtime.java.compiled.factory.JavaModelFactoryRegis
 import org.finos.legend.pure.runtime.java.compiled.generation.processors.IdBuilder;
 import org.finos.legend.pure.runtime.java.compiled.serialization.GraphSerializer;
 import org.finos.legend.pure.runtime.java.compiled.serialization.model.Obj;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
 public abstract class TestDistributedBinaryGraphSerialization extends AbstractPureTestWithCoreCompiled
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getFunctionExecution(), JavaModelFactoryRegistryLoader.loader());
@@ -80,16 +80,16 @@ public abstract class TestDistributedBinaryGraphSerialization extends AbstractPu
 
         // Validate classifiers
         ListMultimap<String, Obj> objsByClassifier = expectedObjs.groupBy(Obj::getClassifier);
-        Assert.assertEquals(objsByClassifier.keysView().toSortedList().makeString("\n"), deserializer.getClassifiers().toSortedList().makeString("\n"));
-        Assert.assertEquals(Lists.fixedSize.empty(), objsByClassifier.keysView().reject(deserializer::hasClassifier, Lists.mutable.empty()));
+        Assertions.assertEquals(objsByClassifier.keysView().toSortedList().makeString("\n"), deserializer.getClassifiers().toSortedList().makeString("\n"));
+        Assertions.assertEquals(Lists.fixedSize.empty(), objsByClassifier.keysView().reject(deserializer::hasClassifier, Lists.mutable.empty()));
 
         // Validate instances by classifier
         for (String classifierId : objsByClassifier.keysView())
         {
             MutableList<Obj> instances = objsByClassifier.get(classifierId).toSortedListBy(Obj::getIdentifier);
             MutableList<String> instanceIds = instances.collect(Obj::getIdentifier);
-            Assert.assertEquals(classifierId, instanceIds.makeString("\n"), deserializer.getClassifierInstanceIds(classifierId).toSortedList().makeString("\n"));
-            Assert.assertEquals(classifierId, instances, deserializer.getInstances(classifierId, instanceIds).toSortedListBy(Obj::getIdentifier));
+            Assertions.assertEquals(instanceIds.makeString("\n"), deserializer.getClassifierInstanceIds(classifierId).toSortedList().makeString("\n"), classifierId);
+            Assertions.assertEquals(instances, deserializer.getInstances(classifierId, instanceIds).toSortedListBy(Obj::getIdentifier), classifierId);
         }
 
         // Validate all individual objs
@@ -97,8 +97,8 @@ public abstract class TestDistributedBinaryGraphSerialization extends AbstractPu
         {
             String classifierId = obj.getClassifier();
             String identifier = obj.getIdentifier();
-            Assert.assertTrue(classifierId + " / " + identifier, deserializer.hasInstance(classifierId, identifier));
-            Assert.assertEquals(obj, deserializer.getInstance(classifierId, identifier));
+            Assertions.assertTrue(deserializer.hasInstance(classifierId, identifier), classifierId + " / " + identifier);
+            Assertions.assertEquals(obj, deserializer.getInstance(classifierId, identifier));
         }
     }
 

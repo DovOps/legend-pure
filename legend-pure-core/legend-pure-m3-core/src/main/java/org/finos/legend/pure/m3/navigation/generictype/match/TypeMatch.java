@@ -124,7 +124,7 @@ abstract class TypeMatch implements Comparable<TypeMatch>
         @Override
         public boolean equals(Object other)
         {
-            return (this == other) || ((other instanceof SimpleTypeMatch) && (this.typeDistance == ((SimpleTypeMatch) other).typeDistance));
+            return (this == other) || ((other instanceof SimpleTypeMatch stm) && (this.typeDistance == stm.typeDistance));
         }
 
         @Override

@@ -97,9 +97,8 @@ public class LambdaFunctionProcessor extends Processor<LambdaFunction<?>>
 
     private static void processValue(CoreInstance valueSpecification, Consumer<String> declaredVarConsumer, Consumer<String> otherVarConsumer, ProcessorSupport processorSupport)
     {
-        if (valueSpecification instanceof FunctionExpression)
+        if (valueSpecification instanceof FunctionExpression functionExpression)
         {
-            FunctionExpression functionExpression = (FunctionExpression) valueSpecification;
             if ("letFunction".equals(functionExpression._functionName()))
             {
                 InstanceValue firstParamValue = (InstanceValue) ListHelper.wrapListIterable(functionExpression._parametersValues()).get(0);
@@ -108,21 +107,21 @@ public class LambdaFunctionProcessor extends Processor<LambdaFunction<?>>
             }
             functionExpression._parametersValues().forEach(p -> processValue(p, declaredVarConsumer, otherVarConsumer, processorSupport));
         }
-        else if (valueSpecification instanceof InstanceValue)
+        else if (valueSpecification instanceof InstanceValue value)
         {
-            ((InstanceValue) valueSpecification)._valuesCoreInstance().forEach(v -> processValue(v, declaredVarConsumer, otherVarConsumer, processorSupport));
+            value._valuesCoreInstance().forEach(v -> processValue(v, declaredVarConsumer, otherVarConsumer, processorSupport));
         }
-        else if (valueSpecification instanceof KeyExpression)
+        else if (valueSpecification instanceof KeyExpression expression)
         {
-            processValue(((KeyExpression) valueSpecification)._expression(), declaredVarConsumer, otherVarConsumer, processorSupport);
+            processValue(expression._expression(), declaredVarConsumer, otherVarConsumer, processorSupport);
         }
-        else if (valueSpecification instanceof LambdaFunction)
+        else if (valueSpecification instanceof LambdaFunction function)
         {
-            processLambda((LambdaFunction<?>) valueSpecification, processorSupport).forEach(otherVarConsumer);
+            processLambda(function, processorSupport).forEach(otherVarConsumer);
         }
-        else if (valueSpecification instanceof VariableExpression)
+        else if (valueSpecification instanceof VariableExpression expression)
         {
-            otherVarConsumer.accept(((VariableExpression) valueSpecification)._name());
+            otherVarConsumer.accept(expression._name());
         }
     }
 }

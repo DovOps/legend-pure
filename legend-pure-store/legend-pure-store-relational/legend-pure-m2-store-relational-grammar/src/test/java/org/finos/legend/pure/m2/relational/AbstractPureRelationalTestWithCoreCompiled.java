@@ -15,18 +15,18 @@
 package org.finos.legend.pure.m2.relational;
 
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 
 public class AbstractPureRelationalTestWithCoreCompiled extends AbstractPureTestWithCoreCompiled
 {
-    @Before
+    @BeforeEach
     public void _setUp()
     {
         setUpRuntime();
     }
 
-    @After
+    @AfterEach
     public void _tearDown()
     {
         tearDownRuntime();

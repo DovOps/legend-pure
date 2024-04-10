@@ -17,13 +17,13 @@ package org.finos.legend.pure.runtime.java.interpreted.incremental;
 import org.finos.legend.pure.m3.execution.FunctionExecution;
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
 import org.finos.legend.pure.runtime.java.interpreted.FunctionExecutionInterpreted;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestMultiFiles extends AbstractPureTestWithCoreCompiled
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getFunctionExecution());
@@ -35,7 +35,7 @@ public class TestMultiFiles extends AbstractPureTestWithCoreCompiled
         runtime.createInMemorySource("sourceId.pure", "function simple():String[1]{'theFunc';}");
         runtime.createInMemorySource("userId.pure", "function go():Nil[0]{print(simple(),1);}");
         this.compileAndExecute("go():Nil[0]");
-        Assert.assertEquals("'theFunc'", functionExecution.getConsole().getLine(0));
+        Assertions.assertEquals("'theFunc'", functionExecution.getConsole().getLine(0));
 
         for (int i = 0; i < 10; i++)
         {
@@ -45,17 +45,17 @@ public class TestMultiFiles extends AbstractPureTestWithCoreCompiled
             try
             {
                 this.compileAndExecute("go():Nil[0]");
-                Assert.fail();
+                Assertions.fail();
             }
             catch (Exception e)
             {
-                Assert.assertEquals("The function 'go():Nil[0]' can't be found", e.getMessage());
+                Assertions.assertEquals("The function 'go():Nil[0]' can't be found", e.getMessage());
             }
 
             runtime.createInMemorySource("sourceId.pure", "function simple():String[1]{'theFunc';}");
             runtime.createInMemorySource("userId.pure", "function go():Nil[0]{print(simple(),1);}");
             this.compileAndExecute("go():Nil[0]");
-            Assert.assertEquals("'theFunc'", functionExecution.getConsole().getLine(0));
+            Assertions.assertEquals("'theFunc'", functionExecution.getConsole().getLine(0));
         }
     }
 

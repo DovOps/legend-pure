@@ -40,12 +40,13 @@ import org.finos.legend.pure.runtime.java.compiled.generation.orchestrator.VoidL
 import org.finos.legend.pure.runtime.java.compiled.metadata.ClassCache;
 import org.finos.legend.pure.runtime.java.compiled.metadata.FunctionCache;
 import org.finos.legend.pure.runtime.java.compiled.metadata.MetadataLazy;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -58,10 +59,10 @@ import java.util.stream.Collectors;
 
 public class TestJavaStandaloneLibraryGenerator extends AbstractPureTestWithCoreCompiled
 {
-    @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+    @TempDir
+    public File temporaryFolder;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         RichIterable<? extends CodeRepository> repositories = AbstractPureTestWithCoreCompiled.getCodeRepositories();
@@ -73,49 +74,53 @@ public class TestJavaStandaloneLibraryGenerator extends AbstractPureTestWithCore
 
         runtime.createInMemorySource(
                 "/test/standalone/tests.pure",
-                "import test::standalone::*;\n" +
-                        "\n" +
-                        "Enum test::standalone::TestEnumeration\n" +
-                        "{\n" +
-                        "    TYPE1, TYPE2, TYPE3\n" +
-                        "}\n" +
-                        "\n" +
-                        "Class test::standalone::TestClassA\n" +
-                        "{\n" +
-                        "    name : String[1];\n" +
-                        "}\n" +
-                        "\n" +
-                        "Class test::standalone::TestClassB\n" +
-                        "{\n" +
-                        "    id:Integer[1];\n" +
-                        "    type:TestEnumeration[1];\n" +
-                        "}\n" +
-                        "\n" +
-                        "Association test::standalone::TestAssociation\n" +
-                        "{\n" +
-                        "    toA:TestClassA[1];\n" +
-                        "    toB:TestClassB[1];\n" +
-                        "}\n" +
-                        "\n" +
-                        "function <<access.externalizable>> test::standalone::joinWithCommas(strings:String[*]):String[1]\n" +
-                        "{\n" +
-                        "    $strings->joinStrings(', ');\n" +
-                        "}\n" +
-                        "\n" +
-                        "function <<access.externalizable>> test::standalone::testWithReflection(prefix:String[1]):String[1]\n" +
-                        "{\n" +
-                        "    let f = testWithReflection_String_1__String_1_;\n" +
-                        "    let class = TestClassA;\n" +
-                        "    let association = TestAssociation;\n" +
-                        "    let b = ^TestClassB(id=43, type=TestEnumeration.TYPE3, toA=^TestClassA(name=$prefix));\n" +
-                        "    if($class == $association, |'ERROR', |$b.toA.name + $f.functionName->toOne());\n" +
-                        "}\n"
+                """
+                import test::standalone::*;
+                
+                Enum test::standalone::TestEnumeration
+                {
+                    TYPE1, TYPE2, TYPE3
+                }
+                
+                Class test::standalone::TestClassA
+                {
+                    name : String[1];
+                }
+                
+                Class test::standalone::TestClassB
+                {
+                    id:Integer[1];
+                    type:TestEnumeration[1];
+                }
+                
+                Association test::standalone::TestAssociation
+                {
+                    toA:TestClassA[1];
+                    toB:TestClassB[1];
+                }
+                
+                function <<access.externalizable>> test::standalone::joinWithCommas(strings:String[*]):String[1]
+                {
+                    $strings->joinStrings(', ');
+                }
+                
+                function <<access.externalizable>> test::standalone::testWithReflection(prefix:String[1]):String[1]
+                {
+                    let f = testWithReflection_String_1__String_1_;
+                    let class = TestClassA;
+                    let association = TestAssociation;
+                    let b = ^TestClassB(id=43, type=TestEnumeration.TYPE3, toA=^TestClassA(name=$prefix));
+                    if($class == $association, |'ERROR', |$b.toA.name + $f.functionName->toOne());
+                }
+                """
         );
         runtime.createInMemorySource(
                 "/other/standalone/other.pure",
-                "Class other::standalone::TestClassC extends test::standalone::TestClassA\n" +
-                        "{\n" +
-                        "}\n"
+                """
+                Class other::standalone::TestClassC extends test::standalone::TestClassA
+                {
+                }
+                """
         );
         runtime.compile();
     }
@@ -124,7 +129,7 @@ public class TestJavaStandaloneLibraryGenerator extends AbstractPureTestWithCore
     public void testStandaloneLibraryNoExternal() throws Exception
     {
         JavaStandaloneLibraryGenerator generator = JavaStandaloneLibraryGenerator.newGenerator(runtime, CompiledExtensionLoader.extensions(), false, null, new VoidLog());
-        Path classesDir = this.temporaryFolder.newFolder("classes").toPath();
+        Path classesDir = newFolder(this.temporaryFolder, "classes").toPath();
         generator.serializeAndWriteDistributedMetadata(classesDir);
         generator.compileAndWriteClasses(classesDir, new VoidLog());
         URLClassLoader classLoader = new URLClassLoader(new URL[]{classesDir.toUri().toURL()}, Thread.currentThread().getContextClassLoader());
@@ -150,45 +155,54 @@ public class TestJavaStandaloneLibraryGenerator extends AbstractPureTestWithCore
 
         Method joinWithCommas = testClass.getMethod("Root_test_standalone_joinWithCommas_String_MANY__String_1_", RichIterable.class, ExecutionSupport.class);
         Object result1 = joinWithCommas.invoke(null, Lists.immutable.with("a", "b", "c"), executionSupport);
-        Assert.assertEquals("a, b, c", result1);
+        Assertions.assertEquals("a, b, c", result1);
 
         Method testWithReflection = testClass.getMethod("Root_test_standalone_testWithReflection_String_1__String_1_", String.class, ExecutionSupport.class);
         Object result2 = testWithReflection.invoke(null, "_*_", executionSupport);
-        Assert.assertEquals("_*_testWithReflection", result2);
+        Assertions.assertEquals("_*_testWithReflection", result2);
     }
 
     @Test
     public void testGenerateOnly_allRepos() throws Exception
     {
         JavaStandaloneLibraryGenerator generator = JavaStandaloneLibraryGenerator.newGenerator(runtime, CompiledExtensionLoader.extensions(), false, null, new VoidLog());
-        Path sourcesDir = this.temporaryFolder.newFolder("src", "java").toPath();
-        Assert.assertEquals(Lists.fixedSize.empty(), Files.list(sourcesDir).collect(Collectors.toList()));
+        Path sourcesDir = newFolder(this.temporaryFolder, "src", "java").toPath();
+        Assertions.assertEquals(Lists.fixedSize.empty(), Files.list(sourcesDir).collect(Collectors.toList()));
 
         Generate generate = generator.generateOnly(true, sourcesDir);
-        Assert.assertEquals(Lists.fixedSize.with("test_generic_repository", "other_test_generic_repository", "test", "other", "platform").sortThis(), generate.getJavaSourcesByGroup().keysView().toList().sortThis());
-        Assert.assertNotEquals(Lists.immutable.empty(), generate.getJavaSourcesByGroup().get("test"));
-        Assert.assertNotEquals(Lists.immutable.empty(), generate.getJavaSourcesByGroup().get("other"));
+        Assertions.assertEquals(Lists.fixedSize.with("test_generic_repository", "other_test_generic_repository", "test", "other", "platform").sortThis(), generate.getJavaSourcesByGroup().keysView().toList().sortThis());
+        Assertions.assertNotEquals(Lists.immutable.empty(), generate.getJavaSourcesByGroup().get("test"));
+        Assertions.assertNotEquals(Lists.immutable.empty(), generate.getJavaSourcesByGroup().get("other"));
 
         List<Path> files = Files.walk(sourcesDir).filter(Files::isRegularFile).collect(Collectors.toList());
-        Assert.assertNotEquals(Lists.fixedSize.empty(), files);
+        Assertions.assertNotEquals(Lists.fixedSize.empty(), files);
         Pattern pattern = Pattern.compile("org/finos/legend/pure/generated/((CoreGen|PureEnum|LambdaZero|PureCompiledLambda|PureEnum_LazyImpl)|(Package_\\w++)|(test_\\w++)|(platform_\\w++)|(Root_meta_\\w++)|(Root_test_\\w++)|(other_\\w++)|(Root_other_\\w++))\\.java");
-        Assert.assertEquals(Collections.emptyList(), ListIterate.reject(files, f -> pattern.matcher(Iterate.makeString(sourcesDir.relativize(f), "/")).matches()));
+        Assertions.assertEquals(Collections.emptyList(), ListIterate.reject(files, f -> pattern.matcher(Iterate.makeString(sourcesDir.relativize(f), "/")).matches()));
     }
 
     @Test
     public void testGenerateOnly_oneRepo() throws Exception
     {
         JavaStandaloneLibraryGenerator generator = JavaStandaloneLibraryGenerator.newGenerator(runtime, CompiledExtensionLoader.extensions(), false, null, new VoidLog());
-        Path sourcesDir = this.temporaryFolder.newFolder("src", "java").toPath();
-        Assert.assertEquals(Lists.fixedSize.empty(), Files.list(sourcesDir).collect(Collectors.toList()));
+        Path sourcesDir = newFolder(this.temporaryFolder, "src", "java").toPath();
+        Assertions.assertEquals(Lists.fixedSize.empty(), Files.list(sourcesDir).collect(Collectors.toList()));
 
         Generate generate = generator.generateOnly("test", true, sourcesDir);
-        Assert.assertEquals(Lists.fixedSize.with("test"), generate.getJavaSourcesByGroup().keysView().toList());
-        Assert.assertNotEquals(Lists.immutable.empty(), generate.getJavaSourcesByGroup().get("test"));
+        Assertions.assertEquals(Lists.fixedSize.with("test"), generate.getJavaSourcesByGroup().keysView().toList());
+        Assertions.assertNotEquals(Lists.immutable.empty(), generate.getJavaSourcesByGroup().get("test"));
 
         List<Path> files = Files.walk(sourcesDir).filter(Files::isRegularFile).collect(Collectors.toList());
-        Assert.assertNotEquals(Lists.fixedSize.empty(), files);
+        Assertions.assertNotEquals(Lists.fixedSize.empty(), files);
         Pattern pattern = Pattern.compile("org/finos/legend/pure/generated/((CoreGen|PureEnum|LambdaZero|PureCompiledLambda|PureEnum_LazyImpl)|(test_\\w++)|(Root_test_\\w++))\\.java");
-        Assert.assertEquals(Lists.fixedSize.empty(), ListIterate.reject(files, f -> pattern.matcher(Iterate.makeString(sourcesDir.relativize(f), "/")).matches()));
+        Assertions.assertEquals(Lists.fixedSize.empty(), ListIterate.reject(files, f -> pattern.matcher(Iterate.makeString(sourcesDir.relativize(f), "/")).matches()));
+    }
+
+    private static File newFolder(File root, String... subDirs) throws IOException {
+        String subFolder = String.join("/", subDirs);
+        File result = new File(root, subFolder);
+        if (!result.mkdirs()) {
+            throw new IOException("Couldn't create folders " + root);
+        }
+        return result;
     }
 }

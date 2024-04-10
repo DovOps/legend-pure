@@ -89,25 +89,25 @@ public final class JsonParser
         {
             return this.createJsonNull();
         }
-        else if (object instanceof org.json.simple.JSONObject)
+        else if (object instanceof org.json.simple.JSONObject nObject)
         {
-            return this.createJsonObject((org.json.simple.JSONObject)object);
+            return this.createJsonObject(nObject);
         }
-        else if (object instanceof String)
+        else if (object instanceof String string)
         {
-            return this.createJsonString((String)object);
+            return this.createJsonString(string);
         }
-        else if (object instanceof Number)
+        else if (object instanceof Number number)
         {
-            return this.createJsonNumber((Number)object);
+            return this.createJsonNumber(number);
         }
-        else if (object instanceof Boolean)
+        else if (object instanceof Boolean boolean1)
         {
-            return this.createJsonBoolean((Boolean)object);
+            return this.createJsonBoolean(boolean1);
         }
-        else if (object instanceof org.json.simple.JSONArray)
+        else if (object instanceof org.json.simple.JSONArray array)
         {
-            return this.createJsonArray((org.json.simple.JSONArray)object);
+            return this.createJsonArray(array);
         }
         else
         {

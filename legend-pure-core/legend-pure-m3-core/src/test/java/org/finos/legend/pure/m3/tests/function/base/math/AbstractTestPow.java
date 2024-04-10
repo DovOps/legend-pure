@@ -17,8 +17,8 @@ package org.finos.legend.pure.m3.tests.function.base.math;
 import org.eclipse.collections.impl.factory.Lists;
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
 import org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.valuespecification.InstanceValueInstance;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 
@@ -34,12 +34,12 @@ public abstract class AbstractTestPow extends AbstractPureTestWithCoreCompiled
             InstanceValueInstance exponent = InstanceValueInstance.createPersistent(this.repository, null, null);
             exponent._values(Lists.fixedSize.of(this.repository.newFloatCoreInstance(new BigDecimal(999999))));
             compileAndExecute("meta::pure::functions::math::pow(Number[1], Number[1]):Number[1]", base, exponent);
-            Assert.fail();
+            Assertions.fail();
         }
         catch (NumberFormatException e)
         {
             e.printStackTrace();
-            Assert.assertEquals("Infinite or NaN", e.getMessage());
+            Assertions.assertEquals("Infinite or NaN", e.getMessage());
         }
     }
 }

@@ -266,9 +266,8 @@ public class FunctionExecutionCompiled implements FunctionExecution, PureRuntime
     private static CoreInstance convertResult(Object result, ClassLoader classLoader, Metadata metadata, MutableSet<String> extraSupportedTypes)
     {
         final ProcessorSupport compiledProcessorSupport = new CompiledProcessorSupport(classLoader, metadata, extraSupportedTypes);
-        if (result instanceof RichIterable<?>)
+        if (result instanceof RichIterable<?> iterable)
         {
-            RichIterable<?> iterable = (RichIterable<?>) result;
             if (iterable.isEmpty())
             {
                 return ValueSpecificationBootstrap.wrapValueSpecification((CoreInstance) null, true, compiledProcessorSupport);
@@ -277,27 +276,26 @@ public class FunctionExecutionCompiled implements FunctionExecution, PureRuntime
             if (CompiledSupport.isEmpty(CompiledSupport.tail(iterable)))
             {
                 Object first = Iterate.getFirst(iterable);
-                return (first instanceof CoreInstance) ?
-                       ValueSpecificationBootstrap.wrapValueSpecification((CoreInstance) first, true, compiledProcessorSupport) :
+                return (first instanceof CoreInstance ci) ?
+                       ValueSpecificationBootstrap.wrapValueSpecification(ci, true, compiledProcessorSupport) :
                        wrapOneOptimized(first, classLoader, metadata);
             }
             RichIterable<CoreInstance> instances = LazyIterate.collect(iterable, object ->
             {
-                if (object instanceof CoreInstance)
+                if (object instanceof CoreInstance instance)
                 {
-                    return (CoreInstance) object;
+                    return instance;
                 }
-                if (object instanceof String)
+                if (object instanceof String string)
                 {
-                    return compiledProcessorSupport.newCoreInstance((String) object, M3Paths.String, null);
+                    return compiledProcessorSupport.newCoreInstance(string, M3Paths.String, null);
                 }
                 if (object instanceof Boolean)
                 {
                     return compiledProcessorSupport.newCoreInstance(object.toString(), M3Paths.Boolean, null);
                 }
-                if (object instanceof PureDate)
+                if (object instanceof PureDate date)
                 {
-                    PureDate date = (PureDate) object;
                     String type = date.hasHour() ? M3Paths.DateTime : M3Paths.StrictDate;
                     return compiledProcessorSupport.newCoreInstance(object.toString(), type, null);
                 }
@@ -313,9 +311,9 @@ public class FunctionExecutionCompiled implements FunctionExecution, PureRuntime
             });
             return ValueSpecificationBootstrap.wrapValueSpecification(instances, true, compiledProcessorSupport);
         }
-        if (result instanceof CoreInstance)
+        if (result instanceof CoreInstance instance)
         {
-            return ValueSpecificationBootstrap.wrapValueSpecification((CoreInstance) result, true, compiledProcessorSupport);
+            return ValueSpecificationBootstrap.wrapValueSpecification(instance, true, compiledProcessorSupport);
         }
         return wrapOneOptimized(result, classLoader, metadata);
     }
@@ -398,9 +396,8 @@ public class FunctionExecutionCompiled implements FunctionExecution, PureRuntime
             {
                 String t = TypeProcessor.typeToJavaPrimitiveSingle(Instance.getValueForMetaPropertyToOneResolved(param, M3Properties.genericType, processorSupport), processorSupport);
                 paramClasses[i] = CompiledSupport.convertFunctionTypeStringToClass(t, cl);
-                if (val instanceof MutableList)
+                if (val instanceof MutableList valList)
                 {
-                    MutableList<?> valList = (MutableList<?>) val;
                     if (valList.size() != 1)
                     {
                         throw new RuntimeException("Expected exactly one value, found " + valList.size());
@@ -412,9 +409,8 @@ public class FunctionExecutionCompiled implements FunctionExecution, PureRuntime
             {
                 String className = TypeProcessor.typeToJavaObjectSingle(Instance.getValueForMetaPropertyToOneResolved(param, M3Properties.genericType, processorSupport), false, processorSupport);
                 paramClasses[i] = CompiledSupport.loadClass(className, cl);
-                if (val instanceof MutableList)
+                if (val instanceof MutableList valList)
                 {
-                    MutableList<?> valList = (MutableList<?>) val;
                     switch (valList.size())
                     {
                         case 0:

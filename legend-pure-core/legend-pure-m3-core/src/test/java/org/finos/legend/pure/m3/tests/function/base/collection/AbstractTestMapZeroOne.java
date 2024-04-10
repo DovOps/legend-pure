@@ -17,35 +17,36 @@ package org.finos.legend.pure.m3.tests.function.base.collection;
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
 import org.eclipse.collections.impl.list.mutable.FastList;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public abstract class AbstractTestMapZeroOne extends AbstractPureTestWithCoreCompiled
 {
     @Test
     public void testSimple() throws Exception
     {
-        compileTestSource("Class Ok\n" +
-                "{\n" +
-                "  other : Other[0..1]; \n" +
-                "}\n" +
-                "\n" +
-                "Class Other\n" +
-                "{\n" +
-                "   value : X[0..1];\n" +
-                "}" +
-                "Class X" +
-                "{" +
-                "   val : String[1];" +
-                "}" +
-                "" +
-                "function re():Ok[1]" +
-                "{" +
-                "   ^Ok()" +
-                "}\n" +
-                "function do():Any[*]\n" +
-                "{\n" +
-                "   print(re().other->map(o|$o.value)->map(z|$z.val), 1);" +
-                "}");
+        compileTestSource("""
+                Class Ok
+                {
+                  other : Other[0..1];\s
+                }
+                
+                Class Other
+                {
+                   value : X[0..1];
+                }\
+                Class X\
+                {\
+                   val : String[1];\
+                }\
+                function re():Ok[1]\
+                {\
+                   ^Ok()\
+                }
+                function do():Any[*]
+                {
+                   print(re().other->map(o|$o.value)->map(z|$z.val), 1);\
+                }\
+                """);
         CoreInstance func = this.runtime.getFunction("do():Any[*]");
         this.functionExecution.start(func, FastList.<CoreInstance>newList());
 

@@ -35,13 +35,15 @@ public class Or extends AbstractNative
     @Override
     public String buildBody()
     {
-        return "new DefendedPureFunction2<Boolean, Boolean, Boolean>()\n" +
-                "        {\n" +
-                "            @Override\n" +
-                "            public Boolean value(Boolean p1, Boolean p2, ExecutionSupport es)\n" +
-                "            {\n" +
-                "                return p1 || p2;\n" +
-                "            }\n" +
-                "        }";
+        return """
+                new DefendedPureFunction2<Boolean, Boolean, Boolean>()
+                        {
+                            @Override
+                            public Boolean value(Boolean p1, Boolean p2, ExecutionSupport es)
+                            {
+                                return p1 || p2;
+                            }
+                        }\
+                """;
     }
 }

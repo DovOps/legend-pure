@@ -114,7 +114,7 @@ public class ClassProjectionProcessor extends Processor<ClassProjection>
             }
             catch (PureCompilationException pe)
             {
-                throw new PureCompilationException(pe.getSourceInformation(), String.format("Error compiling projection '%s'. Property '%s' cannot be resolved due to underlying cause: %s", PackageableElement.getUserPathForPackageableElement(cls), org.finos.legend.pure.m3.navigation.property.Property.getPropertyName(property), pe.getInfo()), pe);
+                throw new PureCompilationException(pe.getSourceInformation(), "Error compiling projection '%s'. Property '%s' cannot be resolved due to underlying cause: %s".formatted(PackageableElement.getUserPathForPackageableElement(cls), org.finos.legend.pure.m3.navigation.property.Property.getPropertyName(property), pe.getInfo()), pe);
             }
         }
 
@@ -217,15 +217,15 @@ public class ClassProjectionProcessor extends Processor<ClassProjection>
         {
             if (derivedProperty instanceof ExistingPropertyRouteNode)
             {
-                throw new PureCompilationException(derivedProperty.getSourceInformation(), String.format("Invalid projection specification. Found complex property '%s', only simple properties are allowed in a class projection.", derivedProperty._propertyName()));
+                throw new PureCompilationException(derivedProperty.getSourceInformation(), "Invalid projection specification. Found complex property '%s', only simple properties are allowed in a class projection.".formatted(derivedProperty._propertyName()));
             }
             CoreInstance derivedPropertyType = derivedProperty._type() == null ? null : ImportStub.withImportStubByPass(derivedProperty._type()._rawTypeCoreInstance(), processorSupport);
             if (!(derivedPropertyType instanceof DataType))
             {
-                throw new PureCompilationException(derivedProperty.getSourceInformation(), String.format("Invalid projection specification. Derived property '%s' should be of PrimitiveType.", derivedProperty._propertyName()));
+                throw new PureCompilationException(derivedProperty.getSourceInformation(), "Invalid projection specification. Derived property '%s' should be of PrimitiveType.".formatted(derivedProperty._propertyName()));
             }
-            ListIterable<? extends ValueSpecification> valueSpecifications = derivedProperty instanceof NewPropertyRouteNode ?
-                    ((NewPropertyRouteNode)derivedProperty)._specifications().toList() : Lists.immutable.<ValueSpecification>empty();
+            ListIterable<? extends ValueSpecification> valueSpecifications = derivedProperty instanceof NewPropertyRouteNode nprn ?
+                    nprn._specifications().toList() : Lists.immutable.<ValueSpecification>empty();
             if (valueSpecifications.size() != 1)
             {
                 throw new PureCompilationException(derivedProperty.getSourceInformation(), "Invalid projection specification: derived property '" + derivedProperty._propertyName() + "' should have exactly 1 value specification, found " + valueSpecifications.size());
@@ -235,7 +235,7 @@ public class ClassProjectionProcessor extends Processor<ClassProjection>
                 CoreInstance func = ImportStub.withImportStubByPass(((FunctionExpression)valueSpecifications.getFirst())._funcCoreInstance(), processorSupport);
                 if (func != null && !(func instanceof Property) && Automap.getAutoMapExpressionSequence(valueSpecifications.getFirst()) == null)
                 {
-                    throw new PureCompilationException(derivedProperty.getSourceInformation(), String.format("Invalid projection specification. Derived property '%s' should be a simple property.", derivedProperty._propertyName()));
+                    throw new PureCompilationException(derivedProperty.getSourceInformation(), "Invalid projection specification. Derived property '%s' should be a simple property.".formatted(derivedProperty._propertyName()));
                 }
             }
         }

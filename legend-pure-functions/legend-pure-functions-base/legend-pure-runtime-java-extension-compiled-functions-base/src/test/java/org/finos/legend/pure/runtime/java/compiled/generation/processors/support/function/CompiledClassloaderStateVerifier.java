@@ -17,7 +17,7 @@ package org.finos.legend.pure.runtime.java.compiled.generation.processors.suppor
 import org.finos.legend.pure.m3.execution.FunctionExecution;
 import org.finos.legend.pure.m3.tests.RuntimeVerifier;
 import org.finos.legend.pure.runtime.java.compiled.execution.FunctionExecutionCompiled;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 
 public class CompiledClassloaderStateVerifier implements RuntimeVerifier.FunctionExecutionStateVerifier
 {
@@ -34,7 +34,7 @@ public class CompiledClassloaderStateVerifier implements RuntimeVerifier.Functio
     public void assertStateSame(FunctionExecution functionExecution)
     {
         FunctionExecutionCompiled functionExecutionCompiled = (FunctionExecutionCompiled)functionExecution;
-        Assert.assertEquals(this.classLoaderClassCount, functionExecutionCompiled.getJavaCompiler().getClassLoader().loadedClassCount());
+        Assertions.assertEquals(this.classLoaderClassCount, functionExecutionCompiled.getJavaCompiler().getClassLoader().loadedClassCount());
     }
 }
 

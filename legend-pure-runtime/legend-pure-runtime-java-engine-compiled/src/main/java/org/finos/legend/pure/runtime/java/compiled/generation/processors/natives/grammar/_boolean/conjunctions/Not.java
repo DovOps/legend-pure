@@ -35,13 +35,15 @@ public class Not extends AbstractNative
     @Override
     public String buildBody()
     {
-        return "new DefendedPureFunction1<Boolean, Boolean>()\n" +
-                "        {\n" +
-                "            @Override\n" +
-                "            public Boolean value(Boolean p1, ExecutionSupport es)\n" +
-                "            {\n" +
-                "                return !p1;\n" +
-                "            }\n" +
-                "        }";
+        return """
+                new DefendedPureFunction1<Boolean, Boolean>()
+                        {
+                            @Override
+                            public Boolean value(Boolean p1, ExecutionSupport es)
+                            {
+                                return !p1;
+                            }
+                        }\
+                """;
     }
 }

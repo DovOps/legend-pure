@@ -16,35 +16,33 @@ package org.finos.legend.pure.m3.tests.validation.milestoning.functionExpression
 
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiledPlatform;
 import org.finos.legend.pure.m4.exception.PureCompilationException;
-import org.junit.After;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestGetAllVersionsValidator extends AbstractPureTestWithCoreCompiledPlatform
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getExtra());
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("sourceId.pure");
     }
 
-    @Rule
-    public final ExpectedException expectedEx = ExpectedException.none();
-
     @Test
     public void testGetAllVersionsIsNotPermittedForNonTemporalTypes()
     {
-        expectedEx.expect(PureCompilationException.class);
-        expectedEx.expectMessage("The function 'getAllVersions' may only be used with temporal types: processingtemporal & businesstemporal, the type Product is  not temporal");
-        validateGetAllVersionsIsNotPermittedForNonTemporalTypes(false);
+        Throwable exception = assertThrows(PureCompilationException.class, () -> {
+            validateGetAllVersionsIsNotPermittedForNonTemporalTypes(false);
+        });
+        assertTrue(exception.getMessage().contains("The function 'getAllVersions' may only be used with temporal types: processingtemporal & businesstemporal, the type Product is  not temporal"));
     }
 
     @Test

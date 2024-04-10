@@ -177,7 +177,7 @@ public class JsonClassSerialization<T extends CoreInstance> extends ClassConvers
 
     private boolean doNotDropKeyValue(JsonSerializationContext jsonSerializationContext, Object serializedValues)
     {
-        return !(jsonSerializationContext.isRemovePropertiesWithEmptyValues() && serializedValues instanceof JSONArray && ((JSONArray) serializedValues).isEmpty()
+        return !(jsonSerializationContext.isRemovePropertiesWithEmptyValues() && serializedValues instanceof JSONArray jsona && jsona.isEmpty()
                 || serializedValues == JsonPropertySerialization.CYCLE_DETECTED);
     }
 

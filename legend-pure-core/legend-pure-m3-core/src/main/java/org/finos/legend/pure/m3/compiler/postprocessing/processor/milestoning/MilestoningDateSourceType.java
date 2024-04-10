@@ -82,7 +82,7 @@ enum MilestoningDateSourceType implements MilestoningDateSource
                 public MilestoningDates getMilestonedDates(CoreInstance fe, ProcessorState state, ModelRepository repository, Context context, ProcessorSupport processorSupport)
                 {
                     ValueSpecification parameterValue = ((FunctionExpression) fe)._parametersValues().getFirst();
-                    CoreInstance propertyReturnType = parameterValue instanceof InstanceValue ? ImportStub.withImportStubByPass(((InstanceValue) parameterValue)._valuesCoreInstance().getFirst(), processorSupport) : null;
+                    CoreInstance propertyReturnType = parameterValue instanceof InstanceValue iv ? ImportStub.withImportStubByPass(iv._valuesCoreInstance().getFirst(), processorSupport) : null;
                     MilestoningStereotype milestoningStereotype = MilestoningFunctions.getTemporalStereoTypesFromTopMostNonTopTypeGeneralizations(propertyReturnType, processorSupport).getFirst();
                     return new MilestoningDates(milestoningStereotype, ListHelper.tail(((FunctionExpression) fe)._parametersValues()).toList());
                 }
@@ -102,7 +102,7 @@ enum MilestoningDateSourceType implements MilestoningDateSource
                     CoreInstance exprSeq = Automap.getAutoMapExpressionSequence(fe);
                     if (exprSeq != null)
                     {
-                        CoreInstance func = exprSeq instanceof FunctionExpression ? ((FunctionExpression) exprSeq)._funcCoreInstance() : null;
+                        CoreInstance func = exprSeq instanceof FunctionExpression fe1 ? fe1._funcCoreInstance() : null;
                         if (func != null && MilestoningFunctions.isGeneratedQualifiedPropertyWithWithAllMilestoningDatesSpecified(func, processorSupport))
                         {
                             return MilestoningDatesPropagationFunctions.getMilestonedDates(exprSeq, processorSupport);

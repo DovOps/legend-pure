@@ -58,13 +58,13 @@ public class PathValidator implements MatchRunner<Path<?, ?>>
 
         pathInstance._path().forEach(pathElement ->
         {
-            if (pathElement instanceof PropertyPathElement)
+            if (pathElement instanceof PropertyPathElement element)
             {
-                AbstractProperty<?> property = (AbstractProperty<?>) ImportStub.withImportStubByPass(((PropertyPathElement) pathElement)._propertyCoreInstance(), processorSupport);
+                AbstractProperty<?> property = (AbstractProperty<?>) ImportStub.withImportStubByPass(element._propertyCoreInstance(), processorSupport);
 
                 RichIterable<? extends VariableExpression> valueSpecifications = ((FunctionType) processorSupport.function_getFunctionType(property))._parameters();
                 ListIterable<? extends VariableExpression> parameterSpecifications = valueSpecifications.toList().subList(1, valueSpecifications.size());
-                ListIterable<? extends ValueSpecification> parameters = ListHelper.wrapListIterable(((PropertyPathElement) pathElement)._parameters());
+                ListIterable<? extends ValueSpecification> parameters = ListHelper.wrapListIterable(element._parameters());
 
                 if (parameterSpecifications.size() != parameters.size())
                 {
@@ -74,9 +74,9 @@ public class PathValidator implements MatchRunner<Path<?, ?>>
                 parameterSpecifications.forEachWithIndex((valueSpecification, i) ->
                 {
                     ValueSpecification parameter = parameters.get(i);
-                    if (parameter instanceof InstanceValue)
+                    if (parameter instanceof InstanceValue value)
                     {
-                        ListIterable<? extends CoreInstance> values = ImportStub.withImportStubByPasses(ListHelper.wrapListIterable(((InstanceValue) parameter)._valuesCoreInstance()), processorSupport);
+                        ListIterable<? extends CoreInstance> values = ImportStub.withImportStubByPasses(ListHelper.wrapListIterable(value._valuesCoreInstance()), processorSupport);
 
                         GenericType genericTypeSpecified = valueSpecification._genericType();
                         CoreInstance type = (values.size() == 1) ?
@@ -97,7 +97,7 @@ public class PathValidator implements MatchRunner<Path<?, ?>>
 
     private static CoreInstance extractGenericType(CoreInstance instance, ProcessorSupport processorSupport)
     {
-        GenericType classifierGenericType = instance instanceof Any ? ((Any) instance)._classifierGenericType() : null;
+        GenericType classifierGenericType = instance instanceof Any a ? a._classifierGenericType() : null;
         return classifierGenericType == null ? Type.wrapGenericType(processorSupport.getClassifier(instance), processorSupport) : classifierGenericType;
     }
 }

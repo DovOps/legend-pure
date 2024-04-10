@@ -18,8 +18,8 @@ import org.finos.legend.pure.m3.navigation.Instance;
 import org.finos.legend.pure.m3.navigation.M3Properties;
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -35,6 +35,6 @@ public abstract class AbstractTestToday extends AbstractPureTestWithCoreCompiled
         String expected = dateFormat.format(new Date());
         CoreInstance result = execute("meta::pure::functions::date::today():StrictDate[1]");
         CoreInstance date = Instance.getValueForMetaPropertyToOneResolved(result, M3Properties.values, processorSupport);
-        Assert.assertEquals(expected, date.getName());
+        Assertions.assertEquals(expected, date.getName());
     }
 }

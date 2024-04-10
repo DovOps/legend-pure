@@ -22,8 +22,8 @@ import org.finos.legend.pure.m3.serialization.filesystem.usercodestorage.composi
 import org.finos.legend.pure.m3.serialization.filesystem.repository.CodeRepository;
 import org.finos.legend.pure.m3.serialization.filesystem.repository.CodeRepositoryProviderHelper;
 import org.finos.legend.pure.m3.serialization.filesystem.repository.GenericCodeRepository;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 
@@ -33,7 +33,7 @@ public class TestGenericRepository
     public void testRepositoryDetection()
     {
         RichIterable<CodeRepository> repositoryList = CodeRepositoryProviderHelper.findCodeRepositories();
-        Assert.assertEquals(3, repositoryList.size());
+        Assertions.assertEquals(3, repositoryList.size());
         Verify.assertAllSatisfy(repositoryList, r -> r instanceof GenericCodeRepository);
         Verify.assertSetsEqual(Sets.mutable.with("platform", "test_generic_repository", "other_test_generic_repository"), repositoryList.collect(CodeRepository::getName).toSet());
     }
@@ -44,8 +44,8 @@ public class TestGenericRepository
         RichIterable<CodeRepository> repositoryList = CodeRepositoryProviderHelper.findCodeRepositories();
         CodeRepository other_test_generic_repository = repositoryList.detect(r -> r.getName().equals("other_test_generic_repository"));
         CodeRepository test_generic_repository = repositoryList.detect(r -> r.getName().equals("test_generic_repository"));
-        Assert.assertFalse(test_generic_repository.isVisible(other_test_generic_repository));
-        Assert.assertTrue(other_test_generic_repository.isVisible(test_generic_repository));
+        Assertions.assertFalse(test_generic_repository.isVisible(other_test_generic_repository));
+        Assertions.assertTrue(other_test_generic_repository.isVisible(test_generic_repository));
     }
 
     @Test

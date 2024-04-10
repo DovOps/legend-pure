@@ -88,8 +88,8 @@ public class ToJson extends NativeFunction
             @Override
             protected Object extractPrimitiveValue(Object potentiallyWrappedPrimitive)
             {
-                Object val = potentiallyWrappedPrimitive instanceof PrimitiveCoreInstance ? ((PrimitiveCoreInstance) potentiallyWrappedPrimitive).getValue() : potentiallyWrappedPrimitive;
-                val = potentiallyWrappedPrimitive instanceof FloatCoreInstance && val instanceof BigDecimal ? ((BigDecimal) val).doubleValue() : val;
+                Object val = potentiallyWrappedPrimitive instanceof PrimitiveCoreInstance pci ? pci.getValue() : potentiallyWrappedPrimitive;
+                val = potentiallyWrappedPrimitive instanceof FloatCoreInstance && val instanceof BigDecimal bd ? bd.doubleValue() : val;
                 return val;
             }
 
@@ -98,9 +98,9 @@ public class ToJson extends NativeFunction
             {
                 CoreInstance res = ToJson.this.functionExecution.executeProperty(property, true, resolvedTypeParameters, resolvedMultiplicityParameters, getParentOrEmptyVariableContext(variableContext), profiler, Lists.immutable.with(ValueSpecificationBootstrap.wrapValueSpecification(pureObject, true, processorSupport)), functionExpressionToUseInStack, instantiationContext, executionSupport);
 
-                if (res instanceof InstanceValue)
+                if (res instanceof InstanceValue value)
                 {
-                    RichIterable<?> values = ((InstanceValue) res)._values();
+                    RichIterable<?> values = value._values();
                     return (values.getFirst() instanceof SimpleCoreInstance && !"Map".equals(((SimpleCoreInstance) values.getFirst()).getClassifier().getName())) ? values.collect(v -> AnyCoreInstanceWrapper.toAny((CoreInstance) v)) : values;
                 }
                 return res;
@@ -110,9 +110,9 @@ public class ToJson extends NativeFunction
             protected Object evaluateQualifiedProperty(CoreInstance pureObject, QualifiedProperty qualifiedProperty, Type type, Multiplicity multiplicity, String propertyName)
             {
                 CoreInstance res = ToJson.this.functionExecution.executeFunction(false, qualifiedProperty, Lists.immutable.with(ValueSpecificationBootstrap.wrapValueSpecification(pureObject, true, processorSupport)), new Stack<>(), new Stack<>(), getParentOrEmptyVariableContextForLambda(variableContext, qualifiedProperty), functionExpressionToUseInStack, profiler, instantiationContext, executionSupport);
-                if (res instanceof InstanceValue)
+                if (res instanceof InstanceValue value)
                 {
-                    return ((InstanceValue) res)._values();
+                    return value._values();
                 }
                 return res;
             }

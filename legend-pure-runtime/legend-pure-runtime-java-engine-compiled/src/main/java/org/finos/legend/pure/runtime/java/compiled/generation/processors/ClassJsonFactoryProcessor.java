@@ -32,24 +32,27 @@ import org.finos.legend.pure.runtime.java.compiled.generation.processors.type.Ty
 
 public class ClassJsonFactoryProcessor
 {
-    private static final String imports = "import org.eclipse.collections.api.RichIterable;\n" +
-            "import org.eclipse.collections.api.set.MutableSet;\n" +
-            "import org.eclipse.collections.impl.set.mutable.UnifiedSet;\n" +
-            "import org.eclipse.collections.impl.factory.Sets;\n" +
-            "import org.eclipse.collections.impl.list.mutable.FastList;\n" +
-            "import org.finos.legend.pure.runtime.java.compiled.execution.sourceInformation.PureCompiledExecutionException;\n" +
-            "import org.finos.legend.pure.runtime.java.compiled.metadata.MetadataAccessor;\n" +
-            "import org.finos.legend.pure.runtime.java.extension.external.json.compiled.natives.JsonParserHelper;\n" +
-            "import org.finos.legend.pure.m4.exception.PureException;\n" +
-            "import org.finos.legend.pure.runtime.java.compiled.generation.processors.support.*;\n" +
-            "import org.finos.legend.pure.runtime.java.compiled.generation.processors.support.function.defended.*;\n" +
-            "import org.finos.legend.pure.runtime.java.compiled.generation.processors.support.function.*;\n" +
-            "import org.finos.legend.pure.runtime.java.compiled.execution.*;\n" +
-            "import org.finos.legend.pure.runtime.java.compiled.execution.sourceInformation.*;\n" +
-            "import org.finos.legend.pure.m4.coreinstance.SourceInformation;\n" +
-            "import org.finos.legend.pure.m3.execution.ExecutionSupport;\n" +
-            "import org.finos.legend.pure.runtime.java.compiled.generation.processors.support.coreinstance.*;\n" +
-            "import org.finos.legend.pure.m3.exception.PureExecutionException;\n\n";
+    private static final String imports = """
+            import org.eclipse.collections.api.RichIterable;
+            import org.eclipse.collections.api.set.MutableSet;
+            import org.eclipse.collections.impl.set.mutable.UnifiedSet;
+            import org.eclipse.collections.impl.factory.Sets;
+            import org.eclipse.collections.impl.list.mutable.FastList;
+            import org.finos.legend.pure.runtime.java.compiled.execution.sourceInformation.PureCompiledExecutionException;
+            import org.finos.legend.pure.runtime.java.compiled.metadata.MetadataAccessor;
+            import org.finos.legend.pure.runtime.java.extension.external.json.compiled.natives.JsonParserHelper;
+            import org.finos.legend.pure.m4.exception.PureException;
+            import org.finos.legend.pure.runtime.java.compiled.generation.processors.support.*;
+            import org.finos.legend.pure.runtime.java.compiled.generation.processors.support.function.defended.*;
+            import org.finos.legend.pure.runtime.java.compiled.generation.processors.support.function.*;
+            import org.finos.legend.pure.runtime.java.compiled.execution.*;
+            import org.finos.legend.pure.runtime.java.compiled.execution.sourceInformation.*;
+            import org.finos.legend.pure.m4.coreinstance.SourceInformation;
+            import org.finos.legend.pure.m3.execution.ExecutionSupport;
+            import org.finos.legend.pure.runtime.java.compiled.generation.processors.support.coreinstance.*;
+            import org.finos.legend.pure.m3.exception.PureExecutionException;
+            
+            """;
 
     /**
      * Generates code for checking the multiplicity of properties extracted from JSON

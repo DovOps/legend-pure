@@ -15,7 +15,7 @@
 package org.finos.legend.pure.m2.relational;
 
 import org.finos.legend.pure.m3.serialization.runtime.PureRuntime;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class TestRelationAccessor extends AbstractPureRelationalTestWithCoreCompiled
 {
@@ -23,16 +23,18 @@ public class TestRelationAccessor extends AbstractPureRelationalTestWithCoreComp
     public void testRelationAccessor()
     {
         String sourceCode =
-                "###Pure\n" +
-                "function f():meta::pure::metamodel::relation::Relation<Any>[1]" +
-                "{" +
-                "   #>{my::mainDb.PersonTable}#->filter(f|$f.lastName == 'ee');" +
-                "}\n" +
-                "###Relational\n" +
-                "Database my::mainDb\n" +
-                "( \n" +
-                "   Table PersonTable(firstName VARCHAR(200), lastName VARCHAR(200), firmId INTEGER)\n" +
-                ")\n";
+                """
+                ###Pure
+                function f():meta::pure::metamodel::relation::Relation<Any>[1]\
+                {\
+                   #>{my::mainDb.PersonTable}#->filter(f|$f.lastName == 'ee');\
+                }
+                ###Relational
+                Database my::mainDb
+                (\s
+                   Table PersonTable(firstName VARCHAR(200), lastName VARCHAR(200), firmId INTEGER)
+                )
+                """;
         createAndCompileSourceCode(this.runtime, "myFile.pure", sourceCode);
     }
 
@@ -40,16 +42,18 @@ public class TestRelationAccessor extends AbstractPureRelationalTestWithCoreComp
     public void testRelationAccessorWithSpace()
     {
         String sourceCode =
-                "###Pure\n" +
-                        "function f():meta::pure::metamodel::relation::Relation<Any>[1]" +
-                        "{" +
-                        "   #>{my::mainDb.PersonTable}#->filter(f|$f.'first Name' == 'ee');" +
-                        "}\n" +
-                        "###Relational\n" +
-                        "Database my::mainDb\n" +
-                        "( \n" +
-                        "   Table PersonTable(\"first Name\" VARCHAR(200), lastName VARCHAR(200), firmId INTEGER)\n" +
-                        ")\n";
+                """
+                ###Pure
+                function f():meta::pure::metamodel::relation::Relation<Any>[1]\
+                {\
+                   #>{my::mainDb.PersonTable}#->filter(f|$f.'first Name' == 'ee');\
+                }
+                ###Relational
+                Database my::mainDb
+                (\s
+                   Table PersonTable("first Name" VARCHAR(200), lastName VARCHAR(200), firmId INTEGER)
+                )
+                """;
         createAndCompileSourceCode(this.runtime, "myFile.pure", sourceCode);
     }
 
@@ -57,22 +61,24 @@ public class TestRelationAccessor extends AbstractPureRelationalTestWithCoreComp
     public void testRelationAccessorWithDBIncludes()
     {
         String sourceCode =
-                "###Pure\n" +
-                        "function f():meta::pure::metamodel::relation::Relation<Any>[1]" +
-                        "{" +
-                        "   #>{my::mainDb.PersonTable}#->filter(f|$f.lastName == 'ee');" +
-                        "}\n" +
-                        "###Relational\n" +
-                        "Database my::incDb\n" +
-                        "( \n" +
-                        "   Table PersonTable(firstName VARCHAR(200), lastName VARCHAR(200), firmId INTEGER)\n" +
-                        ")\n" +
-                        "###Relational\n" +
-                        "Database my::mainDb\n" +
-                        "( \n" +
-                        "   include my::incDb\n" +
-                        "   Table FirmTable(legalName VARCHAR(200), firmId INTEGER)\n" +
-                        ")\n";
+                """
+                ###Pure
+                function f():meta::pure::metamodel::relation::Relation<Any>[1]\
+                {\
+                   #>{my::mainDb.PersonTable}#->filter(f|$f.lastName == 'ee');\
+                }
+                ###Relational
+                Database my::incDb
+                (\s
+                   Table PersonTable(firstName VARCHAR(200), lastName VARCHAR(200), firmId INTEGER)
+                )
+                ###Relational
+                Database my::mainDb
+                (\s
+                   include my::incDb
+                   Table FirmTable(legalName VARCHAR(200), firmId INTEGER)
+                )
+                """;
         createAndCompileSourceCode(this.runtime, "myFile.pure", sourceCode);
     }
 

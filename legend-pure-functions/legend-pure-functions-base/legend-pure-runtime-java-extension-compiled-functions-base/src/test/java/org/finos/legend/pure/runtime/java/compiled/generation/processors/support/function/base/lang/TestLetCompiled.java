@@ -20,20 +20,20 @@ import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
 import org.finos.legend.pure.m3.execution.FunctionExecution;
 import org.finos.legend.pure.runtime.java.compiled.execution.FunctionExecutionCompiledBuilder;
 import org.finos.legend.pure.runtime.java.compiled.factory.JavaModelFactoryRegistryLoader;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestLetCompiled extends AbstractPureTestWithCoreCompiled
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         AbstractPureTestWithCoreCompiled.setUpRuntime(getFunctionExecution(), JavaModelFactoryRegistryLoader.loader());
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         AbstractPureTestWithCoreCompiled.runtime.delete("fromString.pure");
@@ -49,24 +49,25 @@ public class TestLetCompiled extends AbstractPureTestWithCoreCompiled
     {
         try
         {
-            AbstractPureTestWithCoreCompiled.compileTestSource("fromString.pure", "function testLetCollectionWithAnyCastIssue():Boolean[1]\n" +
-                    "{\n" +
-                    "    let a = [A, B];\n" +
-                    "    if($a->size() == 2, | true, | false);" +
-                    "}\n" +
-                    "Class A" +
-                    "{" +
-                    "}" +
-                    "\n" +
-                    "Class B" +
-                    "{" +
-                    "}");
+            AbstractPureTestWithCoreCompiled.compileTestSource("fromString.pure", """
+                    function testLetCollectionWithAnyCastIssue():Boolean[1]
+                    {
+                        let a = [A, B];
+                        if($a->size() == 2, | true, | false);\
+                    }
+                    Class A\
+                    {\
+                    }
+                    Class B\
+                    {\
+                    }\
+                    """);
             MutableList<? extends Object> l = FastList.<Object>newListWith("");
         }
         catch (Exception e)
         {
             //e.printStackTrace();
-            Assert.fail();
+            Assertions.fail();
         }
     }
 
@@ -105,7 +106,7 @@ public class TestLetCompiled extends AbstractPureTestWithCoreCompiled
             reallyLargeString += "aaaaaaaaaa";
         }
 
-        Assert.assertTrue("Large string not large enough:" + reallyLargeString.length(), reallyLargeString.length() > 65535);
+        Assertions.assertTrue(reallyLargeString.length() > 65535, "Large string not large enough:" + reallyLargeString.length());
         return reallyLargeString;
     }
 

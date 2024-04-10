@@ -104,9 +104,9 @@ public class GenericTypeTraceability
         Type rawType = (Type) ImportStub.withImportStubByPass(genericType._rawTypeCoreInstance(), processorSupport);
         if (rawType != null)
         {
-            if (rawType instanceof FunctionType)
+            if (rawType instanceof FunctionType type)
             {
-                addTraceForFunctionType((FunctionType) rawType, repository, processorSupport);
+                addTraceForFunctionType(type, repository, processorSupport);
             }
             ReferenceUsage.addReferenceUsage(rawType, genericType, M3Properties.rawType, 0, repository, processorSupport);
 

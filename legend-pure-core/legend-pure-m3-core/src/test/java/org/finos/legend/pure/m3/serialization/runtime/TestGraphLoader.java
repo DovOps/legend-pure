@@ -48,10 +48,10 @@ import org.finos.legend.pure.m4.ModelRepository;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
 import org.finos.legend.pure.m4.coreinstance.SourceInformation;
 import org.finos.legend.pure.m4.tools.GraphNodeIterable;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -67,7 +67,7 @@ public abstract class TestGraphLoader extends AbstractPureTestWithCoreCompiledPl
     private ProcessorSupport processorSupport2;
     private GraphLoader loader;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime();
@@ -89,7 +89,7 @@ public abstract class TestGraphLoader extends AbstractPureTestWithCoreCompiledPl
         }
     }
 
-    @Before
+    @BeforeEach
     public void setUpSecondRuntimeAndGraphLoader()
     {
         MutableList<PureRepositoryJar> jars = Lists.mutable.empty();
@@ -126,31 +126,31 @@ public abstract class TestGraphLoader extends AbstractPureTestWithCoreCompiledPl
     public void testIsKnownRepository()
     {
         assertInitialState();
-        Assert.assertTrue(this.loader.isKnownRepository("platform"));
-        Assert.assertFalse(this.loader.isKnownRepository("not a repo"));
+        Assertions.assertTrue(this.loader.isKnownRepository("platform"));
+        Assertions.assertFalse(this.loader.isKnownRepository("not a repo"));
     }
 
     @Test
     public void testIsKnownFile()
     {
         assertInitialState();
-        Assert.assertTrue(this.loader.isKnownFile("platform/pure/grammar/m3.pc"));
-        Assert.assertTrue(this.loader.isKnownFile("platform/pure/grammar/milestoning.pc"));
+        Assertions.assertTrue(this.loader.isKnownFile("platform/pure/grammar/m3.pc"));
+        Assertions.assertTrue(this.loader.isKnownFile("platform/pure/grammar/milestoning.pc"));
 
-        Assert.assertFalse(this.loader.isKnownFile("not a file at all"));
-        Assert.assertFalse(this.loader.isKnownFile("datamart_datamt/something/somethingelse.pure"));
+        Assertions.assertFalse(this.loader.isKnownFile("not a file at all"));
+        Assertions.assertFalse(this.loader.isKnownFile("datamart_datamt/something/somethingelse.pure"));
     }
 
     @Test
     public void testIsKnownInstance()
     {
         assertInitialState();
-        Assert.assertTrue(this.loader.isKnownInstance("meta::pure::metamodel::type::Class"));
-        Assert.assertTrue(this.loader.isKnownInstance("meta::pure::metamodel::type::Type"));
-        Assert.assertTrue(this.loader.isKnownInstance("meta::pure::metamodel::multiplicity::PureOne"));
+        Assertions.assertTrue(this.loader.isKnownInstance("meta::pure::metamodel::type::Class"));
+        Assertions.assertTrue(this.loader.isKnownInstance("meta::pure::metamodel::type::Type"));
+        Assertions.assertTrue(this.loader.isKnownInstance("meta::pure::metamodel::multiplicity::PureOne"));
 
-        Assert.assertFalse(this.loader.isKnownInstance("not an instance"));
-        Assert.assertFalse(this.loader.isKnownInstance("meta::pure::metamodel::multiplicity::PureOneThousand"));
+        Assertions.assertFalse(this.loader.isKnownInstance("not an instance"));
+        Assertions.assertFalse(this.loader.isKnownInstance("meta::pure::metamodel::multiplicity::PureOneThousand"));
     }
 
     @Test
@@ -179,7 +179,7 @@ public abstract class TestGraphLoader extends AbstractPureTestWithCoreCompiledPl
             SourceInformation sourceInfo = instance.getSourceInformation();
             if (sourceInfo != null && !alreadyLoaded.contains(sourceInfo.getSourceId()))
             {
-                Assert.assertEquals("Wrong source id for " + instance + " (" + sourceInfo + ")", m3SourceId, sourceInfo.getSourceId());
+                Assertions.assertEquals(m3SourceId, sourceInfo.getSourceId(), "Wrong source id for " + instance + " (" + sourceInfo + ")");
             }
         }
 
@@ -190,7 +190,7 @@ public abstract class TestGraphLoader extends AbstractPureTestWithCoreCompiledPl
             {
                 path = "::";
             }
-            Assert.assertNotNull(path, this.runtime2.getCoreInstance(path));
+            Assertions.assertNotNull(this.runtime2.getCoreInstance(path), path);
         }
 
         assertSetsEqual(repository.getTopLevels().collect(CoreInstance::getName, Sets.mutable.empty()), this.repository2.getTopLevels().collect(CoreInstance::getName, Sets.mutable.empty()));
@@ -207,10 +207,10 @@ public abstract class TestGraphLoader extends AbstractPureTestWithCoreCompiledPl
         this.loader.loadFile(collectionSourceId);
         MutableSet<String> loadedFiles = this.loader.getLoadedFiles().collect(PureRepositoryJarTools::binaryPathToPurePath, Sets.mutable.empty());
 
-        Verify.assertContains(collectionSourceId, loadedFiles);
+        Verify.assertContains(loadedFiles, collectionSourceId);
         assertSourcesEqual(collectionSourceId);
 
-        Verify.assertContains(m3SourceId, loadedFiles);
+        Verify.assertContains(loadedFiles, m3SourceId);
         assertSourcesEqual(m3SourceId);
 
         assertSetsEqual(repository.getTopLevels().collect(CoreInstance::getName, Sets.mutable.empty()), this.repository2.getTopLevels().collect(CoreInstance::getName, Sets.mutable.empty()));
@@ -235,8 +235,8 @@ public abstract class TestGraphLoader extends AbstractPureTestWithCoreCompiledPl
 
     private void assertInitialState()
     {
-        Assert.assertEquals(Sets.immutable.empty(), this.loader.getLoadedFiles());
-        Assert.assertTrue(this.repository2.getTopLevels().isEmpty());
+        Assertions.assertEquals(Sets.immutable.empty(), this.loader.getLoadedFiles());
+        Assertions.assertTrue(this.repository2.getTopLevels().isEmpty());
     }
 
     private void assertAllOfRuntimeLoaded(SetIterable<String> repos)
@@ -292,11 +292,11 @@ public abstract class TestGraphLoader extends AbstractPureTestWithCoreCompiledPl
         Source source1 = runtime.getSourceById(sourceId);
         Source source2 = this.runtime2.getSourceById(sourceId);
         String message = "Mismatch for " + sourceId;
-        Assert.assertEquals(message, source1.getContent(), source2.getContent());
-        Assert.assertEquals(message, source1.isCompiled(), source2.isCompiled());
-        Assert.assertEquals(message, source1.isInMemory(), source2.isInMemory());
-        Assert.assertEquals(message, source1.isImmutable(), source2.isImmutable());
-        Verify.assertMapsEqual(message, getElementsByParser(source1), getElementsByParser(source2));
+        Assertions.assertEquals(source1.getContent(), source2.getContent(), message);
+        Assertions.assertEquals(source1.isCompiled(), source2.isCompiled(), message);
+        Assertions.assertEquals(source1.isInMemory(), source2.isInMemory(), message);
+        Assertions.assertEquals(source1.isImmutable(), source2.isImmutable(), message);
+        Verify.assertMapsEqual(getElementsByParser(source1), getElementsByParser(source2), message);
     }
 
     private void assertURLPatternLibrariesEqual(URLPatternLibrary library1, URLPatternLibrary library2)
@@ -359,7 +359,7 @@ public abstract class TestGraphLoader extends AbstractPureTestWithCoreCompiledPl
             {
                 extra.appendString(builder, "\n\textra: ", ", ", "");
             }
-            Assert.fail(builder.toString());
+            Assertions.fail(builder.toString());
         }
     }
 }

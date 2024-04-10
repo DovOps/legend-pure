@@ -22,22 +22,22 @@ import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiledPlatform;
 import org.finos.legend.pure.m3.navigation.M3Properties;
 import org.finos.legend.pure.m3.serialization.runtime.Source;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
 
 public class TestImports extends AbstractPureTestWithCoreCompiledPlatform
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getExtra());
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("/platform/pure/graph.pure");
@@ -48,11 +48,11 @@ public class TestImports extends AbstractPureTestWithCoreCompiledPlatform
     {
         String sourceId = "/platform/pure/anonymousCollections.pure";
         Source source = runtime.getSourceById(sourceId);
-        Assert.assertNotNull("Could not find source: " + sourceId, source);
+        Assertions.assertNotNull(source, "Could not find source: " + sourceId);
 
         ListIterable<? extends CoreInstance> selectedImportGroups = Imports.getImportGroupsForSource(sourceId, processorSupport);
         Verify.assertSize(1, selectedImportGroups);
-        Assert.assertEquals(Source.importForSourceName(sourceId, 1), selectedImportGroups.get(0).getName());
+        Assertions.assertEquals(Source.importForSourceName(sourceId, 1), selectedImportGroups.get(0).getName());
     }
 
     @Test
@@ -60,7 +60,7 @@ public class TestImports extends AbstractPureTestWithCoreCompiledPlatform
     {
         String sourceId = "/platform/pure/anonymousCollections.pure";
         Source source = runtime.getSourceById(sourceId);
-        Assert.assertNotNull("Could not find source: " + sourceId, source);
+        Assertions.assertNotNull(source, "Could not find source: " + sourceId);
 
         Predicate2<CoreInstance, String> isImportGroupForSourcePredicate = new Predicate2<CoreInstance, String>()
         {
@@ -76,11 +76,11 @@ public class TestImports extends AbstractPureTestWithCoreCompiledPlatform
 
         ListIterable<? extends CoreInstance> selectedImportGroups = importGroups.selectWith(isImportGroupForSourcePredicate, sourceId);
         Verify.assertSize(1, selectedImportGroups);
-        Assert.assertEquals(Source.importForSourceName(sourceId, 1), selectedImportGroups.get(0).getName());
+        Assertions.assertEquals(Source.importForSourceName(sourceId, 1), selectedImportGroups.get(0).getName());
 
         ListIterable<? extends CoreInstance> rejectedImportGroups = importGroups.rejectWith(isImportGroupForSourcePredicate, sourceId);
         Verify.assertNotEmpty(rejectedImportGroups);
-        Verify.assertContains("coreImport", (Collection<String>) rejectedImportGroups.collect(CoreInstance::getName));
+        Verify.assertContains((Collection<String>) rejectedImportGroups.collect(CoreInstance::getName), "coreImport");
     }
 
     @Test
@@ -88,13 +88,13 @@ public class TestImports extends AbstractPureTestWithCoreCompiledPlatform
     {
         String sourceId = "/platform/pure/anonymousCollections.pure";
         Source source = runtime.getSourceById(sourceId);
-        Assert.assertNotNull("Could not find source: " + sourceId, source);
+        Assertions.assertNotNull(source, "Could not find source: " + sourceId);
 
         String importGroupName = Source.importForSourceName(sourceId, 1);
         CoreInstance imports = processorSupport.package_getByUserPath("system::imports");
         CoreInstance importGroup = imports.getValueInValueForMetaPropertyToMany(M3Properties.children, importGroupName);
-        Assert.assertNotNull("Could not find import group: " + importGroupName, importGroup);
+        Assertions.assertNotNull(importGroup, "Could not find import group: " + importGroupName);
 
-        Assert.assertEquals(Source.formatForImportGroupId(sourceId), Imports.getImportGroupBaseName(importGroup));
+        Assertions.assertEquals(Source.formatForImportGroupId(sourceId), Imports.getImportGroupBaseName(importGroup));
     }
 }

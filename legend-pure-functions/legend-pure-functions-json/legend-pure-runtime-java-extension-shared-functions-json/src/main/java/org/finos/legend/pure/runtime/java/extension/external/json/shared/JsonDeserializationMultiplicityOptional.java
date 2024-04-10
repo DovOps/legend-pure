@@ -38,9 +38,8 @@ public class JsonDeserializationMultiplicityOptional<T> extends JsonPropertyDese
         {
             return Lists.immutable.empty();
         }
-        if (jsonValue instanceof JSONArray)
+        if (jsonValue instanceof JSONArray jsonValues)
         {
-            JSONArray jsonValues = (JSONArray) jsonValue;
             if (jsonValues.size() > 1)
             {
                 throw new PureExecutionException(jsonDeserializationContext.getSourceInformation(), "Expected value(s) of multiplicity [0..1], found " + jsonValues.size() + " value(s).");

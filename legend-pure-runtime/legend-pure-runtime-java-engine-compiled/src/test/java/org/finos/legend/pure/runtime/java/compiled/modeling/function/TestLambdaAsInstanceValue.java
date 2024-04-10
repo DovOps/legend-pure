@@ -28,20 +28,20 @@ import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
 import org.finos.legend.pure.runtime.java.compiled.execution.FunctionExecutionCompiledBuilder;
 import org.finos.legend.pure.runtime.java.compiled.factory.JavaModelFactoryRegistryLoader;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestLambdaAsInstanceValue extends AbstractPureTestWithCoreCompiled
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getFunctionExecution(), new CompositeCodeStorage(new ClassLoaderCodeStorage(getCodeRepositories())), JavaModelFactoryRegistryLoader.loader());
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("/test/testSource1.pure");
@@ -82,11 +82,13 @@ public class TestLambdaAsInstanceValue extends AbstractPureTestWithCoreCompiled
     private void testLambdaWithNArgsAsInstanceValue(int n)
     {
         compileTestSource("/test/testSource1.pure",
-                "function test::testGetFunctionName(f:Function<Any>[1]):String[1]\n" +
-                        "{\n" +
-                        "  let name = $f.functionName;\n" +
-                        "  if($name->isEmpty(), |'LAMBDA', |$name->toOne());\n" +
-                        "}");
+                """
+                function test::testGetFunctionName(f:Function<Any>[1]):String[1]
+                {
+                  let name = $f.functionName;
+                  if($name->isEmpty(), |'LAMBDA', |$name->toOne());
+                }\
+                """);
 
         StringBuilder lambda = new StringBuilder("{");
         for (int i = 1; i <= n; i++)
@@ -108,7 +110,7 @@ public class TestLambdaAsInstanceValue extends AbstractPureTestWithCoreCompiled
                         "}");
         CoreInstance test = runtime.getFunction("test::testFn():Any[1]");
         CoreInstance result = functionExecution.start(test, Lists.immutable.empty());
-        Assert.assertEquals("LAMBDA", PrimitiveUtilities.getStringValue(result.getValueForMetaPropertyToOne(M3Properties.values)));
+        Assertions.assertEquals("LAMBDA", PrimitiveUtilities.getStringValue(result.getValueForMetaPropertyToOne(M3Properties.values)));
     }
 
     protected static FunctionExecution getFunctionExecution()

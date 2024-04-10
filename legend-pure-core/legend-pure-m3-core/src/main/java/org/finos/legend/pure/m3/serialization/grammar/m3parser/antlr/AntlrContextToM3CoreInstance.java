@@ -3031,9 +3031,8 @@ public class AntlrContextToM3CoreInstance
         CoreInstance rawType = genericType._rawTypeCoreInstance();
         if (rawType != null)
         {
-            if (rawType instanceof ImportStub)
+            if (rawType instanceof ImportStub gtis)
             {
-                ImportStub gtis = (ImportStub) rawType;
                 ImportStubInstance is = ImportStubInstance.createPersistent(this.repository, gtis.getSourceInformation(), gtis._idOrPath(), gtis._importGroup());
 //                ImportStubInstance is = ImportStubInstance.createPersistent(this.repository, gtis.getSourceInformation(), ((ImportStubInstance)gtis)._idOrPathAsCoreInstance().getName(), (ImportGroup)gtis._importGroup());
                 ngt._rawTypeCoreInstance(is);
@@ -3105,9 +3104,8 @@ public class AntlrContextToM3CoreInstance
         CoreInstance rawType = genericType._rawTypeCoreInstance();
         if (rawType != null)
         {
-            if (rawType instanceof ImportStub)
+            if (rawType instanceof ImportStub gtis)
             {
-                ImportStub gtis = (ImportStub) rawType;
                 ImportStubInstance is = ImportStubInstance.createPersistent(this.repository, gtis.getSourceInformation(), gtis._idOrPath(), gtis._importGroup());
 //                ImportStubInstance is = ImportStubInstance.createPersistent(this.repository, gtis.getSourceInformation(), ((ImportStubInstance)gtis)._idOrPathAsCoreInstance().getName(), (ImportGroup)gtis._importGroup());
                 ngt._rawTypeCoreInstance(is);

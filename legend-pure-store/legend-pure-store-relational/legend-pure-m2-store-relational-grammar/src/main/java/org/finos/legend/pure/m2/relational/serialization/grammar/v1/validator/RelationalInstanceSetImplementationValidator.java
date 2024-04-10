@@ -112,16 +112,16 @@ public class RelationalInstanceSetImplementationValidator implements MatchRunner
 
             this.validateEnumPropertyHasEnumMapping(property, propertyMapping, processorSupport);
 
-            if (propertyMapping instanceof EmbeddedRelationalInstanceSetImplementation)
+            if (propertyMapping instanceof EmbeddedRelationalInstanceSetImplementation implementation)
             {
                 validatorState.validateSetImplementation(propertyMapping, true);
-                RichIterable<? extends PropertyMapping> embeddedPropertyMappings = ((EmbeddedRelationalInstanceSetImplementation) propertyMapping)._propertyMappings();
+                RichIterable<? extends PropertyMapping> embeddedPropertyMappings = implementation._propertyMappings();
                 validatePropertyMappings(mappingInstance, validatorState, property, embeddedPropertyMappings, processorSupport);
 
-                if (propertyMapping instanceof InlineEmbeddedRelationalInstanceSetImplementation)
+                if (propertyMapping instanceof InlineEmbeddedRelationalInstanceSetImplementation implementation)
                 {
                     //get inlineSetId and check is not null
-                    String inlineSetId = ((InlineEmbeddedRelationalInstanceSetImplementation) propertyMapping)._inlineSetImplementationId();
+                    String inlineSetId = implementation._inlineSetImplementationId();
                     if (inlineSetId.isEmpty())
                     {
                         throw new PureCompilationException(propertyMapping.getSourceInformation(), "Invalid Inline mapping found: '" + property.getName() + "' mapping has not inline set defined, please use: " + property.getName() + "() Inline[setid].");
@@ -142,14 +142,14 @@ public class RelationalInstanceSetImplementationValidator implements MatchRunner
                         //   startTable
                     }
                 }
-                if (propertyMapping instanceof OtherwiseEmbeddedRelationalInstanceSetImplementation)
+                if (propertyMapping instanceof OtherwiseEmbeddedRelationalInstanceSetImplementation implementation)
                 {
                     if (embeddedPropertyMappings.isEmpty())
                     {
                         throw new PureCompilationException(propertyMapping.getSourceInformation(), "Invalid Otherwise mapping found: '" + property.getName() + "' property has no embedded mappings defined, please use a property mapping with Join instead.");
                     }
 
-                    PropertyMapping otherwiseTarget = ((OtherwiseEmbeddedRelationalInstanceSetImplementation) propertyMapping)._otherwisePropertyMapping();
+                    PropertyMapping otherwiseTarget = implementation._otherwisePropertyMapping();
                     String otherwiseTargetId = otherwiseTarget._targetSetImplementationId();
                     MapIterable<String, SetImplementation> classMappingIndex = org.finos.legend.pure.m2.dsl.mapping.Mapping.getClassMappingsByIdIncludeEmbedded(parentMapping, processorSupport);
                     SetImplementation targetInstanceMapping = classMappingIndex.get(otherwiseTargetId);
@@ -160,20 +160,20 @@ public class RelationalInstanceSetImplementationValidator implements MatchRunner
                 }
             }
 
-            if (propertyMapping instanceof RelationalPropertyMapping)
+            if (propertyMapping instanceof RelationalPropertyMapping mapping)
             {
-                RelationalOperationElement elem = ((RelationalPropertyMapping) propertyMapping)._relationalOperationElement();
+                RelationalOperationElement elem = mapping._relationalOperationElement();
 
                 if (targetClass instanceof DataType)
                 {
-                    if (elem instanceof RelationalOperationElementWithJoin)
+                    if (elem instanceof RelationalOperationElementWithJoin join)
                     {
-                        JoinTreeNode joinTreeNode = ((RelationalOperationElementWithJoin) elem)._joinTreeNode();
+                        JoinTreeNode joinTreeNode = join._joinTreeNode();
                         if (joinTreeNode != null)
                         {
                             JoinTreeNodeValidation.validateJoinTreeNode(joinTreeNode, startTable, processorSupport);
                         }
-                        if (((RelationalOperationElementWithJoin) elem)._relationalOperationElement() == null)
+                        if (join._relationalOperationElement() == null)
                         {
                             throw new RuntimeException("Mapping error: The property '" + property.getName() + "' returns a data type. However it's mapped to a Join.");
                         }
@@ -194,7 +194,7 @@ public class RelationalInstanceSetImplementationValidator implements MatchRunner
                         throw new PureCompilationException(propertyMapping.getSourceInformation(), "Mapping Error! The setImplementationId '" + targetId + "' is implementing the class '" + ((Class<?>) ImportStub.withImportStubByPass(targetInstanceMapping._classCoreInstance(), processorSupport))._name() + "' which is not a subType of '" + targetClass._name() + "' (return type of the mapped property '" + property.getName() + "'");
                     }
 
-                    JoinTreeNode joinTreeNode = elem instanceof RelationalOperationElementWithJoin ? ((RelationalOperationElementWithJoin) elem)._joinTreeNode() : null;
+                    JoinTreeNode joinTreeNode = elem instanceof RelationalOperationElementWithJoin roewj ? roewj._joinTreeNode() : null;
                     if (joinTreeNode == null)
                     {
                         throw new PureCompilationException(propertyMapping.getSourceInformation(), "Mapping Error! The target type:'" + targetClass + "' is not a data type but the relationalOperation is not a join");

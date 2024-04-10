@@ -14,8 +14,8 @@
 
 package org.finos.legend.pure.m4.serialization.grammar;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class TestStringEscape
 {
@@ -24,69 +24,69 @@ public class TestStringEscape
     @Test
     public void testEscape()
     {
-        Assert.assertEquals(NO_ESCAPES, StringEscape.escape(NO_ESCAPES));
+        Assertions.assertEquals(NO_ESCAPES, StringEscape.escape(NO_ESCAPES));
 
-        Assert.assertEquals("\\'", StringEscape.escape("'"));
-        Assert.assertEquals("\\n", StringEscape.escape("\n"));
-        Assert.assertEquals("\\r", StringEscape.escape("\r"));
-        Assert.assertEquals("\\t", StringEscape.escape("\t"));
-        Assert.assertEquals("\\b", StringEscape.escape("\b"));
-        Assert.assertEquals("\\f", StringEscape.escape("\f"));
-        Assert.assertEquals("\\\\", StringEscape.escape("\\"));
+        Assertions.assertEquals("\\'", StringEscape.escape("'"));
+        Assertions.assertEquals("\\n", StringEscape.escape("\n"));
+        Assertions.assertEquals("\\r", StringEscape.escape("\r"));
+        Assertions.assertEquals("\\t", StringEscape.escape("\t"));
+        Assertions.assertEquals("\\b", StringEscape.escape("\b"));
+        Assertions.assertEquals("\\f", StringEscape.escape("\f"));
+        Assertions.assertEquals("\\\\", StringEscape.escape("\\"));
 
-        Assert.assertEquals("\\\\\\n", StringEscape.escape("\\\n"));
-        Assert.assertEquals("\\\\\\'", StringEscape.escape("\\'"));
+        Assertions.assertEquals("\\\\\\n", StringEscape.escape("\\\n"));
+        Assertions.assertEquals("\\\\\\'", StringEscape.escape("\\'"));
 
-        Assert.assertEquals("The\\tQuick\\nBrown\\rFox\\bJumps\\f\\'Over\\' The\\\\Lazy \"Dog\"", StringEscape.escape("The\tQuick\nBrown\rFox\bJumps\f'Over' The\\Lazy \"Dog\""));
+        Assertions.assertEquals("The\\tQuick\\nBrown\\rFox\\bJumps\\f\\'Over\\' The\\\\Lazy \"Dog\"", StringEscape.escape("The\tQuick\nBrown\rFox\bJumps\f'Over' The\\Lazy \"Dog\""));
     }
 
     @Test
     public void testUnescape()
     {
-        Assert.assertEquals(NO_ESCAPES, StringEscape.unescape(NO_ESCAPES));
+        Assertions.assertEquals(NO_ESCAPES, StringEscape.unescape(NO_ESCAPES));
 
-        Assert.assertEquals("\n", StringEscape.unescape("\\n"));
-        Assert.assertEquals("\r", StringEscape.unescape("\\r"));
-        Assert.assertEquals("\t", StringEscape.unescape("\\t"));
-        Assert.assertEquals("\b", StringEscape.unescape("\\b"));
-        Assert.assertEquals("\f", StringEscape.unescape("\\f"));
-        Assert.assertEquals("\\", StringEscape.unescape("\\\\"));
-        Assert.assertEquals("'", StringEscape.unescape("\\'"));
+        Assertions.assertEquals("\n", StringEscape.unescape("\\n"));
+        Assertions.assertEquals("\r", StringEscape.unescape("\\r"));
+        Assertions.assertEquals("\t", StringEscape.unescape("\\t"));
+        Assertions.assertEquals("\b", StringEscape.unescape("\\b"));
+        Assertions.assertEquals("\f", StringEscape.unescape("\\f"));
+        Assertions.assertEquals("\\", StringEscape.unescape("\\\\"));
+        Assertions.assertEquals("'", StringEscape.unescape("\\'"));
 
-        Assert.assertEquals("\\\"", StringEscape.unescape("\\\\\""));
-        Assert.assertEquals("\\\n", StringEscape.unescape("\\\\\\n"));
-        Assert.assertEquals("\\n", StringEscape.unescape("\\\\n"));
+        Assertions.assertEquals("\\\"", StringEscape.unescape("\\\\\""));
+        Assertions.assertEquals("\\\n", StringEscape.unescape("\\\\\\n"));
+        Assertions.assertEquals("\\n", StringEscape.unescape("\\\\n"));
 
-        Assert.assertEquals("a", StringEscape.unescape("\\a"));
-        Assert.assertEquals("\"", StringEscape.unescape("\\\""));
+        Assertions.assertEquals("a", StringEscape.unescape("\\a"));
+        Assertions.assertEquals("\"", StringEscape.unescape("\\\""));
 
-        Assert.assertEquals("The\tQuick\nBrown\rFox\bJumps\f'Over' The\\Lazy \"Dog\"", StringEscape.unescape("The\\tQuick\\nBrown\\rFox\\bJumps\\f\\'Over\\' The\\\\Lazy \"Dog\""));
+        Assertions.assertEquals("The\tQuick\nBrown\rFox\bJumps\f'Over' The\\Lazy \"Dog\"", StringEscape.unescape("The\\tQuick\\nBrown\\rFox\\bJumps\\f\\'Over\\' The\\\\Lazy \"Dog\""));
     }
 
     @Test
     public void testRoundTrip()
     {
-        Assert.assertEquals(NO_ESCAPES, StringEscape.unescape(StringEscape.escape(NO_ESCAPES)));
-        Assert.assertEquals(NO_ESCAPES, StringEscape.escape(StringEscape.unescape(NO_ESCAPES)));
+        Assertions.assertEquals(NO_ESCAPES, StringEscape.unescape(StringEscape.escape(NO_ESCAPES)));
+        Assertions.assertEquals(NO_ESCAPES, StringEscape.escape(StringEscape.unescape(NO_ESCAPES)));
 
         String quickBrownFox = "The\tQuick\nBrown\rFox\bJumps\f'Over' The\\Lazy \"Dog\"";
-        Assert.assertEquals(quickBrownFox, StringEscape.unescape(StringEscape.escape(quickBrownFox)));
+        Assertions.assertEquals(quickBrownFox, StringEscape.unescape(StringEscape.escape(quickBrownFox)));
 
         String quickBrownFoxEscaped = "The\\tQuick\\nBrown\\rFox\\bJumps\\f\\'Over\\' The\\\\Lazy \"Dog\"";
-        Assert.assertEquals(quickBrownFoxEscaped, StringEscape.escape(StringEscape.unescape(quickBrownFoxEscaped)));
+        Assertions.assertEquals(quickBrownFoxEscaped, StringEscape.escape(StringEscape.unescape(quickBrownFoxEscaped)));
 
         String slashNewline = "\\\n";
-        Assert.assertEquals(slashNewline, StringEscape.unescape(StringEscape.escape(slashNewline)));
+        Assertions.assertEquals(slashNewline, StringEscape.unescape(StringEscape.escape(slashNewline)));
 
         String slashNewlineEscaped = "\\\\\\n";
-        Assert.assertEquals(slashNewlineEscaped, StringEscape.escape(StringEscape.unescape(slashNewlineEscaped)));
+        Assertions.assertEquals(slashNewlineEscaped, StringEscape.escape(StringEscape.unescape(slashNewlineEscaped)));
 
         String slashN = "\\n";
-        Assert.assertEquals(slashN, StringEscape.unescape(StringEscape.escape(slashN)));
+        Assertions.assertEquals(slashN, StringEscape.unescape(StringEscape.escape(slashN)));
 
         String slashNEscaped = "\\\\n";
-        Assert.assertEquals(slashNEscaped, StringEscape.escape(StringEscape.unescape(slashNEscaped)));
+        Assertions.assertEquals(slashNEscaped, StringEscape.escape(StringEscape.unescape(slashNEscaped)));
 
-        Assert.assertEquals("a", StringEscape.escape(StringEscape.unescape("\\a")));
+        Assertions.assertEquals("a", StringEscape.escape(StringEscape.unescape("\\a")));
     }
 }

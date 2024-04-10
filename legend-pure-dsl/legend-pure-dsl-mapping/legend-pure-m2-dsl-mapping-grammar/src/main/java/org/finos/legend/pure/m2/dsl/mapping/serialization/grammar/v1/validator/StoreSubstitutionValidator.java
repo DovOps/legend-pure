@@ -68,7 +68,7 @@ class StoreSubstitutionValidator
         @Override
         public Iterable<Store> valueOf(SetImplementation setImplementation)
         {
-            return setImplementation instanceof InstanceSetImplementation ? (Iterable<Store>)((InstanceSetImplementation)setImplementation)._stores() : Sets.mutable.<Store>empty();
+            return setImplementation instanceof InstanceSetImplementation isi ? (Iterable<Store>)isi._stores() : Sets.mutable.<Store>empty();
         }
     };
 

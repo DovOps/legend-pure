@@ -27,7 +27,7 @@ import org.finos.legend.pure.m3.execution.VoidFunctionExecution;
 import org.finos.legend.pure.m3.serialization.runtime.PureRuntime;
 import org.finos.legend.pure.m3.tools.GraphStatistics;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 
 public class RuntimeVerifier
 {
@@ -163,7 +163,7 @@ public class RuntimeVerifier
                 {
                     Integer beforeC = instanceByClassifierCountsBefore.get(key);
                     Integer afterC = instanceByClassifierCountsAfter.get(key);
-                    Assert.assertEquals(key, beforeC, afterC);
+                    Assertions.assertEquals(beforeC, afterC, key);
                 }
 
                 //PLEASE NOTE - these lines need to be commented out if running a delete operation. Deletes are non-transactional
@@ -218,7 +218,7 @@ public class RuntimeVerifier
             }
         }
 
-        Assert.assertEquals(expectedNotPartOfActual.size(), actualNotPartOfExpected.size());
+        Assertions.assertEquals(expectedNotPartOfActual.size(), actualNotPartOfExpected.size());
     }
 
     public interface RuntimeStateVerifier
@@ -271,11 +271,11 @@ public class RuntimeVerifier
             {
                 StringBuilder message = new StringBuilder("Mismatch in instance counts by classifier:\n");
                 GraphStatistics.writeInstanceCountsByClassifierPathDeltas(message, "\t", "before", this.instanceCountByClassifier, "after", instanceCountByClassifierAfter);
-                Assert.fail(message.toString());
+                Assertions.fail(message.toString());
             }
             int sizeAfter = pureRuntime.getModelRepository().serialize().length;
-            Assert.assertEquals("Memory Before (bytes):" + this.repositorySize + " Memory After (bytes):" + sizeAfter + " Delta:" + (sizeAfter - this.repositorySize), this.repositorySize, sizeAfter);
-            Assert.assertEquals("Source is not registered", this.sourceCount, pureRuntime.getSourceRegistry().getSources().size());
+            Assertions.assertEquals(this.repositorySize, sizeAfter, "Memory Before (bytes):" + this.repositorySize + " Memory After (bytes):" + sizeAfter + " Delta:" + (sizeAfter - this.repositorySize));
+            Assertions.assertEquals(this.sourceCount, pureRuntime.getSourceRegistry().getSources().size(), "Source is not registered");
 
             this.contextStateVerifier.assertStateSame(pureRuntime);
         }
@@ -294,7 +294,7 @@ public class RuntimeVerifier
         @Override
         public void assertStateSame(PureRuntime pureRuntime)
         {
-            Assert.assertEquals(this.instancesByClassifier, pureRuntime.getContext().getAllInstances().size());
+            Assertions.assertEquals(this.instancesByClassifier, pureRuntime.getContext().getAllInstances().size());
         }
     }
 

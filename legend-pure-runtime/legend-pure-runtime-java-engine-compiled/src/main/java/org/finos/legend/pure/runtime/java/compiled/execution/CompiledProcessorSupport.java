@@ -106,9 +106,9 @@ public class CompiledProcessorSupport implements ProcessorSupport
             return cl.isInstance(object);
         }
 
-        if (object instanceof ValCoreInstance)
+        if (object instanceof ValCoreInstance instance)
         {
-            String valType = ((ValCoreInstance) object).getType();
+            String valType = instance.getType();
             return typeName.equals(valType) ||
                     (M3Paths.Date.equals(typeName) && (valType.equals(M3Paths.DateTime) || valType.equals(M3Paths.StrictDate) || valType.equals(M3Paths.LatestDate)));
         }
@@ -404,7 +404,7 @@ public class CompiledProcessorSupport implements ProcessorSupport
         //TODO Iterate over ConcreteFunctionDefinition and FunctionDefinition along with NativeFunction.
         return this.metadata.getMetadata(MetadataJavaPaths.NativeFunction).valuesView().asLazy()
                 .concatenate(this.metadata.getMetadata(MetadataJavaPaths.ConcreteFunctionDefinition).valuesView())
-                .select(f -> (f instanceof FunctionAccessor) && functionName.equals(((FunctionAccessor<?>) f)._functionName()), Sets.mutable.empty());
+                .select(f -> (f instanceof FunctionAccessor fa) && functionName.equals(fa._functionName()), Sets.mutable.empty());
     }
 
     @Override
@@ -461,9 +461,9 @@ public class CompiledProcessorSupport implements ProcessorSupport
     @Override
     public CoreInstance getClassifier(CoreInstance instance)
     {
-        if (instance instanceof ValCoreInstance)
+        if (instance instanceof ValCoreInstance coreInstance)
         {
-            return this.metadataAccessor.getPrimitiveType(((ValCoreInstance) instance).getType());
+            return this.metadataAccessor.getPrimitiveType(coreInstance.getType());
         }
 
         //todo: clean this up, seem to have interpreted style core instances in compiled
@@ -472,9 +472,8 @@ public class CompiledProcessorSupport implements ProcessorSupport
             return instance.getClassifier();
         }
 
-        if (instance instanceof Any)
+        if (instance instanceof Any any)
         {
-            Any any = (Any) instance;
             GenericType genericType = any._classifierGenericType();
             if (genericType != null)
             {

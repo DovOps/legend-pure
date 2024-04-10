@@ -21,9 +21,9 @@ import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiledPlatform;
 import org.finos.legend.pure.m3.tests.RuntimeTestScriptBuilder;
 import org.finos.legend.pure.m3.tests.RuntimeVerifier;
 import org.finos.legend.pure.m3.tests.TrackingTransactionObserver;
-import org.junit.After;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -33,13 +33,13 @@ import java.nio.file.Paths;
 
 public class TestPureRuntimeProjection extends AbstractPureTestWithCoreCompiledPlatform
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getExtra());
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("userId.pure");
@@ -84,8 +84,11 @@ public class TestPureRuntimeProjection extends AbstractPureTestWithCoreCompiledP
     {
         String source = "Class A{ } \n Class B{ }\n";
         String association = "Association AB{a:A[1]; b:B[1];}";
-        String projections = "Class AP projects #A{*}# \n Class BP projects #B{*}#\n" +
-                "Association ABP projects AB<AP,BP>";
+        String projections = """
+                Class AP projects #A{*}#\s
+                 Class BP projects #B{*}#
+                Association ABP projects AB<AP,BP>\
+                """;
 
         String sourceId = "sourceId.pure";
         runtime.createInMemorySource(sourceId, source);
@@ -143,23 +146,25 @@ public class TestPureRuntimeProjection extends AbstractPureTestWithCoreCompiledP
     @Test
     public void testPureRuntimeWithQualifiedPropertyWithEnum()
     {
-        String source = "Class EntityWithLocations\n" +
-                "{\n" +
-                "    locations : Location[*];\n" +
-                "    locationsByType(types:GeographicEntityType[*])\n" +
-                "    {\n" +
-                "        $types\n" +
-                "    }:GeographicEntityType[*];\n" +
-                "}\n" +
-                "Class Location\n" +
-                "{\n" +
-                "    type : GeographicEntityType[1];\n" +
-                "}\n" +
-                "Enum GeographicEntityType\n" +
-                "{\n" +
-                "    CITY,\n" +
-                "    COUNTRY\n" +
-                "}";
+        String source = """
+                Class EntityWithLocations
+                {
+                    locations : Location[*];
+                    locationsByType(types:GeographicEntityType[*])
+                    {
+                        $types
+                    }:GeographicEntityType[*];
+                }
+                Class Location
+                {
+                    type : GeographicEntityType[1];
+                }
+                Enum GeographicEntityType
+                {
+                    CITY,
+                    COUNTRY
+                }\
+                """;
         String sourceId = "sourceId.pure";
         runtime.createInMemorySource(sourceId, source);
         runtime.createInMemorySource("userId.pure", "Class AP projects #EntityWithLocations{+[locationsByType(GeographicEntityType[*])]}#");

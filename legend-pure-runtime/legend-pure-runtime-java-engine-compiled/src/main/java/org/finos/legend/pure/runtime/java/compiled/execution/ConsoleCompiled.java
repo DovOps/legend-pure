@@ -64,9 +64,8 @@ public class ConsoleCompiled extends AbstractConsole
         {
             return "null";
         }
-        if (content instanceof RichIterable)
+        if (content instanceof RichIterable collection)
         {
-            RichIterable<?> collection = (RichIterable<?>) content;
             int size = collection.size();
             switch (size)
             {
@@ -116,13 +115,13 @@ public class ConsoleCompiled extends AbstractConsole
         {
             return space + content + " instance " + content.getClass().getSimpleName();
         }
-        if (content instanceof RichIterable)
+        if (content instanceof RichIterable iterable)
         {
-            return ((RichIterable<?>) content).collect(o -> processOneValue(o, processed, space, current + 1, max, isExcluded)).makeString("\n");
+            return iterable.collect(o -> processOneValue(o, processed, space, current + 1, max, isExcluded)).makeString("\n");
         }
-        if (content instanceof BaseCoreInstance)
+        if (content instanceof BaseCoreInstance instance)
         {
-            return Printer.print((BaseCoreInstance) content, space, max, new CompiledProcessorSupport(null, null, null));
+            return Printer.print(instance, space, max, new CompiledProcessorSupport(null, null, null));
         }
         if (processed.add(content))
         {
@@ -148,9 +147,9 @@ public class ConsoleCompiled extends AbstractConsole
                         {
                             return null;
                         }
-                        if (result instanceof RichIterable)
+                        if (result instanceof RichIterable iterable)
                         {
-                            if (((RichIterable<?>) result).isEmpty())
+                            if (iterable.isEmpty())
                             {
                                 return null;
                             }

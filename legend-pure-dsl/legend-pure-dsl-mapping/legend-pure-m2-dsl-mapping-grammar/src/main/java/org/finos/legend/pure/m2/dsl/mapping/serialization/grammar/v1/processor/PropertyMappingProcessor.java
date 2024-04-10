@@ -117,16 +117,15 @@ public class PropertyMappingProcessor
 
         // SourceId
         String sourceId = propertyMapping._sourceSetImplementationId();
-        Class sourceClass = propertyOwner instanceof Class ? (Class) propertyOwner : getSourceClassForAssociationProperty(processorSupport, propertyOwner, property.getName());
+        Class sourceClass = propertyOwner instanceof Class c ? c : getSourceClassForAssociationProperty(processorSupport, propertyOwner, property.getName());
         if (sourceId == null)
         {
             String sourceIdString = PackageableElement.getUserPathForPackageableElement(sourceClass, "_");
             propertyMapping._sourceSetImplementationId(sourceIdString);
         }
 
-        if (propertyMapping instanceof PropertyMappingsImplementation)
+        if (propertyMapping instanceof PropertyMappingsImplementation propertyMappingsImplementation)
         {
-            PropertyMappingsImplementation propertyMappingsImplementation = (PropertyMappingsImplementation) propertyMapping;
             Class propertyCls = property._genericType() == null ? null : (Class) ImportStub.withImportStubByPass(property._genericType()._rawTypeCoreInstance(), processorSupport);//Instance.getValueForMetaPropertyToOneResolved(property, M3Properties.genericType, M3Properties.rawType, processorSupport);
             for (PropertyMapping childPropertyMapping : propertyMappingsImplementation._propertyMappings())
             {
@@ -140,14 +139,14 @@ public class PropertyMappingProcessor
             }
         }
 
-        if (propertyMapping instanceof OtherwiseEmbeddedSetImplementation)
+        if (propertyMapping instanceof OtherwiseEmbeddedSetImplementation implementation)
         {
-            PropertyMapping otherwiseMapping = ((OtherwiseEmbeddedSetImplementation)propertyMapping)._otherwisePropertyMapping();
+            PropertyMapping otherwiseMapping = implementation._otherwisePropertyMapping();
             otherwiseMapping._propertyCoreInstance(property);
             PropertyMappingsImplementation otherOwner = otherwiseMapping._owner();
             if (otherOwner == null)
             {
-                otherwiseMapping._owner((OtherwiseEmbeddedSetImplementation)propertyMapping);
+                otherwiseMapping._owner(implementation);
             }
         }
     }
@@ -157,9 +156,9 @@ public class PropertyMappingProcessor
         Property property = (Property) ImportStub.withImportStubByPass(propertyMapping._propertyCoreInstance(), processorSupport);
         ReferenceUsage.addReferenceUsage(property, propertyMapping, M3Properties.property, 0, repository, processorSupport);
 
-        if (propertyMapping instanceof PropertyMappingsImplementation)
+        if (propertyMapping instanceof PropertyMappingsImplementation implementation)
         {
-            for (PropertyMapping childPropertyMapping : ((PropertyMappingsImplementation)propertyMapping)._propertyMappings())
+            for (PropertyMapping childPropertyMapping : implementation._propertyMappings())
             {
                 populateReferenceUsagesForPropertyMapping(childPropertyMapping, repository, processorSupport);
             }
@@ -174,7 +173,7 @@ public class PropertyMappingProcessor
 
     private static Class getSourceClassForAssociationProperty(ProcessorSupport processorSupport, PropertyOwner propertyOwner, String propertyName)
     {
-        RichIterable<? extends Property<?,?>> associationProperties = propertyOwner instanceof Class ? ((Class)propertyOwner)._properties() : ((Association)propertyOwner)._properties();
+        RichIterable<? extends Property<?,?>> associationProperties = propertyOwner instanceof Class c ? c._properties() : ((Association)propertyOwner)._properties();
         Property otherProperty = associationProperties.detect(Predicates.attributeNotEqual(CoreInstance.GET_NAME, propertyName));
         return (Class) ImportStub.withImportStubByPass(otherProperty._classifierGenericType()._typeArguments().toList().get(1)._rawTypeCoreInstance(), processorSupport);
     }

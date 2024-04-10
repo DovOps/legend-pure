@@ -74,6 +74,6 @@ public class FilterPostProcessorObserver<T extends PostProcessorObserver> implem
 
     public static <T extends PostProcessorObserver> FilterPostProcessorObserver<T> onlyPackagedElements(T observer)
     {
-        return filter(observer, e -> (e instanceof PackageableElement) && (((PackageableElement) e)._package() != null));
+        return filter(observer, e -> (e instanceof PackageableElement pe) && (pe._package() != null));
     }
 }

@@ -35,16 +35,16 @@ import org.finos.legend.pure.m4.ModelRepository;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
 import org.finos.legend.pure.m4.tools.GraphNodeIterable;
 import org.finos.legend.pure.runtime.java.compiled.generation.processors.IdBuilder;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestIdBuilder
 {
     private static PureRuntime runtime;
     private static ProcessorSupport processorSupport;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         MutableRepositoryCodeStorage codeStorage = new CompositeCodeStorage(new ClassLoaderCodeStorage(CodeRepositoryProviderHelper.findPlatformCodeRepository()));
@@ -92,7 +92,7 @@ public class TestIdBuilder
                 builder.append("\n\t").append(classifierPaths.get(classifier)).append(":\n\t\t");
                 badIdsByClassifier.get(classifier).toSortedList().appendString(builder, ", ");
             });
-            Assert.fail(builder.toString());
+            Assertions.fail(builder.toString());
         }
     }
 
@@ -107,18 +107,18 @@ public class TestIdBuilder
 
         // Class (with custom builder)
         CoreInstance classClass = runtime.getCoreInstance("meta::pure::metamodel::type::Class");
-        Assert.assertEquals("Root::meta::pure::metamodel::type::Class", standardIdBuilder.buildId(classClass));
-        Assert.assertEquals("Root/meta/pure/metamodel/type/Class", customIdBuilder.buildId(classClass));
+        Assertions.assertEquals("Root::meta::pure::metamodel::type::Class", standardIdBuilder.buildId(classClass));
+        Assertions.assertEquals("Root/meta/pure/metamodel/type/Class", customIdBuilder.buildId(classClass));
 
         // Package (with custom builder)
         CoreInstance metaPurePackage = runtime.getCoreInstance("meta::pure");
-        Assert.assertEquals("Root::meta::pure", standardIdBuilder.buildId(metaPurePackage));
-        Assert.assertEquals("Root+meta+pure", customIdBuilder.buildId(metaPurePackage));
+        Assertions.assertEquals("Root::meta::pure", standardIdBuilder.buildId(metaPurePackage));
+        Assertions.assertEquals("Root+meta+pure", customIdBuilder.buildId(metaPurePackage));
 
         // Profile (no custom builder)
         CoreInstance testProfile = runtime.getCoreInstance("meta::pure::profiles::test");
-        Assert.assertEquals("Root::meta::pure::profiles::test", standardIdBuilder.buildId(testProfile));
-        Assert.assertEquals("Root::meta::pure::profiles::test", customIdBuilder.buildId(testProfile));
+        Assertions.assertEquals("Root::meta::pure::profiles::test", standardIdBuilder.buildId(testProfile));
+        Assertions.assertEquals("Root::meta::pure::profiles::test", customIdBuilder.buildId(testProfile));
     }
 
     private void testIdUniqueness(IdBuilder idBuilder)
@@ -149,7 +149,7 @@ public class TestIdBuilder
                 ObjectIntMap<String> classifierIdConflicts = idConflicts.get(classifier);
                 classifierIdConflicts.forEachKeyValue((id, count) -> builder.append("\n\t\t").append(id).append(": ").append(count).append(" instances"));
             });
-            Assert.fail(builder.toString());
+            Assertions.fail(builder.toString());
         }
     }
 }

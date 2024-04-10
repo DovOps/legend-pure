@@ -18,21 +18,23 @@ import org.eclipse.collections.api.list.ListIterable;
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
 import org.finos.legend.pure.m3.tests.RuntimeTestScriptBuilder;
 import org.finos.legend.pure.m3.tests.RuntimeVerifier;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 public abstract class AbstractTestCompileValueSpecification extends AbstractPureTestWithCoreCompiled
 {
-    private static final String EXECUTE_CODE_BLOCK = "function apps::pure::api::execution::compileAndExecuteCodeBlock(block:String[1]):Any[*]\n" +
-            "{\n" +
-            "   let prefix = '{|';\n" +
-            "   let vs = compileValueSpecification($prefix + $block + '}');\n" +
-            "   assert($vs.succeeded(), | 'Invalid PURE code block: ' + if($vs.failure.sourceInformation->isEmpty(), |'', | let col = ($vs.failure.sourceInformation->toOne().column - $prefix->length()); '(line:' + $vs.failure.sourceInformation->toOne().line->toString() + ' column:' + $col->toString() + ') ' + $vs.failure->toOne().message;));\n" +
-            "\n" +
-            "   $vs.result->toOne()->reactivate(^Map<String, List<Any>>())->cast(@Function<{->Any[*]}>)->toOne()->eval();\n" +
-            "}\n";
+    private static final String EXECUTE_CODE_BLOCK = """
+            function apps::pure::api::execution::compileAndExecuteCodeBlock(block:String[1]):Any[*]
+            {
+               let prefix = '{|';
+               let vs = compileValueSpecification($prefix + $block + '}');
+               assert($vs.succeeded(), | 'Invalid PURE code block: ' + if($vs.failure.sourceInformation->isEmpty(), |'', | let col = ($vs.failure.sourceInformation->toOne().column - $prefix->length()); '(line:' + $vs.failure.sourceInformation->toOne().line->toString() + ' column:' + $col->toString() + ') ' + $vs.failure->toOne().message;));
+            
+               $vs.result->toOne()->reactivate(^Map<String, List<Any>>())->cast(@Function<{->Any[*]}>)->toOne()->eval();
+            }
+            """;
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("testSource.pure");
@@ -47,12 +49,14 @@ public abstract class AbstractTestCompileValueSpecification extends AbstractPure
     public void testEvalSingle()
     {
         compileTestSource("testSource.pure",
-                "function test():Any[*]\n" +
-                        "{\n" +
-                        "let result = compileValueSpecification_String_m__CompilationResult_m_->eval('123');" +
-                        "assert($result.succeeded->toOne(), |'');" +
-                        "assert(123 == $result.result->toOne()->reactivate(^Map<String, List<Any>>()), |'');" +
-                        "}\n");
+                """
+                function test():Any[*]
+                {
+                let result = compileValueSpecification_String_m__CompilationResult_m_->eval('123');\
+                assert($result.succeeded->toOne(), |'');\
+                assert(123 == $result.result->toOne()->reactivate(^Map<String, List<Any>>()), |'');\
+                }
+                """);
         this.execute("test():Any[*]");
     }
 
@@ -60,14 +64,16 @@ public abstract class AbstractTestCompileValueSpecification extends AbstractPure
     public void testEvalList()
     {
         compileTestSource("testSource.pure",
-                "function test():Any[*]\n" +
-                        "{\n" +
-                        "let result = compileValueSpecification_String_m__CompilationResult_m_->eval(['123', '456']);" +
-                        "assert($result->at(0).succeeded->toOne(), |'');" +
-                        "assert($result->at(1).succeeded->toOne(), |'');" +
-                        "assert(123 == $result->at(0).result->toOne()->reactivate(^Map<String, List<Any>>()), |'');" +
-                        "assert(456 == $result->at(1).result->toOne()->reactivate(^Map<String, List<Any>>()), |'');" +
-                        "}\n");
+                """
+                function test():Any[*]
+                {
+                let result = compileValueSpecification_String_m__CompilationResult_m_->eval(['123', '456']);\
+                assert($result->at(0).succeeded->toOne(), |'');\
+                assert($result->at(1).succeeded->toOne(), |'');\
+                assert(123 == $result->at(0).result->toOne()->reactivate(^Map<String, List<Any>>()), |'');\
+                assert(456 == $result->at(1).result->toOne()->reactivate(^Map<String, List<Any>>()), |'');\
+                }
+                """);
         this.execute("test():Any[*]");
     }
 
@@ -76,11 +82,13 @@ public abstract class AbstractTestCompileValueSpecification extends AbstractPure
     {
         RuntimeVerifier.verifyOperationIsStable(new RuntimeTestScriptBuilder().createInMemorySource(
                         "testSource.pure",
-                        "function test():Any[1]\n" +
-                                "{\n" +
-                                "   let res = compileValueSpecification('{|$a + 3}');\n" +
-                                "   assert('The variable \\'a\\' is unknown!' == $res.failure.message, |'');\n" +
-                                "}\n"
+                        """
+                        function test():Any[1]
+                        {
+                           let res = compileValueSpecification('{|$a + 3}');
+                           assert('The variable \\'a\\' is unknown!' == $res.failure.message, |'');
+                        }
+                        """
                 ).compile(), new RuntimeTestScriptBuilder().executeFunction("test():Any[1]"),
                 runtime, functionExecution, this.getExecutionVerifiers());
     }
@@ -90,16 +98,17 @@ public abstract class AbstractTestCompileValueSpecification extends AbstractPure
     {
         RuntimeVerifier.verifyOperationIsStable(new RuntimeTestScriptBuilder().createInMemorySource(
                         "testSource.pure",
-                        "function test():Any[1]\n" +
-                                "{\n" +
-                                "   let code = '{| let a = \\'hello world\\';\\n unknownfunc::display($a);\\n}';\n" +
-                                "   let res = compileValueSpecification($code);\n" +
-                                "   assert('The system can\\'t find a match for the function: unknownfunc::display(_:String[1])' == $res.failure.message, |'');\n" +
-                                "   assert(2 == $res.failure.sourceInformation.line, |'');\n" +
-                                "   assert(15 == $res.failure.sourceInformation.column, |'');\n" +
-                                //We do not want to expose the temporary filename we create
-                                "   assert($res.failure.sourceInformation.source->isEmpty(),|'');\n" +
-                                "}\n"
+                        """
+                        function test():Any[1]
+                        {
+                           let code = '{| let a = \\'hello world\\';\\n unknownfunc::display($a);\\n}';
+                           let res = compileValueSpecification($code);
+                           assert('The system can\\'t find a match for the function: unknownfunc::display(_:String[1])' == $res.failure.message, |'');
+                           assert(2 == $res.failure.sourceInformation.line, |'');
+                           assert(15 == $res.failure.sourceInformation.column, |'');
+                           assert($res.failure.sourceInformation.source->isEmpty(),|'');
+                        }
+                        """
                 ).compile(), new RuntimeTestScriptBuilder().executeFunction("test():Any[1]"),
                 runtime, functionExecution, this.getExecutionVerifiers());
     }
@@ -109,17 +118,19 @@ public abstract class AbstractTestCompileValueSpecification extends AbstractPure
     {
         RuntimeVerifier.verifyOperationIsStable(new RuntimeTestScriptBuilder().createInMemorySource(
                         "testSource.pure",
-                        "Class my::Person\n" +
-                                "{\n" +
-                                "   name:String[1];\n" +
-                                "}\n" +
-                                "\n" +
-                                "function test():Any[1]\n" +
-                                "{\n" +
-                                "   let res = compileValueSpecification('my::Person.all()->filter(p | $p.name == \\'George\\')');\n" +
-                                "   assert($res.failure->isEmpty(), |'');\n" +
-                                "   assert(!$res.result->isEmpty(), |'');\n" +
-                                "}\n"
+                        """
+                        Class my::Person
+                        {
+                           name:String[1];
+                        }
+                        
+                        function test():Any[1]
+                        {
+                           let res = compileValueSpecification('my::Person.all()->filter(p | $p.name == \\'George\\')');
+                           assert($res.failure->isEmpty(), |'');
+                           assert(!$res.result->isEmpty(), |'');
+                        }
+                        """
                 ).compile(), new RuntimeTestScriptBuilder().executeFunction("test():Any[1]"),
                 runtime, functionExecution, this.getExecutionVerifiers());
 
@@ -130,20 +141,22 @@ public abstract class AbstractTestCompileValueSpecification extends AbstractPure
     {
         RuntimeVerifier.verifyOperationIsStable(new RuntimeTestScriptBuilder().createInMemorySource(
                         "testSource.pure",
-                        "Class my::Person\n" +
-                                "{\n" +
-                                "   name:String[1];\n" +
-                                "}\n" +
-                                "\n" +
-                                "function test():Any[1]\n" +
-                                "{\n" +
-                                "   let blocks = ['my::Person.all()->filter(p | $p.name == \\'George\\')','my::Person.all()->filter(p | $p.name == \\'Bob\\')'];\n" +
-                                "   let res = $blocks->compileValueSpecification();\n" +
-                                "   assert($res->at(0).failure->isEmpty(),|'');\n" +
-                                "   assert(!$res->at(0).result->isEmpty(), |'');\n" +
-                                "   assert($res->at(1).failure->isEmpty(),|'');\n" +
-                                "   assert(!$res->at(1).result->isEmpty(),|'');\n" +
-                                "}\n"
+                        """
+                        Class my::Person
+                        {
+                           name:String[1];
+                        }
+                        
+                        function test():Any[1]
+                        {
+                           let blocks = ['my::Person.all()->filter(p | $p.name == \\'George\\')','my::Person.all()->filter(p | $p.name == \\'Bob\\')'];
+                           let res = $blocks->compileValueSpecification();
+                           assert($res->at(0).failure->isEmpty(),|'');
+                           assert(!$res->at(0).result->isEmpty(), |'');
+                           assert($res->at(1).failure->isEmpty(),|'');
+                           assert(!$res->at(1).result->isEmpty(),|'');
+                        }
+                        """
                 ).compile(), new RuntimeTestScriptBuilder().executeFunction("test():Any[1]"),
                 runtime, functionExecution, this.getExecutionVerifiers());
 
@@ -158,26 +171,32 @@ public abstract class AbstractTestCompileValueSpecification extends AbstractPure
     @Test
     public void testExecuteSimpleBlockDeactivated()
     {
-        String codeBlock = "let f = [1,2,3]->map(e | $e * 2)->deactivate()->cast(@FunctionExpression);\n" +
-                           "$f.func->evaluate($f.parametersValues->map(p | ^List<Any>(values=$p->reactivate(^Map<String, List<Any>>()))))->map(s|$s->toString())->joinStrings(',');";
+        String codeBlock = """
+                           let f = [1,2,3]->map(e | $e * 2)->deactivate()->cast(@FunctionExpression);
+                           $f.func->evaluate($f.parametersValues->map(p | ^List<Any>(values=$p->reactivate(^Map<String, List<Any>>()))))->map(s|$s->toString())->joinStrings(',');\
+                           """;
         this.testExecuteCodeBlockIsStable(codeBlock, "2,4,6");
     }
 
     @Test
     public void testExecuteCodeBlockWithCompileValueSpecification()
     {
-        String codeBlock = "let res = compileValueSpecification('[1,2,3]->map(e | $e * 2)');\n" +
-                           "let f = $res.result->cast(@FunctionExpression);\n" +
-                           "$f.func->toOne()->evaluate($f.parametersValues->map(p|^List<Any>(values=$p->reactivate())))->map(s|$s->toString())->joinStrings(',');";
+        String codeBlock = """
+                           let res = compileValueSpecification('[1,2,3]->map(e | $e * 2)');
+                           let f = $res.result->cast(@FunctionExpression);
+                           $f.func->toOne()->evaluate($f.parametersValues->map(p|^List<Any>(values=$p->reactivate())))->map(s|$s->toString())->joinStrings(',');\
+                           """;
         this.testExecuteCodeBlockIsStable(codeBlock, "2,4,6");
     }
 
     @Test
     public void testExecuteCodeBlockWithFailingCompileValueSpecification()
     {
-        String codeBlock = "let res = compileValueSpecification('$z->map(e | $e * 2)');\n" +
-                           "let f = $res.failure;\n" +
-                           "$f.message;";
+        String codeBlock = """
+                           let res = compileValueSpecification('$z->map(e | $e * 2)');
+                           let f = $res.failure;
+                           $f.message;\
+                           """;
         this.testExecuteCodeBlockIsStable(codeBlock, "The variable \\\'z\\\' is unknown!");
     }
 

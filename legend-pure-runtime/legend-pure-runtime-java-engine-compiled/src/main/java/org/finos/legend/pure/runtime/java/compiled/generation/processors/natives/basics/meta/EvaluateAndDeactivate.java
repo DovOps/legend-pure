@@ -35,13 +35,16 @@ public class EvaluateAndDeactivate extends AbstractNative
     @Override
     public String buildBody()
     {
-        return "new SharedPureFunction<Object>()\n" +
-                "{\n" +
-                "   @Override\n" +
-                "   public Object execute(ListIterable<?> vars, ExecutionSupport es)\n" +
-                "   {\n" +
-                "       return vars.get(0);\n" +
-                "   }\n" +
-                "\n}";
+        return """
+                new SharedPureFunction<Object>()
+                {
+                   @Override
+                   public Object execute(ListIterable<?> vars, ExecutionSupport es)
+                   {
+                       return vars.get(0);
+                   }
+                
+                }\
+                """;
     }
 }

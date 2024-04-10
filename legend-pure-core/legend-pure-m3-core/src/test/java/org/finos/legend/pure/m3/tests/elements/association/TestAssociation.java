@@ -19,21 +19,17 @@ import org.finos.legend.pure.m3.tools.test.ToFix;
 import org.finos.legend.pure.m4.coreinstance.SourceInformation;
 import org.finos.legend.pure.m4.exception.PureCompilationException;
 import org.finos.legend.pure.m4.exception.PureException;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.*;
 
 public class TestAssociation extends AbstractPureTestWithCoreCompiledPlatform
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getExtra());
     }
 
-    @After
+    @AfterEach
     public void clearRuntime()
     {
         runtime.delete("fromString.pure");
@@ -45,21 +41,23 @@ public class TestAssociation extends AbstractPureTestWithCoreCompiledPlatform
     {
         try
         {
-            compileTestSource("fromString.pure", "Class Product\n" +
-                    "{\n" +
-                    "   name : String[1];\n" +
-                    "}\n" +
-                    "\n" +
-                    "Association ProdSyn\n" +
-                    "{\n" +
-                    "   product : Product[1];\n" +
-                    "}\n" +
-                    "\n" +
-                    "Class Synonym\n" +
-                    "{\n" +
-                    "   name : String[1];\n" +
-                    "}\n");
-            Assert.fail("Expected compilation exception");
+            compileTestSource("fromString.pure", """
+                    Class Product
+                    {
+                       name : String[1];
+                    }
+                    
+                    Association ProdSyn
+                    {
+                       product : Product[1];
+                    }
+                    
+                    Class Synonym
+                    {
+                       name : String[1];
+                    }
+                    """);
+            Assertions.fail("Expected compilation exception");
         }
         catch (RuntimeException e)
         {
@@ -72,23 +70,25 @@ public class TestAssociation extends AbstractPureTestWithCoreCompiledPlatform
     {
         try
         {
-            compileTestSource("fromString.pure", "Class Product\n" +
-                    "{\n" +
-                    "   name : String[1];\n" +
-                    "}\n" +
-                    "\n" +
-                    "Association ProdSyn\n" +
-                    "{\n" +
-                    "   product : Product[1];\n" +
-                    "   synonyms : Synonym[*];\n" +
-                    "   moreSynonyms : Synonym[*];\n" +
-                    "}\n" +
-                    "\n" +
-                    "Class Synonym\n" +
-                    "{\n" +
-                    "   name : String[1];\n" +
-                    "}\n");
-            Assert.fail("Expected compilation exception");
+            compileTestSource("fromString.pure", """
+                    Class Product
+                    {
+                       name : String[1];
+                    }
+                    
+                    Association ProdSyn
+                    {
+                       product : Product[1];
+                       synonyms : Synonym[*];
+                       moreSynonyms : Synonym[*];
+                    }
+                    
+                    Class Synonym
+                    {
+                       name : String[1];
+                    }
+                    """);
+            Assertions.fail("Expected compilation exception");
         }
         catch (RuntimeException e)
         {
@@ -101,17 +101,19 @@ public class TestAssociation extends AbstractPureTestWithCoreCompiledPlatform
     {
         try
         {
-            compileTestSource("fromString.pure", "Class Product\n" +
-                    "{\n" +
-                    "   name : String[1];\n" +
-                    "}\n" +
-                    "\n" +
-                    "Association ProdSyn\n" +
-                    "{\n" +
-                    "   product : Product[1];\n" +
-                    "   synonyms : SynonymErr[*];\n" +
-                    "}");
-            Assert.fail();
+            compileTestSource("fromString.pure", """
+                    Class Product
+                    {
+                       name : String[1];
+                    }
+                    
+                    Association ProdSyn
+                    {
+                       product : Product[1];
+                       synonyms : SynonymErr[*];
+                    }\
+                    """);
+            Assertions.fail();
         }
         catch (Exception e)
         {
@@ -124,22 +126,24 @@ public class TestAssociation extends AbstractPureTestWithCoreCompiledPlatform
     {
         try
         {
-            compileTestSource("fromString.pure", "Class Product\n" +
-                    "{\n" +
-                    "   name : String[1];\n" +
-                    "}\n" +
-                    "\n" +
-                    "Association ProdSyn\n" +
-                    "{\n" +
-                    "   product : Product[1];\n" +
-                    "   synonyms : Synonym<Error>[*];\n" +
-                    "}\n" +
-                    "\n" +
-                    "Class Synonym<T>\n" +
-                    "{\n" +
-                    "   name : T[1];\n" +
-                    "}");
-            Assert.fail();
+            compileTestSource("fromString.pure", """
+                    Class Product
+                    {
+                       name : String[1];
+                    }
+                    
+                    Association ProdSyn
+                    {
+                       product : Product[1];
+                       synonyms : Synonym<Error>[*];
+                    }
+                    
+                    Class Synonym<T>
+                    {
+                       name : T[1];
+                    }\
+                    """);
+            Assertions.fail();
         }
         catch (Exception e)
         {
@@ -152,22 +156,24 @@ public class TestAssociation extends AbstractPureTestWithCoreCompiledPlatform
     {
         try
         {
-            compileTestSource("fromString.pure", "Class Product\n" +
-                    "{\n" +
-                    "   name : String[1];\n" +
-                    "}\n" +
-                    "\n" +
-                    "Association ProdSyn\n" +
-                    "{\n" +
-                    "   product : Product[1];\n" +
-                    "   synonyms : Synonym[*];\n" +
-                    "}\n" +
-                    "\n" +
-                    "Class Synonym<T>\n" +
-                    "{\n" +
-                    "   name : T[1];\n" +
-                    "}");
-            Assert.fail();
+            compileTestSource("fromString.pure", """
+                    Class Product
+                    {
+                       name : String[1];
+                    }
+                    
+                    Association ProdSyn
+                    {
+                       product : Product[1];
+                       synonyms : Synonym[*];
+                    }
+                    
+                    Class Synonym<T>
+                    {
+                       name : T[1];
+                    }\
+                    """);
+            Assertions.fail();
         }
         catch (Exception e)
         {
@@ -178,25 +184,27 @@ public class TestAssociation extends AbstractPureTestWithCoreCompiledPlatform
     @Test
     public void testAssociationWithValidQualifiedPropertyIsProcessedWithoutError()
     {
-        compileTestSource("fromString.pure", "Class Product\n" +
-                "{\n" +
-                "   name : String[1];\n" +
-                "}\n" +
-                "\n" +
-                "Association ProdSyn\n" +
-                "{\n" +
-                "   product : Product[1];\n" +
-                "   synonyms : Synonym[*];\n" +
-                "   synonymsByName(st:String[1])\n" +
-                "   {\n" +
-                "     $this.synonyms->filter(s|$s.name == $st)->toOne()\n" +
-                "   }: Synonym[1];\n" +
-                "}\n" +
-                "\n" +
-                "Class Synonym\n" +
-                "{\n" +
-                "   name : String[1];\n" +
-                "}");
+        compileTestSource("fromString.pure", """
+                Class Product
+                {
+                   name : String[1];
+                }
+                
+                Association ProdSyn
+                {
+                   product : Product[1];
+                   synonyms : Synonym[*];
+                   synonymsByName(st:String[1])
+                   {
+                     $this.synonyms->filter(s|$s.name == $st)->toOne()
+                   }: Synonym[1];
+                }
+                
+                Class Synonym
+                {
+                   name : String[1];
+                }\
+                """);
     }
 
     @Test
@@ -204,38 +212,40 @@ public class TestAssociation extends AbstractPureTestWithCoreCompiledPlatform
     {
         try
         {
-            compileTestSource("fromString.pure", "Class Product\n" +
-                    "{\n" +
-                    "   name : String[1];\n" +
-                    "}\n" +
-                    "\n" +
-                    "Association ProdSyn\n" +
-                    "{\n" +
-                    "   product : Product[1];\n" +
-                    "   synonyms : Synonym[*];\n" +
-                    "   newSynonym(strings:String[*])\n" +
-                    "   {\n" +
-                    "     ^Synonym();\n" +
-                    "   }:Synonym[*];\n" +
-                    "}\n" +
-                    "\n" +
-                    "Class Synonym\n" +
-                    "{\n" +
-                    "   name : String[1];\n" +
-                    "}");
-            Assert.fail("Expected compilation exception");
+            compileTestSource("fromString.pure", """
+                    Class Product
+                    {
+                       name : String[1];
+                    }
+                    
+                    Association ProdSyn
+                    {
+                       product : Product[1];
+                       synonyms : Synonym[*];
+                       newSynonym(strings:String[*])
+                       {
+                         ^Synonym();
+                       }:Synonym[*];
+                    }
+                    
+                    Class Synonym
+                    {
+                       name : String[1];
+                    }\
+                    """);
+            Assertions.fail("Expected compilation exception");
         }
         catch (RuntimeException e)
         {
             PureException pe = PureException.findPureException(e);
-            Assert.assertNotNull(pe);
-            Assert.assertTrue(pe instanceof PureCompilationException);
-            Assert.assertEquals("Association Qualified Properties must follow the following pattern '$this.<<associationProperty>>->filter(p|<<lambdaExpression>>)'. Qualified property: 'newSynonym_0' in association: 'ProdSyn'  does not use the 'filter' function", pe.getInfo());
+            Assertions.assertNotNull(pe);
+            Assertions.assertTrue(pe instanceof PureCompilationException);
+            Assertions.assertEquals("Association Qualified Properties must follow the following pattern '$this.<<associationProperty>>->filter(p|<<lambdaExpression>>)'. Qualified property: 'newSynonym_0' in association: 'ProdSyn'  does not use the 'filter' function", pe.getInfo());
 
             SourceInformation sourceInfo = pe.getSourceInformation();
-            Assert.assertNotNull(sourceInfo);
-            Assert.assertEquals(10, sourceInfo.getLine());
-            Assert.assertEquals(4, sourceInfo.getColumn());
+            Assertions.assertNotNull(sourceInfo);
+            Assertions.assertEquals(10, sourceInfo.getLine());
+            Assertions.assertEquals(4, sourceInfo.getColumn());
         }
     }
 
@@ -244,38 +254,40 @@ public class TestAssociation extends AbstractPureTestWithCoreCompiledPlatform
     {
         try
         {
-            compileTestSource("fromString.pure", "Class Product\n" +
-                    "{\n" +
-                    "   name : String[1];\n" +
-                    "}\n" +
-                    "\n" +
-                    "Association ProdSyn\n" +
-                    "{\n" +
-                    "   product : Product[1];\n" +
-                    "   synonyms : Synonym[*];\n" +
-                    "   synonymsByName(st:String[1])\n" +
-                    "   {\n" +
-                    "     $this.synonyms->filter(s|$s.name == $st)->toOne(); ^Synonym();\n" +
-                    "   }: Synonym[1];\n" +
-                    "}\n" +
-                    "\n" +
-                    "Class Synonym\n" +
-                    "{\n" +
-                    "   name : String[1];\n" +
-                    "}");
-            Assert.fail("Expected compilation exception");
+            compileTestSource("fromString.pure", """
+                    Class Product
+                    {
+                       name : String[1];
+                    }
+                    
+                    Association ProdSyn
+                    {
+                       product : Product[1];
+                       synonyms : Synonym[*];
+                       synonymsByName(st:String[1])
+                       {
+                         $this.synonyms->filter(s|$s.name == $st)->toOne(); ^Synonym();
+                       }: Synonym[1];
+                    }
+                    
+                    Class Synonym
+                    {
+                       name : String[1];
+                    }\
+                    """);
+            Assertions.fail("Expected compilation exception");
         }
         catch (RuntimeException e)
         {
             PureException pe = PureException.findPureException(e);
-            Assert.assertNotNull(pe);
-            Assert.assertTrue(pe instanceof PureCompilationException);
-            Assert.assertEquals("Association Qualified Properties must follow the following pattern '$this.<<associationProperty>>->filter(p|<<lambdaExpression>>)'. Qualified property: 'synonymsByName_0' in association: 'ProdSyn'  has more than one Expression Sequence", pe.getInfo());
+            Assertions.assertNotNull(pe);
+            Assertions.assertTrue(pe instanceof PureCompilationException);
+            Assertions.assertEquals("Association Qualified Properties must follow the following pattern '$this.<<associationProperty>>->filter(p|<<lambdaExpression>>)'. Qualified property: 'synonymsByName_0' in association: 'ProdSyn'  has more than one Expression Sequence", pe.getInfo());
 
             SourceInformation sourceInfo = pe.getSourceInformation();
-            Assert.assertNotNull(sourceInfo);
-            Assert.assertEquals(10, sourceInfo.getLine());
-            Assert.assertEquals(4, sourceInfo.getColumn());
+            Assertions.assertNotNull(sourceInfo);
+            Assertions.assertEquals(10, sourceInfo.getLine());
+            Assertions.assertEquals(4, sourceInfo.getColumn());
         }
     }
 
@@ -284,43 +296,45 @@ public class TestAssociation extends AbstractPureTestWithCoreCompiledPlatform
     {
         try
         {
-            compileTestSource("fromString.pure", "Class Product\n" +
-                    "{\n" +
-                    "   name : String[1];\n" +
-                    "   orderVersions : OrderVersion[*];\n" +
-                    "}\n" +
-                    "\n" +
-                    "Association ProdSyn\n" +
-                    "{\n" +
-                    "   product : Product[1];\n" +
-                    "   synonyms : Synonym[*];\n" +
-                    "   orderVersionById(id:String[1])\n" +
-                    "   {\n" +
-                    "     $this.orderVersions->filter(o|$o.id == $id)->toOne()\n" +
-                    "   }: OrderVersion[1];\n" +
-                    "}\n" +
-                    "\n" +
-                    "Class Synonym\n" +
-                    "{\n" +
-                    "   name : String[1];\n" +
-                    "}" +
-                    "Class OrderVersion\n" +
-                    "{\n" +
-                    "   id : String[1];\n" +
-                    "}");
-            Assert.fail("Expected compilation exception");
+            compileTestSource("fromString.pure", """
+                    Class Product
+                    {
+                       name : String[1];
+                       orderVersions : OrderVersion[*];
+                    }
+                    
+                    Association ProdSyn
+                    {
+                       product : Product[1];
+                       synonyms : Synonym[*];
+                       orderVersionById(id:String[1])
+                       {
+                         $this.orderVersions->filter(o|$o.id == $id)->toOne()
+                       }: OrderVersion[1];
+                    }
+                    
+                    Class Synonym
+                    {
+                       name : String[1];
+                    }\
+                    Class OrderVersion
+                    {
+                       id : String[1];
+                    }\
+                    """);
+            Assertions.fail("Expected compilation exception");
         }
         catch (RuntimeException e)
         {
             PureException pe = PureException.findPureException(e);
-            Assert.assertNotNull(pe);
-            Assert.assertTrue(pe instanceof PureCompilationException);
-            Assert.assertEquals("Qualified property: 'orderVersionById_0' in association: 'ProdSyn' has returnType of : OrderVersion it should be one of Association: 'ProdSyn' properties' return types: [Synonym, Product]", pe.getInfo());
+            Assertions.assertNotNull(pe);
+            Assertions.assertTrue(pe instanceof PureCompilationException);
+            Assertions.assertEquals("Qualified property: 'orderVersionById_0' in association: 'ProdSyn' has returnType of : OrderVersion it should be one of Association: 'ProdSyn' properties' return types: [Synonym, Product]", pe.getInfo());
 
             SourceInformation sourceInfo = pe.getSourceInformation();
-            Assert.assertNotNull(sourceInfo);
-            Assert.assertEquals(11, sourceInfo.getLine());
-            Assert.assertEquals(4, sourceInfo.getColumn());
+            Assertions.assertNotNull(sourceInfo);
+            Assertions.assertEquals(11, sourceInfo.getLine());
+            Assertions.assertEquals(4, sourceInfo.getColumn());
         }
     }
 
@@ -329,38 +343,40 @@ public class TestAssociation extends AbstractPureTestWithCoreCompiledPlatform
     {
         try
         {
-            compileTestSource("fromString.pure", "Class Product\n" +
-                    "{\n" +
-                    "   name : String[1];\n" +
-                    "}\n" +
-                    "\n" +
-                    "Association ProdSyn\n" +
-                    "{\n" +
-                    "   product : Product[1];\n" +
-                    "   synonyms : Synonym[*];\n" +
-                    "   synonymsByName(st:String[1])\n" +
-                    "   {\n" +
-                    "     $this.synonyms->filter(s|$s.name == $st)->map(s|^Product(name=''))\n" +
-                    "   }: Product[*];\n" +
-                    "}\n" +
-                    "\n" +
-                    "Class Synonym\n" +
-                    "{\n" +
-                    "   name : String[1];\n" +
-                    "}");
-            Assert.fail("Expected compilation exception");
+            compileTestSource("fromString.pure", """
+                    Class Product
+                    {
+                       name : String[1];
+                    }
+                    
+                    Association ProdSyn
+                    {
+                       product : Product[1];
+                       synonyms : Synonym[*];
+                       synonymsByName(st:String[1])
+                       {
+                         $this.synonyms->filter(s|$s.name == $st)->map(s|^Product(name=''))
+                       }: Product[*];
+                    }
+                    
+                    Class Synonym
+                    {
+                       name : String[1];
+                    }\
+                    """);
+            Assertions.fail("Expected compilation exception");
         }
         catch (RuntimeException e)
         {
             PureException pe = PureException.findPureException(e);
-            Assert.assertNotNull(pe);
-            Assert.assertTrue(pe instanceof PureCompilationException);
-            Assert.assertEquals("Qualified property: 'synonymsByName_0' in association: 'ProdSyn' should return a subset of property: 'synonyms' (left side of filter) and consequently should have a returnType of : 'Synonym'", pe.getInfo());
+            Assertions.assertNotNull(pe);
+            Assertions.assertTrue(pe instanceof PureCompilationException);
+            Assertions.assertEquals("Qualified property: 'synonymsByName_0' in association: 'ProdSyn' should return a subset of property: 'synonyms' (left side of filter) and consequently should have a returnType of : 'Synonym'", pe.getInfo());
 
             SourceInformation sourceInfo = pe.getSourceInformation();
-            Assert.assertNotNull(sourceInfo);
-            Assert.assertEquals(10, sourceInfo.getLine());
-            Assert.assertEquals(4, sourceInfo.getColumn());
+            Assertions.assertNotNull(sourceInfo);
+            Assertions.assertEquals(10, sourceInfo.getLine());
+            Assertions.assertEquals(4, sourceInfo.getColumn());
         }
     }
 
@@ -369,45 +385,47 @@ public class TestAssociation extends AbstractPureTestWithCoreCompiledPlatform
     {
         try
         {
-            compileTestSource("fromString.pure", "Class Product\n" +
-                    "{\n" +
-                    "   name : String[1];\n" +
-                    "   synonymsByName(st:String[1]){$this.synonyms->filter(s | $s.name == $st)->toOne()}: Synonym[1];" +
-                    "}\n" +
-                    "\n" +
-                    "Association ProdSyn\n" +
-                    "{\n" +
-                    "   product : Product[1];\n" +
-                    "   synonyms : Synonym[*];\n" +
-                    "   synonymsByName(st:String[1])\n" +
-                    "   {\n" +
-                    "     $this.synonyms->filter(s|$s.name == $st)->toOne();\n" +
-                    "   }: Synonym[1];\n" +
-                    "}\n" +
-                    "\n" +
-                    "Class Synonym\n" +
-                    "{\n" +
-                    "   name : String[1];\n" +
-                    "}");
-            Assert.fail("Expected compilation exception");
+            compileTestSource("fromString.pure", """
+                    Class Product
+                    {
+                       name : String[1];
+                       synonymsByName(st:String[1]){$this.synonyms->filter(s | $s.name == $st)->toOne()}: Synonym[1];\
+                    }
+                    
+                    Association ProdSyn
+                    {
+                       product : Product[1];
+                       synonyms : Synonym[*];
+                       synonymsByName(st:String[1])
+                       {
+                         $this.synonyms->filter(s|$s.name == $st)->toOne();
+                       }: Synonym[1];
+                    }
+                    
+                    Class Synonym
+                    {
+                       name : String[1];
+                    }\
+                    """);
+            Assertions.fail("Expected compilation exception");
         }
         catch (RuntimeException e)
         {
             PureException pe = PureException.findPureException(e);
-            Assert.assertNotNull(pe);
-            Assert.assertTrue(pe instanceof PureCompilationException);
-            Assert.assertEquals("Property conflict on class Product: qualified property 'synonymsByName' defined more than once", pe.getInfo());
+            Assertions.assertNotNull(pe);
+            Assertions.assertTrue(pe instanceof PureCompilationException);
+            Assertions.assertEquals("Property conflict on class Product: qualified property 'synonymsByName' defined more than once", pe.getInfo());
 
             SourceInformation sourceInfo = pe.getSourceInformation();
-            Assert.assertNotNull(sourceInfo);
-            Assert.assertEquals(1, sourceInfo.getLine());
-            Assert.assertEquals(7, sourceInfo.getColumn());
+            Assertions.assertNotNull(sourceInfo);
+            Assertions.assertEquals(1, sourceInfo.getLine());
+            Assertions.assertEquals(7, sourceInfo.getColumn());
         }
     }
 
 
     @Test
-    @Ignore
+    @Disabled
     @ToFix
     public void testAssociationWithDuplicatePropertyNames()
     {
@@ -415,14 +433,16 @@ public class TestAssociation extends AbstractPureTestWithCoreCompiledPlatform
         try
         {
             compileTestSource("fromString.pure",
-                    "Class Class1 {}\n" +
-                            "Class Class2 {}\n" +
-                            "Association Association12\n" +
-                            "{\n" +
-                            "    prop:Class1[*];\n" +
-                            "    prop:Class2[0..1];\n" +
-                            "}\n");
-            Assert.fail("Expected compilation exception");
+                    """
+                    Class Class1 {}
+                    Class Class2 {}
+                    Association Association12
+                    {
+                        prop:Class1[*];
+                        prop:Class2[0..1];
+                    }
+                    """);
+            Assertions.fail("Expected compilation exception");
         }
         catch (RuntimeException e)
         {
@@ -436,13 +456,15 @@ public class TestAssociation extends AbstractPureTestWithCoreCompiledPlatform
         try
         {
             compileTestSource("fromString.pure",
-                    "Class Class1 {}\n" +
-                            "Association Association12\n" +
-                            "{\n" +
-                            "    prop:Class1[*];\n" +
-                            "    prop:Class1[0..1];\n" +
-                            "}\n");
-            Assert.fail("Expected compilation exception");
+                    """
+                    Class Class1 {}
+                    Association Association12
+                    {
+                        prop:Class1[*];
+                        prop:Class1[0..1];
+                    }
+                    """);
+            Assertions.fail("Expected compilation exception");
         }
         catch (Exception e)
         {
@@ -456,17 +478,19 @@ public class TestAssociation extends AbstractPureTestWithCoreCompiledPlatform
         try
         {
             compileTestSource("fromString.pure",
-                    "Class Class1\n" +
-                            "{\n" +
-                            "  prop:Class2[*];\n" +
-                            "}\n" +
-                            "Class Class2 {}\n" +
-                            "Association Association12\n" +
-                            "{\n" +
-                            "  prop:Class2[*];\n" +
-                            "  prop2:Class1[1];\n" +
-                            "}");
-            Assert.fail("Expected compilation exception");
+                    """
+                    Class Class1
+                    {
+                      prop:Class2[*];
+                    }
+                    Class Class2 {}
+                    Association Association12
+                    {
+                      prop:Class2[*];
+                      prop2:Class1[1];
+                    }\
+                    """);
+            Assertions.fail("Expected compilation exception");
         }
         catch (Exception e)
         {
@@ -478,20 +502,24 @@ public class TestAssociation extends AbstractPureTestWithCoreCompiledPlatform
     public void testAssociationWithPropertyNameConflictInOtherSource()
     {
         compileTestSource("fromString.pure",
-                "Class Class1\n" +
-                        "{\n" +
-                        "  prop:Class2[*];\n" +
-                        "}\n" +
-                        "Class Class2 {}\n");
+                """
+                Class Class1
+                {
+                  prop:Class2[*];
+                }
+                Class Class2 {}
+                """);
         try
         {
             compileTestSource("fromString2.pure",
-                    "Association Association12\n" +
-                            "{\n" +
-                            "  prop:Class2[*];\n" +
-                            "  prop2:Class1[1];\n" +
-                            "}");
-            Assert.fail("Expected compilation exception");
+                    """
+                    Association Association12
+                    {
+                      prop:Class2[*];
+                      prop2:Class1[1];
+                    }\
+                    """);
+            Assertions.fail("Expected compilation exception");
         }
         catch (Exception e)
         {
@@ -506,12 +534,14 @@ public class TestAssociation extends AbstractPureTestWithCoreCompiledPlatform
         try
         {
             compileTestSource("fromString2.pure",
-                    "Association Association1\n" +
-                            "{\n" +
-                            "  prop1 : Class1[1];\n" +
-                            "  prop2 : String[1];\n" +
-                            "}");
-            Assert.fail("Expected compilation exception");
+                    """
+                    Association Association1
+                    {
+                      prop1 : Class1[1];
+                      prop2 : String[1];
+                    }\
+                    """);
+            Assertions.fail("Expected compilation exception");
         }
         catch (Exception e)
         {
@@ -521,12 +551,14 @@ public class TestAssociation extends AbstractPureTestWithCoreCompiledPlatform
         try
         {
             compileTestSource("fromString3.pure",
-                    "Association Association2\n" +
-                            "{\n" +
-                            "  prop1 : Integer[1];\n" +
-                            "  prop2 : Class1[1];\n" +
-                            "}");
-            Assert.fail("Expected compilation exception");
+                    """
+                    Association Association2
+                    {
+                      prop1 : Integer[1];
+                      prop2 : Class1[1];
+                    }\
+                    """);
+            Assertions.fail("Expected compilation exception");
         }
         catch (Exception e)
         {
@@ -536,12 +568,14 @@ public class TestAssociation extends AbstractPureTestWithCoreCompiledPlatform
         try
         {
             compileTestSource("fromString4.pure",
-                    "Association Association3\n" +
-                            "{\n" +
-                            "  prop1 : Integer[1];\n" +
-                            "  prop2 : Date[1];\n" +
-                            "}");
-            Assert.fail("Expected compilation exception");
+                    """
+                    Association Association3
+                    {
+                      prop1 : Integer[1];
+                      prop2 : Date[1];
+                    }\
+                    """);
+            Assertions.fail("Expected compilation exception");
         }
         catch (Exception e)
         {

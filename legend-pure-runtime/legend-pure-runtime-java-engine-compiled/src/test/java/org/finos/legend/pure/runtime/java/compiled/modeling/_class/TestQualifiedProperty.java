@@ -29,17 +29,21 @@ import org.finos.legend.pure.m3.tools.test.ToFix;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
 import org.finos.legend.pure.runtime.java.compiled.execution.FunctionExecutionCompiledBuilder;
 import org.finos.legend.pure.runtime.java.compiled.factory.JavaModelFactoryRegistryLoader;
-import org.junit.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 public class TestQualifiedProperty extends AbstractPureTestWithCoreCompiled
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getFunctionExecution(), new CompositeCodeStorage(new ClassLoaderCodeStorage(getCodeRepositories())), JavaModelFactoryRegistryLoader.loader(), getOptions(), getExtra());
     }
 
-    @After
+    @AfterEach
     public void clearRuntime()
     {
         runtime.delete("/test/testSource.pure");
@@ -50,63 +54,67 @@ public class TestQualifiedProperty extends AbstractPureTestWithCoreCompiled
     public void testInheritedQualifiedProperty()
     {
         compileTestSource("/test/testSource.pure",
-                "import test::*;\n" +
-                        "Class test::TestClass1\n" +
-                        "{\n" +
-                        "  name : String[1];\n" +
-                        "  getNameFunction()\n" +
-                        "  {\n" +
-                        "     $this.name + 'x'\n" +
-                        "  }:String[1];\n" +
-                        "}\n" +
-                        "\n" +
-                        "Class test::TestClass2 extends TestClass1\n" +
-                        "{\n" +
-                        "}\n" +
-                        "\n" +
-                        "function test::testFn():Any[*]\n" +
-                        "{\n" +
-                        "  assertEquals('Danielx', ^TestClass1(name='Daniel').getNameFunction());\n" +
-                        "  assertEquals('Benedictx', ^TestClass2(name='Benedict').getNameFunction());\n" +
-                        "}\n");
+                """
+                import test::*;
+                Class test::TestClass1
+                {
+                  name : String[1];
+                  getNameFunction()
+                  {
+                     $this.name + 'x'
+                  }:String[1];
+                }
+                
+                Class test::TestClass2 extends TestClass1
+                {
+                }
+                
+                function test::testFn():Any[*]
+                {
+                  assertEquals('Danielx', ^TestClass1(name='Daniel').getNameFunction());
+                  assertEquals('Benedictx', ^TestClass2(name='Benedict').getNameFunction());
+                }
+                """);
         CoreInstance func = runtime.getFunction("test::testFn():Any[*]");
         functionExecution.start(func, Lists.immutable.empty());
     }
 
     @Test
     @ToFix
-    @Ignore
+    @Disabled
     public void testInheritedQualifiedPropertyWithTighterMultiplicity()
     {
         compileTestSource("/test/testSource.pure",
-                "import test::*;\n" +
-                        "Class test::TestClass1\n" +
-                        "{\n" +
-                        "  name : String[1];\n" +
-                        "  getNames()\n" +
-                        "  {\n" +
-                        "    $this.name->split(' ')\n" +
-                        "  }:String[*];\n" +
-                        "}\n" +
-                        "\n" +
-                        "Class test::TestClass2 extends TestClass1\n" +
-                        "{\n" +
-                        "  getNames()\n" +
-                        "  {\n" +
-                        "    let x = $this.name->split(' ');" +
-                        "    $x->at($x->size()-1);\n" +
-                        "  }:String[0..1];\n" +
-                        "}\n" +
-                        "\n" +
-                        "function test::testFn():Any[*]\n" +
-                        "{\n" +
-                        "  ^TestClass1(name='Daniel Benedict').getNames()->joinStrings(', ') +\n" +
-                        "    '\\n' +\n" +
-                        "    ^TestClass2(name='Daniel Benedict').getNames()->joinStrings(', ')\n" +
-                        "}\n");
+                """
+                import test::*;
+                Class test::TestClass1
+                {
+                  name : String[1];
+                  getNames()
+                  {
+                    $this.name->split(' ')
+                  }:String[*];
+                }
+                
+                Class test::TestClass2 extends TestClass1
+                {
+                  getNames()
+                  {
+                    let x = $this.name->split(' ');\
+                    $x->at($x->size()-1);
+                  }:String[0..1];
+                }
+                
+                function test::testFn():Any[*]
+                {
+                  ^TestClass1(name='Daniel Benedict').getNames()->joinStrings(', ') +
+                    '\\n' +
+                    ^TestClass2(name='Daniel Benedict').getNames()->joinStrings(', ')
+                }
+                """);
         CoreInstance func = runtime.getFunction("test::testFn():Any[*]");
         CoreInstance result = functionExecution.start(func, Lists.immutable.empty());
-        Assert.assertEquals("Daniel, Benedict\nBenedict", PrimitiveUtilities.getStringValue(result.getValueForMetaPropertyToOne(M3Properties.values)));
+        Assertions.assertEquals("Daniel, Benedict\nBenedict", PrimitiveUtilities.getStringValue(result.getValueForMetaPropertyToOne(M3Properties.values)));
     }
 
     protected static FunctionExecution getFunctionExecution()

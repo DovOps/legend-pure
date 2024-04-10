@@ -24,15 +24,15 @@ import org.finos.legend.pure.m3.serialization.filesystem.repository.GenericCodeR
 import org.finos.legend.pure.m3.serialization.filesystem.usercodestorage.MutableRepositoryCodeStorage;
 import org.finos.legend.pure.m3.serialization.filesystem.usercodestorage.classpath.ClassLoaderCodeStorage;
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;
 
 public abstract class AbstractTestCast extends AbstractPureTestWithCoreCompiled
 {
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("fromString.pure");
@@ -43,38 +43,42 @@ public abstract class AbstractTestCast extends AbstractPureTestWithCoreCompiled
     public void testCastError()
     {
         compileTestSource("fromString.pure",
-                "Class A\n" +
-                        "{\n" +
-                        "  prop3:String[1];\n" +
-                        "}\n" +
-                        "Class B extends A\n" +
-                        "{\n" +
-                        "  prop2 : String[1];\n" +
-                        "}\n" +
-                        "Class C\n" +
-                        "{\n" +
-                        "  prop:String[1];\n" +
-                        "}\n" +
-                        "\n" +
-                        "function testError():Nil[0]\n" +
-                        "{\n" +
-                        "   print(^A(prop3='a')->cast(@C).prop,1);\n" +
-                        "}\n");
+                """
+                Class A
+                {
+                  prop3:String[1];
+                }
+                Class B extends A
+                {
+                  prop2 : String[1];
+                }
+                Class C
+                {
+                  prop:String[1];
+                }
+                
+                function testError():Nil[0]
+                {
+                   print(^A(prop3='a')->cast(@C).prop,1);
+                }
+                """);
 
-        PureExecutionException e = Assert.assertThrows(PureExecutionException.class, () -> execute("testError():Nil[0]"));
+        PureExecutionException e = Assertions.assertThrows(PureExecutionException.class, () -> execute("testError():Nil[0]"));
         checkException(e, "Cast exception: A cannot be cast to C", "fromString.pure", 16, 25);
-        Assert.assertSame(e, findRootException(e));
+        Assertions.assertSame(e, findRootException(e));
     }
 
     @Test
     public void testInvalidCastWithTypeParameters()
     {
         compileTestSource("fromString.pure",
-                "function test():Any[*]\n" +
-                        "{\n" +
-                        "   ^List<X>(values=^X(nameX = 'my name is X'))->castToListY().values.nameY->print(1);\n" +
-                        "}");
-        PureExecutionException e = Assert.assertThrows(PureExecutionException.class, () -> execute("test():Any[*]"));
+                """
+                function test():Any[*]
+                {
+                   ^List<X>(values=^X(nameX = 'my name is X'))->castToListY().values.nameY->print(1);
+                }\
+                """);
+        PureExecutionException e = Assertions.assertThrows(PureExecutionException.class, () -> execute("test():Any[*]"));
         checkInvalidCastWithTypeParametersTopLevelException(e);
         checkInvalidCastWithTypeParametersRootException(e);
     }
@@ -93,24 +97,28 @@ public abstract class AbstractTestCast extends AbstractPureTestWithCoreCompiled
     public void testInvalidPrimitiveDownCast()
     {
         compileTestSource("fromString.pure",
-                "function test():Number[*]\n" +
-                        "{\n" +
-                        "   [1, 3.0, 'the cat sat on the mat']->cast(@Number)->plus()\n" +
-                        "}\n");
-        PureExecutionException e = Assert.assertThrows(PureExecutionException.class, () -> execute("test():Number[*]"));
+                """
+                function test():Number[*]
+                {
+                   [1, 3.0, 'the cat sat on the mat']->cast(@Number)->plus()
+                }
+                """);
+        PureExecutionException e = Assertions.assertThrows(PureExecutionException.class, () -> execute("test():Number[*]"));
         checkException(e, "Cast exception: String cannot be cast to Number", "fromString.pure", 3, 40);
-        Assert.assertSame(e, findRootException(e));
+        Assertions.assertSame(e, findRootException(e));
     }
 
     @Test
     public void testPrimitiveConcreteOne()
     {
         compileTestSource("fromString.pure",
-                "function test():Any[*]\n" +
-                        "{\n" +
-                        "   1->castToString()->joinStrings('');\n" +
-                        "}");
-        PureExecutionException e = Assert.assertThrows(PureExecutionException.class, () -> execute("test():Any[*]"));
+                """
+                function test():Any[*]
+                {
+                   1->castToString()->joinStrings('');
+                }\
+                """);
+        PureExecutionException e = Assertions.assertThrows(PureExecutionException.class, () -> execute("test():Any[*]"));
         checkPrimitiveConcreteOneTopLevelException(e);
         checkPrimitiveConcreteOneRootException(e);
     }
@@ -129,11 +137,13 @@ public abstract class AbstractTestCast extends AbstractPureTestWithCoreCompiled
     public void testPrimitiveConcreteMany()
     {
         compileTestSource("fromString.pure",
-                "function testMany():Any[*]\n" +
-                        "{\n" +
-                        "   [1, 2.5, 'abc']->castToNumber()->plus();\n" +
-                        "}");
-        PureExecutionException e = Assert.assertThrows(PureExecutionException.class, () -> execute("testMany():Any[*]"));
+                """
+                function testMany():Any[*]
+                {
+                   [1, 2.5, 'abc']->castToNumber()->plus();
+                }\
+                """);
+        PureExecutionException e = Assertions.assertThrows(PureExecutionException.class, () -> execute("testMany():Any[*]"));
         checkPrimitiveConcreteManyTopLevelException(e);
         checkPrimitiveConcreteManyRootException(e);
     }
@@ -152,11 +162,13 @@ public abstract class AbstractTestCast extends AbstractPureTestWithCoreCompiled
     public void testNonPrimitiveConcreteOne()
     {
         compileTestSource("fromString.pure",
-                "function test():Any[*]\n" +
-                        "{\n" +
-                        "   ^X()->castToY().nameY;\n" +
-                        "}");
-        PureExecutionException e = Assert.assertThrows(PureExecutionException.class, () -> execute("test():Any[*]"));
+                """
+                function test():Any[*]
+                {
+                   ^X()->castToY().nameY;
+                }\
+                """);
+        PureExecutionException e = Assertions.assertThrows(PureExecutionException.class, () -> execute("test():Any[*]"));
         checkNonPrimitiveConcreteOneTopLevelException(e);
         checkNonPrimitiveConcreteOneRootException(e);
     }
@@ -175,11 +187,13 @@ public abstract class AbstractTestCast extends AbstractPureTestWithCoreCompiled
     public void testNonPrimitiveConcreteMany()
     {
         compileTestSource("fromString.pure",
-                "function test():Any[*]\n" +
-                        "{\n" +
-                        "   [^X(), ^Y(), ^S()]->castToY().nameY;\n" +
-                        "}");
-        PureExecutionException e = Assert.assertThrows(PureExecutionException.class, () -> execute("test():Any[*]"));
+                """
+                function test():Any[*]
+                {
+                   [^X(), ^Y(), ^S()]->castToY().nameY;
+                }\
+                """);
+        PureExecutionException e = Assertions.assertThrows(PureExecutionException.class, () -> execute("test():Any[*]"));
         checkNonPrimitiveConcreteManyTopLevelException(e);
         checkNonPrimitiveConcreteManyRootException(e);
     }
@@ -198,11 +212,13 @@ public abstract class AbstractTestCast extends AbstractPureTestWithCoreCompiled
     public void testPrimitiveNonConcreteOne()
     {
         compileTestSource("fromString.pure",
-                "function testConcrete():Any[*]\n" +
-                        "{\n" +
-                        "   1->nonConcreteCastToString()->joinStrings('');\n" +
-                        "}");
-        PureExecutionException e = Assert.assertThrows(PureExecutionException.class, () -> execute("testConcrete():Any[*]"));
+                """
+                function testConcrete():Any[*]
+                {
+                   1->nonConcreteCastToString()->joinStrings('');
+                }\
+                """);
+        PureExecutionException e = Assertions.assertThrows(PureExecutionException.class, () -> execute("testConcrete():Any[*]"));
         checkPrimitiveNonConcreteOneTopLevelException(e);
         checkPrimitiveNonConcreteOneRootException(e);
     }
@@ -221,11 +237,13 @@ public abstract class AbstractTestCast extends AbstractPureTestWithCoreCompiled
     public void testPrimitiveNonConcreteMany()
     {
         compileTestSource("fromString.pure",
-                "function testNonConcrete():Any[*]\n" +
-                        "{\n" +
-                        "   [1, 2.5, 'abc']->nonConcreteCastToNumber()->plus();\n" +
-                        "}");
-        PureExecutionException e = Assert.assertThrows(PureExecutionException.class, () -> execute("testNonConcrete():Any[*]"));
+                """
+                function testNonConcrete():Any[*]
+                {
+                   [1, 2.5, 'abc']->nonConcreteCastToNumber()->plus();
+                }\
+                """);
+        PureExecutionException e = Assertions.assertThrows(PureExecutionException.class, () -> execute("testNonConcrete():Any[*]"));
         checkPrimitiveNonConcreteManyTopLevelException(e);
         checkPrimitiveNonConcreteManyRootException(e);
     }
@@ -244,11 +262,13 @@ public abstract class AbstractTestCast extends AbstractPureTestWithCoreCompiled
     public void testNonPrimitiveNonConcreteOne()
     {
         compileTestSource("fromString.pure",
-                "function testNonPrimitive():Any[*]\n" +
-                        "{\n" +
-                        "   ^X()->nonConcreteCastToY().nameY;\n" +
-                        "}");
-        PureExecutionException e = Assert.assertThrows(PureExecutionException.class, () -> execute("testNonPrimitive():Any[*]"));
+                """
+                function testNonPrimitive():Any[*]
+                {
+                   ^X()->nonConcreteCastToY().nameY;
+                }\
+                """);
+        PureExecutionException e = Assertions.assertThrows(PureExecutionException.class, () -> execute("testNonPrimitive():Any[*]"));
         checkNonPrimitiveNonConcreteOneTopLevelException(e);
         checkNonPrimitiveNonConcreteOneRootException(e);
     }
@@ -267,11 +287,13 @@ public abstract class AbstractTestCast extends AbstractPureTestWithCoreCompiled
     public void testNonPrimitiveNonConcreteMany()
     {
         compileTestSource("fromString.pure",
-                "function test():Any[*]\n" +
-                        "{\n" +
-                        "   [^X(), ^Y(), ^S()]->nonConcreteCastToY().nameY;\n" +
-                        "}");
-        PureExecutionException e = Assert.assertThrows(PureExecutionException.class, () -> execute("test():Any[*]"));
+                """
+                function test():Any[*]
+                {
+                   [^X(), ^Y(), ^S()]->nonConcreteCastToY().nameY;
+                }\
+                """);
+        PureExecutionException e = Assertions.assertThrows(PureExecutionException.class, () -> execute("test():Any[*]"));
         checkNonPrimitiveNonConcreteManyTopLevelException(e);
         checkNonPrimitiveNonConcreteManyRootException(e);
     }
@@ -290,11 +312,13 @@ public abstract class AbstractTestCast extends AbstractPureTestWithCoreCompiled
     public void testEnumToStringCast()
     {
         compileTestSource("fromString.pure",
-                "function testEnum():Any[*]\n" +
-                        "{\n" +
-                        "   Month.January -> castToString() -> joinStrings('');\n" +
-                        "}");
-        PureExecutionException e = Assert.assertThrows(PureExecutionException.class, () -> execute("testEnum():Any[*]"));
+                """
+                function testEnum():Any[*]
+                {
+                   Month.January -> castToString() -> joinStrings('');
+                }\
+                """);
+        PureExecutionException e = Assertions.assertThrows(PureExecutionException.class, () -> execute("testEnum():Any[*]"));
         checkEnumToStringCastTopLevelException(e);
         checkEnumToStringCastRootException(e);
     }
@@ -313,13 +337,15 @@ public abstract class AbstractTestCast extends AbstractPureTestWithCoreCompiled
     public void testStringToEnumCast()
     {
         compileTestSource("fromString.pure",
-                "function test():Nil[0]\n" +
-                        "{\n" +
-                        "   'January' -> cast(@Month) -> print(1);\n" +
-                        "}");
-        PureExecutionException e = Assert.assertThrows(PureExecutionException.class, () -> execute("test():Nil[0]"));
+                """
+                function test():Nil[0]
+                {
+                   'January' -> cast(@Month) -> print(1);
+                }\
+                """);
+        PureExecutionException e = Assertions.assertThrows(PureExecutionException.class, () -> execute("test():Nil[0]"));
         checkStringToEnumCastTopLevelException(e);
-        Assert.assertSame(e, findRootException(e));
+        Assertions.assertSame(e, findRootException(e));
     }
 
     protected void checkStringToEnumCastTopLevelException(PureExecutionException e)
@@ -343,7 +369,7 @@ public abstract class AbstractTestCast extends AbstractPureTestWithCoreCompiled
                 return root;
             }
         }
-        return (t instanceof Exception) ? (Exception) t : null;
+        return (t instanceof Exception e) ? e : null;
     }
 
     protected static MutableRepositoryCodeStorage getCodeStorage()

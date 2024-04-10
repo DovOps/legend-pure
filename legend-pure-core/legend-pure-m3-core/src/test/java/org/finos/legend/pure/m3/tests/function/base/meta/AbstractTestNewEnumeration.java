@@ -15,8 +15,8 @@
 package org.finos.legend.pure.m3.tests.function.base.meta;
 
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public abstract class AbstractTestNewEnumeration extends AbstractPureTestWithCoreCompiled
 {
@@ -25,18 +25,22 @@ public abstract class AbstractTestNewEnumeration extends AbstractPureTestWithCor
     {
 
         compileTestSource("/test/test.pure",
-                "function test::testFn():Any[*]\n" +
-                        "{\n" +
-                        " let  testEnum =  newEnumeration('test::testEnum',['value1','value2']);" +
-                        "assert($testEnum->instanceOf(Enumeration), |'');" +
-                        "assert($testEnum->subTypeOf(Enum), |'');" +
-                        "$testEnum->enumValues()->map(e|assert($e->instanceOf(Enum), |'')); " +
-                        "$testEnum->enumValues()->map(e|$e->id())->print(1);\n" +
-                        "}\n");
+                """
+                function test::testFn():Any[*]
+                {
+                 let  testEnum =  newEnumeration('test::testEnum',['value1','value2']);\
+                assert($testEnum->instanceOf(Enumeration), |'');\
+                assert($testEnum->subTypeOf(Enum), |'');\
+                $testEnum->enumValues()->map(e|assert($e->instanceOf(Enum), |'')); \
+                $testEnum->enumValues()->map(e|$e->id())->print(1);
+                }
+                """);
         execute("test::testFn():Any[*]");
-        Assert.assertEquals("[\n" +
-                "   'value1'\n" +
-                "   'value2'\n" +
-                "]", functionExecution.getConsole().getLine(0));
+        Assertions.assertEquals("""
+                [
+                   'value1'
+                   'value2'
+                ]\
+                """, functionExecution.getConsole().getLine(0));
     }
 }

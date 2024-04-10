@@ -36,13 +36,15 @@ public class NewAssociation extends AbstractNative
     @Override
     public String buildBody()
     {
-        return "new SharedPureFunction<Object>()\n" +
-                "        {\n" +
-                "            @Override\n" +
-                "            public Object execute(ListIterable<?> vars, final ExecutionSupport es)\n" +
-                "            {\n" +
-                "                return FunctionsGen.newAssociation((String) vars.get(0), (org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.function.property.Property) vars.get(1), (org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.function.property.Property) vars.get(2), ((CompiledExecutionSupport) es).getMetadataAccessor(), null);\n" +
-                "            }\n" +
-                "        }";
+        return """
+                new SharedPureFunction<Object>()
+                        {
+                            @Override
+                            public Object execute(ListIterable<?> vars, final ExecutionSupport es)
+                            {
+                                return FunctionsGen.newAssociation((String) vars.get(0), (org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.function.property.Property) vars.get(1), (org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.function.property.Property) vars.get(2), ((CompiledExecutionSupport) es).getMetadataAccessor(), null);
+                            }
+                        }\
+                """;
     }
 }

@@ -52,11 +52,11 @@ public class InstanceValueUnbind implements MatchRunner<InstanceValue>
 
             Shared.cleanUpReferenceUsage(value, instanceValue, processorSupport);
 
-            if (value instanceof KeyExpression)
+            if (value instanceof KeyExpression expression)
             {
-                ((UnbindState) state).freeProcessedAndValidated(modelRepository.newBooleanCoreInstance(((KeyExpression) value)._add()));
-                ((UnbindState) state).freeProcessedAndValidated(((KeyExpression) value)._key());
-                matcher.fullMatch(((KeyExpression) value)._expression(), state);
+                ((UnbindState) state).freeProcessedAndValidated(modelRepository.newBooleanCoreInstance(expression._add()));
+                ((UnbindState) state).freeProcessedAndValidated(expression._key());
+                matcher.fullMatch(expression._expression(), state);
             }
             else if (value instanceof ImportStub)
             {
@@ -67,9 +67,9 @@ public class InstanceValueUnbind implements MatchRunner<InstanceValue>
                 matcher.fullMatch(value, state);
             }
 
-            if (value instanceof ValueSpecification)
+            if (value instanceof ValueSpecification specification)
             {
-                ((ValueSpecification) value)._usageContextRemove();
+                specification._usageContextRemove();
             }
         }
     }

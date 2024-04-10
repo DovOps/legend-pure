@@ -629,7 +629,7 @@ public class GraphPath
         @Override
         public boolean equals(Object other)
         {
-            return (this == other) || ((other instanceof ToOnePropertyEdge) && this.property.equals(((ToOnePropertyEdge) other).property));
+            return (this == other) || ((other instanceof ToOnePropertyEdge tope) && this.property.equals(tope.property));
         }
 
         @Override
@@ -887,9 +887,9 @@ public class GraphPath
 
     static boolean isPackaged(CoreInstance node, ProcessorSupport processorSupport)
     {
-        if (node instanceof org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.PackageableElement)
+        if (node instanceof org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.PackageableElement element)
         {
-            return ((org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.PackageableElement) node)._package() != null;
+            return element._package() != null;
         }
         return !(node instanceof Any) && (node.getValueForMetaPropertyToOne(M3Properties._package) != null) && processorSupport.instance_instanceOf(node, M3Paths.PackageableElement);
     }

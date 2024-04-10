@@ -25,7 +25,7 @@ public class EnumStubHelper
 
     public static CoreInstance fromEnumStub(CoreInstance instance)
     {
-        return (instance instanceof EnumStub) ? fromEnumStub((EnumStub) instance) : instance;
+        return (instance instanceof EnumStub es) ? fromEnumStub(es) : instance;
     }
 
     public static CoreInstance fromEnumStub(EnumStub enumStub)

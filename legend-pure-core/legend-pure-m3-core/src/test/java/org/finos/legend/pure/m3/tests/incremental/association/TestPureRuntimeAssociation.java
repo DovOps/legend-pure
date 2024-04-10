@@ -25,14 +25,14 @@ import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiledPlatform;
 import org.finos.legend.pure.m3.tests.RuntimeTestScriptBuilder;
 import org.finos.legend.pure.m3.tests.RuntimeVerifier;
 import org.finos.legend.pure.m4.exception.PureCompilationException;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestPureRuntimeAssociation extends AbstractPureTestWithCoreCompiledPlatform
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getFunctionExecution(), new CompositeCodeStorage(new ClassLoaderCodeStorage(getCodeRepositories())), getFactoryRegistryOverride(), getOptions(), getExtra());
@@ -45,7 +45,7 @@ public class TestPureRuntimeAssociation extends AbstractPureTestWithCoreCompiled
                 GenericCodeRepository.build("test", "test(::.*)?", "platform", "system"));
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("userId.pure");
@@ -57,9 +57,11 @@ public class TestPureRuntimeAssociation extends AbstractPureTestWithCoreCompiled
     public void testPureRuntimeAssociation()
     {
         RuntimeVerifier.verifyOperationIsStable(new RuntimeTestScriptBuilder().createInMemorySource("sourceId.pure", "Association a {a:A[0..1];b:B[0..1];}")
-                        .createInMemorySource("userId.pure", "Class A{}" +
-                                "Class B{}" +
-                                "function test():Nil[0]{ let k = ^A(b=^B()); let j = ^B(a=^A()); [];}")
+                        .createInMemorySource("userId.pure", """
+                                Class A{}\
+                                Class B{}\
+                                function test():Nil[0]{ let k = ^A(b=^B()); let j = ^B(a=^A()); [];}\
+                                """)
                         .compile(),
                 new RuntimeTestScriptBuilder()
                         .deleteSource("sourceId.pure")
@@ -91,9 +93,11 @@ public class TestPureRuntimeAssociation extends AbstractPureTestWithCoreCompiled
 */
 
         runtime.createInMemorySource("sourceId.pure", "Association a {a:A[0..1];b:B[0..1];}");
-        runtime.createInMemorySource("userId.pure", "Class A{}" +
-                "Class B{}" +
-                "function test():Nil[0]{ let k = ^A(b=^B()); let j = ^B(a=^A()); [];}");
+        runtime.createInMemorySource("userId.pure", """
+                Class A{}\
+                Class B{}\
+                function test():Nil[0]{ let k = ^A(b=^B()); let j = ^B(a=^A()); [];}\
+                """);
         runtime.compile();
         int size = runtime.getModelRepository().serialize().length;
 
@@ -103,7 +107,7 @@ public class TestPureRuntimeAssociation extends AbstractPureTestWithCoreCompiled
             try
             {
                 runtime.compile();
-                Assert.fail();
+                Assertions.fail();
             }
             catch (Exception e)
             {
@@ -114,18 +118,18 @@ public class TestPureRuntimeAssociation extends AbstractPureTestWithCoreCompiled
             {
                 runtime.createInMemorySource("sourceId.pure", "Association a {xx:A[0..1];yy:B[0..1];}");
                 runtime.compile();
-                Assert.fail();
+                Assertions.fail();
             }
             catch (Exception e)
             {
-                Assert.assertTrue("Compilation error at (resource:userId.pure line:1 column:54), \"The property 'b' can't be found in the type 'A' or in its hierarchy.\"".equals(e.getMessage()) ||
+                Assertions.assertTrue("Compilation error at (resource:userId.pure line:1 column:54), \"The property 'b' can't be found in the type 'A' or in its hierarchy.\"".equals(e.getMessage()) ||
                         "Compilation error at (resource:userId.pure line:1 column:74), \"The property 'a' can't be found in the type 'B' or in its hierarchy.\"".equals(e.getMessage()));
             }
         }
 
         runtime.modify("sourceId.pure", "Association a {a:A[0..1];b:B[0..1];}");
         runtime.compile();
-        Assert.assertEquals("Graph size mismatch", size, repository.serialize().length);
+        Assertions.assertEquals(size, repository.serialize().length, "Graph size mismatch");
     }
 
 
@@ -140,9 +144,11 @@ public class TestPureRuntimeAssociation extends AbstractPureTestWithCoreCompiled
     public void testPureRuntimeAssociationWithQualifiedPropertyAssociationRebuild()
     {
         RuntimeVerifier.verifyOperationIsStable(new RuntimeTestScriptBuilder().createInMemorySource("sourceId.pure", "Association a {a:A[0..1]; b:B[*]; bSubset(){$this.b->filter(b|$b.name=='')->first()}:B[0..1];}")
-                        .createInMemorySource("userId.pure", "Class A{}" +
-                                "Class B{name : String[0..1];}" +
-                                "function test():Nil[0]{ let a = ^A(); let b = $a.bSubset(); [];}")
+                        .createInMemorySource("userId.pure", """
+                                Class A{}\
+                                Class B{name : String[0..1];}\
+                                function test():Nil[0]{ let a = ^A(); let b = $a.bSubset(); [];}\
+                                """)
                         .compile(),
                 new RuntimeTestScriptBuilder()
                         .deleteSource("sourceId.pure")
@@ -173,14 +179,18 @@ public class TestPureRuntimeAssociation extends AbstractPureTestWithCoreCompiled
     public void testPureRuntimeAssociationUnload()
     {
         String classSourceId = "/test/myClass.pure";
-        String classSource = "Class test::Class1 {}\n" +
-                "Class test::Class2 {}\n";
+        String classSource = """
+                Class test::Class1 {}
+                Class test::Class2 {}
+                """;
         String assocSourceId = "/test/myAssociation.pure";
-        String assocSource = "Association test::Assoc\n" +
-                "{\n" +
-                "    p1 : test::Class1[*];\n" +
-                "    p2 : test::Class2[*];\n" +
-                "}\n";
+        String assocSource = """
+                Association test::Assoc
+                {
+                    p1 : test::Class1[*];
+                    p2 : test::Class2[*];
+                }
+                """;
 
         RuntimeVerifier.verifyOperationIsStable(new RuntimeTestScriptBuilder().createInMemorySource(classSourceId, classSource)
                         .createInMemorySource(assocSourceId, assocSource)

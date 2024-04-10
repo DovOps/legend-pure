@@ -34,15 +34,15 @@ import org.finos.legend.pure.m3.serialization.filesystem.repository.GenericCodeR
 import org.finos.legend.pure.m3.serialization.grammar.Parser;
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
 
 public class TestBinarySourceSerializer extends AbstractPureTestWithCoreCompiled
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getFunctionExecution(), new CompositeCodeStorage(new ClassLoaderCodeStorage(getCodeRepositories())), getFactoryRegistryOverride(), getOptions(), getExtra(), false);
@@ -64,7 +64,7 @@ public class TestBinarySourceSerializer extends AbstractPureTestWithCoreCompiled
     public void testWithEmptyFile()
     {
         compileTestSource("/test/emptySource.pure", "");
-        Assert.assertEquals("", runtime.getSourceById("/test/emptySource.pure").getContent());
+        Assertions.assertEquals("", runtime.getSourceById("/test/emptySource.pure").getContent());
         testSerializationForCurrentRuntime();
     }
 
@@ -72,7 +72,7 @@ public class TestBinarySourceSerializer extends AbstractPureTestWithCoreCompiled
     public void testWithUncompiledFile()
     {
         runtime.createInMemorySource("/test/uncompiledSource.pure", "Class test::Class1 {}");
-        Assert.assertFalse(runtime.getSourceById("/test/uncompiledSource.pure").isCompiled());
+        Assertions.assertFalse(runtime.getSourceById("/test/uncompiledSource.pure").isCompiled());
         testSerializationForCurrentRuntime();
     }
 
@@ -101,16 +101,16 @@ public class TestBinarySourceSerializer extends AbstractPureTestWithCoreCompiled
         Context targetContext = new Context();
         BinarySourceSerializer.build(serialization.toByteArray(), targetRegistry, instancesById, runtime.getIncrementalCompiler().getParserLibrary(), targetContext);
 
-        Assert.assertEquals(sourceRegistry.getSourceIds().toSet(), targetRegistry.getSourceIds().toSet());
+        Assertions.assertEquals(sourceRegistry.getSourceIds().toSet(), targetRegistry.getSourceIds().toSet());
         sourceRegistry.getSources().forEach(source ->
         {
             Source targetSource = targetRegistry.getSource(source.getId());
-            Assert.assertEquals(source.getId(), source.getContent(), targetSource.getContent());
-            Assert.assertEquals(source.getId(), source.isImmutable(), targetSource.isImmutable());
-            Assert.assertEquals(source.getId(), source.isCompiled(), targetSource.isCompiled());
-            Assert.assertEquals(getElementsByParserName(source), getElementsByParserName(targetSource));
+            Assertions.assertEquals(source.getContent(), targetSource.getContent(), source.getId());
+            Assertions.assertEquals(source.isImmutable(), targetSource.isImmutable(), source.getId());
+            Assertions.assertEquals(source.isCompiled(), targetSource.isCompiled(), source.getId());
+            Assertions.assertEquals(getElementsByParserName(source), getElementsByParserName(targetSource));
         });
-        classifiers.forEach(classifier -> Assert.assertEquals(PackageableElement.getUserPathForPackageableElement(classifier), context.getClassifierInstances(classifier), targetContext.getClassifierInstances(classifier)));
+        classifiers.forEach(classifier -> Assertions.assertEquals(context.getClassifierInstances(classifier), targetContext.getClassifierInstances(classifier), PackageableElement.getUserPathForPackageableElement(classifier)));
     }
 
     private ListMultimap<String, CoreInstance> getElementsByParserName(Source source)

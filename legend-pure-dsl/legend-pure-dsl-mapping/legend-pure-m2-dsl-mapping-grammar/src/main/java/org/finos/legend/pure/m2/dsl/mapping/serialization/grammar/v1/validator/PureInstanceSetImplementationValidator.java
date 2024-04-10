@@ -126,8 +126,8 @@ public class PureInstanceSetImplementationValidator implements MatchRunner<PureI
                 {
                     throw new PureCompilationException(propertyMapping.getSourceInformation(), "The set implementation '" + propertyMapping._targetSetImplementationId() + "' is unknown in the mapping '" + mapping.getName() + "'");
                 }
-                Type srcClass = setImplementation instanceof PureInstanceSetImplementation ?
-                        (Type) ImportStub.withImportStubByPass(((PureInstanceSetImplementation) setImplementation)._srcClassCoreInstance(), processorSupport) : null;
+                Type srcClass = setImplementation instanceof PureInstanceSetImplementation pisi ?
+                        (Type) ImportStub.withImportStubByPass(pisi._srcClassCoreInstance(), processorSupport) : null;
                 Type expRawType = (Type) ImportStub.withImportStubByPass(expressionGenericType._rawTypeCoreInstance(), processorSupport);
                 if (srcClass != null && srcClass != expRawType)
                 {

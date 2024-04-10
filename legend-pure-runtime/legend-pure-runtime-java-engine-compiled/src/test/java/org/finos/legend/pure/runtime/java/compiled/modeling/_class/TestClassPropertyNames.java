@@ -23,20 +23,20 @@ import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
 import org.finos.legend.pure.runtime.java.compiled.execution.FunctionExecutionCompiledBuilder;
 import org.finos.legend.pure.runtime.java.compiled.factory.JavaModelFactoryRegistryLoader;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestClassPropertyNames extends AbstractPureTestWithCoreCompiled
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getFunctionExecution(), JavaModelFactoryRegistryLoader.loader());
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("fromString.pure");
@@ -45,50 +45,55 @@ public class TestClassPropertyNames extends AbstractPureTestWithCoreCompiled
     @Test
     public void testClassWithJavaKeywordProperty()
     {
-        compileTestSource("fromString.pure", "Class test::TestClass\n" +
-                "{\n" +
-                "  case : String[1];\n" +
-                "}\n" +
-                "\n" +
-                "function test::testFn():Boolean[1]\n" +
-                "{\n" +
-                "  let t = ^test::TestClass(case='abc');\n" +
-                "  'abc' == $t.case;\n" +
-                "}\n");
+        compileTestSource("fromString.pure", """
+                Class test::TestClass
+                {
+                  case : String[1];
+                }
+                
+                function test::testFn():Boolean[1]
+                {
+                  let t = ^test::TestClass(case='abc');
+                  'abc' == $t.case;
+                }
+                """);
         CoreInstance testFn = this.runtime.getFunction("test::testFn():Boolean[1]");
-        Assert.assertNotNull(testFn);
+        Assertions.assertNotNull(testFn);
         CoreInstance result = this.functionExecution.start(testFn, Lists.immutable.<CoreInstance>empty());
-        Assert.assertTrue(result instanceof InstanceValue);
+        Assertions.assertTrue(result instanceof InstanceValue);
         RichIterable<?> values = ((InstanceValue) result)._values();
         Verify.assertSize(1, values);
         Object value = values.getFirst();
-        Assert.assertEquals(Boolean.TRUE, value);
+        Assertions.assertEquals(Boolean.TRUE, value);
     }
 
     @Test
     public void testClassWithJavaKeywordQualifiedProperty()
     {
-        compileTestSource("fromString.pure", "Class test::TestClass\n" +
-                "{\n" +
-                "  case()\n" +
-                "  {\n" +
-                "    'abc'\n" +
-                "  }\n: String[1];\n" +
-                "}\n" +
-                "\n" +
-                "function test::testFn():Boolean[1]\n" +
-                "{\n" +
-                "  let t = ^test::TestClass();\n" +
-                "  'abc' == $t.case;\n" +
-                "}\n");
+        compileTestSource("fromString.pure", """
+                Class test::TestClass
+                {
+                  case()
+                  {
+                    'abc'
+                  }
+                : String[1];
+                }
+                
+                function test::testFn():Boolean[1]
+                {
+                  let t = ^test::TestClass();
+                  'abc' == $t.case;
+                }
+                """);
         CoreInstance testFn = this.runtime.getFunction("test::testFn():Boolean[1]");
-        Assert.assertNotNull(testFn);
+        Assertions.assertNotNull(testFn);
         CoreInstance result = this.functionExecution.start(testFn, Lists.immutable.<CoreInstance>empty());
-        Assert.assertTrue(result instanceof InstanceValue);
+        Assertions.assertTrue(result instanceof InstanceValue);
         RichIterable<?> values = ((InstanceValue) result)._values();
         Verify.assertSize(1, values);
         Object value = values.getFirst();
-        Assert.assertEquals(Boolean.TRUE, value);
+        Assertions.assertEquals(Boolean.TRUE, value);
     }
 
     protected static FunctionExecution getFunctionExecution()

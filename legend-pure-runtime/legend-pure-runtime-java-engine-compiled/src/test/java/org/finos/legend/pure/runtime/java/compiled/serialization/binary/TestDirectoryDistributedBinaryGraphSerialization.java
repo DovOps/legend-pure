@@ -14,23 +14,24 @@
 
 package org.finos.legend.pure.runtime.java.compiled.serialization.binary;
 
-import org.junit.Rule;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.io.TempDir;
+
+import java.io.File;
 
 public class TestDirectoryDistributedBinaryGraphSerialization extends TestDistributedBinaryGraphSerialization
 {
-    @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+    @TempDir
+    public File temporaryFolder;
 
     @Override
     protected FileWriter getFileWriter()
     {
-        return FileWriters.fromDirectory(this.temporaryFolder.getRoot().toPath());
+        return FileWriters.fromDirectory(this.temporaryFolder.toPath());
     }
 
     @Override
     protected FileReader getFileReader()
     {
-        return FileReaders.fromDirectory(this.temporaryFolder.getRoot().toPath());
+        return FileReaders.fromDirectory(this.temporaryFolder.toPath());
     }
 }

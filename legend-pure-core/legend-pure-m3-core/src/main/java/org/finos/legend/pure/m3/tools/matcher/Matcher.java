@@ -114,9 +114,8 @@ public class Matcher
                     }
                     throw new PureCompilationException(instance.getSourceInformation(), message, e);
                 }
-                if (pureException instanceof PureCompilationException)
+                if (pureException instanceof PureCompilationException compilationException)
                 {
-                    PureCompilationException compilationException = (PureCompilationException)pureException;
                     if (compilationException.getSourceInformation() == null)
                     {
                         throw new PureCompilationException(instance.getSourceInformation(), compilationException.getInfo(), e);

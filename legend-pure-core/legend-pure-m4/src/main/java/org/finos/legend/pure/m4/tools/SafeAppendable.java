@@ -65,17 +65,17 @@ public interface SafeAppendable extends Appendable
 
     static SafeAppendable wrap(Appendable appendable)
     {
-        if (appendable instanceof SafeAppendable)
+        if (appendable instanceof SafeAppendable safeAppendable)
         {
-            return (SafeAppendable) appendable;
+            return safeAppendable;
         }
-        if (appendable instanceof StringBuilder)
+        if (appendable instanceof StringBuilder builder)
         {
-            return wrap((StringBuilder) appendable);
+            return wrap(builder);
         }
-        if (appendable instanceof StringBuffer)
+        if (appendable instanceof StringBuffer buffer)
         {
-            return wrap((StringBuffer) appendable);
+            return wrap(buffer);
         }
         return new SafeAppendable()
         {

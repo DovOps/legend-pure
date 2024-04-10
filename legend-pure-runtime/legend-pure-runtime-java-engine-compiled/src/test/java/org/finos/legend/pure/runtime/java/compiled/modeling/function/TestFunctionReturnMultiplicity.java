@@ -24,16 +24,16 @@ import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
 import org.finos.legend.pure.runtime.java.compiled.execution.FunctionExecutionCompiledBuilder;
 import org.finos.legend.pure.runtime.java.compiled.factory.JavaModelFactoryRegistryLoader;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestFunctionReturnMultiplicity extends AbstractPureTestWithCoreCompiled
 {
     private static final String TEST_FILE_NAME = "fromString.pure";
 
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(
@@ -41,18 +41,20 @@ public class TestFunctionReturnMultiplicity extends AbstractPureTestWithCoreComp
                 JavaModelFactoryRegistryLoader.loader(),
                 Tuples.pair(
                         "testModel.pure",
-                        "Class A\n" +
-                                "{\n" +
-                                "   b:Integer[1];\n" +
-                                "}\n" +
-                                "Class Result<T|m>\n" +
-                                "{\n" +
-                                "   values:T[m];\n" +
-                                "}\n")
+                        """
+                        Class A
+                        {
+                           b:Integer[1];
+                        }
+                        Class Result<T|m>
+                        {
+                           values:T[m];
+                        }
+                        """)
         );
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete(TEST_FILE_NAME);
@@ -64,22 +66,24 @@ public class TestFunctionReturnMultiplicity extends AbstractPureTestWithCoreComp
     {
         compileTestSource(
                 TEST_FILE_NAME,
-                "function process():String[*]\n" +
-                        "{\n" +
-                        "    ['a','b']\n" +
-                        "}\n" +
-                        "function makeString(any:Any[*], s:String[1]):String[1]\n" +
-                        "{\n" +
-                        "    $any->map(x | $x->toString())->joinStrings('', $s, '')\n" +
-                        "}\n" +
-                        "function test():Nil[0]\n" +
-                        "{\n" +
-                        "   assertEquals('a__b', process()->makeString('__'));" +
-                        "   [];\n" +
-                        "}\n");
+                """
+                function process():String[*]
+                {
+                    ['a','b']
+                }
+                function makeString(any:Any[*], s:String[1]):String[1]
+                {
+                    $any->map(x | $x->toString())->joinStrings('', $s, '')
+                }
+                function test():Nil[0]
+                {
+                   assertEquals('a__b', process()->makeString('__'));\
+                   [];
+                }
+                """);
         CoreInstance result = compileAndExecute("test():Nil[0]");
         ListIterable<? extends CoreInstance> values = result.getValueForMetaPropertyToMany(M3Properties.values);
-        Assert.assertEquals(Lists.fixedSize.empty(), values);
+        Assertions.assertEquals(Lists.fixedSize.empty(), values);
     }
 
     @Test
@@ -87,18 +91,20 @@ public class TestFunctionReturnMultiplicity extends AbstractPureTestWithCoreComp
     {
         compileTestSource(
                 TEST_FILE_NAME,
-                "function process():Any[*]\n" +
-                        "{\n" +
-                        "    ['a', 1, 2.0, %2015-03-12, %2015-03-12T23:59:00, true, Class]\n" +
-                        "}\n" +
-                        "\n" +
-                        "function test():Any[*]\n" +
-                        "{\n" +
-                        "   process();\n" +
-                        "}\n");
+                """
+                function process():Any[*]
+                {
+                    ['a', 1, 2.0, %2015-03-12, %2015-03-12T23:59:00, true, Class]
+                }
+                
+                function test():Any[*]
+                {
+                   process();
+                }
+                """);
         CoreInstance result = compileAndExecute("test():Any[*]");
         ListIterable<? extends CoreInstance> values = result.getValueForMetaPropertyToMany(M3Properties.values);
-        Assert.assertEquals("a instanceOf String,1 instanceOf Integer,2.0 instanceOf Float,2015-03-12 instanceOf StrictDate,2015-03-12T23:59:00+0000 instanceOf DateTime,true instanceOf Boolean," + runtime.getCoreInstance(M3Paths.Class), values.makeString(","));
+        Assertions.assertEquals("a instanceOf String,1 instanceOf Integer,2.0 instanceOf Float,2015-03-12 instanceOf StrictDate,2015-03-12T23:59:00+0000 instanceOf DateTime,true instanceOf Boolean," + runtime.getCoreInstance(M3Paths.Class), values.makeString(","));
     }
 
     @Test
@@ -106,18 +112,20 @@ public class TestFunctionReturnMultiplicity extends AbstractPureTestWithCoreComp
     {
         compileTestSource(
                 TEST_FILE_NAME,
-                "function process():Any[*]\n" +
-                        "{\n" +
-                        "    ['a']\n" +
-                        "}\n" +
-                        "\n" +
-                        "function test():Any[*]\n" +
-                        "{\n" +
-                        "   process();\n" +
-                        "}\n");
+                """
+                function process():Any[*]
+                {
+                    ['a']
+                }
+                
+                function test():Any[*]
+                {
+                   process();
+                }
+                """);
         CoreInstance result = compileAndExecute("test():Any[*]");
         CoreInstance value = result.getValueForMetaPropertyToOne(M3Properties.values);
-        Assert.assertEquals("a instanceOf String", value.toString());
+        Assertions.assertEquals("a instanceOf String", value.toString());
     }
 
     @Test
@@ -125,18 +133,20 @@ public class TestFunctionReturnMultiplicity extends AbstractPureTestWithCoreComp
     {
         compileTestSource(
                 TEST_FILE_NAME,
-                "function process():Any[*]\n" +
-                        "{\n" +
-                        "    [Class]\n" +
-                        "}\n" +
-                        "\n" +
-                        "function test():Any[*]\n" +
-                        "{\n" +
-                        "   process();\n" +
-                        "}\n");
+                """
+                function process():Any[*]
+                {
+                    [Class]
+                }
+                
+                function test():Any[*]
+                {
+                   process();
+                }
+                """);
         CoreInstance result = compileAndExecute("test():Any[*]");
         CoreInstance value = result.getValueForMetaPropertyToOne(M3Properties.values);
-        Assert.assertSame(runtime.getCoreInstance(M3Paths.Class), value);
+        Assertions.assertSame(runtime.getCoreInstance(M3Paths.Class), value);
     }
 
     @Test
@@ -144,29 +154,31 @@ public class TestFunctionReturnMultiplicity extends AbstractPureTestWithCoreComp
     {
         compileTestSource(
                 TEST_FILE_NAME,
-                "function process<T|m>(f:FunctionDefinition<{->T[m]}>[1]):Result<T|m>[1]\n" +
-                        "{\n" +
-                        "    let vals = $f->eval();\n" +
-                        "    ^Result<T|m>(values=$vals);\n" +
-                        "}\n" +
-                        "\n" +
-                        "function testOne():A[1]\n" +
-                        "{\n" +
-                        "   process({| ^A(b=1)}).values;\n" +
-                        "}\n" +
-                        "\n" +
-                        "function testMany():A[*]\n" +
-                        "{\n" +
-                        "   process({| [^A(b=1),^A(b=2)]}).values;\n" +
-                        "}\n");
+                """
+                function process<T|m>(f:FunctionDefinition<{->T[m]}>[1]):Result<T|m>[1]
+                {
+                    let vals = $f->eval();
+                    ^Result<T|m>(values=$vals);
+                }
+                
+                function testOne():A[1]
+                {
+                   process({| ^A(b=1)}).values;
+                }
+                
+                function testMany():A[*]
+                {
+                   process({| [^A(b=1),^A(b=2)]}).values;
+                }
+                """);
         CoreInstance result = this.compileAndExecute("testOne():A[1]");
         CoreInstance value = result.getValueForMetaPropertyToOne(M3Properties.values);
-        Assert.assertEquals("A", functionExecution.getProcessorSupport().getClassifier(value).getName());
-        Assert.assertEquals("1", value.getValueForMetaPropertyToOne("b").getName());
+        Assertions.assertEquals("A", functionExecution.getProcessorSupport().getClassifier(value).getName());
+        Assertions.assertEquals("1", value.getValueForMetaPropertyToOne("b").getName());
 
         CoreInstance result2 = this.execute("testMany():A[*]");
         ListIterable<? extends CoreInstance> value2 = result2.getValueForMetaPropertyToMany(M3Properties.values);
-        Assert.assertEquals("1,2", value2.collect(v -> v.getValueForMetaPropertyToOne("b").getName()).makeString(","));
+        Assertions.assertEquals("1,2", value2.collect(v -> v.getValueForMetaPropertyToOne("b").getName()).makeString(","));
     }
 
     @Test
@@ -174,36 +186,38 @@ public class TestFunctionReturnMultiplicity extends AbstractPureTestWithCoreComp
     {
         compileTestSource(
                 TEST_FILE_NAME,
-                "function process<T|m>(f:FunctionDefinition<{->T[m]}>[1]):Result<T|m>[1]\n" +
-                        "{\n" +
-                        "    let vals = $f->eval();\n" +
-                        "    ^Result<T|m>(values=$vals);\n" +
-                        "}\n" +
-                        "\n" +
-                        "function testOne():A[1]\n" +
-                        "{\n" +
-                        "   let v = process({| ^A(b=1)}).values;\n" +
-                        "   $v;\n" +
-                        "}\n" +
-                        "function testOne2():A[1]\n" +
-                        "{\n" +
-                        "   let v = process({| ^A(b=1)});\n" +
-                        "   $v.values;\n" +
-                        "}\n" +
-                        "\n" +
-                        "function testMany():A[*]\n" +
-                        "{\n" +
-                        "   let v = process({| [^A(b=1),^A(b=2)]}).values;\n" +
-                        "   $v;\n" +
-                        "}\n");
+                """
+                function process<T|m>(f:FunctionDefinition<{->T[m]}>[1]):Result<T|m>[1]
+                {
+                    let vals = $f->eval();
+                    ^Result<T|m>(values=$vals);
+                }
+                
+                function testOne():A[1]
+                {
+                   let v = process({| ^A(b=1)}).values;
+                   $v;
+                }
+                function testOne2():A[1]
+                {
+                   let v = process({| ^A(b=1)});
+                   $v.values;
+                }
+                
+                function testMany():A[*]
+                {
+                   let v = process({| [^A(b=1),^A(b=2)]}).values;
+                   $v;
+                }
+                """);
         CoreInstance result = this.compileAndExecute("testOne():A[1]");
         CoreInstance value = result.getValueForMetaPropertyToOne(M3Properties.values);
-        Assert.assertEquals("A", functionExecution.getProcessorSupport().getClassifier(value).getName());
-        Assert.assertEquals("1", value.getValueForMetaPropertyToOne("b").getName());
+        Assertions.assertEquals("A", functionExecution.getProcessorSupport().getClassifier(value).getName());
+        Assertions.assertEquals("1", value.getValueForMetaPropertyToOne("b").getName());
 
         CoreInstance result2 = this.execute("testMany():A[*]");
         ListIterable<? extends CoreInstance> value2 = result2.getValueForMetaPropertyToMany(M3Properties.values);
-        Assert.assertEquals("1,2", value2.collect(o -> o.getValueForMetaPropertyToOne("b").getName()).makeString(","));
+        Assertions.assertEquals("1,2", value2.collect(o -> o.getValueForMetaPropertyToOne("b").getName()).makeString(","));
     }
 
     protected static FunctionExecution getFunctionExecution()

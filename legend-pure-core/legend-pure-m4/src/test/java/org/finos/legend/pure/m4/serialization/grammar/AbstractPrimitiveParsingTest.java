@@ -20,7 +20,7 @@ import org.finos.legend.pure.m4.coreinstance.CoreInstance;
 import org.finos.legend.pure.m4.exception.PureException;
 import org.finos.legend.pure.m4.statelistener.M4StateListener;
 import org.finos.legend.pure.m4.statelistener.VoidM4StateListener;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 
 abstract class AbstractPrimitiveParsingTest
 {
@@ -29,10 +29,10 @@ abstract class AbstractPrimitiveParsingTest
     protected void assertParsesTo(String expectedName, String string)
     {
         CoreInstance value = parsePrimitiveValue(string);
-        Assert.assertNotNull(string, value);
-        Assert.assertNotNull(string, value.getClassifier());
-        Assert.assertEquals(string, getPrimitiveTypeName(), value.getClassifier().getName());
-        Assert.assertEquals(string, expectedName, value.getName());
+        Assertions.assertNotNull(value, string);
+        Assertions.assertNotNull(value.getClassifier(), string);
+        Assertions.assertEquals(getPrimitiveTypeName(), value.getClassifier().getName(), string);
+        Assertions.assertEquals(expectedName, value.getName(), string);
     }
 
     protected void assertFailsToParse(String string)
@@ -53,12 +53,12 @@ abstract class AbstractPrimitiveParsingTest
     protected void assertFailsToParse(String expectedMessage, Class<? extends PureException> expectedExceptionClass, String string)
     {
         PureException e = (expectedExceptionClass == null) ?
-                      Assert.assertThrows(PureException.class, () -> parsePrimitiveValue(string)) :
-                      Assert.assertThrows(expectedExceptionClass, () -> parsePrimitiveValue(string));
+                      Assertions.assertThrows(PureException.class, () -> parsePrimitiveValue(string)) :
+                      Assertions.assertThrows(expectedExceptionClass, () -> parsePrimitiveValue(string));
 //        e.printStackTrace();
         if (expectedMessage != null)
         {
-            Assert.assertEquals(expectedMessage, e.getMessage());
+            Assertions.assertEquals(expectedMessage, e.getMessage());
         }
     }
 
@@ -85,7 +85,7 @@ abstract class AbstractPrimitiveParsingTest
                 "{\n" +
                 "    Class.properties[value] : " + string + "\n" +
                 "}\n", repository, listener);
-        Assert.assertEquals(2, instances.size());
+        Assertions.assertEquals(2, instances.size());
         CoreInstance testClass = instances.get(1);
         return testClass.getValueForMetaPropertyToOne("value");
     }

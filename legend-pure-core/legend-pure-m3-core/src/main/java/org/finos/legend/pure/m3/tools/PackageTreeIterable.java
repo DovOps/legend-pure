@@ -150,15 +150,15 @@ public class PackageTreeIterable extends AbstractLazyIterable<Package>
 
         private void possiblyAddChild(CoreInstance child)
         {
-            if (child instanceof Package)
+            if (child instanceof Package package1)
             {
                 if (this.depthFirst)
                 {
-                    this.deque.addFirst((Package) child);
+                    this.deque.addFirst(package1);
                 }
                 else
                 {
-                    this.deque.addLast((Package) child);
+                    this.deque.addLast(package1);
                 }
             }
         }

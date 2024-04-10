@@ -15,8 +15,8 @@
 package org.finos.legend.pure.m3.tests.tools;
 
 import org.finos.legend.pure.m3.tools.FormatTools;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class TestFormatTools
 {
@@ -125,13 +125,13 @@ public class TestFormatTools
     {
         StringBuilder builder = new StringBuilder(integerString.length());
         FormatTools.appendIntegerString(builder, integerString, zeroPadding);
-        Assert.assertEquals(String.format("Failure writing \"%s\" with zero padding %d", integerString, zeroPadding), expected, builder.toString());
+        Assertions.assertEquals(expected, builder.toString(), "Failure writing \"%s\" with zero padding %d".formatted(integerString, zeroPadding));
     }
 
     private void assertFloatString(String expected, String floatString, int decimalPrecision)
     {
         StringBuilder builder = new StringBuilder(floatString.length());
         FormatTools.appendFloatString(builder, floatString, decimalPrecision);
-        Assert.assertEquals(String.format("Failure writing \"%s\" with decimal precision %d", floatString, decimalPrecision), expected, builder.toString());
+        Assertions.assertEquals(expected, builder.toString(), "Failure writing \"%s\" with decimal precision %d".formatted(floatString, decimalPrecision));
     }
 }

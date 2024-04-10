@@ -69,17 +69,17 @@ public class AssociationProcessor extends Processor<Association>
     @Override
     public void populateReferenceUsages(Association association, ModelRepository repository, ProcessorSupport processorSupport)
     {
-        if (association instanceof AssociationProjection)
+        if (association instanceof AssociationProjection projection)
         {
-            addReferenceUsageForToOneProperty(association, ((AssociationProjection) association)._projectedAssociationCoreInstance(), M3Properties.projectedAssociation, repository, processorSupport);
+            addReferenceUsageForToOneProperty(association, projection._projectedAssociationCoreInstance(), M3Properties.projectedAssociation, repository, processorSupport);
         }
     }
 
     public static Iterable<AbstractProperty<?>> process(Association association, Context context, ProcessorSupport processorSupport, ModelRepository modelRepository) throws PureCompilationException
     {
-        if (association instanceof AssociationProjection)
+        if (association instanceof AssociationProjection projection)
         {
-            preProcessAssociationProjection((AssociationProjection) association, modelRepository, processorSupport);
+            preProcessAssociationProjection(projection, modelRepository, processorSupport);
         }
 
         // Process properties
@@ -89,9 +89,9 @@ public class AssociationProcessor extends Processor<Association>
             throw new PureCompilationException(association.getSourceInformation(), "Expected 2 properties for association '" + PackageableElement.getUserPathForPackageableElement(association) + "', found " + properties.size());
         }
 
-        if (association instanceof AssociationProjection)
+        if (association instanceof AssociationProjection projection)
         {
-            ListIterable<? extends CoreInstance> projections = ImportStub.withImportStubByPasses(ListHelper.wrapListIterable(((AssociationProjection) association)._projectionsCoreInstance()), processorSupport);
+            ListIterable<? extends CoreInstance> projections = ImportStub.withImportStubByPasses(ListHelper.wrapListIterable(projection._projectionsCoreInstance()), processorSupport);
             if (projections.size() != 2)
             {
                 throw new PureCompilationException(association.getSourceInformation(), "Expected exactly two class projections, found " + projections.size());
@@ -351,23 +351,21 @@ public class AssociationProcessor extends Processor<Association>
 
     private static String getPropertyNameForLeftSideOfQualifiedPropertyFilter(Association association, QualifiedProperty<?> qualifiedProperty, ValueSpecification instance)
     {
-        if (instance instanceof FunctionExpression)
+        if (instance instanceof FunctionExpression functionExpression)
         {
-            FunctionExpression functionExpression = (FunctionExpression) instance;
             String functionName = functionExpression._functionName();
             if ("filter".equals(functionName))
             {
                 ValueSpecification leftSideOfFilter = ListHelper.wrapListIterable(functionExpression._parametersValues()).getFirst();
-                if (leftSideOfFilter instanceof FunctionExpression)
+                if (leftSideOfFilter instanceof FunctionExpression leftSideOfFilterFunctionExpression)
                 {
-                    FunctionExpression leftSideOfFilterFunctionExpression = (FunctionExpression) leftSideOfFilter;
                     CoreInstance propertyName = leftSideOfFilterFunctionExpression._propertyName()._valuesCoreInstance().getAny();
                     if (propertyName != null)
                     {
                         ValueSpecification variableExpression = ListHelper.wrapListIterable(leftSideOfFilterFunctionExpression._parametersValues()).getFirst();
-                        if (variableExpression instanceof VariableExpression)
+                        if (variableExpression instanceof VariableExpression expression)
                         {
-                            String variableExpressionName = ((VariableExpression) variableExpression)._name();
+                            String variableExpressionName = expression._name();
                             if (!"this".equals(variableExpressionName))
                             {
                                 throw new PureCompilationException(instance.getSourceInformation(), validQualifiedPropertyInAssociationMsg() + qualifiedPropertyCompileErrorMsgPrefix(association, qualifiedProperty) + " left side of filter should refer to '$this' not '" + variableExpressionName + "'");

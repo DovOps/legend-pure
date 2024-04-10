@@ -126,7 +126,7 @@ public class LoadCsvToDbTable extends NativeFunction
                 {
                     throw new PureExecutionException("Failed to load CSV file " + filePath + " into DB table " + tableName +
                             ".\n Table requires a " + columnTypes.get(i) + " for column " + columns.get(i).getValueForMetaPropertyToOne(M3Properties.name).getName() +
-                            ". CSV row:" + (csvRecord instanceof CSVRecord ? ((CSVRecord)csvRecord).getRecordNumber() : "N/A") + " column:" + (i + 1) + " failed to convert to " + columnTypes.get(i) + " with error '" + ex.getMessage() + "'", ex);
+                            ". CSV row:" + (csvRecord instanceof CSVRecord csvr ? csvr.getRecordNumber() : "N/A") + " column:" + (i + 1) + " failed to convert to " + columnTypes.get(i) + " with error '" + ex.getMessage() + "'", ex);
                 }
                 return result;
             }

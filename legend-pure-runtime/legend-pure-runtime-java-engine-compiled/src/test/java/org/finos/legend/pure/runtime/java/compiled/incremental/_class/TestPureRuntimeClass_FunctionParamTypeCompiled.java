@@ -23,19 +23,19 @@ import org.finos.legend.pure.runtime.java.compiled.CompiledClassloaderStateVerif
 import org.finos.legend.pure.runtime.java.compiled.CompiledMetadataStateVerifier;
 import org.finos.legend.pure.runtime.java.compiled.execution.FunctionExecutionCompiledBuilder;
 import org.finos.legend.pure.runtime.java.compiled.factory.JavaModelFactoryRegistryLoader;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 public class TestPureRuntimeClass_FunctionParamTypeCompiled extends TestPureRuntimeClass_FunctionParamType
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getFunctionExecution(), JavaModelFactoryRegistryLoader.loader());
     }
 
-    @Ignore
+    @Disabled
     @Test
     public void testPureRuntimeClassAsQualifiedPropertyParameter() throws Exception
     {

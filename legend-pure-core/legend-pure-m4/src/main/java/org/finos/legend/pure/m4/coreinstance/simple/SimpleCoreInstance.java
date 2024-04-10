@@ -388,9 +388,9 @@ public class SimpleCoreInstance extends AbstractCoreInstance
                     {
                         values.forEach(childElement ->
                         {
-                            if ((!doneList.contains(childElement) || (childElement.getClassifier() == null)) && (childElement instanceof SimpleCoreInstance))
+                            if ((!doneList.contains(childElement) || (childElement.getClassifier() == null)) && (childElement instanceof SimpleCoreInstance instance))
                             {
-                                stack.push((SimpleCoreInstance) childElement);
+                                stack.push(instance);
                             }
                         });
                     }
@@ -577,9 +577,9 @@ public class SimpleCoreInstance extends AbstractCoreInstance
                 else
                 {
                     String newTab = tab + "        ";
-                    if (value instanceof SimpleCoreInstance)
+                    if (value instanceof SimpleCoreInstance instance)
                     {
-                        ((SimpleCoreInstance) value).print(appendable, newTab, stack, full, addDebug, max);
+                        instance.print(appendable, newTab, stack, full, addDebug, max);
                     }
                     else if (full)
                     {

@@ -181,7 +181,7 @@ public class JavaCodeGeneration
                 log.info("  Start compiling Java classes");
                 PureJavaCompiler compiler = compileJavaSources(startCompilation, generate, addExternalAPI, log);
                 writeJavaClassFiles(startCompilation, compiler, classesDirectory, log);
-                log.info(String.format("  Finished compiling Java classes (%.9fs)", durationSinceInSeconds(startCompilation)));
+                log.info("  Finished compiling Java classes (%.9fs)".formatted(durationSinceInSeconds(startCompilation)));
             }
             else
             {
@@ -189,12 +189,12 @@ public class JavaCodeGeneration
             }
 
             // Write class files
-            log.info(String.format("  Finished building Pure compiled mode jar (%.9fs)", durationSinceInSeconds(start)));
+            log.info("  Finished building Pure compiled mode jar (%.9fs)".formatted(durationSinceInSeconds(start)));
         }
         catch (Exception e)
         {
-            log.error(String.format("    Error (%.9fs)", durationSinceInSeconds(start)), e);
-            log.error(String.format("    FAILURE building Pure compiled mode jar (%.9fs)", durationSinceInSeconds(start)));
+            log.error("    Error (%.9fs)".formatted(durationSinceInSeconds(start)), e);
+            log.error("    FAILURE building Pure compiled mode jar (%.9fs)".formatted(durationSinceInSeconds(start)));
             throw new RuntimeException("Error building Pure compiled mode jar", e);
         }
     }
@@ -207,7 +207,7 @@ public class JavaCodeGeneration
 
     private static void completeStep(String step, long stepStart, Log log)
     {
-        log.info(String.format("    Finished %s (%.9fs)", step, durationSinceInSeconds(stepStart)));
+        log.info("    Finished %s (%.9fs)".formatted(step, durationSinceInSeconds(stepStart)));
     }
 
     private static CodeRepositorySet getAllRepositories(Set<String> extraRepositories)
@@ -367,12 +367,12 @@ public class JavaCodeGeneration
                 runtime.loadAndCompileCore(message);
                 runtime.loadAndCompileSystem(message);
             }
-            log.info(String.format("    Finished Pure initialization (%.9fs)", durationSinceInSeconds(start)));
+            log.info("    Finished Pure initialization (%.9fs)".formatted(durationSinceInSeconds(start)));
             return runtime;
         }
         catch (Exception e)
         {
-            log.error(String.format("    Error initializing Pure (%.9fs)", durationSinceInSeconds(start)), e);
+            log.error("    Error initializing Pure (%.9fs)".formatted(durationSinceInSeconds(start)), e);
             throw new RuntimeException(e);
         }
     }

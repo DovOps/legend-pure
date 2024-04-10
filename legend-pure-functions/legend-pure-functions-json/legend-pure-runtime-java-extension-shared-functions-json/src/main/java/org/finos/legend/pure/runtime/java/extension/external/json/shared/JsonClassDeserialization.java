@@ -111,12 +111,10 @@ public class JsonClassDeserialization<T extends Any> extends ClassConversion<Obj
     @Override
     public T apply(Object input, ConversionContext context)
     {
-        if (input instanceof JSONObject)
+        if (input instanceof JSONObject jsonObject)
         {
             JsonDeserializationContext deserializationContext = (JsonDeserializationContext)context;
             ObjectFactory objectFactory = deserializationContext.getObjectFactory();
-
-            JSONObject jsonObject = (JSONObject)input;
             Map<String, RichIterable<?>> propertyKeyValues = this.keyValueProperties(jsonObject, deserializationContext);
             try
             {
@@ -182,7 +180,7 @@ public class JsonClassDeserialization<T extends Any> extends ClassConversion<Obj
                 StringBuilder errorMsg = new StringBuilder();
                 for (String unknownProperty : unknownProperties)
                 {
-                    errorMsg.append(String.format("Property '%s' can't be found in class %s. ", unknownProperty, PackageableElement.getUserPathForPackageableElement(this.clazz)));
+                    errorMsg.append("Property '%s' can't be found in class %s. ".formatted(unknownProperty, PackageableElement.getUserPathForPackageableElement(this.clazz)));
                 }
                 throw new PureExecutionException(context.getSourceInformation(), errorMsg.toString());
             }

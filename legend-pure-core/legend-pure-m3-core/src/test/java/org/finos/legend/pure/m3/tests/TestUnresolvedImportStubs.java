@@ -22,13 +22,13 @@ import org.finos.legend.pure.m3.navigation.PackageableElement.PackageableElement
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
 import org.finos.legend.pure.m4.coreinstance.SourceInformation;
 import org.finos.legend.pure.m4.tools.GraphNodeIterable;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestUnresolvedImportStubs extends AbstractPureTestWithCoreCompiledPlatform
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getExtra());
@@ -85,7 +85,7 @@ public class TestUnresolvedImportStubs extends AbstractPureTestWithCoreCompiledP
                     sourceInfo.appendMessage(message);
                 }
             });
-            Assert.fail(message.toString());
+            Assertions.fail(message.toString());
         }
     }
 }

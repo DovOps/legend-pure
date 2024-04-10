@@ -25,20 +25,20 @@ import org.finos.legend.pure.m3.serialization.filesystem.usercodestorage.Mutable
 import org.finos.legend.pure.m3.serialization.filesystem.usercodestorage.classpath.ClassLoaderCodeStorage;
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
 import org.finos.legend.pure.m4.exception.PureCompilationException;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestVisibilityInPath extends AbstractPureTestWithCoreCompiled
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getCodeStorage());
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("/datamart_datamt/testFile1.pure");
@@ -73,18 +73,22 @@ public class TestVisibilityInPath extends AbstractPureTestWithCoreCompiled
 
         compileTestSource(
                 "/datamart_datamt/testFile1.pure",
-                "Class datamarts::datamt::domain::A\n" +
-                        "{\n" +
-                        "  name : String[1];\n" +
-                        "}\n");
-        Assert.assertNotNull(runtime.getCoreInstance("datamarts::datamt::domain::A"));
-        PureCompilationException e = Assert.assertThrows(PureCompilationException.class, () -> compileTestSource(
+                """
+                Class datamarts::datamt::domain::A
+                {
+                  name : String[1];
+                }
+                """);
+        Assertions.assertNotNull(runtime.getCoreInstance("datamarts::datamt::domain::A"));
+        PureCompilationException e = Assertions.assertThrows(PureCompilationException.class, () -> compileTestSource(
                 "/datamart_dtm/testFile3.pure",
-                "import meta::pure::metamodel::path::*;\n" +
-                        "function datamarts::dtm::domain::testFn1():Path<Nil,String|1>[1]\n" +
-                        "{\n" +
-                        "  #/datamarts::datamt::domain::A/name#\n" +
-                        "}\n"));
+                """
+                import meta::pure::metamodel::path::*;
+                function datamarts::dtm::domain::testFn1():Path<Nil,String|1>[1]
+                {
+                  #/datamarts::datamt::domain::A/name#
+                }
+                """));
         assertPureException(PureCompilationException.class, "datamarts::datamt::domain::A is not visible in the file /datamart_dtm/testFile3.pure", "/datamart_dtm/testFile3.pure", 4, 32, 4, 32, 4, 32, e);
     }
 }

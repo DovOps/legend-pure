@@ -99,13 +99,12 @@ public class RootGraphFetchTreeProcessor extends Processor<RootGraphFetchTree<?>
         for (ValueSpecification vs : propertyGraphFetchTree._parameters())
         {
             PostProcessor.processElement(matcher, vs, state, processorSupport);
-            if (vs instanceof InstanceValue)
+            if (vs instanceof InstanceValue instanceValue)
             {
-                for (CoreInstance value : ((InstanceValue) vs)._valuesCoreInstance())
+                for (CoreInstance value : instanceValue._valuesCoreInstance())
                 {
-                    if (value instanceof EnumStub)
+                    if (value instanceof EnumStub enumStub)
                     {
-                        EnumStub enumStub = (EnumStub) value;
                         Enumeration<?> enumerationCoreInstance = (Enumeration<?>) ImportStub.withImportStubByPass(enumStub._enumerationCoreInstance(), processorSupport);
                         org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.type.Enum enumValue = (org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.type.Enum) org.finos.legend.pure.m3.navigation.enumeration.Enumeration.findEnum(enumerationCoreInstance, enumStub._enumName());
 

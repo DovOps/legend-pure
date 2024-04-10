@@ -272,9 +272,9 @@ public abstract class IncrementalCompiler implements SourceEventHandler
         for (PackageableElement impGrp : systemImports._children())
         {
             excludes.add(impGrp);
-            if (impGrp instanceof ImportGroup)
+            if (impGrp instanceof ImportGroup group)
             {
-                for (Import _import : ((ImportGroup) impGrp)._imports())
+                for (Import _import : group._imports())
                 {
                     CoreInstance pkg = Imports.getImportPackage(_import, processorSupport);
                     if (pkg != null)
@@ -326,9 +326,8 @@ public abstract class IncrementalCompiler implements SourceEventHandler
 
     void removeInstance(CoreInstance instance)
     {
-        if (instance instanceof PackageableElement)
+        if (instance instanceof PackageableElement element)
         {
-            PackageableElement element = (PackageableElement) instance;
             Package pkg = element._package();
             if (pkg != null)
             {

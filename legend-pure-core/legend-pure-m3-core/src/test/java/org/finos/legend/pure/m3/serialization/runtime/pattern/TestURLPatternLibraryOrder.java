@@ -16,8 +16,8 @@ package org.finos.legend.pure.m3.serialization.runtime.pattern;
 
 import org.eclipse.collections.api.factory.Lists;
 import org.eclipse.collections.api.list.MutableList;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class TestURLPatternLibraryOrder
 {
@@ -32,7 +32,7 @@ public class TestURLPatternLibraryOrder
 
         MutableList<PurePattern> res = patterns.sortThis(URLPatternLibrary::comparePatterns);
 
-        Assert.assertEquals(Lists.mutable.with("/pure/diagram/colors",
+        Assertions.assertEquals(Lists.mutable.with("/pure/diagram/colors",
                 "/gggg/ppppppppp/current/account/{accountId}/{user}",
                 "/gggg/ppppppppp/current/{user}",
                 "/pure/diagram/{diagramPath}"),

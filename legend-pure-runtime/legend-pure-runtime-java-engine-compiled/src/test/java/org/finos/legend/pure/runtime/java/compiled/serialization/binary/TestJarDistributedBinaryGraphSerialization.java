@@ -14,11 +14,11 @@
 
 package org.finos.legend.pure.runtime.java.compiled.serialization.binary;
 
-import org.junit.After;
-import org.junit.Rule;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.io.BufferedOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -27,14 +27,14 @@ import java.util.zip.ZipFile;
 
 public class TestJarDistributedBinaryGraphSerialization extends TestDistributedBinaryGraphSerialization
 {
-    @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+    @TempDir
+    public File temporaryFolder;
 
     private Path jarPath;
     private JarOutputStream jarOutputStream;
     private ZipFile jarZipFile;
 
-    @After
+    @AfterEach
     public void cleanUpJarStream() throws IOException
     {
         if (this.jarOutputStream != null)
@@ -43,7 +43,7 @@ public class TestJarDistributedBinaryGraphSerialization extends TestDistributedB
         }
     }
 
-    @After
+    @AfterEach
     public void cleanUpZipFile() throws IOException
     {
         if (this.jarZipFile != null)
@@ -55,7 +55,7 @@ public class TestJarDistributedBinaryGraphSerialization extends TestDistributedB
     @Override
     protected FileWriter getFileWriter() throws IOException
     {
-        this.jarPath = this.temporaryFolder.newFile("distMetadata.jar").toPath();
+        this.jarPath = File.createTempFile("distMetadata.jar", null, this.temporaryFolder).toPath();
         this.jarOutputStream = new JarOutputStream(new BufferedOutputStream(Files.newOutputStream(this.jarPath)));
         return FileWriters.fromJarOutputStream(this.jarOutputStream);
     }

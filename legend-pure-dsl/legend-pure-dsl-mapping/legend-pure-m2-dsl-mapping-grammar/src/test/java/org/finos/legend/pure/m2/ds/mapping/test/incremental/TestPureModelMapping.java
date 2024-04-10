@@ -21,10 +21,10 @@ import org.finos.legend.pure.m2.ds.mapping.test.AbstractPureMappingTestWithCoreC
 import org.finos.legend.pure.m3.tests.RuntimeTestScriptBuilder;
 import org.finos.legend.pure.m3.tests.RuntimeVerifier;
 import org.finos.legend.pure.m4.exception.PureCompilationException;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestPureModelMapping extends AbstractPureMappingTestWithCoreCompiled
 {
@@ -36,86 +36,100 @@ public class TestPureModelMapping extends AbstractPureMappingTestWithCoreCompile
     private static final String TEST_MAPPING_SOURCE_ID2 = "testMapping2.pure";
 
     private static final ImmutableMap<String, String> TEST_SOURCES = Maps.immutable.with(TEST_MODEL_SOURCE_ID1,
-            "Class Firm\n" +
-                    "{\n" +
-                    "  legalName : String[1];" +
-                    "  other : Integer[1];\n" +
-                    "  other1 : Float[1];\n" +
-                    "}",
+            """
+            Class Firm
+            {
+              legalName : String[1];\
+              other : Integer[1];
+              other1 : Float[1];
+            }\
+            """,
             TEST_MODEL_SOURCE_ID2,
-            "Enum MyEnum\n" +
-                    "{\n" +
-                    "   a,b\n" +
-                    "}\n" +
-                    "Class SourceFirm\n" +
-                    "{\n" +
-                    "  name : String[1];" +
-                    "  other2 : MyEnum[1];\n" +
-                    "}",
+            """
+            Enum MyEnum
+            {
+               a,b
+            }
+            Class SourceFirm
+            {
+              name : String[1];\
+              other2 : MyEnum[1];
+            }\
+            """,
             TEST_MAPPING_SOURCE_ID1,
-            "###Mapping\n" +
-                    "Mapping FirmMapping\n" +
-                    "(\n" +
-                    "  Firm : Pure\n" +
-                    "         {\n" +
-                    "            legalName : ['a','b']->map(k|$k+'Yeah!')->joinStrings(',') ,\n" +
-                    "            other : 1+2,\n" +
-                    "            other1 : 1.0+2.0\n" +
-                    "         }\n" +
-                    ")",
+            """
+            ###Mapping
+            Mapping FirmMapping
+            (
+              Firm : Pure
+                     {
+                        legalName : ['a','b']->map(k|$k+'Yeah!')->joinStrings(',') ,
+                        other : 1+2,
+                        other1 : 1.0+2.0
+                     }
+            )\
+            """,
             TEST_MAPPING_SOURCE_ID2,
-            "###Mapping\n" +
-                    "Mapping FirmMapping2\n" +
-                    "(\n" +
-                    "  Firm : Pure\n" +
-                    "         {\n" +
-                    "            ~src SourceFirm\n" +
-                    "            ~filter $src.other2 == MyEnum.b\n" +
-                    "            legalName : $src.name,\n" +
-                    "            other : $src.name->length(),\n" +
-                    "            other1 : 3.14\n" +
-                    "         }\n" +
-                    ")"
+            """
+            ###Mapping
+            Mapping FirmMapping2
+            (
+              Firm : Pure
+                     {
+                        ~src SourceFirm
+                        ~filter $src.other2 == MyEnum.b
+                        legalName : $src.name,
+                        other : $src.name->length(),
+                        other1 : 3.14
+                     }
+            )\
+            """
     );
 
     private static final ImmutableMap<String, String> TEST_SOURCES_WITH_TYPO = Maps.immutable.with(TEST_MODEL_SOURCE_ID1,
-            "Class Firm\n" +
-                    "{\n" +
-                    "  legalNameX : String[1];\n" +
-                    "  other : String[1];\n" +
-                    "  other1 : String[1];\n" +
-                    "}");
+            """
+            Class Firm
+            {
+              legalNameX : String[1];
+              other : String[1];
+              other1 : String[1];
+            }\
+            """);
 
     private static final ImmutableMap<String, String> TEST_MAPPING_SOURCE_WITH_ERROR = Maps.immutable.with(TEST_MAPPING_SOURCE_ID1,
-            "###Mapping\n" +
-                    "Mapping FirmMapping\n" +
-                    "(\n" +
-                    "  Firm : Pure\n" +
-                    "         {\n" +
-                    "            legalName : ['a','b']->maXp(k|$src->toString() + 'Yeah!') ,\n" +
-                    "            other : 'ok' + 'op',\n" +
-                    "            other1 : ['o','e']" +
-                    "         }\n" +
-                    ")");
+            """
+            ###Mapping
+            Mapping FirmMapping
+            (
+              Firm : Pure
+                     {
+                        legalName : ['a','b']->maXp(k|$src->toString() + 'Yeah!') ,
+                        other : 'ok' + 'op',
+                        other1 : ['o','e']\
+                     }
+            )\
+            """);
 
     private static final ImmutableMap<String, String> TEST_MAPPING_SOURCE_NO_SOURCE__ERROR = Maps.immutable.with(TEST_MAPPING_SOURCE_ID2,
-            "###Mapping\n" +
-                    "Mapping FirmMapping2\n" +
-                    "(\n" +
-                    "  Firm : Pure\n" +
-                    "         {\n" +
-                    "            legalName : $src.name\n" +
-                    "         }\n" +
-                    ")"
+            """
+            ###Mapping
+            Mapping FirmMapping2
+            (
+              Firm : Pure
+                     {
+                        legalName : $src.name
+                     }
+            )\
+            """
     );
 
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime();
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete(TEST_MAPPING_SOURCE_ID1);
@@ -142,7 +156,7 @@ public class TestPureModelMapping extends AbstractPureMappingTestWithCoreCompile
             {
                 runtime.createInMemoryAndCompile(TEST_SOURCES_WITH_TYPO);
                 runtime.compile();
-                Assert.fail("Expected compilation exception on iteration #" + i);
+                Assertions.fail("Expected compilation exception on iteration #" + i);
             }
             catch (Exception e)
             {
@@ -154,7 +168,7 @@ public class TestPureModelMapping extends AbstractPureMappingTestWithCoreCompile
             runtime.delete(TEST_MODEL_SOURCE_ID1);
             runtime.createInMemoryAndCompile(Tuples.pair(TEST_MODEL_SOURCE_ID1, TEST_SOURCES.get(TEST_MODEL_SOURCE_ID1)));
             runtime.compile();
-            Assert.assertEquals("Graph size mismatch at iteration #" + i, size, repository.serialize().length);
+            Assertions.assertEquals(size, repository.serialize().length, "Graph size mismatch at iteration #" + i);
         }
     }
 
@@ -172,7 +186,7 @@ public class TestPureModelMapping extends AbstractPureMappingTestWithCoreCompile
             {
                 runtime.createInMemoryAndCompile(TEST_MAPPING_SOURCE_WITH_ERROR);
                 runtime.compile();
-                Assert.fail("Expected compilation exception on iteration #" + i);
+                Assertions.fail("Expected compilation exception on iteration #" + i);
             }
             catch (Exception e)
             {
@@ -184,7 +198,7 @@ public class TestPureModelMapping extends AbstractPureMappingTestWithCoreCompile
             runtime.delete(TEST_MAPPING_SOURCE_ID1);
             runtime.createInMemoryAndCompile(Tuples.pair(TEST_MAPPING_SOURCE_ID1, TEST_SOURCES.get(TEST_MAPPING_SOURCE_ID1)));
             runtime.compile();
-            Assert.assertEquals("Graph size mismatch at iteration #" + i, size, repository.serialize().length);
+            Assertions.assertEquals(size, repository.serialize().length, "Graph size mismatch at iteration #" + i);
         }
     }
 
@@ -201,7 +215,7 @@ public class TestPureModelMapping extends AbstractPureMappingTestWithCoreCompile
             {
                 runtime.createInMemoryAndCompile(TEST_MAPPING_SOURCE_NO_SOURCE__ERROR);
                 runtime.compile();
-                Assert.fail("Expected compilation exception on iteration #" + i);
+                Assertions.fail("Expected compilation exception on iteration #" + i);
             }
             catch (Exception e)
             {
@@ -213,7 +227,7 @@ public class TestPureModelMapping extends AbstractPureMappingTestWithCoreCompile
             runtime.delete(TEST_MAPPING_SOURCE_ID2);
             runtime.createInMemoryAndCompile(Tuples.pair(TEST_MAPPING_SOURCE_ID2, TEST_SOURCES.get(TEST_MAPPING_SOURCE_ID2)));
             runtime.compile();
-            Assert.assertEquals("Graph size mismatch at iteration #" + i, size, repository.serialize().length);
+            Assertions.assertEquals(size, repository.serialize().length, "Graph size mismatch at iteration #" + i);
         }
     }
 
@@ -229,7 +243,7 @@ public class TestPureModelMapping extends AbstractPureMappingTestWithCoreCompile
             try
             {
                 runtime.compile();
-                Assert.fail("Expected compilation exception on iteration #" + i);
+                Assertions.fail("Expected compilation exception on iteration #" + i);
             }
             catch (Exception e)
             {
@@ -240,7 +254,7 @@ public class TestPureModelMapping extends AbstractPureMappingTestWithCoreCompile
 
             runtime.createInMemoryAndCompile(Tuples.pair(TEST_MODEL_SOURCE_ID2, TEST_SOURCES.get(TEST_MODEL_SOURCE_ID2)));
             runtime.compile();
-            Assert.assertEquals("Graph size mismatch at iteration #" + i, size, repository.serialize().length);
+            Assertions.assertEquals(size, repository.serialize().length, "Graph size mismatch at iteration #" + i);
         }
     }
 
@@ -264,65 +278,73 @@ public class TestPureModelMapping extends AbstractPureMappingTestWithCoreCompile
     @Test
     public void testPropertyMappingStabilityOnEnumerationMappingUpdation()
     {
-        String modelCode = "###Pure\n" +
-                "import my::*;\n" +
-                "\n" +
-                "Class my::SourceProduct\n" +
-                "{\n" +
-                "   id : Integer[1];\n" +
-                "   state : String[1];\n" +
-                "}\n" +
-                "\n" +
-                "Class my::TargetProduct\n" +
-                "{\n" +
-                "   id : Integer[1];\n" +
-                "   state : State[1];\n" +
-                "}\n" +
-                "\n" +
-                "Enum my::State\n" +
-                "{\n" +
-                "   ACTIVE,\n" +
-                "   INACTIVE\n" +
-                "}\n";
+        String modelCode = """
+                ###Pure
+                import my::*;
+                
+                Class my::SourceProduct
+                {
+                   id : Integer[1];
+                   state : String[1];
+                }
+                
+                Class my::TargetProduct
+                {
+                   id : Integer[1];
+                   state : State[1];
+                }
+                
+                Enum my::State
+                {
+                   ACTIVE,
+                   INACTIVE
+                }
+                """;
 
-        String modelMappingCode = "###Mapping\n" +
-                "import my::*;\n" +
-                "\n" +
-                "Mapping my::modelMapping\n" +
-                "(\n" +
-                "   include enumerationMapping\n" +
-                "\n" +
-                "   TargetProduct : Pure\n" +
-                "   {\n" +
-                "      ~src SourceProduct\n" +
-                "      id : $src.id,\n" +
-                "      state : EnumerationMapping StateMapping : $src.state\n" +
-                "   }\n" +
-                ")\n";
+        String modelMappingCode = """
+                ###Mapping
+                import my::*;
+                
+                Mapping my::modelMapping
+                (
+                   include enumerationMapping
+                
+                   TargetProduct : Pure
+                   {
+                      ~src SourceProduct
+                      id : $src.id,
+                      state : EnumerationMapping StateMapping : $src.state
+                   }
+                )
+                """;
 
-        String enumerationMappingCode = "###Mapping\n" +
-                "import my::*;\n" +
-                "\n" +
-                "Mapping my::enumerationMapping\n" +
-                "(\n" +
-                "   State : EnumerationMapping StateMapping\n" +
-                "   {\n" +
-                "      ACTIVE : 1,\n" +
-                "      INACTIVE : 0\n" +
-                "   }\n" +
-                ")\n";
+        String enumerationMappingCode = """
+                ###Mapping
+                import my::*;
+                
+                Mapping my::enumerationMapping
+                (
+                   State : EnumerationMapping StateMapping
+                   {
+                      ACTIVE : 1,
+                      INACTIVE : 0
+                   }
+                )
+                """;
 
-        String updatedEnumerationMappingCode = "###Mapping\n" +
-                "import my::*;\n" +
-                "\n" +
-                "Mapping my::enumerationMapping\n" +
-                "(\n" +
-                "   State : EnumerationMapping StateMapping\n" +
-                "   {\n" +
-                "      ACTIVE : 'ACTIVE',\n" +
-                "      INACTIVE : 'INACTIVE'\n" +
-                "   }\n" +
-                ")\n";
+        String updatedEnumerationMappingCode = """
+                ###Mapping
+                import my::*;
+                
+                Mapping my::enumerationMapping
+                (
+                   State : EnumerationMapping StateMapping
+                   {
+                      ACTIVE : 'ACTIVE',
+                      INACTIVE : 'INACTIVE'
+                   }
+                )
+                """;
 
         RuntimeVerifier.verifyOperationIsStable(
                 new RuntimeTestScriptBuilder()
@@ -344,60 +366,68 @@ public class TestPureModelMapping extends AbstractPureMappingTestWithCoreCompile
     @Test
     public void testPropertyMappingStabilityOnEnumerationMappingDeletion()
     {
-        String modelCode = "###Pure\n" +
-                "import my::*;\n" +
-                "\n" +
-                "Class my::SourceProduct\n" +
-                "{\n" +
-                "   id : Integer[1];\n" +
-                "   state : String[1];\n" +
-                "}\n" +
-                "\n" +
-                "Class my::TargetProduct\n" +
-                "{\n" +
-                "   id : Integer[1];\n" +
-                "   state : State[1];\n" +
-                "}\n" +
-                "\n" +
-                "Enum my::State\n" +
-                "{\n" +
-                "   ACTIVE,\n" +
-                "   INACTIVE\n" +
-                "}\n";
+        String modelCode = """
+                ###Pure
+                import my::*;
+                
+                Class my::SourceProduct
+                {
+                   id : Integer[1];
+                   state : String[1];
+                }
+                
+                Class my::TargetProduct
+                {
+                   id : Integer[1];
+                   state : State[1];
+                }
+                
+                Enum my::State
+                {
+                   ACTIVE,
+                   INACTIVE
+                }
+                """;
 
-        String modelMappingCode = "###Mapping\n" +
-                "import my::*;\n" +
-                "\n" +
-                "Mapping my::modelMapping\n" +
-                "(\n" +
-                "   include enumerationMapping\n" +
-                "\n" +
-                "   TargetProduct : Pure\n" +
-                "   {\n" +
-                "      ~src SourceProduct\n" +
-                "      id : $src.id,\n" +
-                "      state : EnumerationMapping StateMapping : $src.state\n" +
-                "   }\n" +
-                ")\n";
+        String modelMappingCode = """
+                ###Mapping
+                import my::*;
+                
+                Mapping my::modelMapping
+                (
+                   include enumerationMapping
+                
+                   TargetProduct : Pure
+                   {
+                      ~src SourceProduct
+                      id : $src.id,
+                      state : EnumerationMapping StateMapping : $src.state
+                   }
+                )
+                """;
 
-        String enumerationMappingCode = "###Mapping\n" +
-                "import my::*;\n" +
-                "\n" +
-                "Mapping my::enumerationMapping\n" +
-                "(\n" +
-                "   State : EnumerationMapping StateMapping\n" +
-                "   {\n" +
-                "      ACTIVE : 1,\n" +
-                "      INACTIVE : 0\n" +
-                "   }\n" +
-                ")\n";
+        String enumerationMappingCode = """
+                ###Mapping
+                import my::*;
+                
+                Mapping my::enumerationMapping
+                (
+                   State : EnumerationMapping StateMapping
+                   {
+                      ACTIVE : 1,
+                      INACTIVE : 0
+                   }
+                )
+                """;
 
-        String updatedEnumerationMappingCode = "###Mapping\n" +
-                "import my::*;\n" +
-                "\n" +
-                "Mapping my::enumerationMapping\n" +
-                "(\n" +
-                ")\n";
+        String updatedEnumerationMappingCode = """
+                ###Mapping
+                import my::*;
+                
+                Mapping my::enumerationMapping
+                (
+                )
+                """;
 
         RuntimeVerifier.verifyOperationIsStable(
                 new RuntimeTestScriptBuilder()

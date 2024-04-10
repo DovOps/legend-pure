@@ -42,10 +42,10 @@ import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiledPlatform;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
 import org.finos.legend.pure.m4.serialization.binary.BinaryReaders;
 import org.finos.legend.pure.m4.serialization.binary.BinaryWriters;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Collection;
@@ -53,7 +53,7 @@ import java.util.Set;
 
 public class TestBinaryModelSourceSerializer extends AbstractPureTestWithCoreCompiledPlatform
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getFunctionExecution(), new CompositeCodeStorage(new ClassLoaderCodeStorage(getCodeRepositories())), getFactoryRegistryOverride(), getOptions(), getExtra(), false);
@@ -66,7 +66,7 @@ public class TestBinaryModelSourceSerializer extends AbstractPureTestWithCoreCom
                 GenericCodeRepository.build("test", "test(::.*)?", "platform", "system"));
     }
 
-    @After
+    @AfterEach
     public void clearRuntime()
     {
         runtime.delete("/test/model/testSource.pure");
@@ -78,20 +78,22 @@ public class TestBinaryModelSourceSerializer extends AbstractPureTestWithCoreCom
     public void testSimpleClassSerialization()
     {
         compileTestSource("/test/model/testSource.pure",
-                "import test::*;\n" +
-                        "Class test::ClassA\n" +
-                        "{\n" +
-                        "  name : String[1];\n" +
-                        "  id : Integer[1];\n" +
-                        "}\n" +
-                        "Class test::ClassB extends ClassA\n" +
-                        "{\n" +
-                        "  value : Float[1..*];\n" +
-                        "}\n" +
-                        "Class test::ClassC\n" +
-                        "{\n" +
-                        "  rel : test::ClassB[*];\n" +
-                        "}");
+                """
+                import test::*;
+                Class test::ClassA
+                {
+                  name : String[1];
+                  id : Integer[1];
+                }
+                Class test::ClassB extends ClassA
+                {
+                  value : Float[1..*];
+                }
+                Class test::ClassC
+                {
+                  rel : test::ClassB[*];
+                }\
+                """);
         SetIterable<String> expectedInstances = Sets.mutable.with("test::ClassA", "test::ClassB", "test::ClassC", "system::imports::import__test_model_testSource_pure_1");
         SetIterable<String> expectedReferences = Sets.mutable.with("Float", "Integer", "String", "meta::pure::metamodel::function::property::AggregationKind", "meta::pure::metamodel::function::property::Property", "meta::pure::metamodel::multiplicity::OneMany", "meta::pure::metamodel::multiplicity::PureOne", "meta::pure::metamodel::multiplicity::ZeroMany", "meta::pure::metamodel::relationship::Generalization", "meta::pure::metamodel::type::Any", "meta::pure::metamodel::type::Class", "meta::pure::metamodel::type::generics::GenericType", "meta::pure::metamodel::import::Import", "meta::pure::metamodel::import::ImportGroup", "meta::pure::metamodel::import::ImportStub");
 
@@ -112,11 +114,13 @@ public class TestBinaryModelSourceSerializer extends AbstractPureTestWithCoreCom
     public void testSimpleProfileSerialization()
     {
         compileTestSource("/test/model/testSource.pure",
-                "Profile test::profiles::MyProfile\n" +
-                        "{\n" +
-                        "    stereotypes: [st1, st2];\n" +
-                        "    tags: [tag1];\n" +
-                        "}\n");
+                """
+                Profile test::profiles::MyProfile
+                {
+                    stereotypes: [st1, st2];
+                    tags: [tag1];
+                }
+                """);
         SetIterable<String> expectedInstances = Sets.mutable.with("test::profiles::MyProfile", "system::imports::import__test_model_testSource_pure_1");
         SetIterable<String> expectedReferences = Sets.mutable.with("meta::pure::metamodel::extension::Profile", "meta::pure::metamodel::extension::Stereotype", "meta::pure::metamodel::extension::Tag", "meta::pure::metamodel::import::ImportGroup");
 
@@ -137,10 +141,12 @@ public class TestBinaryModelSourceSerializer extends AbstractPureTestWithCoreCom
     public void testUnicodeInString()
     {
         String sourceId = "/test/model/testSource.pure";
-        String sourceCode = "function test::testFn() : String[1]\n" +
-                "{\n" +
-                "  'hello\u2022world'\n" +
-                "}\n";
+        String sourceCode = """
+                function test::testFn() : String[1]
+                {
+                  'hello•world'
+                }
+                """;
         compileTestSource(sourceId, sourceCode);
 
         SetIterable<String> expectedInstances = Sets.mutable.with("test::testFn__String_1_", "system::imports::import__test_model_testSource_pure_1");
@@ -154,36 +160,40 @@ public class TestBinaryModelSourceSerializer extends AbstractPureTestWithCoreCom
 
         SourceDeserializationResult deserializationResult = BinaryModelSourceDeserializer.deserialize(BinaryReaders.newBinaryReader(serialized), ExternalReferenceSerializerLibrary.newLibrary(runtime));
         assertSetsEqual(expectedInstances, deserializationResult.getInstances().toSet());
-        Assert.assertEquals(sourceCode, deserializationResult.getSource().getContent());
+        Assertions.assertEquals(sourceCode, deserializationResult.getSource().getContent());
     }
 
     @Test
     public void testNonConcreteGenericTypeReference()
     {
         compileTestSourceM3("/test/model/testSource.pure",
-                "import test::*;\n" +
-                        "\n" +
-                        "Class test::TopClass<X,Y>\n" +
-                        "{\n" +
-                        "  prop1:X[*];\n" +
-                        "  prop2:Y[1];\n" +
-                        "}\n" +
-                        "\n" +
-                        "Class test::LeftClass<T> extends TopClass<T,T>\n" +
-                        "{\n" +
-                        "}\n" +
-                        "\n" +
-                        "Class test::RightClass<U,V> extends TopClass<V,U>\n" +
-                        "{\n" +
-                        "}");
+                """
+                import test::*;
+                
+                Class test::TopClass<X,Y>
+                {
+                  prop1:X[*];
+                  prop2:Y[1];
+                }
+                
+                Class test::LeftClass<T> extends TopClass<T,T>
+                {
+                }
+                
+                Class test::RightClass<U,V> extends TopClass<V,U>
+                {
+                }\
+                """);
 
         compileTestSourceM3("/test/model/testSource2.pure",
-                "import test::*;\n" +
-                        "\n" +
-                        "function test::testFn<X,Y>(lefts:LeftClass<Any>[*], rights:RightClass<X,Y>[*]):TopClass<Any,Any>[*]\n" +
-                        "{\n" +
-                        "  concatenate($lefts, $rights)\n" +
-                        "}");
+                """
+                import test::*;
+                
+                function test::testFn<X,Y>(lefts:LeftClass<Any>[*], rights:RightClass<X,Y>[*]):TopClass<Any,Any>[*]
+                {
+                  concatenate($lefts, $rights)
+                }\
+                """);
         SetIterable<String> expectedInstances = Sets.mutable.with("test::testFn_LeftClass_MANY__RightClass_MANY__TopClass_MANY_", "system::imports::import__test_model_testSource2_pure_1");
         SetIterable<String> someExpectedReferences = Sets.mutable.with("meta::pure::functions::collection::concatenate_T_MANY__T_MANY__T_MANY_", "meta::pure::metamodel::function::ConcreteFunctionDefinition", "meta::pure::metamodel::multiplicity::ZeroMany", "meta::pure::metamodel::type::Any", "meta::pure::metamodel::type::FunctionType", "meta::pure::metamodel::type::generics::GenericType", "meta::pure::metamodel::type::generics::TypeParameter", "meta::pure::metamodel::valuespecification::VariableExpression", "test::LeftClass", "test::RightClass", "test::TopClass");
 
@@ -204,14 +214,16 @@ public class TestBinaryModelSourceSerializer extends AbstractPureTestWithCoreCom
     public void testNonConcreteMultiplicityReference()
     {
         compileTestSourceM3("/test/model/testSource.pure",
-                "function test::testFn(class:Class<Any>[1]) : AbstractProperty<Any>[*]\n" +
-                        "{\n" +
-                        "  []\n" +
-                        "     ->concatenate($class.properties)\n" +
-                        "     ->concatenate($class.propertiesFromAssociations)\n" +
-                        "     ->concatenate($class.qualifiedProperties)\n" +
-                        "     ->concatenate($class.qualifiedPropertiesFromAssociations)\n" +
-                        "}\n");
+                """
+                function test::testFn(class:Class<Any>[1]) : AbstractProperty<Any>[*]
+                {
+                  []
+                     ->concatenate($class.properties)
+                     ->concatenate($class.propertiesFromAssociations)
+                     ->concatenate($class.qualifiedProperties)
+                     ->concatenate($class.qualifiedPropertiesFromAssociations)
+                }
+                """);
         SetIterable<String> expectedInstances = Sets.mutable.with("test::testFn_Class_1__AbstractProperty_MANY_", "system::imports::import__test_model_testSource_pure_1");
         SetIterable<String> someExpectedReferences = Sets.mutable.with("meta::pure::functions::collection::concatenate_T_MANY__T_MANY__T_MANY_", "meta::pure::metamodel::function::ConcreteFunctionDefinition", "meta::pure::metamodel::function::property::AbstractProperty", "meta::pure::metamodel::function::property::Property", "meta::pure::metamodel::function::property::QualifiedProperty", "meta::pure::metamodel::multiplicity::PureOne", "meta::pure::metamodel::multiplicity::PureZero", "meta::pure::metamodel::multiplicity::ZeroMany", "meta::pure::metamodel::type::Any", "meta::pure::metamodel::type::Class", "meta::pure::metamodel::type::Nil");
 
@@ -232,29 +244,33 @@ public class TestBinaryModelSourceSerializer extends AbstractPureTestWithCoreCom
     public void testFunctionTypeReference()
     {
         runtime.createInMemorySource("/test/model/testSource.pure",
-                "import test::matrix::*;\n" +
-                        "\n" +
-                        "Class test::matrix::Matrix\n" +
-                        "{\n" +
-                        "  rows : Row[*];\n" +
-                        "}\n" +
-                        "\n" +
-                        "Class test::matrix::Row\n" +
-                        "{\n" +
-                        "  values : Number[*];\n" +
-                        "}\n" +
-                        "\n" +
-                        "function test::matrix::filter(matrix:Matrix[1], func:Function<{Row[1]->Boolean[1]}>[1]):Matrix[1]\n" +
-                        "{\n" +
-                        "  ^$matrix(rows=$matrix.rows->filter($func))\n" +
-                        "}");
+                """
+                import test::matrix::*;
+                
+                Class test::matrix::Matrix
+                {
+                  rows : Row[*];
+                }
+                
+                Class test::matrix::Row
+                {
+                  values : Number[*];
+                }
+                
+                function test::matrix::filter(matrix:Matrix[1], func:Function<{Row[1]->Boolean[1]}>[1]):Matrix[1]
+                {
+                  ^$matrix(rows=$matrix.rows->filter($func))
+                }\
+                """);
         runtime.compile();
         runtime.createInMemorySource("/test/model/testSource2.pure",
-                "import test::matrix::*;\n" +
-                        "function test::matrix::testFn(m:Matrix[1]):Matrix[1]\n" +
-                        "{\n" +
-                        "  $m->filter(r | $r.values->forAll(x | $x < 5))\n" +
-                        "}");
+                """
+                import test::matrix::*;
+                function test::matrix::testFn(m:Matrix[1]):Matrix[1]
+                {
+                  $m->filter(r | $r.values->forAll(x | $x < 5))
+                }\
+                """);
         runtime.compile();
         SetIterable<String> expectedInstances = Sets.mutable.with("test::matrix::testFn_Matrix_1__Matrix_1_", "system::imports::import__test_model_testSource2_pure_1");
         SetIterable<String> someExpectedReferences = Sets.mutable.with("test::matrix::Matrix", "test::matrix::Row", "test::matrix::filter_Matrix_1__Function_1__Matrix_1_");
@@ -276,33 +292,37 @@ public class TestBinaryModelSourceSerializer extends AbstractPureTestWithCoreCom
     public void testTreePath()
     {
         compileTestSource("/test/model/testSource.pure",
-                "import test::treepath::*;\n" +
-                        "Class test::treepath::TestClass1\n" +
-                        "{\n" +
-                        "  name : String[1];\n" +
-                        "  others : TestClass2[*];\n" +
-                        "  otherStuff : Any[*];\n" +
-                        "}\n" +
-                        "\n" +
-                        "Class test::treepath::TestClass2\n" +
-                        "{\n" +
-                        "  mainName : String[1];\n" +
-                        "  otherNames : String[*];\n" +
-                        "}");
+                """
+                import test::treepath::*;
+                Class test::treepath::TestClass1
+                {
+                  name : String[1];
+                  others : TestClass2[*];
+                  otherStuff : Any[*];
+                }
+                
+                Class test::treepath::TestClass2
+                {
+                  mainName : String[1];
+                  otherNames : String[*];
+                }\
+                """);
         compileTestSource("/test/model/testSource2.pure",
-                "import test::treepath::*;\n" +
-                        "function test::treepath::simpleTreePath():Any[*]\n" +
-                        "{\n" +
-                        "  #\n" +
-                        "   TestClass1 as TestProjection\n" +
-                        "   {\n" +
-                        "     others as TestClass2\n" +
-                        "     {\n" +
-                        "       *\n" +
-                        "     }\n" +
-                        "   }\n" +
-                        "  #\n" +
-                        "}");
+                """
+                import test::treepath::*;
+                function test::treepath::simpleTreePath():Any[*]
+                {
+                  #
+                   TestClass1 as TestProjection
+                   {
+                     others as TestClass2
+                     {
+                       *
+                     }
+                   }
+                  #
+                }\
+                """);
         SetIterable<String> expectedInstances = Sets.mutable.with("test::treepath::simpleTreePath__Any_MANY_", "system::imports::import__test_model_testSource2_pure_1");
         SetIterable<String> someExpectedReferences = Sets.mutable.with("test::treepath::TestClass1", "test::treepath::TestClass2");
 
@@ -384,7 +404,7 @@ public class TestBinaryModelSourceSerializer extends AbstractPureTestWithCoreCom
             {
                 byte[] bytes1 = serializeSource(source).getTwo();
                 byte[] bytes2 = serializeSource(source).getTwo();
-                Assert.assertArrayEquals("Failure for source '" + source.getId() + "' on iteration #" + (i + 1), bytes1, bytes2);
+                Assertions.assertArrayEquals(bytes1, bytes2, "Failure for source '" + source.getId() + "' on iteration #" + (i + 1));
             }
         }
     }
@@ -400,14 +420,14 @@ public class TestBinaryModelSourceSerializer extends AbstractPureTestWithCoreCom
             runtime2.loadAndCompileCore();
             runtime2.loadAndCompileSystem();
 
-            Assert.assertEquals(runtime.getSourceRegistry().getSources().select(s -> !s.isInMemory()).collect(s -> s.getId()).toSet().toSortedList(), runtime2.getSourceRegistry().getSourceIds().toSet().toSortedList());
+            Assertions.assertEquals(runtime.getSourceRegistry().getSources().select(s -> !s.isInMemory()).collect(s -> s.getId()).toSet().toSortedList(), runtime2.getSourceRegistry().getSourceIds().toSet().toSortedList());
 
             for (Source source1 : runtime.getSourceRegistry().getSources().select(s -> !s.isInMemory()))
             {
                 Source source2 = runtime2.getSourceById(source1.getId());
                 byte[] bytes1 = serializeSource(source1).getTwo();
                 byte[] bytes2 = serializeSource(source2, runtime2).getTwo();
-                Assert.assertArrayEquals("Failure for source '" + source1.getId() + "' on iteration #" + (i + 1), bytes1, bytes2);
+                Assertions.assertArrayEquals(bytes1, bytes2, "Failure for source '" + source1.getId() + "' on iteration #" + (i + 1));
             }
         }
     }
@@ -415,7 +435,7 @@ public class TestBinaryModelSourceSerializer extends AbstractPureTestWithCoreCom
     protected Pair<SourceSerializationResult, byte[]> serializeSource(String sourceId)
     {
         Source source = runtime.getSourceById(sourceId);
-        Assert.assertNotNull("Unknown source: " + sourceId, source);
+        Assertions.assertNotNull(source, "Unknown source: " + sourceId);
         return serializeSource(source);
     }
 
@@ -458,7 +478,7 @@ public class TestBinaryModelSourceSerializer extends AbstractPureTestWithCoreCom
                 message.append(" for source ").append(sourceId);
             }
             badPaths.sortThis().appendString(message, ": ", ", ", "");
-            Assert.fail(message.toString());
+            Assertions.fail(message.toString());
         }
     }
 
@@ -490,7 +510,7 @@ public class TestBinaryModelSourceSerializer extends AbstractPureTestWithCoreCom
                 }
                 extra.toSortedList().appendString(message.append("Unexpected ").append(description), ": ", ", ", "");
             }
-            Assert.fail(message.toString());
+            Assertions.fail(message.toString());
         }
     }
 
@@ -506,7 +526,7 @@ public class TestBinaryModelSourceSerializer extends AbstractPureTestWithCoreCom
         {
             StringBuilder message = new StringBuilder("Missing ").append(description == null ? "elements" : description).append(": ");
             Iterate.collect(missing, Object::toString, Lists.mutable.empty()).sortThis().appendString(message, ", ");
-            Assert.fail(message.toString());
+            Assertions.fail(message.toString());
         }
     }
 }

@@ -16,20 +16,20 @@ package org.finos.legend.pure.runtime.java.interpreted.function;
 
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
 import org.finos.legend.pure.m4.exception.PureCompilationException;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestEqualityFunctionIntegrity extends AbstractPureTestWithCoreCompiled
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime();
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("testSource.pure");
@@ -41,11 +41,13 @@ public class TestEqualityFunctionIntegrity extends AbstractPureTestWithCoreCompi
         try
         {
             compileTestSource("testSource.pure",
-                    "function is(left:String[1], right:String[1]):Boolean[1]\n" +
-                            "{\n" +
-                            "    true\n" +
-                            "}\n");
-            Assert.fail("Expected compilation exception");
+                    """
+                    function is(left:String[1], right:String[1]):Boolean[1]
+                    {
+                        true
+                    }
+                    """);
+            Assertions.fail("Expected compilation exception");
         }
         catch (Exception e)
         {
@@ -59,11 +61,13 @@ public class TestEqualityFunctionIntegrity extends AbstractPureTestWithCoreCompi
         try
         {
             compileTestSource("testSource.pure",
-                    "function eq(left:String[1], right:String[1]):Boolean[1]\n" +
-                            "{\n" +
-                            "    true\n" +
-                            "}\n");
-            Assert.fail("Expected compilation exception");
+                    """
+                    function eq(left:String[1], right:String[1]):Boolean[1]
+                    {
+                        true
+                    }
+                    """);
+            Assertions.fail("Expected compilation exception");
         }
         catch (Exception e)
         {
@@ -77,11 +81,13 @@ public class TestEqualityFunctionIntegrity extends AbstractPureTestWithCoreCompi
         try
         {
             compileTestSource("testSource.pure",
-                    "function equal(left:String[1], right:String[1]):Boolean[1]\n" +
-                            "{\n" +
-                            "    true\n" +
-                            "}\n");
-            Assert.fail("Expected compilation exception");
+                    """
+                    function equal(left:String[1], right:String[1]):Boolean[1]
+                    {
+                        true
+                    }
+                    """);
+            Assertions.fail("Expected compilation exception");
         }
         catch (Exception e)
         {

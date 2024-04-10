@@ -18,200 +18,210 @@ import org.eclipse.collections.impl.factory.Lists;
 import org.finos.legend.pure.m2.ds.mapping.test.AbstractPureMappingTestWithCoreCompiled;
 import org.finos.legend.pure.m3.tests.RuntimeTestScriptBuilder;
 import org.finos.legend.pure.m3.tests.RuntimeVerifier;
-import org.junit.After;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 
 public class TestPureRuntimeAggregationAwareMapping extends AbstractPureMappingTestWithCoreCompiled
 {
     private static final String model =
-            "###Pure\n" +
-                    "Class Sales\n" +
-                    "{\n" +
-                    "   id: Integer[1];\n" +
-                    "   salesDate: FiscalCalendar[1];\n" +
-                    "   revenue: Float[1];\n" +
-                    "}\n" +
-                    "\n" +
-                    "Class FiscalCalendar\n" +
-                    "{\n" +
-                    "   date: Date[1];\n" +
-                    "   fiscalYear: Integer[1];\n" +
-                    "   fiscalMonth: Integer[1];\n" +
-                    "   fiscalQtr: Integer[1];\n" +
-                    "}\n" +
-                    "\n" +
-                    "Class Sales_By_Date\n" +
-                    "{\n" +
-                    "   salesDate: FiscalCalendar[1];\n" +
-                    "   netRevenue: Float[1];\n" +
-                    "}\n" +
-                    "function meta::pure::functions::math::sum(numbers:Float[*]):Float[1]\n" +
-                    "{\n" +
-                    "    $numbers->plus();\n" +
-                    "}\n";
+            """
+            ###Pure
+            Class Sales
+            {
+               id: Integer[1];
+               salesDate: FiscalCalendar[1];
+               revenue: Float[1];
+            }
+            
+            Class FiscalCalendar
+            {
+               date: Date[1];
+               fiscalYear: Integer[1];
+               fiscalMonth: Integer[1];
+               fiscalQtr: Integer[1];
+            }
+            
+            Class Sales_By_Date
+            {
+               salesDate: FiscalCalendar[1];
+               netRevenue: Float[1];
+            }
+            function meta::pure::functions::math::sum(numbers:Float[*]):Float[1]
+            {
+                $numbers->plus();
+            }
+            """;
 
     private static final String modelWithSalesPersonDimension =
-            "###Pure\n" +
-                    "Class Sales\n" +
-                    "{\n" +
-                    "   id: Integer[1];\n" +
-                    "   salesDate: FiscalCalendar[1];\n" +
-                    "   salesPerson: Person[1];\n" +
-                    "   revenue: Float[1];\n" +
-                    "}\n" +
-                    "Class Person\n" +
-                    "{\n" +
-                    "   lastName: String[1];\n" +
-                    "}\n" +
-                    "\n" +
-                    "Class FiscalCalendar\n" +
-                    "{\n" +
-                    "   date: Date[1];\n" +
-                    "   fiscalYear: Integer[1];\n" +
-                    "   fiscalMonth: Integer[1];\n" +
-                    "   fiscalQtr: Integer[1];\n" +
-                    "}\n" +
-                    "\n" +
-                    "Class Sales_By_Date\n" +
-                    "{\n" +
-                    "   salesDate: FiscalCalendar[1];\n" +
-                    "   netRevenue: Float[1];\n" +
-                    "}" +
-                    "function meta::pure::functions::math::sum(numbers:Float[*]):Float[1]\n" +
-                    "{\n" +
-                    "    $numbers->plus();\n" +
-                    "}\n";
+            """
+            ###Pure
+            Class Sales
+            {
+               id: Integer[1];
+               salesDate: FiscalCalendar[1];
+               salesPerson: Person[1];
+               revenue: Float[1];
+            }
+            Class Person
+            {
+               lastName: String[1];
+            }
+            
+            Class FiscalCalendar
+            {
+               date: Date[1];
+               fiscalYear: Integer[1];
+               fiscalMonth: Integer[1];
+               fiscalQtr: Integer[1];
+            }
+            
+            Class Sales_By_Date
+            {
+               salesDate: FiscalCalendar[1];
+               netRevenue: Float[1];
+            }\
+            function meta::pure::functions::math::sum(numbers:Float[*]):Float[1]
+            {
+                $numbers->plus();
+            }
+            """;
 
-    private static final String mapping = "###Mapping\n" +
-            "Mapping map\n" +
-            "(\n" +
-            "   FiscalCalendar : Pure {\n" +
-            "      ~src FiscalCalendar\n" +
-            "      date : $src.date,\n" +
-            "      fiscalYear : $src.fiscalYear,\n" +
-            "      fiscalMonth : $src.fiscalMonth,\n" +
-            "      fiscalQtr : $src.fiscalQtr\n" +
-            "   }\n" +
-            "   \n" +
-            "   Sales : AggregationAware {\n" +
-            "      Views : [\n" +
-            "         (\n" +
-            "            ~modelOperation : {\n" +
-            "               ~canAggregate true,\n" +
-            "               ~groupByFunctions (\n" +
-            "                  $this.salesDate\n" +
-            "               ),\n" +
-            "               ~aggregateValues (\n" +
-            "                  ( ~mapFn: $this.revenue, ~aggregateFn: $mapped->sum() )\n" +
-            "               )\n" +
-            "            },\n" +
-            "            ~aggregateMapping : Pure {\n" +
-            "               ~src Sales_By_Date\n" +
-            "               salesDate : $src.salesDate,\n" +
-            "               revenue : $src.netRevenue\n" +
-            "            }\n" +
-            "         )\n" +
-            "      ],\n" +
-            "      ~mainMapping : Pure {\n" +
-            "         ~src Sales\n" +
-            "         salesDate : $src.salesDate,\n" +
-            "         revenue : $src.revenue\n" +
-            "      }\n" +
-            "   }\n" +
-            ")";
+    private static final String mapping = """
+            ###Mapping
+            Mapping map
+            (
+               FiscalCalendar : Pure {
+                  ~src FiscalCalendar
+                  date : $src.date,
+                  fiscalYear : $src.fiscalYear,
+                  fiscalMonth : $src.fiscalMonth,
+                  fiscalQtr : $src.fiscalQtr
+               }
+              \s
+               Sales : AggregationAware {
+                  Views : [
+                     (
+                        ~modelOperation : {
+                           ~canAggregate true,
+                           ~groupByFunctions (
+                              $this.salesDate
+                           ),
+                           ~aggregateValues (
+                              ( ~mapFn: $this.revenue, ~aggregateFn: $mapped->sum() )
+                           )
+                        },
+                        ~aggregateMapping : Pure {
+                           ~src Sales_By_Date
+                           salesDate : $src.salesDate,
+                           revenue : $src.netRevenue
+                        }
+                     )
+                  ],
+                  ~mainMapping : Pure {
+                     ~src Sales
+                     salesDate : $src.salesDate,
+                     revenue : $src.revenue
+                  }
+               }
+            )\
+            """;
 
-    private static final String mappingWithSalesPersonDimension = "###Mapping\n" +
-            "Mapping map\n" +
-            "(\n" +
-            "   FiscalCalendar : Pure {\n" +
-            "      ~src FiscalCalendar\n" +
-            "      date : $src.date,\n" +
-            "      fiscalYear : $src.fiscalYear,\n" +
-            "      fiscalMonth : $src.fiscalMonth,\n" +
-            "      fiscalQtr : $src.fiscalQtr\n" +
-            "   }\n" +
-            "   Person : Pure {\n" +
-            "      ~src Person\n" +
-            "      lastName : $src.lastName\n" +
-            "   }\n" +
-            "   \n" +
-            "   Sales : AggregationAware {\n" +
-            "      Views : [\n" +
-            "         (\n" +
-            "            ~modelOperation : {\n" +
-            "               ~canAggregate true,\n" +
-            "               ~groupByFunctions (\n" +
-            "                  $this.salesDate\n" +
-            "               ),\n" +
-            "               ~aggregateValues (\n" +
-            "                  ( ~mapFn: $this.revenue, ~aggregateFn: $mapped->sum() )\n" +
-            "               )\n" +
-            "            },\n" +
-            "            ~aggregateMapping : Pure {\n" +
-            "               ~src Sales_By_Date\n" +
-            "               salesDate : $src.salesDate,\n" +
-            "               revenue : $src.netRevenue\n" +
-            "            }\n" +
-            "         )\n" +
-            "      ],\n" +
-            "      ~mainMapping : Pure {\n" +
-            "         ~src Sales\n" +
-            "         salesDate : $src.salesDate,\n" +
-            "         salesPerson : $src.salesPerson,\n" +
-            "         revenue : $src.revenue\n" +
-            "      }\n" +
-            "   }\n" +
-            ")";
+    private static final String mappingWithSalesPersonDimension = """
+            ###Mapping
+            Mapping map
+            (
+               FiscalCalendar : Pure {
+                  ~src FiscalCalendar
+                  date : $src.date,
+                  fiscalYear : $src.fiscalYear,
+                  fiscalMonth : $src.fiscalMonth,
+                  fiscalQtr : $src.fiscalQtr
+               }
+               Person : Pure {
+                  ~src Person
+                  lastName : $src.lastName
+               }
+              \s
+               Sales : AggregationAware {
+                  Views : [
+                     (
+                        ~modelOperation : {
+                           ~canAggregate true,
+                           ~groupByFunctions (
+                              $this.salesDate
+                           ),
+                           ~aggregateValues (
+                              ( ~mapFn: $this.revenue, ~aggregateFn: $mapped->sum() )
+                           )
+                        },
+                        ~aggregateMapping : Pure {
+                           ~src Sales_By_Date
+                           salesDate : $src.salesDate,
+                           revenue : $src.netRevenue
+                        }
+                     )
+                  ],
+                  ~mainMapping : Pure {
+                     ~src Sales
+                     salesDate : $src.salesDate,
+                     salesPerson : $src.salesPerson,
+                     revenue : $src.revenue
+                  }
+               }
+            )\
+            """;
 
-    private static final String mappingWithFunction = "###Mapping\n" +
-            "Mapping map\n" +
-            "(\n" +
-            "   FiscalCalendar : Pure {\n" +
-            "      ~src FiscalCalendar\n" +
-            "      date : $src.date,\n" +
-            "      fiscalYear : $src.fiscalYear,\n" +
-            "      fiscalMonth : $src.fiscalMonth,\n" +
-            "      fiscalQtr : $src.fiscalQtr\n" +
-            "   }\n" +
-            "   \n" +
-            "   Sales : AggregationAware {\n" +
-            "      Views : [\n" +
-            "         (\n" +
-            "            ~modelOperation : {\n" +
-            "               ~canAggregate true,\n" +
-            "               ~groupByFunctions (\n" +
-            "                  $this.salesDate->myFunction()\n" +
-            "               ),\n" +
-            "               ~aggregateValues (\n" +
-            "                  ( ~mapFn: $this.revenue, ~aggregateFn: $mapped->sum() )\n" +
-            "               )\n" +
-            "            },\n" +
-            "            ~aggregateMapping : Pure {\n" +
-            "               ~src Sales_By_Date\n" +
-            "               salesDate : $src.salesDate,\n" +
-            "               revenue : $src.netRevenue\n" +
-            "            }\n" +
-            "         )\n" +
-            "      ],\n" +
-            "      ~mainMapping : Pure {\n" +
-            "         ~src Sales\n" +
-            "         salesDate : $src.salesDate,\n" +
-            "         revenue : $src.revenue\n" +
-            "      }\n" +
-            "   }\n" +
-            ")";
+    private static final String mappingWithFunction = """
+            ###Mapping
+            Mapping map
+            (
+               FiscalCalendar : Pure {
+                  ~src FiscalCalendar
+                  date : $src.date,
+                  fiscalYear : $src.fiscalYear,
+                  fiscalMonth : $src.fiscalMonth,
+                  fiscalQtr : $src.fiscalQtr
+               }
+              \s
+               Sales : AggregationAware {
+                  Views : [
+                     (
+                        ~modelOperation : {
+                           ~canAggregate true,
+                           ~groupByFunctions (
+                              $this.salesDate->myFunction()
+                           ),
+                           ~aggregateValues (
+                              ( ~mapFn: $this.revenue, ~aggregateFn: $mapped->sum() )
+                           )
+                        },
+                        ~aggregateMapping : Pure {
+                           ~src Sales_By_Date
+                           salesDate : $src.salesDate,
+                           revenue : $src.netRevenue
+                        }
+                     )
+                  ],
+                  ~mainMapping : Pure {
+                     ~src Sales
+                     salesDate : $src.salesDate,
+                     revenue : $src.revenue
+                  }
+               }
+            )\
+            """;
 
     private static final String function = "function myFunction(d: FiscalCalendar[1]) : FiscalCalendar[1] {$d}";
 
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime();
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("source1.pure");

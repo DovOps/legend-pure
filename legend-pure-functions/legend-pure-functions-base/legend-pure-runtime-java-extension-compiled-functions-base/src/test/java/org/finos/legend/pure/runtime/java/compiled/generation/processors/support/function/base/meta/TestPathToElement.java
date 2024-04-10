@@ -17,11 +17,11 @@ package org.finos.legend.pure.runtime.java.compiled.generation.processors.suppor
 import org.finos.legend.pure.m3.execution.FunctionExecution;
 import org.finos.legend.pure.m3.tests.function.base.meta.AbstractTestPathToElement;
 import org.finos.legend.pure.runtime.java.compiled.execution.FunctionExecutionCompiledBuilder;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.BeforeAll;
 
 public class TestPathToElement extends AbstractTestPathToElement
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getFunctionExecution(), getCodeStorage(), getExtra());

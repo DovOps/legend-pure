@@ -19,22 +19,22 @@ import org.finos.legend.pure.m3.navigation.type.Type;
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiledPlatform;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
 import org.finos.legend.pure.m4.exception.PureCompilationException;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.util.regex.Pattern;
 
 public class TestGeneralizationLinearization extends AbstractPureTestWithCoreCompiledPlatform
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getExtra());
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("fromString.pure");
@@ -57,8 +57,10 @@ public class TestGeneralizationLinearization extends AbstractPureTestWithCoreCom
         // B
         // |
         // A
-        assertCompilationException("Class A extends B {}\n" +
-                "Class B extends A {}");
+        assertCompilationException("""
+                Class A extends B {}
+                Class B extends A {}\
+                """);
     }
 
     @Test
@@ -71,9 +73,11 @@ public class TestGeneralizationLinearization extends AbstractPureTestWithCoreCom
         // B
         // |
         // A
-        assertCompilationException("Class A extends B {}\n" +
-                "Class B extends C {}\n" +
-                "Class C extends B {}");
+        assertCompilationException("""
+                Class A extends B {}
+                Class B extends C {}
+                Class C extends B {}\
+                """);
     }
 
     @Test
@@ -91,11 +95,13 @@ public class TestGeneralizationLinearization extends AbstractPureTestWithCoreCom
         // This is invalid because D must precede B in the linearization since it
         // precedes it in A's generalizations, but B must precede D since D is a
         // generalization of it.
-        assertCompilationException("Class A extends D, B {}\n" +
-                "Class B extends C, D {}\n" +
-                "Class C extends E {}\n" +
-                "Class D extends E {}\n" +
-                "Class E {}");
+        assertCompilationException("""
+                Class A extends D, B {}
+                Class B extends C, D {}
+                Class C extends E {}
+                Class D extends E {}
+                Class E {}\
+                """);
     }
 
     @Test
@@ -114,12 +120,14 @@ public class TestGeneralizationLinearization extends AbstractPureTestWithCoreCom
         // This is invalid because D must precede E in the linearization since it
         // precedes it in B's generalizations, but E must precede D in the
         // linearization since it precedes it in C's generalizations.
-        assertCompilationException("Class A extends B, C {}\n" +
-                "Class B extends D, E {}\n" +
-                "Class C extends E, D {}\n" +
-                "Class D extends F {}\n" +
-                "Class E extends F {}\n" +
-                "Class F {}");
+        assertCompilationException("""
+                Class A extends B, C {}
+                Class B extends D, E {}
+                Class C extends E, D {}
+                Class D extends F {}
+                Class E extends F {}
+                Class F {}\
+                """);
     }
 
     private void assertCompilationException(String code)
@@ -127,7 +135,7 @@ public class TestGeneralizationLinearization extends AbstractPureTestWithCoreCom
         try
         {
             compileTestSource("fromString.pure", code);
-            Assert.fail("Expected compilation error from:\n" + code);
+            Assertions.fail("Expected compilation error from:\n" + code);
         }
         catch (RuntimeException e)
         {
@@ -142,8 +150,8 @@ public class TestGeneralizationLinearization extends AbstractPureTestWithCoreCom
         compileTestSource("fromString.pure", pureSource);
         CoreInstance classA = this.runtime.getCoreInstance("A");
         MutableSet<CoreInstance> leafTypes = Type.getTopMostNonTopTypeGeneralizations(classA, this.processorSupport);
-        Assert.assertEquals(1, leafTypes.size());
-        Assert.assertEquals(classA, leafTypes.getFirst());
+        Assertions.assertEquals(1, leafTypes.size());
+        Assertions.assertEquals(classA, leafTypes.getFirst());
     }
 
     @Test
@@ -157,17 +165,19 @@ public class TestGeneralizationLinearization extends AbstractPureTestWithCoreCom
         //    | /
         //    A
         //
-        String pureSource = "Class A extends B, C {}\n" +
-                "Class B extends D, E {}\n" +
-                "Class C extends E {}\n" +
-                "Class D extends F {}\n" +
-                "Class E extends F {}\n" +
-                "Class F {}";
+        String pureSource = """
+                Class A extends B, C {}
+                Class B extends D, E {}
+                Class C extends E {}
+                Class D extends F {}
+                Class E extends F {}
+                Class F {}\
+                """;
         compileTestSource("fromString.pure", pureSource);
         CoreInstance classA = this.runtime.getCoreInstance("A");
         MutableSet<CoreInstance> leafTypes = Type.getTopMostNonTopTypeGeneralizations(classA, this.processorSupport);
-        Assert.assertEquals(1, leafTypes.size());
-        Assert.assertEquals(this.runtime.getCoreInstance("F"), leafTypes.getFirst());
+        Assertions.assertEquals(1, leafTypes.size());
+        Assertions.assertEquals(this.runtime.getCoreInstance("F"), leafTypes.getFirst());
     }
 
     @Test
@@ -179,16 +189,18 @@ public class TestGeneralizationLinearization extends AbstractPureTestWithCoreCom
         //    | /
         //    A
         //
-        String pureSource = "Class A extends B, C {}\n" +
-                "Class B extends D, E {}\n" +
-                "Class C extends E {}\n" +
-                "Class D {}\n" +
-                "Class E {}";
+        String pureSource = """
+                Class A extends B, C {}
+                Class B extends D, E {}
+                Class C extends E {}
+                Class D {}
+                Class E {}\
+                """;
         compileTestSource("fromString.pure", pureSource);
         CoreInstance classA = this.runtime.getCoreInstance("A");
         MutableSet<CoreInstance> leafTypes = Type.getTopMostNonTopTypeGeneralizations(classA, this.processorSupport);
-        Assert.assertEquals(2, leafTypes.size());
-        Assert.assertTrue(leafTypes.contains(this.runtime.getCoreInstance("E")));
-        Assert.assertTrue(leafTypes.contains(this.runtime.getCoreInstance("D")));
+        Assertions.assertEquals(2, leafTypes.size());
+        Assertions.assertTrue(leafTypes.contains(this.runtime.getCoreInstance("E")));
+        Assertions.assertTrue(leafTypes.contains(this.runtime.getCoreInstance("D")));
     }
 }

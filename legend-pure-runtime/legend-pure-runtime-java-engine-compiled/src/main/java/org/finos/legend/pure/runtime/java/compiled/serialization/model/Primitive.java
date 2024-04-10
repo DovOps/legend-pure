@@ -33,7 +33,7 @@ public class Primitive implements RValue
     @Override
     public boolean equals(Object other)
     {
-        return (this == other) || ((other instanceof Primitive) && Objects.equals(this.value, ((Primitive) other).value));
+        return (this == other) || ((other instanceof Primitive p) && Objects.equals(this.value, p.value));
     }
 
     @Override

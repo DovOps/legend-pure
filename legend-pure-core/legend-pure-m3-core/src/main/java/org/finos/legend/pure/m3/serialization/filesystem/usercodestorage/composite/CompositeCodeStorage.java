@@ -273,7 +273,7 @@ public class CompositeCodeStorage implements MutableVersionControlledCodeStorage
     public boolean isVersioned(String path)
     {
         RepositoryCodeStorage codeStorage = getCodeStorage(path);
-        return (codeStorage instanceof VersionControlledCodeStorage) && ((VersionControlledCodeStorage) codeStorage).isVersioned(path);
+        return (codeStorage instanceof VersionControlledCodeStorage vccs) && vccs.isVersioned(path);
     }
 
     @Override
@@ -290,14 +290,14 @@ public class CompositeCodeStorage implements MutableVersionControlledCodeStorage
     public Optional<String> getCurrentRevision(String path)
     {
         RepositoryCodeStorage codeStorage = getCodeStorage(path);
-        return (codeStorage instanceof VersionControlledCodeStorage) ? ((VersionControlledCodeStorage) codeStorage).getCurrentRevision(path) : Optional.empty();
+        return (codeStorage instanceof VersionControlledCodeStorage vccs) ? vccs.getCurrentRevision(path) : Optional.empty();
     }
 
     @Override
     public List<String> getAllRevisions(String path)
     {
         RepositoryCodeStorage codeStorage = getCodeStorage(path);
-        return (codeStorage instanceof VersionControlledCodeStorage) ? ((VersionControlledCodeStorage) codeStorage).getAllRevisions(path) : Lists.mutable.empty();
+        return (codeStorage instanceof VersionControlledCodeStorage vccs) ? vccs.getAllRevisions(path) : Lists.mutable.empty();
     }
 
     @Override
@@ -306,9 +306,9 @@ public class CompositeCodeStorage implements MutableVersionControlledCodeStorage
         MutableList<Revision> allRevisions = Lists.mutable.empty();
         for (RepositoryCodeStorage codeStorage : this.codeStorages)
         {
-            if (codeStorage instanceof VersionControlledCodeStorage)
+            if (codeStorage instanceof VersionControlledCodeStorage storage)
             {
-                allRevisions.addAllIterable(((VersionControlledCodeStorage) codeStorage).getAllRevisionLogs(paths));
+                allRevisions.addAllIterable(storage.getAllRevisionLogs(paths));
             }
         }
         return allRevisions;
@@ -362,9 +362,9 @@ public class CompositeCodeStorage implements MutableVersionControlledCodeStorage
         MutableList<CodeStorageNode> nodes = Lists.mutable.empty();
         for (RepositoryCodeStorage codeStorage : this.codeStorages)
         {
-            if (codeStorage instanceof VersionControlledCodeStorage)
+            if (codeStorage instanceof VersionControlledCodeStorage storage)
             {
-                nodes.addAllIterable(((VersionControlledCodeStorage) codeStorage).getModifiedUserFiles());
+                nodes.addAllIterable(storage.getModifiedUserFiles());
             }
         }
         return nodes;
@@ -376,9 +376,9 @@ public class CompositeCodeStorage implements MutableVersionControlledCodeStorage
         MutableList<CodeStorageNode> nodes = Lists.mutable.empty();
         for (RepositoryCodeStorage codeStorage : this.codeStorages)
         {
-            if (codeStorage instanceof VersionControlledCodeStorage)
+            if (codeStorage instanceof VersionControlledCodeStorage storage)
             {
-                nodes.addAllIterable(((VersionControlledCodeStorage) codeStorage).getUnversionedFiles());
+                nodes.addAllIterable(storage.getUnversionedFiles());
             }
         }
         return nodes;
@@ -482,7 +482,7 @@ public class CompositeCodeStorage implements MutableVersionControlledCodeStorage
     public RichIterable<String> revert(String path)
     {
         RepositoryCodeStorage codeStorage = getCodeStorage(path);
-        return (codeStorage instanceof MutableVersionControlledCodeStorage) ? ((MutableVersionControlledCodeStorage) codeStorage).revert(path) : Lists.immutable.empty();
+        return (codeStorage instanceof MutableVersionControlledCodeStorage mvccs) ? mvccs.revert(path) : Lists.immutable.empty();
     }
 
     @Override
@@ -596,11 +596,11 @@ public class CompositeCodeStorage implements MutableVersionControlledCodeStorage
         MutableList<Exception> exceptions = Lists.mutable.empty();
         for (RepositoryCodeStorage codeStorage : this.codeStorages)
         {
-            if (codeStorage instanceof MutableVersionControlledCodeStorage)
+            if (codeStorage instanceof MutableVersionControlledCodeStorage storage)
             {
                 try
                 {
-                    ((MutableVersionControlledCodeStorage) codeStorage).rollback();
+                    storage.rollback();
                 }
                 catch (Exception e)
                 {
@@ -611,9 +611,9 @@ public class CompositeCodeStorage implements MutableVersionControlledCodeStorage
         if (exceptions.size() == 1)
         {
             Exception e = exceptions.get(0);
-            if (e instanceof PureCodeStorageException)
+            if (e instanceof PureCodeStorageException exception)
             {
-                throw (PureCodeStorageException) e;
+                throw exception;
             }
             throw new PureCodeStorageException("Error performing rollback", e);
         }
@@ -639,11 +639,11 @@ public class CompositeCodeStorage implements MutableVersionControlledCodeStorage
         MutableList<Exception> exceptions = Lists.mutable.empty();
         for (RepositoryCodeStorage codeStorage : this.codeStorages)
         {
-            if (codeStorage instanceof MutableVersionControlledCodeStorage)
+            if (codeStorage instanceof MutableVersionControlledCodeStorage storage)
             {
                 try
                 {
-                    ((MutableVersionControlledCodeStorage) codeStorage).cleanup();
+                    storage.cleanup();
                 }
                 catch (Exception e)
                 {
@@ -654,9 +654,9 @@ public class CompositeCodeStorage implements MutableVersionControlledCodeStorage
         if (exceptions.size() == 1)
         {
             Exception e = exceptions.get(0);
-            if (e instanceof PureCodeStorageException)
+            if (e instanceof PureCodeStorageException exception)
             {
-                throw (PureCodeStorageException) e;
+                throw exception;
             }
             throw new PureCodeStorageException("Error performing cleanup", e);
         }
@@ -683,17 +683,17 @@ public class CompositeCodeStorage implements MutableVersionControlledCodeStorage
         {
             for (RepositoryCodeStorage codeStorage : this.codeStorages)
             {
-                if (codeStorage instanceof MutableVersionControlledCodeStorage)
+                if (codeStorage instanceof MutableVersionControlledCodeStorage storage)
                 {
-                    ((MutableVersionControlledCodeStorage) codeStorage).applyPatch(path, patchFile);
+                    storage.applyPatch(path, patchFile);
                 }
             }
         }
         catch (Exception e)
         {
-            if (e instanceof PureCodeStorageException)
+            if (e instanceof PureCodeStorageException exception)
             {
-                throw (PureCodeStorageException) e;
+                throw exception;
             }
             throw new PureCodeStorageException("Error applying patch", e);
         }
@@ -706,9 +706,9 @@ public class CompositeCodeStorage implements MutableVersionControlledCodeStorage
         {
             for (RepositoryCodeStorage codeStorage : this.codeStorages)
             {
-                if (codeStorage instanceof MutableVersionControlledCodeStorage)
+                if (codeStorage instanceof MutableVersionControlledCodeStorage storage)
                 {
-                    if (((MutableVersionControlledCodeStorage) codeStorage).hasConflicts(path))
+                    if (storage.hasConflicts(path))
                     {
                         return true;
                     }
@@ -717,9 +717,9 @@ public class CompositeCodeStorage implements MutableVersionControlledCodeStorage
         }
         catch (Exception e)
         {
-            if (e instanceof PureCodeStorageException)
+            if (e instanceof PureCodeStorageException exception)
             {
-                throw (PureCodeStorageException) e;
+                throw exception;
             }
             throw new PureCodeStorageException("Error checking file conflicts", e);
         }
@@ -731,9 +731,9 @@ public class CompositeCodeStorage implements MutableVersionControlledCodeStorage
     {
         for (RepositoryCodeStorage codeStorage : this.codeStorages)
         {
-            if (codeStorage instanceof MutableVersionControlledCodeStorage)
+            if (codeStorage instanceof MutableVersionControlledCodeStorage storage)
             {
-                ((MutableVersionControlledCodeStorage) codeStorage).update(report, version);
+                storage.update(report, version);
             }
         }
     }
@@ -748,9 +748,9 @@ public class CompositeCodeStorage implements MutableVersionControlledCodeStorage
         else
         {
             RepositoryCodeStorage codeStorage = getCodeStorage(path);
-            if (codeStorage instanceof MutableVersionControlledCodeStorage)
+            if (codeStorage instanceof MutableVersionControlledCodeStorage storage)
             {
-                ((MutableVersionControlledCodeStorage) codeStorage).update(report, path, version);
+                storage.update(report, path, version);
             }
         }
     }
@@ -760,9 +760,9 @@ public class CompositeCodeStorage implements MutableVersionControlledCodeStorage
     {
         for (RepositoryCodeStorage codeStorage : this.codeStorages)
         {
-            if (codeStorage instanceof MutableVersionControlledCodeStorage)
+            if (codeStorage instanceof MutableVersionControlledCodeStorage storage)
             {
-                ((MutableVersionControlledCodeStorage) codeStorage).update(report, version);
+                storage.update(report, version);
             }
         }
     }
@@ -777,9 +777,9 @@ public class CompositeCodeStorage implements MutableVersionControlledCodeStorage
         else
         {
             RepositoryCodeStorage codeStorage = getCodeStorage(path);
-            if (codeStorage instanceof MutableVersionControlledCodeStorage)
+            if (codeStorage instanceof MutableVersionControlledCodeStorage storage)
             {
-                ((MutableVersionControlledCodeStorage) codeStorage).update(report, path, version);
+                storage.update(report, path, version);
             }
         }
     }

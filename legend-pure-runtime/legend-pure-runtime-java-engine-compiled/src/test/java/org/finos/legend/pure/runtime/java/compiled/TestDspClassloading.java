@@ -14,8 +14,8 @@
 
 package org.finos.legend.pure.runtime.java.compiled;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Constructor;
 import java.util.concurrent.TimeUnit;
@@ -36,6 +36,6 @@ public class TestDspClassloading
         Constructor<?> pureMapConstructor = pureMapClass.getConstructor(gsCollectionsMutableMapClass);
         Object pureCacheMapInstance = pureCacheMapConstructor.newInstance(1, 2, TimeUnit.SECONDS);
         Object pureMapInstance = pureMapConstructor.newInstance(pureCacheMapInstance);
-        Assert.assertNotNull(pureMapInstance);
+        Assertions.assertNotNull(pureMapInstance);
     }
 }

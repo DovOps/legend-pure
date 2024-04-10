@@ -14,7 +14,7 @@
 
 package org.finos.legend.pure.m3.tests;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public abstract class AbstractTestGeneralizationAtRuntime extends AbstractPureTestWithCoreCompiled
 {
@@ -22,12 +22,14 @@ public abstract class AbstractTestGeneralizationAtRuntime extends AbstractPureTe
     public void testSuperTypeStaticInstantiation()
     {
         compileTestSource(
-                "^meta::pure::metamodel::PackageableElement a (name='wee')" +
-                "function go():Any[*]" +
-                "{" +
-                "   assert(meta::pure::metamodel::PackageableElement.specializations->size() > 0, |'');\n" +
-                "   assertEquals('a', a->id());" +
-                "}");
+                """
+                ^meta::pure::metamodel::PackageableElement a (name='wee')\
+                function go():Any[*]\
+                {\
+                   assert(meta::pure::metamodel::PackageableElement.specializations->size() > 0, |'');
+                   assertEquals('a', a->id());\
+                }\
+                """);
         this.execute("go():Any[*]");
     }
 }

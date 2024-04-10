@@ -25,7 +25,7 @@ public class GrammarInfoStubHelper
 
     public static CoreInstance fromGrammarInfoStub(CoreInstance instance)
     {
-        return (instance instanceof GrammarInfoStub) ? fromGrammarInfoStub((GrammarInfoStub) instance) : instance;
+        return (instance instanceof GrammarInfoStub gis) ? fromGrammarInfoStub(gis) : instance;
     }
 
     public static CoreInstance fromGrammarInfoStub(GrammarInfoStub grammarInfoStub)

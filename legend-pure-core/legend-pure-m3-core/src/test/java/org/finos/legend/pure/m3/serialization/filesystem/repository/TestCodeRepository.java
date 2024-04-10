@@ -18,8 +18,8 @@ import org.eclipse.collections.api.factory.Lists;
 import org.eclipse.collections.api.list.ListIterable;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.list.fixed.ArrayAdapter;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class TestCodeRepository
 {
@@ -29,13 +29,13 @@ public class TestCodeRepository
         String[] validNames = {null, "platform", "core", "system", "core_relational", "a_b_c_d_e_f_g", "core_1", "core_abc123", "core_a_1_b_2_c_3"};
         for (String name : validNames)
         {
-            Assert.assertTrue(name, CodeRepository.isValidRepositoryName(name));
+            Assertions.assertTrue(CodeRepository.isValidRepositoryName(name), name);
         }
 
         String[] invalidNames = {"", "platform1", "Platform", "__", "aBc", "core-relational", "c1", "1"};
         for (String name : invalidNames)
         {
-            Assert.assertFalse(name, CodeRepository.isValidRepositoryName(name));
+            Assertions.assertFalse(CodeRepository.isValidRepositoryName(name), name);
         }
     }
 
@@ -105,17 +105,17 @@ public class TestCodeRepository
         assertSort(Lists.fixedSize.with(platformRepo, repoA, repoB, repoD, repoE), platformRepo, repoA, repoB, repoD, repoE);
 
         // Loops
-        RuntimeException e1 = Assert.assertThrows(RuntimeException.class, () -> CodeRepository.toSortedRepositoryList(Lists.fixedSize.with(platformRepo, repoA, repoB, repoC, repoD, repoE)));
-        Assert.assertEquals("Could not consistently order the following repositories: repo_c (visible: repo_e), repo_d (visible: repo_c), repo_e (visible: repo_d)", e1.getMessage());
+        RuntimeException e1 = Assertions.assertThrows(RuntimeException.class, () -> CodeRepository.toSortedRepositoryList(Lists.fixedSize.with(platformRepo, repoA, repoB, repoC, repoD, repoE)));
+        Assertions.assertEquals("Could not consistently order the following repositories: repo_c (visible: repo_e), repo_d (visible: repo_c), repo_e (visible: repo_d)", e1.getMessage());
 
-        RuntimeException e2 = Assert.assertThrows(RuntimeException.class, () -> CodeRepository.toSortedRepositoryList(Lists.fixedSize.with(platformRepo, repoB, repoC, repoD, repoE)));
-        Assert.assertEquals("Could not consistently order the following repositories: repo_c (visible: repo_e), repo_d (visible: repo_c), repo_e (visible: repo_d)", e2.getMessage());
+        RuntimeException e2 = Assertions.assertThrows(RuntimeException.class, () -> CodeRepository.toSortedRepositoryList(Lists.fixedSize.with(platformRepo, repoB, repoC, repoD, repoE)));
+        Assertions.assertEquals("Could not consistently order the following repositories: repo_c (visible: repo_e), repo_d (visible: repo_c), repo_e (visible: repo_d)", e2.getMessage());
 
-        RuntimeException e3 = Assert.assertThrows(RuntimeException.class, () -> CodeRepository.toSortedRepositoryList(Lists.fixedSize.with(platformRepo, repoC, repoD, repoE)));
-        Assert.assertEquals("Could not consistently order the following repositories: repo_c (visible: repo_e), repo_d (visible: repo_c), repo_e (visible: repo_d)", e3.getMessage());
+        RuntimeException e3 = Assertions.assertThrows(RuntimeException.class, () -> CodeRepository.toSortedRepositoryList(Lists.fixedSize.with(platformRepo, repoC, repoD, repoE)));
+        Assertions.assertEquals("Could not consistently order the following repositories: repo_c (visible: repo_e), repo_d (visible: repo_c), repo_e (visible: repo_d)", e3.getMessage());
 
-        RuntimeException e4 = Assert.assertThrows(RuntimeException.class, () -> CodeRepository.toSortedRepositoryList(Lists.fixedSize.with(repoC, repoD, repoE)));
-        Assert.assertEquals("Could not consistently order the following repositories: repo_c (visible: repo_e), repo_d (visible: repo_c), repo_e (visible: repo_d)", e4.getMessage());
+        RuntimeException e4 = Assertions.assertThrows(RuntimeException.class, () -> CodeRepository.toSortedRepositoryList(Lists.fixedSize.with(repoC, repoD, repoE)));
+        Assertions.assertEquals("Could not consistently order the following repositories: repo_c (visible: repo_e), repo_d (visible: repo_c), repo_e (visible: repo_d)", e4.getMessage());
     }
 
     private void assertSort(ListIterable<? extends CodeRepository> expected, CodeRepository... repositories)
@@ -126,10 +126,10 @@ public class TestCodeRepository
     private void assertSort(ListIterable<? extends CodeRepository> expected, Iterable<? extends CodeRepository> repositories)
     {
         MutableList<? extends CodeRepository> actual = CodeRepository.toSortedRepositoryList(repositories);
-        Assert.assertEquals(expected, actual);
+        Assertions.assertEquals(expected, actual);
         if (!isSorted(actual))
         {
-            Assert.fail("Not properly sorted: " + actual);
+            Assertions.fail("Not properly sorted: " + actual);
         }
     }
 

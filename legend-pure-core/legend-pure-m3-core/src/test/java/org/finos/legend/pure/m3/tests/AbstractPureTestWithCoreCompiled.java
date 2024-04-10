@@ -46,8 +46,8 @@ import org.finos.legend.pure.m4.ModelRepository;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
 import org.finos.legend.pure.m4.coreinstance.SourceInformation;
 import org.finos.legend.pure.m4.exception.PureException;
-import org.junit.AfterClass;
-import org.junit.Assert;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assertions;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -234,7 +234,7 @@ public abstract class AbstractPureTestWithCoreCompiled
         return null;
     }
 
-    @AfterClass
+    @AfterAll
     public static void tearDownRuntime()
     {
         if (runtime != null)
@@ -462,14 +462,14 @@ public abstract class AbstractPureTestWithCoreCompiled
     protected void assertOriginatingPureException(Class<? extends PureException> expectedClass, String expectedInfo, String expectedSource, Integer expectedLine, Integer expectedColumn, Integer expectedEndLine, Integer expectedEndColumn, Exception exception)
     {
         PureException pe = PureException.findPureException(exception);
-        Assert.assertNotNull("No Pure exception", pe);
+        Assertions.assertNotNull(pe, "No Pure exception");
         assertOriginatingPureException(expectedClass, expectedInfo, expectedSource, expectedLine, expectedColumn, expectedEndLine, expectedEndColumn, pe);
     }
 
     protected void assertOriginatingPureException(Class<? extends PureException> expectedClass, Pattern expectedInfo, String expectedSource, Integer expectedLine, Integer expectedColumn, Integer expectedEndLine, Integer expectedEndColumn, Exception exception)
     {
         PureException pe = PureException.findPureException(exception);
-        Assert.assertNotNull("No Pure exception", pe);
+        Assertions.assertNotNull(pe, "No Pure exception");
         assertOriginatingPureException(expectedClass, expectedInfo, expectedSource, expectedLine, expectedColumn, expectedEndLine, expectedEndColumn, pe);
     }
 
@@ -548,28 +548,28 @@ public abstract class AbstractPureTestWithCoreCompiled
     protected static void assertPureException(Class<? extends PureException> expectedClass, String expectedInfo, String expectedSource, Integer expectedLine, Integer expectedColumn, Integer expectedEndLine, Integer expectedEndColumn, Exception exception)
     {
         PureException pe = PureException.findPureException(exception);
-        Assert.assertNotNull("No Pure exception", pe);
+        Assertions.assertNotNull(pe, "No Pure exception");
         assertPureException(expectedClass, expectedInfo, expectedSource, expectedLine, expectedColumn, expectedEndLine, expectedEndColumn, pe);
     }
 
     protected void assertPureException(Class<? extends PureException> expectedClass, Pattern expectedInfo, String expectedSource, Integer expectedLine, Integer expectedColumn, Integer expectedEndLine, Integer expectedEndColumn, Exception exception)
     {
         PureException pe = PureException.findPureException(exception);
-        Assert.assertNotNull("No Pure exception", pe);
+        Assertions.assertNotNull(pe, "No Pure exception");
         assertPureException(expectedClass, expectedInfo, expectedSource, expectedLine, expectedColumn, expectedEndLine, expectedEndColumn, pe);
     }
 
     protected void assertPureException(Class<? extends PureException> expectedClass, String expectedInfo, String expectedSource, Integer expectedStartLine, Integer expectedStartColumn, Integer expectedLine, Integer expectedColumn, Integer expectedEndLine, Integer expectedEndColumn, Exception exception)
     {
         PureException pe = PureException.findPureException(exception);
-        Assert.assertNotNull("No Pure exception", pe);
+        Assertions.assertNotNull(pe, "No Pure exception");
         assertPureException(expectedClass, expectedInfo, expectedSource, expectedStartLine, expectedStartColumn, expectedLine, expectedColumn, expectedEndLine, expectedEndColumn, pe);
     }
 
     protected void assertPureException(Class<? extends PureException> expectedClass, Pattern expectedInfo, String expectedSource, Integer expectedStartLine, Integer expectedStartColumn, Integer expectedLine, Integer expectedColumn, Integer expectedEndLine, Integer expectedEndColumn, Exception exception)
     {
         PureException pe = PureException.findPureException(exception);
-        Assert.assertNotNull("No Pure exception", pe);
+        Assertions.assertNotNull(pe, "No Pure exception");
         assertPureException(expectedClass, expectedInfo, expectedSource, expectedStartLine, expectedStartColumn, expectedLine, expectedColumn, expectedEndLine, expectedEndColumn, pe);
     }
 
@@ -588,14 +588,14 @@ public abstract class AbstractPureTestWithCoreCompiled
         // Check class
         if (expectedClass != null)
         {
-            Assert.assertTrue("Expected an exception of type " + expectedClass.getCanonicalName() + ", got: " + exception.getClass().getCanonicalName() + " message:" + exception.getMessage(),
-                    expectedClass.isInstance(exception));
+            Assertions.assertTrue(expectedClass.isInstance(exception),
+                    "Expected an exception of type " + expectedClass.getCanonicalName() + ", got: " + exception.getClass().getCanonicalName() + " message:" + exception.getMessage());
         }
 
         // Check info
         if (expectedInfo != null)
         {
-            Assert.assertEquals(expectedInfo, exception.getInfo());
+            Assertions.assertEquals(expectedInfo, exception.getInfo());
         }
 
         // Check source information
@@ -607,14 +607,14 @@ public abstract class AbstractPureTestWithCoreCompiled
         // Check class
         if (expectedClass != null)
         {
-            Assert.assertTrue("Expected an exception of type " + expectedClass.getCanonicalName() + ", got: " + exception.getClass().getCanonicalName(),
-                    expectedClass.isInstance(exception));
+            Assertions.assertTrue(expectedClass.isInstance(exception),
+                    "Expected an exception of type " + expectedClass.getCanonicalName() + ", got: " + exception.getClass().getCanonicalName());
         }
 
         // Check info
         if ((expectedInfo != null) && !expectedInfo.matcher(exception.getInfo()).matches())
         {
-            Assert.fail("Expected exception info matching:\n\t" + expectedInfo.pattern() + "\ngot:\n\t" + exception.getInfo());
+            Assertions.fail("Expected exception info matching:\n\t" + expectedInfo.pattern() + "\ngot:\n\t" + exception.getInfo());
         }
 
         // Check source information
@@ -625,31 +625,31 @@ public abstract class AbstractPureTestWithCoreCompiled
     {
         if (expectedSource != null)
         {
-            Assert.assertEquals("Wrong source", expectedSource, sourceInfo.getSourceId());
+            Assertions.assertEquals(expectedSource, sourceInfo.getSourceId(), "Wrong source");
         }
         if (expectedStartLine != null)
         {
-            Assert.assertEquals("Wrong start line", expectedStartLine.intValue(), sourceInfo.getStartLine());
+            Assertions.assertEquals(expectedStartLine.intValue(), sourceInfo.getStartLine(), "Wrong start line");
         }
         if (expectedStartColumn != null)
         {
-            Assert.assertEquals("Wrong start column", expectedStartColumn.intValue(), sourceInfo.getStartColumn());
+            Assertions.assertEquals(expectedStartColumn.intValue(), sourceInfo.getStartColumn(), "Wrong start column");
         }
         if (expectedLine != null)
         {
-            Assert.assertEquals("Wrong line", expectedLine.intValue(), sourceInfo.getLine());
+            Assertions.assertEquals(expectedLine.intValue(), sourceInfo.getLine(), "Wrong line");
         }
         if (expectedColumn != null)
         {
-            Assert.assertEquals("Wrong column", expectedColumn.intValue(), sourceInfo.getColumn());
+            Assertions.assertEquals(expectedColumn.intValue(), sourceInfo.getColumn(), "Wrong column");
         }
         if (expectedEndLine != null)
         {
-            Assert.assertEquals("Wrong end line", expectedEndLine.intValue(), sourceInfo.getEndLine());
+            Assertions.assertEquals(expectedEndLine.intValue(), sourceInfo.getEndLine(), "Wrong end line");
         }
         if (expectedEndColumn != null)
         {
-            Assert.assertEquals("Wrong end column", expectedEndColumn.intValue(), sourceInfo.getEndColumn());
+            Assertions.assertEquals(expectedEndColumn.intValue(), sourceInfo.getEndColumn(), "Wrong end column");
         }
     }
 
@@ -660,6 +660,6 @@ public abstract class AbstractPureTestWithCoreCompiled
 
     protected void assertRepoExists(String repositoryName)
     {
-        Assert.assertNotNull("This test relies on the " + repositoryName + " repository", getRepositoryByName(repositoryName));
+        Assertions.assertNotNull(getRepositoryByName(repositoryName), "This test relies on the " + repositoryName + " repository");
     }
 }

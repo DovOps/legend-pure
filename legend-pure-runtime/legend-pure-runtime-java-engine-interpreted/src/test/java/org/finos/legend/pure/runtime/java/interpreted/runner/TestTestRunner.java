@@ -30,20 +30,20 @@ import org.finos.legend.pure.m3.navigation.PackageableElement.PackageableElement
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
 import org.finos.legend.pure.runtime.java.interpreted.FunctionExecutionInterpreted;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestTestRunner extends AbstractPureTestWithCoreCompiled
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getFunctionExecution());
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("fromString.pure");
@@ -52,133 +52,139 @@ public class TestTestRunner extends AbstractPureTestWithCoreCompiled
     @Test
     public void testRun() throws Exception
     {
-        compileTestSource("fromString.pure", "function <<test.Test>> a::b::test():Boolean[1]\n" +
-                "{\n" +
-                "   print('1', 1);\n" +
-                "   assert(true, |'');\n" +
-                "}\n" +
-                "\n" +
-                "function <<test.Test>> a::b::c::test():Boolean[1]\n" +
-                "{\n" +
-                "   print('2', 1);\n" +
-                "   assert(false, |'');\n" +
-                "}\n" +
-                "function <<test.Test>> a::b::d::test():Nil[0]\n" +
-                "{\n" +
-                "   print('3', 1);\n" +
-                "   print([1, 2, 3, 4]->at(5), 1);\n" +
-                "}\n" +
-                "function ok():Nil[0]\n" +
-                "{\n" +
-                "   []\n" +
-                "}");
+        compileTestSource("fromString.pure", """
+                function <<test.Test>> a::b::test():Boolean[1]
+                {
+                   print('1', 1);
+                   assert(true, |'');
+                }
+                
+                function <<test.Test>> a::b::c::test():Boolean[1]
+                {
+                   print('2', 1);
+                   assert(false, |'');
+                }
+                function <<test.Test>> a::b::d::test():Nil[0]
+                {
+                   print('3', 1);
+                   print([1, 2, 3, 4]->at(5), 1);
+                }
+                function ok():Nil[0]
+                {
+                   []
+                }\
+                """);
         UnitTestTestCallBack callback = new UnitTestTestCallBack();
         TestRunner testRunner = new TestRunner("::", runtime, functionExecution, callback, false);
         testRunner.run();
 
-        Assert.assertEquals(Sets.fixedSize.with("a::b::c::test__Boolean_1_", "a::b::d::test__Nil_0_", "a::b::test__Boolean_1_"), callback.getTests().collect(PackageableElement::getUserPathForPackageableElement).select(c -> !c.startsWith("meta")));
+        Assertions.assertEquals(Sets.fixedSize.with("a::b::c::test__Boolean_1_", "a::b::d::test__Nil_0_", "a::b::test__Boolean_1_"), callback.getTests().collect(PackageableElement::getUserPathForPackageableElement).select(c -> !c.startsWith("meta")));
 
         MutableList<CallBackGroup> groups = callback.getGroups().sortThisBy(g -> PackageableElement.getUserPathForPackageableElement(g.getFunction()));
 
-        Assert.assertEquals("a::b::c::test__Boolean_1_", PackageableElement.getUserPathForPackageableElement(groups.get(0).getFunction(), "::"));
-        Assert.assertTrue(groups.get(0).getMessage().startsWith("2"));
+        Assertions.assertEquals("a::b::c::test__Boolean_1_", PackageableElement.getUserPathForPackageableElement(groups.get(0).getFunction(), "::"));
+        Assertions.assertTrue(groups.get(0).getMessage().startsWith("2"));
         Verify.assertInstanceOf(AssertFailTestStatus.class, groups.get(0).getStatus());
 
-        Assert.assertEquals("a::b::d::test__Nil_0_", PackageableElement.getUserPathForPackageableElement(groups.get(1).getFunction(), "::"));
-        Assert.assertTrue(groups.get(1).getMessage().startsWith("3"));
+        Assertions.assertEquals("a::b::d::test__Nil_0_", PackageableElement.getUserPathForPackageableElement(groups.get(1).getFunction(), "::"));
+        Assertions.assertTrue(groups.get(1).getMessage().startsWith("3"));
         Verify.assertInstanceOf(ErrorTestStatus.class, groups.get(1).getStatus());
 
-        Assert.assertEquals("a::b::test__Boolean_1_", PackageableElement.getUserPathForPackageableElement(groups.get(2).getFunction(), "::"));
-        Assert.assertTrue(groups.get(2).getMessage().startsWith("1"));
+        Assertions.assertEquals("a::b::test__Boolean_1_", PackageableElement.getUserPathForPackageableElement(groups.get(2).getFunction(), "::"));
+        Assertions.assertTrue(groups.get(2).getMessage().startsWith("1"));
         Verify.assertInstanceOf(SuccessTestStatus.class, groups.get(2).getStatus());
     }
 
     @Test
     public void testSetup() throws Exception
     {
-        compileTestSource("function <<test.BeforePackage>> a::b::setUp():Nil[0]\n" +
-                "{\n" +
-                "   print('setup AB', 1);\n" +
-                "}\n" +
-                "function <<test.BeforePackage>> a::b::c::setUp():Nil[0]\n" +
-                "{\n" +
-                "   print('setup ABC', 1);\n" +
-                "}\n" +
-                "function <<test.Test>> a::b::test():Boolean[1]\n" +
-                "{\n" +
-                "   print('1', 1);\n" +
-                "   assert(true, |'');\n" +
-                "}\n" +
-                "\n" +
-                "function <<test.Test>> a::b::c::test():Boolean[1]\n" +
-                "{\n" +
-                "   print('2', 1);\n" +
-                "   assert(false, |'');\n" +
-                "}\n" +
-                "function <<test.Test>> a::b::d::test():Nil[0]\n" +
-                "{\n" +
-                "   print('3', 1);\n" +
-                "   print([1, 2, 3, 4]->at(5), 1);\n" +
-                "}\n" +
-                "function ok():Nil[0]\n" +
-                "{\n" +
-                "   []\n" +
-                "}");
+        compileTestSource("""
+                function <<test.BeforePackage>> a::b::setUp():Nil[0]
+                {
+                   print('setup AB', 1);
+                }
+                function <<test.BeforePackage>> a::b::c::setUp():Nil[0]
+                {
+                   print('setup ABC', 1);
+                }
+                function <<test.Test>> a::b::test():Boolean[1]
+                {
+                   print('1', 1);
+                   assert(true, |'');
+                }
+                
+                function <<test.Test>> a::b::c::test():Boolean[1]
+                {
+                   print('2', 1);
+                   assert(false, |'');
+                }
+                function <<test.Test>> a::b::d::test():Nil[0]
+                {
+                   print('3', 1);
+                   print([1, 2, 3, 4]->at(5), 1);
+                }
+                function ok():Nil[0]
+                {
+                   []
+                }\
+                """);
         UnitTestTestCallBack callback = new UnitTestTestCallBack();
         TestRunner testRunner = new TestRunner("a::b::c", runtime, functionExecution, callback, false);
         testRunner.run();
 
-        Assert.assertEquals(Sets.fixedSize.with("a::b::c::test__Boolean_1_"), callback.getTests().collect(PackageableElement::getUserPathForPackageableElement));
+        Assertions.assertEquals(Sets.fixedSize.with("a::b::c::test__Boolean_1_"), callback.getTests().collect(PackageableElement::getUserPathForPackageableElement));
 
         MutableList<CallBackGroup> groups = callback.getGroups().sortThisBy(g -> PackageableElement.getUserPathForPackageableElement(g.getFunction()));
 
-        Assert.assertEquals("a::b::c::test__Boolean_1_", PackageableElement.getUserPathForPackageableElement(groups.get(0).getFunction(), "::"));
-        Assert.assertTrue(groups.get(0).getMessage().startsWith("2"));
+        Assertions.assertEquals("a::b::c::test__Boolean_1_", PackageableElement.getUserPathForPackageableElement(groups.get(0).getFunction(), "::"));
+        Assertions.assertTrue(groups.get(0).getMessage().startsWith("2"));
         Verify.assertInstanceOf(AssertFailTestStatus.class, groups.get(0).getStatus());
 
-        Assert.assertEquals("'setup AB'", functionExecution.getConsole().getLine(5));
-        Assert.assertEquals("'setup ABC'", functionExecution.getConsole().getLine(6));
+        Assertions.assertEquals("'setup AB'", functionExecution.getConsole().getLine(5));
+        Assertions.assertEquals("'setup ABC'", functionExecution.getConsole().getLine(6));
     }
 
     @Test
     public void testExclusion()
     {
-        compileTestSource("fromString.pure", "function <<test.Test>> a::b::test():Boolean[1]\n" +
-                "{\n" +
-                "   print('1', 1);\n" +
-                "   assert(true, |'');\n" +
-                "}\n" +
-                "\n" +
-                "function <<test.Test>> {test.excludePlatform = 'Interpreted'} a::b::c::test():Boolean[1]\n" +
-                "{\n" +
-                "   print('2', 1);\n" +
-                "   assert(false, |'');\n" +
-                "}\n" +
-                "function <<test.Test>> a::b::d::test():Nil[0]\n" +
-                "{\n" +
-                "   print('3', 1);\n" +
-                "   print([1, 2, 3, 4]->at(5), 1);\n" +
-                "}\n" +
-                "function ok():Nil[0]\n" +
-                "{\n" +
-                "   []\n" +
-                "}");
+        compileTestSource("fromString.pure", """
+                function <<test.Test>> a::b::test():Boolean[1]
+                {
+                   print('1', 1);
+                   assert(true, |'');
+                }
+                
+                function <<test.Test>> {test.excludePlatform = 'Interpreted'} a::b::c::test():Boolean[1]
+                {
+                   print('2', 1);
+                   assert(false, |'');
+                }
+                function <<test.Test>> a::b::d::test():Nil[0]
+                {
+                   print('3', 1);
+                   print([1, 2, 3, 4]->at(5), 1);
+                }
+                function ok():Nil[0]
+                {
+                   []
+                }\
+                """);
         UnitTestTestCallBack callback = new UnitTestTestCallBack();
         TestRunner testRunner = new TestRunner("::", runtime, functionExecution, callback, false);
         testRunner.run();
 
-        Assert.assertEquals(Sets.fixedSize.with("a::b::d::test__Nil_0_", "a::b::test__Boolean_1_"), callback.getTests().collect(PackageableElement::getUserPathForPackageableElement).select(c -> !c.startsWith("meta")));
+        Assertions.assertEquals(Sets.fixedSize.with("a::b::d::test__Nil_0_", "a::b::test__Boolean_1_"), callback.getTests().collect(PackageableElement::getUserPathForPackageableElement).select(c -> !c.startsWith("meta")));
 
         MutableList<CallBackGroup> groups = callback.getGroups().sortThisBy(g -> PackageableElement.getUserPathForPackageableElement(g.getFunction()));
 
         CallBackGroup group = groups.get(0);
-        Assert.assertEquals("a::b::d::test__Nil_0_", PackageableElement.getUserPathForPackageableElement(group.getFunction(), "::"));
-        Assert.assertTrue(group.getMessage().startsWith("3"));
+        Assertions.assertEquals("a::b::d::test__Nil_0_", PackageableElement.getUserPathForPackageableElement(group.getFunction(), "::"));
+        Assertions.assertTrue(group.getMessage().startsWith("3"));
         Verify.assertInstanceOf(ErrorTestStatus.class, group.getStatus());
 
         group = groups.get(1);
-        Assert.assertEquals("a::b::test__Boolean_1_", PackageableElement.getUserPathForPackageableElement(group.getFunction(), "::"));
-        Assert.assertTrue(group.getMessage().startsWith("1"));
+        Assertions.assertEquals("a::b::test__Boolean_1_", PackageableElement.getUserPathForPackageableElement(group.getFunction(), "::"));
+        Assertions.assertTrue(group.getMessage().startsWith("1"));
         Verify.assertInstanceOf(SuccessTestStatus.class, group.getStatus());
     }
 

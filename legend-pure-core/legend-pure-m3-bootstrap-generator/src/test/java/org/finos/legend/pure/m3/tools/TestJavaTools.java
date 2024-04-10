@@ -16,8 +16,8 @@ package org.finos.legend.pure.m3.tools;
 
 import org.eclipse.collections.api.factory.Lists;
 import org.eclipse.collections.api.list.ImmutableList;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class TestJavaTools
 {
@@ -31,12 +31,12 @@ public class TestJavaTools
         {
             for (String validIdentifier : validIdentifiers)
             {
-                Assert.assertEquals(empty, validIdentifier, JavaTools.makeValidJavaIdentifier(empty, validIdentifier));
+                Assertions.assertEquals(validIdentifier, JavaTools.makeValidJavaIdentifier(empty, validIdentifier), empty);
             }
             for (String invalidIdentifier : invalidIdentifiers)
             {
-                IllegalStateException e = Assert.assertThrows(empty, IllegalStateException.class, () -> JavaTools.makeValidJavaIdentifier(empty, invalidIdentifier));
-                Assert.assertEquals(empty, "Cannot replace null or empty string with \"" + invalidIdentifier + "\", as it is not a valid Java identifier", e.getMessage());
+                IllegalStateException e = Assertions.assertThrows(IllegalStateException.class, () -> JavaTools.makeValidJavaIdentifier(empty, invalidIdentifier), empty);
+                Assertions.assertEquals("Cannot replace null or empty string with \"" + invalidIdentifier + "\", as it is not a valid Java identifier", e.getMessage(), empty);
             }
         }
     }
@@ -55,7 +55,7 @@ public class TestJavaTools
         {
             for (String fix : fixStrings)
             {
-                Assert.assertSame(string + " / " + fix, string, JavaTools.makeValidJavaIdentifier(string, fix));
+                Assertions.assertSame(string, JavaTools.makeValidJavaIdentifier(string, fix), string + " / " + fix);
             }
         }
     }
@@ -65,30 +65,30 @@ public class TestJavaTools
     {
         for (String keyword : new String[] {"assert", "class", "public", "private"})
         {
-            Assert.assertEquals("$" + keyword, JavaTools.makeValidJavaIdentifier(keyword, "$"));
-            Assert.assertEquals(keyword + "1", JavaTools.makeValidJavaIdentifier(keyword, "1"));
+            Assertions.assertEquals("$" + keyword, JavaTools.makeValidJavaIdentifier(keyword, "$"));
+            Assertions.assertEquals(keyword + "1", JavaTools.makeValidJavaIdentifier(keyword, "1"));
 
-            IllegalStateException e = Assert.assertThrows(IllegalStateException.class, () -> JavaTools.makeValidJavaIdentifier(keyword, "%%%"));
-            Assert.assertEquals("\"" + keyword + "\" is a Java keyword, but fix (\"%%%\") is not a valid Java identifier part", e.getMessage());
+            IllegalStateException e = Assertions.assertThrows(IllegalStateException.class, () -> JavaTools.makeValidJavaIdentifier(keyword, "%%%"));
+            Assertions.assertEquals("\"" + keyword + "\" is a Java keyword, but fix (\"%%%\") is not a valid Java identifier part", e.getMessage());
         }
     }
 
     @Test
     public void testMakeValidJavaIdentifier_nonKeywordInvalidIdentifiers()
     {
-        Assert.assertEquals("_123", JavaTools.makeValidJavaIdentifier("123", "_"));
-        Assert.assertEquals("$$1_a", JavaTools.makeValidJavaIdentifier("1_a", "$$"));
+        Assertions.assertEquals("_123", JavaTools.makeValidJavaIdentifier("123", "_"));
+        Assertions.assertEquals("$$1_a", JavaTools.makeValidJavaIdentifier("1_a", "$$"));
 
-        Assert.assertEquals("abc$def", JavaTools.makeValidJavaIdentifier("abc%def", "$"));
-        Assert.assertEquals("abc_X_def", JavaTools.makeValidJavaIdentifier("abc%def", "_X_"));
-        Assert.assertEquals("abc$_Y_$def$_Y_$ghi", JavaTools.makeValidJavaIdentifier("abc%def%ghi", "$_Y_$"));
+        Assertions.assertEquals("abc$def", JavaTools.makeValidJavaIdentifier("abc%def", "$"));
+        Assertions.assertEquals("abc_X_def", JavaTools.makeValidJavaIdentifier("abc%def", "_X_"));
+        Assertions.assertEquals("abc$_Y_$def$_Y_$ghi", JavaTools.makeValidJavaIdentifier("abc%def%ghi", "$_Y_$"));
 
-        Assert.assertEquals("abc$", JavaTools.makeValidJavaIdentifier("abc%", "$"));
-        Assert.assertEquals("a35____", JavaTools.makeValidJavaIdentifier("a35%%", "__"));
+        Assertions.assertEquals("abc$", JavaTools.makeValidJavaIdentifier("abc%", "$"));
+        Assertions.assertEquals("a35____", JavaTools.makeValidJavaIdentifier("a35%%", "__"));
 
-        IllegalStateException e1 = Assert.assertThrows(IllegalStateException.class, () -> JavaTools.makeValidJavaIdentifier("123", "9"));
-        Assert.assertEquals("First character of \"123\" needs to be replaced, but replacement (\"9\") is not a valid Java identifier start", e1.getMessage());
-        IllegalStateException e2 = Assert.assertThrows(IllegalStateException.class, () -> JavaTools.makeValidJavaIdentifier("ab%", "##"));
-        Assert.assertEquals("Character 2 of \"ab%\" needs to be replaced, but replacement (\"##\") is not a valid Java identifier part", e2.getMessage());
+        IllegalStateException e1 = Assertions.assertThrows(IllegalStateException.class, () -> JavaTools.makeValidJavaIdentifier("123", "9"));
+        Assertions.assertEquals("First character of \"123\" needs to be replaced, but replacement (\"9\") is not a valid Java identifier start", e1.getMessage());
+        IllegalStateException e2 = Assertions.assertThrows(IllegalStateException.class, () -> JavaTools.makeValidJavaIdentifier("ab%", "##"));
+        Assertions.assertEquals("Character 2 of \"ab%\" needs to be replaced, but replacement (\"##\") is not a valid Java identifier part", e2.getMessage());
     }
 }

@@ -20,20 +20,20 @@ import org.finos.legend.pure.m3.navigation._class._Class;
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiledPlatform;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
 import org.finos.legend.pure.m4.exception.PureCompilationException;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestClassPropertyOverride extends AbstractPureTestWithCoreCompiledPlatform
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getExtra());
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("file.pure");
@@ -44,58 +44,64 @@ public class TestClassPropertyOverride extends AbstractPureTestWithCoreCompiledP
     public void testSimpleOverride()
     {
         assertCompiles(
-                "Class A\n" +
-                        "{\n" +
-                        "  prop:String[1];\n" +
-                        "}\n" +
-                        "Class B extends A\n" +
-                        "{\n" +
-                        "  prop:String[1];\n" +
-                        "}");
+                """
+                Class A
+                {
+                  prop:String[1];
+                }
+                Class B extends A
+                {
+                  prop:String[1];
+                }\
+                """);
         CoreInstance classA = runtime.getCoreInstance("A");
         CoreInstance classB = runtime.getCoreInstance("B");
         CoreInstance propA = processorSupport.class_findPropertyUsingGeneralization(classA, "prop");
         CoreInstance propB = processorSupport.class_findPropertyUsingGeneralization(classB, "prop");
-        Assert.assertNotSame(propA, propB);
+        Assertions.assertNotSame(propA, propB);
     }
 
     @Test
     public void testSimpleOverrideWithStereotype()
     {
         assertCompiles(
-                "Profile prof\n" +
-                        "{\n" +
-                        "  stereotypes: [st];" +
-                        "}\n" +
-                        "Class A\n" +
-                        "{\n" +
-                        "  prop:String[1];\n" +
-                        "}\n" +
-                        "Class B extends A\n" +
-                        "{\n" +
-                        "  <<prof.st>> prop:String[1];\n" +
-                        "}");
+                """
+                Profile prof
+                {
+                  stereotypes: [st];\
+                }
+                Class A
+                {
+                  prop:String[1];
+                }
+                Class B extends A
+                {
+                  <<prof.st>> prop:String[1];
+                }\
+                """);
         CoreInstance classA = runtime.getCoreInstance("A");
         CoreInstance classB = runtime.getCoreInstance("B");
         CoreInstance propA = processorSupport.class_findPropertyUsingGeneralization(classA, "prop");
         CoreInstance propB = processorSupport.class_findPropertyUsingGeneralization(classB, "prop");
-        Assert.assertNotSame(propA, propB);
-        Assert.assertEquals(0, Instance.getValueForMetaPropertyToManyResolved(propA, M3Properties.stereotypes, processorSupport).size());
-        Assert.assertEquals(1, Instance.getValueForMetaPropertyToManyResolved(propB, M3Properties.stereotypes, processorSupport).size());
+        Assertions.assertNotSame(propA, propB);
+        Assertions.assertEquals(0, Instance.getValueForMetaPropertyToManyResolved(propA, M3Properties.stereotypes, processorSupport).size());
+        Assertions.assertEquals(1, Instance.getValueForMetaPropertyToManyResolved(propB, M3Properties.stereotypes, processorSupport).size());
     }
 
     @Test
     public void testOverrideChangingType()
     {
         assertCompilationException(
-                "Class A\n" +
-                        "{\n" +
-                        "  prop:String[1];\n" +
-                        "}\n" +
-                        "Class B extends A\n" +
-                        "{\n" +
-                        "  prop:Integer[1];\n" +
-                        "}",
+                """
+                Class A
+                {
+                  prop:String[1];
+                }
+                Class B extends A
+                {
+                  prop:Integer[1];
+                }\
+                """,
                 "Property conflict on class B: property 'prop' defined on B conflicts with property 'prop' defined on A", 5, 7);
     }
 
@@ -103,14 +109,16 @@ public class TestClassPropertyOverride extends AbstractPureTestWithCoreCompiledP
     public void testOverrideChangingMultiplicity()
     {
         assertCompilationException(
-                "Class A\n" +
-                        "{\n" +
-                        "  prop:String[1];\n" +
-                        "}\n" +
-                        "Class B extends A\n" +
-                        "{\n" +
-                        "  prop:String[*];\n" +
-                        "}",
+                """
+                Class A
+                {
+                  prop:String[1];
+                }
+                Class B extends A
+                {
+                  prop:String[*];
+                }\
+                """,
                 "Property conflict on class B: property 'prop' defined on B conflicts with property 'prop' defined on A", 5, 7);
     }
 
@@ -118,50 +126,54 @@ public class TestClassPropertyOverride extends AbstractPureTestWithCoreCompiledP
     public void testSimpleQualifiedPropertyOverride()
     {
         assertCompiles(
-                "Class A\n" +
-                        "{\n" +
-                        "  prop(x:String[1])\n" +
-                        "  {\n" +
-                        "    $x + $x\n" +
-                        "  }:String[1];\n" +
-                        "}\n" +
-                        "Class B extends A\n" +
-                        "{\n" +
-                        "  prop(x:String[1])\n" +
-                        "  {\n" +
-                        "    $x + $x + $x\n" +
-                        "  }:String[1];\n" +
-                        "}");
+                """
+                Class A
+                {
+                  prop(x:String[1])
+                  {
+                    $x + $x
+                  }:String[1];
+                }
+                Class B extends A
+                {
+                  prop(x:String[1])
+                  {
+                    $x + $x + $x
+                  }:String[1];
+                }\
+                """);
         CoreInstance classA = runtime.getCoreInstance("A");
         CoreInstance classB = runtime.getCoreInstance("B");
         CoreInstance propA = _Class.findQualifiedPropertiesUsingGeneralization(classA, "prop", processorSupport).getFirst();
         CoreInstance propB = _Class.findQualifiedPropertiesUsingGeneralization(classB, "prop", processorSupport).getFirst();
-        Assert.assertNotSame(propA, propB);
+        Assertions.assertNotSame(propA, propB);
     }
 
     @Test
     public void testQualifiedPropertyOverrideWithValidDifferentArgType()
     {
         assertCompiles(
-                "Class A\n" +
-                        "{\n" +
-                        "  prop(x:String[1])\n" +
-                        "  {\n" +
-                        "    $x + $x\n" +
-                        "  }:String[1];\n" +
-                        "}\n" +
-                        "Class B extends A\n" +
-                        "{\n" +
-                        "  prop(x:Any[1])\n" +
-                        "  {\n" +
-                        "    $x->toString()\n" +
-                        "  }:String[1];\n" +
-                        "}");
+                """
+                Class A
+                {
+                  prop(x:String[1])
+                  {
+                    $x + $x
+                  }:String[1];
+                }
+                Class B extends A
+                {
+                  prop(x:Any[1])
+                  {
+                    $x->toString()
+                  }:String[1];
+                }\
+                """);
         CoreInstance classA = runtime.getCoreInstance("A");
         CoreInstance classB = runtime.getCoreInstance("B");
         CoreInstance propA = _Class.findQualifiedPropertiesUsingGeneralization(classA, "prop", processorSupport).getFirst();
         CoreInstance propB = _Class.findQualifiedPropertiesUsingGeneralization(classB, "prop", processorSupport).getFirst();
-        Assert.assertNotSame(propA, propB);
+        Assertions.assertNotSame(propA, propB);
     }
 
     @Test
@@ -169,20 +181,22 @@ public class TestClassPropertyOverride extends AbstractPureTestWithCoreCompiledP
     public void testQualifiedPropertyOverrideWithInvalidDifferentArgType()
     {
         assertCompilationException(
-                "Class A\n" +
-                        "{\n" +
-                        "  prop(x:String[1])\n" +
-                        "  {\n" +
-                        "    $x + $x\n" +
-                        "  }:String[1];\n" +
-                        "}\n" +
-                        "Class B extends A\n" +
-                        "{\n" +
-                        "  prop(x:Float[1])\n" +
-                        "  {\n" +
-                        "    $x->toString()\n" +
-                        "  }:String[1];\n" +
-                        "}",
+                """
+                Class A
+                {
+                  prop(x:String[1])
+                  {
+                    $x + $x
+                  }:String[1];
+                }
+                Class B extends A
+                {
+                  prop(x:Float[1])
+                  {
+                    $x->toString()
+                  }:String[1];
+                }\
+                """,
                 "Property conflict on class B: property 'prop' defined on B conflicts with property 'prop' defined on A", 8, 7);
     }
 
@@ -190,45 +204,49 @@ public class TestClassPropertyOverride extends AbstractPureTestWithCoreCompiledP
     public void testQualifiedPropertyOverrideWithValidDifferentReturnType()
     {
         assertCompiles(
-                "Class A\n" +
-                        "{\n" +
-                        "  prop(x:String[1])\n" +
-                        "  {\n" +
-                        "    $x + $x\n" +
-                        "  }:Any[1];\n" +
-                        "}\n" +
-                        "Class B extends A\n" +
-                        "{\n" +
-                        "  prop(x:String[1])\n" +
-                        "  {\n" +
-                        "    $x\n" +
-                        "  }:String[1];\n" +
-                        "}");
+                """
+                Class A
+                {
+                  prop(x:String[1])
+                  {
+                    $x + $x
+                  }:Any[1];
+                }
+                Class B extends A
+                {
+                  prop(x:String[1])
+                  {
+                    $x
+                  }:String[1];
+                }\
+                """);
         CoreInstance classA = runtime.getCoreInstance("A");
         CoreInstance classB = runtime.getCoreInstance("B");
         CoreInstance propA = _Class.findQualifiedPropertiesUsingGeneralization(classA, "prop", processorSupport).getFirst();
         CoreInstance propB = _Class.findQualifiedPropertiesUsingGeneralization(classB, "prop", processorSupport).getFirst();
-        Assert.assertNotSame(propA, propB);
+        Assertions.assertNotSame(propA, propB);
     }
 
     @Test
     public void testQualifiedPropertyOverrideWithInvalidDifferentReturnType()
     {
         assertCompilationException(
-                "Class A\n" +
-                        "{\n" +
-                        "  prop(x:String[1])\n" +
-                        "  {\n" +
-                        "    $x + $x\n" +
-                        "  }:String[1];\n" +
-                        "}\n" +
-                        "Class B extends A\n" +
-                        "{\n" +
-                        "  prop(x:String[1])\n" +
-                        "  {\n" +
-                        "    $x\n" +
-                        "  }:Any[1];\n" +
-                        "}",
+                """
+                Class A
+                {
+                  prop(x:String[1])
+                  {
+                    $x + $x
+                  }:String[1];
+                }
+                Class B extends A
+                {
+                  prop(x:String[1])
+                  {
+                    $x
+                  }:Any[1];
+                }\
+                """,
                 "Property conflict on class B: property 'prop' defined on B conflicts with property 'prop' defined on A", 8, 7);
     }
 
@@ -236,42 +254,46 @@ public class TestClassPropertyOverride extends AbstractPureTestWithCoreCompiledP
     public void testValidImplicitOverrideViaGeneralization()
     {
         assertCompiles(
-                "Class A\n" +
-                        "{\n" +
-                        "  prop:String[1];\n" +
-                        "}\n" +
-                        "Class B\n" +
-                        "{\n" +
-                        "  prop:String[1];\n" +
-                        "}\n" +
-                        "Class C extends A, B\n" +
-                        "{\n" +
-                        "}");
+                """
+                Class A
+                {
+                  prop:String[1];
+                }
+                Class B
+                {
+                  prop:String[1];
+                }
+                Class C extends A, B
+                {
+                }\
+                """);
         CoreInstance classA = runtime.getCoreInstance("A");
         CoreInstance classB = runtime.getCoreInstance("B");
         CoreInstance classC = runtime.getCoreInstance("C");
         CoreInstance propA = processorSupport.class_findPropertyUsingGeneralization(classA, "prop");
         CoreInstance propB = processorSupport.class_findPropertyUsingGeneralization(classB, "prop");
         CoreInstance propC = processorSupport.class_findPropertyUsingGeneralization(classC, "prop");
-        Assert.assertNotSame(propA, propB);
-        Assert.assertSame(propA, propC);
+        Assertions.assertNotSame(propA, propB);
+        Assertions.assertSame(propA, propC);
     }
 
     @Test
     public void testInvalidImplicitOverrideViaGeneralization()
     {
         assertCompilationException(
-                "Class A\n" +
-                        "{\n" +
-                        "  prop:String[1];\n" +
-                        "}\n" +
-                        "Class B\n" +
-                        "{\n" +
-                        "  prop:Integer[1];\n" +
-                        "}\n" +
-                        "Class C extends A, B\n" +
-                        "{\n" +
-                        "}",
+                """
+                Class A
+                {
+                  prop:String[1];
+                }
+                Class B
+                {
+                  prop:Integer[1];
+                }
+                Class C extends A, B
+                {
+                }\
+                """,
                 "Property conflict on class C: property 'prop' defined on A conflicts with property 'prop' defined on B", 9, 7);
     }
 
@@ -287,11 +309,13 @@ public class TestClassPropertyOverride extends AbstractPureTestWithCoreCompiledP
 //                "}",
 //                "Compilation error at (resource:fromString.pure line:1 column:7), \"Property conflict on class A: property 'prop' defined more than once\"");
         assertCompilationException(
-                "Class A\n" +
-                        "{\n" +
-                        "  prop:String[1];\n" +
-                        "  prop:String[1];\n" +
-                        "}");
+                """
+                Class A
+                {
+                  prop:String[1];
+                  prop:String[1];
+                }\
+                """);
     }
 
     @Test
@@ -312,17 +336,19 @@ public class TestClassPropertyOverride extends AbstractPureTestWithCoreCompiledP
 //                "}",
 //                "Property conflict on class A: qualified property 'prop' defined more than once", 1, 7);
         assertCompilationException(
-                "Class A\n" +
-                        "{\n" +
-                        "  prop(x:String[1])\n" +
-                        "  {\n" +
-                        "    $x + $x\n" +
-                        "  }:String[1];\n" +
-                        "  prop(x:String[1])\n" +
-                        "  {\n" +
-                        "    $x\n" +
-                        "  }:String[1];\n" +
-                        "}");
+                """
+                Class A
+                {
+                  prop(x:String[1])
+                  {
+                    $x + $x
+                  }:String[1];
+                  prop(x:String[1])
+                  {
+                    $x
+                  }:String[1];
+                }\
+                """);
     }
 
     private void assertCompiles(String code)
@@ -345,7 +371,7 @@ public class TestClassPropertyOverride extends AbstractPureTestWithCoreCompiledP
         try
         {
             compileTestSource("fromString.pure", code);
-            Assert.fail("Expected compilation error from:\n" + code);
+            Assertions.fail("Expected compilation error from:\n" + code);
         }
         catch (Exception e)
         {

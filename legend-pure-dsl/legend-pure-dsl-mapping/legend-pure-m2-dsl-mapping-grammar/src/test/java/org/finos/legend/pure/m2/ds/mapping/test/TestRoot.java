@@ -15,20 +15,20 @@
 package org.finos.legend.pure.m2.ds.mapping.test;
 
 import org.finos.legend.pure.m4.exception.PureCompilationException;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestRoot extends AbstractPureMappingTestWithCoreCompiled
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime();
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("userId.pure");
@@ -37,23 +37,25 @@ public class TestRoot extends AbstractPureMappingTestWithCoreCompiled
     @Test
     public void testRoot()
     {
-        String source = "Class Person{name:String[1];}\n" +
-                "function a():meta::pure::mapping::SetImplementation[*]{[]}\n" +
-                "###Mapping\n" +
-                "Mapping myMap(\n" +
-                "   *Person[op]: Operation\n" +
-                "           {\n" +
-                "               a__SetImplementation_MANY_(rel1,rel2)\n" +
-                "           }\n" +
-                "   Person[rel1]: Operation\n" +
-                "           {\n" +
-                "               a__SetImplementation_MANY_()\n" +
-                "           }\n" +
-                "   Person[rel2]: Operation\n" +
-                "           {\n" +
-                "               a__SetImplementation_MANY_()\n" +
-                "           }\n" +
-                ")\n";
+        String source = """
+                Class Person{name:String[1];}
+                function a():meta::pure::mapping::SetImplementation[*]{[]}
+                ###Mapping
+                Mapping myMap(
+                   *Person[op]: Operation
+                           {
+                               a__SetImplementation_MANY_(rel1,rel2)
+                           }
+                   Person[rel1]: Operation
+                           {
+                               a__SetImplementation_MANY_()
+                           }
+                   Person[rel2]: Operation
+                           {
+                               a__SetImplementation_MANY_()
+                           }
+                )
+                """;
         runtime.createInMemorySource("userId.pure", source);
         runtime.compile();
         assertSetSourceInformation(source, "Person");
@@ -63,25 +65,27 @@ public class TestRoot extends AbstractPureMappingTestWithCoreCompiled
     public void testRootError() throws Exception
     {
         runtime.createInMemorySource("userId.pure",
-                "Class Person{name:String[1];}\n" +
-                        "function a():meta::pure::mapping::SetImplementation[*]{[]}\n" +
-                        "###Mapping\n" +
-                        "Mapping myMap(\n" +
-                        "   *Person[op]: Operation\n" +
-                        "           {\n" +
-                        "               a__SetImplementation_MANY_(rel1,rel2)\n" +
-                        "           }\n" +
-                        "   *Person[rel1]: Operation\n" +
-                        "           {\n" +
-                        "               a__SetImplementation_MANY_()\n" +
-                        "           }\n" +
-                        "   Person[rel2]: Operation\n" +
-                        "           {\n" +
-                        "               a__SetImplementation_MANY_()\n" +
-                        "           }\n" +
-                        ")\n"
+                """
+                Class Person{name:String[1];}
+                function a():meta::pure::mapping::SetImplementation[*]{[]}
+                ###Mapping
+                Mapping myMap(
+                   *Person[op]: Operation
+                           {
+                               a__SetImplementation_MANY_(rel1,rel2)
+                           }
+                   *Person[rel1]: Operation
+                           {
+                               a__SetImplementation_MANY_()
+                           }
+                   Person[rel2]: Operation
+                           {
+                               a__SetImplementation_MANY_()
+                           }
+                )
+                """
         );
-        PureCompilationException e = Assert.assertThrows(PureCompilationException.class, runtime::compile);
+        PureCompilationException e = Assertions.assertThrows(PureCompilationException.class, runtime::compile);
         assertPureException(PureCompilationException.class, "The class 'Person' is mapped by 3 set implementations and has 2 roots. There should be exactly one root set implementation for the class, and it should be marked with a '*'.", "userId.pure", 4, 9, e);
     }
 
@@ -89,34 +93,36 @@ public class TestRoot extends AbstractPureMappingTestWithCoreCompiled
     @Test
     public void testRootWithInclude()
     {
-        String source = "Class Person{name:String[1];}\n" +
-                "function a():meta::pure::mapping::SetImplementation[*]{[]}\n" +
-                "###Mapping\n" +
-                "Mapping myMap1(\n" +
-                "   *Person[one]: Operation\n" +
-                "           {\n" +
-                "               a__SetImplementation_MANY_()\n" +
-                "           }\n" +
-                "   Person[two]: Operation\n" +
-                "           {\n" +
-                "               a__SetImplementation_MANY_()\n" +
-                "           }\n" +
-                ")\n" +
-                "###Mapping\n" +
-                "Mapping myMap2(\n" +
-                "   *Person[one_1]: Operation\n" +
-                "           {\n" +
-                "               a__SetImplementation_MANY_()\n" +
-                "           }\n" +
-                "   Person[two_1]: Operation\n" +
-                "           {\n" +
-                "               a__SetImplementation_MANY_()\n" +
-                "           }\n" +
-                ")\n" +
-                "Mapping includeMap(\n" +
-                "   include myMap1" +
-                "   include myMap2" +
-                ")\n";
+        String source = """
+                Class Person{name:String[1];}
+                function a():meta::pure::mapping::SetImplementation[*]{[]}
+                ###Mapping
+                Mapping myMap1(
+                   *Person[one]: Operation
+                           {
+                               a__SetImplementation_MANY_()
+                           }
+                   Person[two]: Operation
+                           {
+                               a__SetImplementation_MANY_()
+                           }
+                )
+                ###Mapping
+                Mapping myMap2(
+                   *Person[one_1]: Operation
+                           {
+                               a__SetImplementation_MANY_()
+                           }
+                   Person[two_1]: Operation
+                           {
+                               a__SetImplementation_MANY_()
+                           }
+                )
+                Mapping includeMap(
+                   include myMap1\
+                   include myMap2\
+                )
+                """;
         runtime.createInMemorySource("userId.pure", source);
         runtime.compile();
         assertSetSourceInformation(source, "Person");
@@ -125,45 +131,47 @@ public class TestRoot extends AbstractPureMappingTestWithCoreCompiled
     @Test
     public void testRootWithIncludeDuplicate()
     {
-        String source = "Class Person{name:String[1];}\n" +
-                "Enum OK {e_true,e_false}\n" +
-                "function a():meta::pure::mapping::SetImplementation[*]{[]}\n" +
-                "###Mapping\n" +
-                "Mapping myMap1(" +
-                "   OK: EnumerationMapping Foo\n" +
-                "   {\n" +
-                "        e_true:  ['FTC', 'FTO'],\n" +
-                "        e_false: 'FTE'\n" +
-                "   }\n" +
-                "   *Person[one]: Operation\n" +
-                "           {\n" +
-                "               a__SetImplementation_MANY_()\n" +
-                "           }\n" +
-                "   Person[two]: Operation\n" +
-                "           {\n" +
-                "               a__SetImplementation_MANY_()\n" +
-                "           }\n" +
-                ")\n" +
-                "###Mapping\n" +
-                "Mapping myMap2(\n" +
-                "   *Person[one_1]: Operation\n" +
-                "           {\n" +
-                "               a__SetImplementation_MANY_()\n" +
-                "           }\n" +
-                "   Person[two_1]: Operation\n" +
-                "           {\n" +
-                "               a__SetImplementation_MANY_()\n" +
-                "           }\n" +
-                ")\n" +
-                "Mapping myMap3\n" +
-                "(\n" +
-                "   include myMap1\n" +
-                ")\n" +
-                "Mapping includeMap(\n" +
-                "   include myMap1\n" +
-                "   include myMap2\n" +
-                "   include myMap3\n" +
-                ")\n";
+        String source = """
+                Class Person{name:String[1];}
+                Enum OK {e_true,e_false}
+                function a():meta::pure::mapping::SetImplementation[*]{[]}
+                ###Mapping
+                Mapping myMap1(\
+                   OK: EnumerationMapping Foo
+                   {
+                        e_true:  ['FTC', 'FTO'],
+                        e_false: 'FTE'
+                   }
+                   *Person[one]: Operation
+                           {
+                               a__SetImplementation_MANY_()
+                           }
+                   Person[two]: Operation
+                           {
+                               a__SetImplementation_MANY_()
+                           }
+                )
+                ###Mapping
+                Mapping myMap2(
+                   *Person[one_1]: Operation
+                           {
+                               a__SetImplementation_MANY_()
+                           }
+                   Person[two_1]: Operation
+                           {
+                               a__SetImplementation_MANY_()
+                           }
+                )
+                Mapping myMap3
+                (
+                   include myMap1
+                )
+                Mapping includeMap(
+                   include myMap1
+                   include myMap2
+                   include myMap3
+                )
+                """;
         runtime.createInMemorySource("userId.pure", source);
         runtime.compile();
         assertSetSourceInformation(source, "Person");
@@ -173,21 +181,23 @@ public class TestRoot extends AbstractPureMappingTestWithCoreCompiled
     public void testDuplicateError()
     {
         runtime.createInMemorySource("userId.pure",
-                "Class Person{name:String[1];}\n" +
-                        "function a():meta::pure::mapping::SetImplementation[*]{[]}\n" +
-                        "###Mapping\n" +
-                        "Mapping myMap1(\n" +
-                        "   *Person[one]: Operation\n" +
-                        "           {\n" +
-                        "               a__SetImplementation_MANY_()\n" +
-                        "           }\n" +
-                        "   Person[one]: Operation\n" +
-                        "           {\n" +
-                        "               a__SetImplementation_MANY_()\n" +
-                        "           }\n" +
-                        ")\n");
+                """
+                Class Person{name:String[1];}
+                function a():meta::pure::mapping::SetImplementation[*]{[]}
+                ###Mapping
+                Mapping myMap1(
+                   *Person[one]: Operation
+                           {
+                               a__SetImplementation_MANY_()
+                           }
+                   Person[one]: Operation
+                           {
+                               a__SetImplementation_MANY_()
+                           }
+                )
+                """);
 
-        PureCompilationException e = Assert.assertThrows(PureCompilationException.class, runtime::compile);
+        PureCompilationException e = Assertions.assertThrows(PureCompilationException.class, runtime::compile);
         assertPureException(PureCompilationException.class, "Duplicate mapping found with id: 'one' in mapping myMap1", 9, 4, e);
     }
 }

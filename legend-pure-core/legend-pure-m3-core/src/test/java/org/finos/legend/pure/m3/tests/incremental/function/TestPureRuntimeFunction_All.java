@@ -24,13 +24,13 @@ import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiledPlatform;
 import org.finos.legend.pure.m3.tests.RuntimeTestScriptBuilder;
 import org.finos.legend.pure.m3.tests.RuntimeVerifier;
-import org.junit.After;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestPureRuntimeFunction_All extends AbstractPureTestWithCoreCompiledPlatform
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getFunctionExecution(), new CompositeCodeStorage(new ClassLoaderCodeStorage(getCodeRepositories())), getFactoryRegistryOverride(), getOptions(), getExtra());
@@ -46,7 +46,7 @@ public class TestPureRuntimeFunction_All extends AbstractPureTestWithCoreCompile
         return repositories;
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("userId.pure");
@@ -73,23 +73,25 @@ public class TestPureRuntimeFunction_All extends AbstractPureTestWithCoreCompile
     @Test
     public void testPureRuntimeFunctionAllFunctionsIncludingLambda()
     {
-        String source = "Profile PR1\n" +
-                "{\n" +
-                "   tags : [Contract, DataSet, ValidationRule];\n" +
-                "}\n" +
-                "\n" +
-                "function {PR1.Contract='eee'} go():Any[*]\n" +
-                "{\n" +
-                "   ConcreteFunctionDefinition.all()->filter(f|!$f.name->isEmpty() && isContract($f)).name;\n" +
-                "}\n" +
-                "function meta::pure::functions::meta::tag(profile:Profile[1], str:String[1]):Tag[1]" +
-                "{" +
-                "   $profile.p_tags->at(0);" +
-                "}\n" +
-                "function isContract(f:ConcreteFunctionDefinition<Any>[1]):Boolean[1]\n" +
-                "{\n" +
-                "   $f.taggedValues->filter(t|$t.tag == PR1->tag('Contract'))->size() > 0;\n" +
-                "}";
+        String source = """
+                Profile PR1
+                {
+                   tags : [Contract, DataSet, ValidationRule];
+                }
+                
+                function {PR1.Contract='eee'} go():Any[*]
+                {
+                   ConcreteFunctionDefinition.all()->filter(f|!$f.name->isEmpty() && isContract($f)).name;
+                }
+                function meta::pure::functions::meta::tag(profile:Profile[1], str:String[1]):Tag[1]\
+                {\
+                   $profile.p_tags->at(0);\
+                }
+                function isContract(f:ConcreteFunctionDefinition<Any>[1]):Boolean[1]
+                {
+                   $f.taggedValues->filter(t|$t.tag == PR1->tag('Contract'))->size() > 0;
+                }\
+                """;
         RuntimeVerifier.verifyOperationIsStable(new RuntimeTestScriptBuilder().createInMemorySource("sourceId.pure", source)
                         .compile(),
                 new RuntimeTestScriptBuilder()
@@ -103,12 +105,14 @@ public class TestPureRuntimeFunction_All extends AbstractPureTestWithCoreCompile
     @Test
     public void testPureRuntimeFunctionAllFunctionsIncludingLambdaInNew()
     {
-        String source = "Class U{}" +
-                "Class T{val:U[*];}\n" +
-                "function go():Any[*]\n" +
-                "{\n" +
-                "   ConcreteFunctionDefinition.all()->map(c|^T(val=[1,2]->map(c|^U())));\n" +
-                "}\n";
+        String source = """
+                Class U{}\
+                Class T{val:U[*];}
+                function go():Any[*]
+                {
+                   ConcreteFunctionDefinition.all()->map(c|^T(val=[1,2]->map(c|^U())));
+                }
+                """;
 
         RuntimeVerifier.verifyOperationIsStable(new RuntimeTestScriptBuilder().createInMemorySource("sourceId.pure", source)
                         .compile(),
@@ -170,34 +174,40 @@ public class TestPureRuntimeFunction_All extends AbstractPureTestWithCoreCompile
                 new RuntimeTestScriptBuilder()
                         .createInMemorySource(
                                 "/test/model.pure",
-                                "Class test::TestClass1\n" +
-                                        "{\n" +
-                                        "  prop : String[1];\n" +
-                                        "}\n")
+                                """
+                                Class test::TestClass1
+                                {
+                                  prop : String[1];
+                                }
+                                """)
                         .createInMemorySource(
                                 "/test/function.pure",
-                                "import test::*;\n" +
-                                        "\n" +
-                                        "Class test::TestClass2<T>\n" +
-                                        "{\n" +
-                                        "    func : Function<{T[1]->String[1]}>[1];\n" +
-                                        "}\n" +
-                                        "\n" +
-                                        "function test::testFn<S>(s:S[1], tc2:TestClass2<S>[1]):String[1]\n" +
-                                        "{\n" +
-                                        "    let mc = ^TestClass1(prop=$tc2.func->eval($s));\n" +
-                                        "    $mc.prop;" +
-                                        "}\n")
+                                """
+                                import test::*;
+                                
+                                Class test::TestClass2<T>
+                                {
+                                    func : Function<{T[1]->String[1]}>[1];
+                                }
+                                
+                                function test::testFn<S>(s:S[1], tc2:TestClass2<S>[1]):String[1]
+                                {
+                                    let mc = ^TestClass1(prop=$tc2.func->eval($s));
+                                    $mc.prop;\
+                                }
+                                """)
                         .compile(),
                 new RuntimeTestScriptBuilder()
                         .deleteSource("/test/model.pure")
                         .compileWithExpectedCompileFailure("TestClass1 has not been defined!", "/test/function.pure", 10, 15)
                         .createInMemorySource(
                                 "/test/model.pure",
-                                "Class test::TestClass1\n" +
-                                        "{\n" +
-                                        "  prop : String[1];\n" +
-                                        "}\n")
+                                """
+                                Class test::TestClass1
+                                {
+                                  prop : String[1];
+                                }
+                                """)
                         .compile(),
                 runtime, functionExecution, this.getAdditionalVerifiers());
     }

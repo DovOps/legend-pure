@@ -28,15 +28,15 @@ import org.finos.legend.pure.m3.statelistener.VoidM3M4StateListener;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
 import org.finos.legend.pure.m4.exception.PureCompilationException;
 import org.finos.legend.pure.m4.serialization.grammar.antlr.PureParserException;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class TestExtendGrammar extends AbstractPureRelationalTestWithCoreCompiled
 {
     private RelationalGraphWalker graphWalker;
 
-    @Before
+    @BeforeEach
     public void setUpRelational()
     {
         this.graphWalker = new RelationalGraphWalker(runtime, processorSupport);
@@ -46,58 +46,59 @@ public class TestExtendGrammar extends AbstractPureRelationalTestWithCoreCompile
     public void testExtend()
     {
         Loader.parseM3(
-                "import other::*;\n" +
-                        "\n" +
-                        "Class other::Person\n" +
-                        "{\n" +
-                        "    name:String[1];\n" +
-                        "    otherInfo:String[1];\n" +
-                        "}\n" +
+                """
+import other::*;
 
-                        "###Relational\n" +
-                        "Database mapping::db(\n" +
-                        "   Table employeeTable\n" +
-                        "   (\n" +
-                        "    id INT PRIMARY KEY,\n" +
-                        "    name VARCHAR(200),\n" +
-                        "    firm VARCHAR(200),\n" +
-                        "    otherInfo VARCHAR(200),\n" +
-                        "    postcode VARCHAR(10)\n" +
-                        "   )\n" +
-                        ")\n" +
-                        "###Mapping\n" +
-                        "import other::*;\n" +
-                        "import mapping::*;\n" +
-                        "Mapping mappingPackage::myMapping\n" +
-                        "(\n" +
-                        "    *Person[superClass]: Relational\n" +
-                        "    {\n" +
-                        "       name : [db]employeeTable.name \n" +
-                        "    }\n" +
-                        "    Person[p_subclass] extends [superClass]: Relational\n" +
-                        "    {\n" +
-                        "       otherInfo: [db]employeeTable.otherInfo\n" +
-                        "    }\n" +
-                        ")\n", repository, new ParserLibrary(Lists.immutable.with(new M3AntlrParser(), new MappingParser(), new RelationalParser())), ValidationType.DEEP, VoidM3M4StateListener.VOID_M3_M4_STATE_LISTENER, context);
+Class other::Person
+{
+    name:String[1];
+    otherInfo:String[1];
+}
+###Relational
+Database mapping::db(
+   Table employeeTable
+   (
+    id INT PRIMARY KEY,
+    name VARCHAR(200),
+    firm VARCHAR(200),
+    otherInfo VARCHAR(200),
+    postcode VARCHAR(10)
+   )
+)
+###Mapping
+import other::*;
+import mapping::*;
+Mapping mappingPackage::myMapping
+(
+    *Person[superClass]: Relational
+    {
+       name : [db]employeeTable.name\s
+    }
+    Person[p_subclass] extends [superClass]: Relational
+    {
+       otherInfo: [db]employeeTable.otherInfo
+    }
+)
+""", repository, new ParserLibrary(Lists.immutable.with(new M3AntlrParser(), new MappingParser(), new RelationalParser())), ValidationType.DEEP, VoidM3M4StateListener.VOID_M3_M4_STATE_LISTENER, context);
         runtime.compile();
 
 
         CoreInstance mapping = this.graphWalker.getMapping("mappingPackage::myMapping");
-        Assert.assertNotNull(mapping);
-        Assert.assertEquals(2, this.graphWalker.getClassMappings(mapping).size());
+        Assertions.assertNotNull(mapping);
+        Assertions.assertEquals(2, this.graphWalker.getClassMappings(mapping).size());
 
         CoreInstance personMapping = this.graphWalker.getClassMappingById(mapping, "superClass");
-        Assert.assertNotNull(personMapping);
-        Assert.assertTrue(PrimitiveUtilities.getBooleanValue(personMapping.getValueForMetaPropertyToOne(M3Properties.root)));
-        Assert.assertEquals("employeeTable", this.graphWalker.getName(this.graphWalker.getClassMappingImplementationMainTable(personMapping)));
-        Assert.assertEquals(1, this.graphWalker.getClassMappingImplementationPropertyMappings(personMapping).size());
+        Assertions.assertNotNull(personMapping);
+        Assertions.assertTrue(PrimitiveUtilities.getBooleanValue(personMapping.getValueForMetaPropertyToOne(M3Properties.root)));
+        Assertions.assertEquals("employeeTable", this.graphWalker.getName(this.graphWalker.getClassMappingImplementationMainTable(personMapping)));
+        Assertions.assertEquals(1, this.graphWalker.getClassMappingImplementationPropertyMappings(personMapping).size());
 
         CoreInstance personSubMapping = this.graphWalker.getClassMappingById(mapping, "p_subclass");
-        Assert.assertNotNull(personSubMapping);
-        Assert.assertFalse(PrimitiveUtilities.getBooleanValue(personSubMapping.getValueForMetaPropertyToOne(M3Properties.root)));
-        Assert.assertEquals("employeeTable", this.graphWalker.getName(this.graphWalker.getClassMappingImplementationMainTable(personSubMapping)));
-        Assert.assertEquals(1, this.graphWalker.getClassMappingImplementationPropertyMappings(personSubMapping).size());
-        Assert.assertEquals("superClass", personSubMapping.getValueForMetaPropertyToOne(M2MappingProperties.superSetImplementationId).getName());
+        Assertions.assertNotNull(personSubMapping);
+        Assertions.assertFalse(PrimitiveUtilities.getBooleanValue(personSubMapping.getValueForMetaPropertyToOne(M3Properties.root)));
+        Assertions.assertEquals("employeeTable", this.graphWalker.getName(this.graphWalker.getClassMappingImplementationMainTable(personSubMapping)));
+        Assertions.assertEquals(1, this.graphWalker.getClassMappingImplementationPropertyMappings(personSubMapping).size());
+        Assertions.assertEquals("superClass", personSubMapping.getValueForMetaPropertyToOne(M2MappingProperties.superSetImplementationId).getName());
     }
 
 
@@ -105,59 +106,60 @@ public class TestExtendGrammar extends AbstractPureRelationalTestWithCoreCompile
     public void testExtendEmptySubtype()
     {
         Loader.parseM3(
-                "import other::*;\n" +
-                        "\n" +
-                        "Class other::Person\n" +
-                        "{\n" +
-                        "    name:String[1];\n" +
-                        "    otherInfo:String[1];\n" +
-                        "}\n" +
-                        "Class other::MyPerson extends other::Person\n" +
-                        "{\n" +
-                        "}\n" +
+                """
+import other::*;
 
-                        "###Relational\n" +
-                        "Database mapping::db(\n" +
-                        "   Table employeeTable\n" +
-                        "   (\n" +
-                        "    id INT PRIMARY KEY,\n" +
-                        "    name VARCHAR(200),\n" +
-                        "    otherInfo VARCHAR(200)\n" +
-                        "   )\n" +
-                        ")\n" +
-                        "###Mapping\n" +
-                        "import other::*;\n" +
-                        "import mapping::*;\n" +
-                        "Mapping mappingPackage::myMapping\n" +
-                        "(\n" +
-                        "    *Person[superClass]: Relational\n" +
-                        "    {\n" +
-                        "       name : [db]employeeTable.name,\n" +
-                        "       otherInfo: [db]employeeTable.otherInfo\n" +
-                        "    }\n" +
-                        "    MyPerson[p_subclass] extends [superClass]: Relational\n" +
-                        "    {\n" +
-                        "    }\n" +
-                        ")\n", repository, new ParserLibrary(Lists.immutable.with(new M3AntlrParser(), new MappingParser(), new RelationalParser())), ValidationType.DEEP, VoidM3M4StateListener.VOID_M3_M4_STATE_LISTENER, context);
+Class other::Person
+{
+    name:String[1];
+    otherInfo:String[1];
+}
+Class other::MyPerson extends other::Person
+{
+}
+###Relational
+Database mapping::db(
+   Table employeeTable
+   (
+    id INT PRIMARY KEY,
+    name VARCHAR(200),
+    otherInfo VARCHAR(200)
+   )
+)
+###Mapping
+import other::*;
+import mapping::*;
+Mapping mappingPackage::myMapping
+(
+    *Person[superClass]: Relational
+    {
+       name : [db]employeeTable.name,
+       otherInfo: [db]employeeTable.otherInfo
+    }
+    MyPerson[p_subclass] extends [superClass]: Relational
+    {
+    }
+)
+""", repository, new ParserLibrary(Lists.immutable.with(new M3AntlrParser(), new MappingParser(), new RelationalParser())), ValidationType.DEEP, VoidM3M4StateListener.VOID_M3_M4_STATE_LISTENER, context);
         runtime.compile();
 
 
         CoreInstance mapping = this.graphWalker.getMapping("mappingPackage::myMapping");
-        Assert.assertNotNull(mapping);
-        Assert.assertEquals(2, this.graphWalker.getClassMappings(mapping).size());
+        Assertions.assertNotNull(mapping);
+        Assertions.assertEquals(2, this.graphWalker.getClassMappings(mapping).size());
 
         CoreInstance personMapping = this.graphWalker.getClassMappingById(mapping, "superClass");
-        Assert.assertNotNull(personMapping);
-        Assert.assertTrue(PrimitiveUtilities.getBooleanValue(personMapping.getValueForMetaPropertyToOne(M3Properties.root)));
-        Assert.assertEquals("employeeTable", this.graphWalker.getName(this.graphWalker.getClassMappingImplementationMainTable(personMapping)));
-        Assert.assertEquals(2, this.graphWalker.getClassMappingImplementationPropertyMappings(personMapping).size());
+        Assertions.assertNotNull(personMapping);
+        Assertions.assertTrue(PrimitiveUtilities.getBooleanValue(personMapping.getValueForMetaPropertyToOne(M3Properties.root)));
+        Assertions.assertEquals("employeeTable", this.graphWalker.getName(this.graphWalker.getClassMappingImplementationMainTable(personMapping)));
+        Assertions.assertEquals(2, this.graphWalker.getClassMappingImplementationPropertyMappings(personMapping).size());
 
         CoreInstance personSubMapping = this.graphWalker.getClassMappingById(mapping, "p_subclass");
-        Assert.assertNotNull(personSubMapping);
-        Assert.assertTrue(PrimitiveUtilities.getBooleanValue(personSubMapping.getValueForMetaPropertyToOne(M3Properties.root)));
-        Assert.assertEquals("employeeTable", this.graphWalker.getName(this.graphWalker.getClassMappingImplementationMainTable(personSubMapping)));
-        Assert.assertEquals(0, this.graphWalker.getClassMappingImplementationPropertyMappings(personSubMapping).size());
-        Assert.assertEquals("superClass", personSubMapping.getValueForMetaPropertyToOne(M2MappingProperties.superSetImplementationId).getName());
+        Assertions.assertNotNull(personSubMapping);
+        Assertions.assertTrue(PrimitiveUtilities.getBooleanValue(personSubMapping.getValueForMetaPropertyToOne(M3Properties.root)));
+        Assertions.assertEquals("employeeTable", this.graphWalker.getName(this.graphWalker.getClassMappingImplementationMainTable(personSubMapping)));
+        Assertions.assertEquals(0, this.graphWalker.getClassMappingImplementationPropertyMappings(personSubMapping).size());
+        Assertions.assertEquals("superClass", personSubMapping.getValueForMetaPropertyToOne(M2MappingProperties.superSetImplementationId).getName());
 
     }
 
@@ -168,41 +170,42 @@ public class TestExtendGrammar extends AbstractPureRelationalTestWithCoreCompile
         try
         {
             Loader.parseM3(
-                    "import other::*;\n" +
-                            "\n" +
-                            "Class other::Person\n" +
-                            "{\n" +
-                            "    name:String[1];\n" +
-                            "    otherInfo:String[1];\n" +
-                            "}\n" +
-                            "Class other::MyPerson extends other::Person\n" +
-                            "{\n" +
-                            "    title:String[1];\n" +
-                            "}\n" +
+                    """
+import other::*;
 
-                            "###Relational\n" +
-                            "Database mapping::db(\n" +
-                            "   Table employeeTable\n" +
-                            "   (\n" +
-                            "    id INT PRIMARY KEY,\n" +
-                            "    name VARCHAR(200),\n" +
-                            "    otherInfo VARCHAR(200)\n" +
-                            "   )\n" +
-                            ")\n" +
-                            "###Mapping\n" +
-                            "import other::*;\n" +
-                            "import mapping::*;\n" +
-                            "Mapping mappingPackage::myMapping\n" +
-                            "(\n" +
-                            "    *Person[superClass]: Relational\n" +
-                            "    {\n" +
-                            "       name : [db]employeeTable.name,\n" +
-                            "       otherInfo: [db]employeeTable.otherInfo\n" +
-                            "    }\n" +
-                            "    MyPerson[p_subclass] extends [superClass]: Relational\n" +
-                            "    {\n" +
-                            "    }\n" +
-                            ")\n", repository, new ParserLibrary(Lists.immutable.with(new M3AntlrParser(), new MappingParser(), new RelationalParser())), ValidationType.DEEP, VoidM3M4StateListener.VOID_M3_M4_STATE_LISTENER, context);
+Class other::Person
+{
+    name:String[1];
+    otherInfo:String[1];
+}
+Class other::MyPerson extends other::Person
+{
+    title:String[1];
+}
+###Relational
+Database mapping::db(
+   Table employeeTable
+   (
+    id INT PRIMARY KEY,
+    name VARCHAR(200),
+    otherInfo VARCHAR(200)
+   )
+)
+###Mapping
+import other::*;
+import mapping::*;
+Mapping mappingPackage::myMapping
+(
+    *Person[superClass]: Relational
+    {
+       name : [db]employeeTable.name,
+       otherInfo: [db]employeeTable.otherInfo
+    }
+    MyPerson[p_subclass] extends [superClass]: Relational
+    {
+    }
+)
+""", repository, new ParserLibrary(Lists.immutable.with(new M3AntlrParser(), new MappingParser(), new RelationalParser())), ValidationType.DEEP, VoidM3M4StateListener.VOID_M3_M4_STATE_LISTENER, context);
             runtime.compile();
         }
         catch (Exception e)
@@ -217,40 +220,42 @@ public class TestExtendGrammar extends AbstractPureRelationalTestWithCoreCompile
         try
         {
             Loader.parseM3(
-                    "import other::*;\n" +
-                            "\n" +
-                            "Class other::Person\n" +
-                            "{\n" +
-                            "    name:String[1];\n" +
-                            "    otherInfo:String[1];\n" +
-                            "}\n" +
-                            "###Relational\n" +
-                            "Database mapping::db(\n" +
-                            "   Table employeeTable\n" +
-                            "   (\n" +
-                            "    id INT PRIMARY KEY,\n" +
-                            "    name VARCHAR(200),\n" +
-                            "    firm VARCHAR(200),\n" +
-                            "    otherInfo VARCHAR(200),\n" +
-                            "    postcode VARCHAR(10)\n" +
-                            "   )\n" +
-                            ")\n" +
-                            "###Mapping\n" +
-                            "import other::*;\n" +
-                            "import mapping::*;\n" +
-                            "Mapping mappingPackage::myMapping\n" +
-                            "(\n" +
-                            "    *Person[superClass]: Relational\n" +
-                            "    {\n" +
-                            "       name : [db]employeeTable.name \n" +
-                            "    }\n" +
-                            "    Person[p_subclass] extends [badId]: Relational\n" +
-                            "    {\n" +
-                            "       otherInfo: [db]employeeTable.otherInfo\n" +
-                            "    }\n" +
-                            ")\n", repository, new ParserLibrary(Lists.immutable.with(new M3AntlrParser(), new MappingParser(), new RelationalParser())), ValidationType.DEEP, VoidM3M4StateListener.VOID_M3_M4_STATE_LISTENER, context);
+                    """
+                    import other::*;
+                    
+                    Class other::Person
+                    {
+                        name:String[1];
+                        otherInfo:String[1];
+                    }
+                    ###Relational
+                    Database mapping::db(
+                       Table employeeTable
+                       (
+                        id INT PRIMARY KEY,
+                        name VARCHAR(200),
+                        firm VARCHAR(200),
+                        otherInfo VARCHAR(200),
+                        postcode VARCHAR(10)
+                       )
+                    )
+                    ###Mapping
+                    import other::*;
+                    import mapping::*;
+                    Mapping mappingPackage::myMapping
+                    (
+                        *Person[superClass]: Relational
+                        {
+                           name : [db]employeeTable.name\s
+                        }
+                        Person[p_subclass] extends [badId]: Relational
+                        {
+                           otherInfo: [db]employeeTable.otherInfo
+                        }
+                    )
+                    """, repository, new ParserLibrary(Lists.immutable.with(new M3AntlrParser(), new MappingParser(), new RelationalParser())), ValidationType.DEEP, VoidM3M4StateListener.VOID_M3_M4_STATE_LISTENER, context);
             runtime.compile();
-            Assert.fail(" this should not compile!");
+            Assertions.fail(" this should not compile!");
         }
         catch (Exception e)
         {
@@ -263,42 +268,44 @@ public class TestExtendGrammar extends AbstractPureRelationalTestWithCoreCompile
     public void testExtendWithInclude()
     {
         Loader.parseM3(
-                "import other::*;\n" +
-                        "\n" +
-                        "Class other::Person\n" +
-                        "{\n" +
-                        "    name:String[1];\n" +
-                        "    otherInfo:String[1];\n" +
-                        "}\n" +
-                        "###Relational\n" +
-                        "Database mapping::db(\n" +
-                        "   Table employeeTable\n" +
-                        "   (\n" +
-                        "    id INT PRIMARY KEY,\n" +
-                        "    name VARCHAR(200),\n" +
-                        "    firm VARCHAR(200),\n" +
-                        "    otherInfo VARCHAR(200),\n" +
-                        "    postcode VARCHAR(10)\n" +
-                        "   )\n" +
-                        ")\n" +
-                        "###Mapping\n" +
-                        "import other::*;\n" +
-                        "import mapping::*;\n" +
-                        "Mapping mappingPackage::myMapping\n" +
-                        "(\n" +
-                        "    *Person[superClass]: Relational\n" +
-                        "    {\n" +
-                        "       name : [db]employeeTable.name \n" +
-                        "    }\n" +
-                        ")\n" +
-                        "Mapping mappingPackage::myMappingWithIncludes\n" +
-                        "(\n" +
-                        "    include mappingPackage::myMapping\n" +
-                        "    Person[p_subclass] extends [superClass]: Relational\n" +
-                        "    {\n" +
-                        "       otherInfo: [db]employeeTable.otherInfo\n" +
-                        "    }\n" +
-                        ")\n", repository, new ParserLibrary(Lists.immutable.with(new M3AntlrParser(), new MappingParser(), new RelationalParser())), ValidationType.DEEP, VoidM3M4StateListener.VOID_M3_M4_STATE_LISTENER, context);
+                """
+                import other::*;
+                
+                Class other::Person
+                {
+                    name:String[1];
+                    otherInfo:String[1];
+                }
+                ###Relational
+                Database mapping::db(
+                   Table employeeTable
+                   (
+                    id INT PRIMARY KEY,
+                    name VARCHAR(200),
+                    firm VARCHAR(200),
+                    otherInfo VARCHAR(200),
+                    postcode VARCHAR(10)
+                   )
+                )
+                ###Mapping
+                import other::*;
+                import mapping::*;
+                Mapping mappingPackage::myMapping
+                (
+                    *Person[superClass]: Relational
+                    {
+                       name : [db]employeeTable.name\s
+                    }
+                )
+                Mapping mappingPackage::myMappingWithIncludes
+                (
+                    include mappingPackage::myMapping
+                    Person[p_subclass] extends [superClass]: Relational
+                    {
+                       otherInfo: [db]employeeTable.otherInfo
+                    }
+                )
+                """, repository, new ParserLibrary(Lists.immutable.with(new M3AntlrParser(), new MappingParser(), new RelationalParser())), ValidationType.DEEP, VoidM3M4StateListener.VOID_M3_M4_STATE_LISTENER, context);
         runtime.compile();
 
 
@@ -310,44 +317,46 @@ public class TestExtendGrammar extends AbstractPureRelationalTestWithCoreCompile
         try
         {
             Loader.parseM3(
-                    "import other::*;\n" +
-                            "\n" +
-                            "Class other::Person\n" +
-                            "{\n" +
-                            "    name:String[1];\n" +
-                            "    otherInfo:String[1];\n" +
-                            "}\n" +
-                            "###Relational\n" +
-                            "Database mapping::db(\n" +
-                            "   Table employeeTable\n" +
-                            "   (\n" +
-                            "    id INT PRIMARY KEY,\n" +
-                            "    name VARCHAR(200),\n" +
-                            "    firm VARCHAR(200),\n" +
-                            "    otherInfo VARCHAR(200),\n" +
-                            "    postcode VARCHAR(10)\n" +
-                            "   )\n" +
-                            ")\n" +
-                            "###Mapping\n" +
-                            "import other::*;\n" +
-                            "import mapping::*;\n" +
-                            "Mapping mappingPackage::myMapping\n" +
-                            "(\n" +
-                            "    *Person[superClass]: Relational\n" +
-                            "    {\n" +
-                            "       name : [db]employeeTable.name \n" +
-                            "    }\n" +
-                            ")\n" +
-                            "Mapping mappingPackage::myMappingWithIncludes\n" +
-                            "(\n" +
-                            "    include mappingPackage::myMapping\n" +
-                            "    Person[p_subclass] extends [badId]: Relational\n" +
-                            "    {\n" +
-                            "       otherInfo: [db]employeeTable.otherInfo\n" +
-                            "    }\n" +
-                            ")\n", repository, new ParserLibrary(Lists.immutable.with(new M3AntlrParser(), new MappingParser(), new RelationalParser())), ValidationType.DEEP, VoidM3M4StateListener.VOID_M3_M4_STATE_LISTENER, context);
+                    """
+                    import other::*;
+                    
+                    Class other::Person
+                    {
+                        name:String[1];
+                        otherInfo:String[1];
+                    }
+                    ###Relational
+                    Database mapping::db(
+                       Table employeeTable
+                       (
+                        id INT PRIMARY KEY,
+                        name VARCHAR(200),
+                        firm VARCHAR(200),
+                        otherInfo VARCHAR(200),
+                        postcode VARCHAR(10)
+                       )
+                    )
+                    ###Mapping
+                    import other::*;
+                    import mapping::*;
+                    Mapping mappingPackage::myMapping
+                    (
+                        *Person[superClass]: Relational
+                        {
+                           name : [db]employeeTable.name\s
+                        }
+                    )
+                    Mapping mappingPackage::myMappingWithIncludes
+                    (
+                        include mappingPackage::myMapping
+                        Person[p_subclass] extends [badId]: Relational
+                        {
+                           otherInfo: [db]employeeTable.otherInfo
+                        }
+                    )
+                    """, repository, new ParserLibrary(Lists.immutable.with(new M3AntlrParser(), new MappingParser(), new RelationalParser())), ValidationType.DEEP, VoidM3M4StateListener.VOID_M3_M4_STATE_LISTENER, context);
             runtime.compile();
-            Assert.fail();
+            Assertions.fail();
         }
         catch (Exception e)
         {
@@ -362,36 +371,38 @@ public class TestExtendGrammar extends AbstractPureRelationalTestWithCoreCompile
         try
         {
             Loader.parseM3(
-                    "import other::*;\n" +
-                            "\n" +
-                            "Class other::Person\n" +
-                            "{\n" +
-                            "    name:String[1];\n" +
-                            "    otherInfo:String[1];\n" +
-                            "}\n" +
-                            "###Relational\n" +
-                            "Database mapping::db(\n" +
-                            "   Table employeeTable\n" +
-                            "   (\n" +
-                            "    id INT PRIMARY KEY,\n" +
-                            "    name VARCHAR(200),\n" +
-                            "    firm VARCHAR(200),\n" +
-                            "    otherInfo VARCHAR(200),\n" +
-                            "    postcode VARCHAR(10)\n" +
-                            "   )\n" +
-                            ")\n" +
-                            "###Mapping\n" +
-                            "import other::*;\n" +
-                            "import mapping::*;\n" +
-                            "Mapping mappingPackage::myMapping\n" +
-                            "(\n" +
-                            "    Person[p_subclass] extends [p_subclass]: Relational\n" +
-                            "    {\n" +
-                            "       otherInfo: [db]employeeTable.otherInfo\n" +
-                            "    }\n" +
-                            ")\n", repository, new ParserLibrary(Lists.immutable.with(new M3AntlrParser(), new MappingParser(), new RelationalParser())), ValidationType.DEEP, VoidM3M4StateListener.VOID_M3_M4_STATE_LISTENER, context);
+                    """
+                    import other::*;
+                    
+                    Class other::Person
+                    {
+                        name:String[1];
+                        otherInfo:String[1];
+                    }
+                    ###Relational
+                    Database mapping::db(
+                       Table employeeTable
+                       (
+                        id INT PRIMARY KEY,
+                        name VARCHAR(200),
+                        firm VARCHAR(200),
+                        otherInfo VARCHAR(200),
+                        postcode VARCHAR(10)
+                       )
+                    )
+                    ###Mapping
+                    import other::*;
+                    import mapping::*;
+                    Mapping mappingPackage::myMapping
+                    (
+                        Person[p_subclass] extends [p_subclass]: Relational
+                        {
+                           otherInfo: [db]employeeTable.otherInfo
+                        }
+                    )
+                    """, repository, new ParserLibrary(Lists.immutable.with(new M3AntlrParser(), new MappingParser(), new RelationalParser())), ValidationType.DEEP, VoidM3M4StateListener.VOID_M3_M4_STATE_LISTENER, context);
             runtime.compile();
-            Assert.fail("this should not compile");
+            Assertions.fail("this should not compile");
         }
         catch (Exception e)
         {
@@ -408,36 +419,38 @@ public class TestExtendGrammar extends AbstractPureRelationalTestWithCoreCompile
         try
         {
             Loader.parseM3(
-                    "import other::*;\n" +
-                            "\n" +
-                            "Class other::Person\n" +
-                            "{\n" +
-                            "    name:String[1];\n" +
-                            "    otherInfo:String[1];\n" +
-                            "}\n" +
-                            "###Relational\n" +
-                            "Database mapping::db(\n" +
-                            "   Table employeeTable\n" +
-                            "   (\n" +
-                            "    id INT PRIMARY KEY,\n" +
-                            "    name VARCHAR(200),\n" +
-                            "    firm VARCHAR(200),\n" +
-                            "    otherInfo VARCHAR(200),\n" +
-                            "    postcode VARCHAR(10)\n" +
-                            "   )\n" +
-                            ")\n" +
-                            "###Mapping\n" +
-                            "import other::*;\n" +
-                            "import mapping::*;\n" +
-                            "Mapping mappingPackage::myMapping\n" +
-                            "(\n" +
-                            "    Person[p_subclass] extends []: Relational\n" +
-                            "    {\n" +
-                            "       otherInfo: [db]employeeTable.otherInfo\n" +
-                            "    }\n" +
-                            ")\n", repository, new ParserLibrary(Lists.immutable.with(new M3AntlrParser(), new MappingParser(), new RelationalParser())), ValidationType.DEEP, VoidM3M4StateListener.VOID_M3_M4_STATE_LISTENER, context);
+                    """
+                    import other::*;
+                    
+                    Class other::Person
+                    {
+                        name:String[1];
+                        otherInfo:String[1];
+                    }
+                    ###Relational
+                    Database mapping::db(
+                       Table employeeTable
+                       (
+                        id INT PRIMARY KEY,
+                        name VARCHAR(200),
+                        firm VARCHAR(200),
+                        otherInfo VARCHAR(200),
+                        postcode VARCHAR(10)
+                       )
+                    )
+                    ###Mapping
+                    import other::*;
+                    import mapping::*;
+                    Mapping mappingPackage::myMapping
+                    (
+                        Person[p_subclass] extends []: Relational
+                        {
+                           otherInfo: [db]employeeTable.otherInfo
+                        }
+                    )
+                    """, repository, new ParserLibrary(Lists.immutable.with(new M3AntlrParser(), new MappingParser(), new RelationalParser())), ValidationType.DEEP, VoidM3M4StateListener.VOID_M3_M4_STATE_LISTENER, context);
             runtime.compile();
-            Assert.fail("this should not parse");
+            Assertions.fail("this should not parse");
         }
         catch (Exception e)
         {
@@ -453,41 +466,43 @@ public class TestExtendGrammar extends AbstractPureRelationalTestWithCoreCompile
         try
         {
             Loader.parseM3(
-                    "import other::*;\n" +
-                            "\n" +
-                            "Class other::Person\n" +
-                            "{\n" +
-                            "    name:String[1];\n" +
-                            "    otherInfo:String[1];\n" +
-                            "}\n" +
-                            "###Relational\n" +
-                            "Database mapping::db(\n" +
-                            "   Table employeeTable\n" +
-                            "   (\n" +
-                            "    id INT PRIMARY KEY,\n" +
-                            "    name VARCHAR(200),\n" +
-                            "    firm VARCHAR(200),\n" +
-                            "    otherInfo VARCHAR(200),\n" +
-                            "    postcode VARCHAR(10)\n" +
-                            "   )\n" +
-                            ")\n" +
-                            "###Mapping\n" +
-                            "import other::*;\n" +
-                            "import mapping::*;\n" +
-                            "Mapping mappingPackage::myMapping\n" +
-                            "(\n" +
-                            "   *Person[pure]: Pure\n" +
-                            "    {\n" +
-                            "       name :'Test'\n" +
-                            "    }\n" +
-                            "    Person[p_subclass] extends [pure]: Relational\n" +
-                            "    {\n" +
-                            "       otherInfo: [db]employeeTable.otherInfo\n" +
-                            "    }\n" +
-                            ")\n", repository, new ParserLibrary(Lists.immutable.with(new M3AntlrParser(), new MappingParser(), new RelationalParser())), ValidationType.DEEP, VoidM3M4StateListener.VOID_M3_M4_STATE_LISTENER, context);
+                    """
+                    import other::*;
+                    
+                    Class other::Person
+                    {
+                        name:String[1];
+                        otherInfo:String[1];
+                    }
+                    ###Relational
+                    Database mapping::db(
+                       Table employeeTable
+                       (
+                        id INT PRIMARY KEY,
+                        name VARCHAR(200),
+                        firm VARCHAR(200),
+                        otherInfo VARCHAR(200),
+                        postcode VARCHAR(10)
+                       )
+                    )
+                    ###Mapping
+                    import other::*;
+                    import mapping::*;
+                    Mapping mappingPackage::myMapping
+                    (
+                       *Person[pure]: Pure
+                        {
+                           name :'Test'
+                        }
+                        Person[p_subclass] extends [pure]: Relational
+                        {
+                           otherInfo: [db]employeeTable.otherInfo
+                        }
+                    )
+                    """, repository, new ParserLibrary(Lists.immutable.with(new M3AntlrParser(), new MappingParser(), new RelationalParser())), ValidationType.DEEP, VoidM3M4StateListener.VOID_M3_M4_STATE_LISTENER, context);
             runtime.compile();
 
-            Assert.fail();
+            Assertions.fail();
 
 
         }
@@ -505,45 +520,47 @@ public class TestExtendGrammar extends AbstractPureRelationalTestWithCoreCompile
         try
         {
             Loader.parseM3(
-                    "import other::*;\n" +
-                            "\n" +
-                            "Class other::Person\n" +
-                            "{\n" +
-                            "    name:String[1];\n" +
-                            "    otherInfo:String[1];\n" +
-                            "}\n" +
-                            "Class other::Firm\n" +
-                            "{\n" +
-                            "    legalName:String[1];\n" +
-                            "    otherInformation:String[1];\n" +
-                            "}\n" +
-                            "###Relational\n" +
-                            "Database mapping::db(\n" +
-                            "   Table employeeTable\n" +
-                            "   (\n" +
-                            "    id INT PRIMARY KEY,\n" +
-                            "    name VARCHAR(200),\n" +
-                            "    firm VARCHAR(200),\n" +
-                            "    otherInfo VARCHAR(200),\n" +
-                            "    postcode VARCHAR(10)\n" +
-                            "   )\n" +
-                            ")\n" +
-                            "###Mapping\n" +
-                            "import other::*;\n" +
-                            "import mapping::*;\n" +
-                            "Mapping mappingPackage::myMapping\n" +
-                            "(\n" +
-                            "    Firm[f1]: Relational\n" +
-                            "    {\n" +
-                            "       legalName : [db]employeeTable.firm \n" +
-                            "    }\n" +
-                            "    Person[p_subclass] extends [f1]: Relational\n" +
-                            "    {\n" +
-                            "       otherInfo: [db]employeeTable.otherInfo\n" +
-                            "    }\n" +
-                            ")\n", repository, new ParserLibrary(Lists.immutable.with(new M3AntlrParser(), new MappingParser(), new RelationalParser())), ValidationType.DEEP, VoidM3M4StateListener.VOID_M3_M4_STATE_LISTENER, context);
+                    """
+                    import other::*;
+                    
+                    Class other::Person
+                    {
+                        name:String[1];
+                        otherInfo:String[1];
+                    }
+                    Class other::Firm
+                    {
+                        legalName:String[1];
+                        otherInformation:String[1];
+                    }
+                    ###Relational
+                    Database mapping::db(
+                       Table employeeTable
+                       (
+                        id INT PRIMARY KEY,
+                        name VARCHAR(200),
+                        firm VARCHAR(200),
+                        otherInfo VARCHAR(200),
+                        postcode VARCHAR(10)
+                       )
+                    )
+                    ###Mapping
+                    import other::*;
+                    import mapping::*;
+                    Mapping mappingPackage::myMapping
+                    (
+                        Firm[f1]: Relational
+                        {
+                           legalName : [db]employeeTable.firm\s
+                        }
+                        Person[p_subclass] extends [f1]: Relational
+                        {
+                           otherInfo: [db]employeeTable.otherInfo
+                        }
+                    )
+                    """, repository, new ParserLibrary(Lists.immutable.with(new M3AntlrParser(), new MappingParser(), new RelationalParser())), ValidationType.DEEP, VoidM3M4StateListener.VOID_M3_M4_STATE_LISTENER, context);
             runtime.compile();
-            Assert.fail("this should not compile");
+            Assertions.fail("this should not compile");
         }
         catch (Exception e)
         {

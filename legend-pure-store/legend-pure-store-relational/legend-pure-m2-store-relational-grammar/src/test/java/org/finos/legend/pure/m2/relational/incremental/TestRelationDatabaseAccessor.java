@@ -23,9 +23,9 @@ import org.finos.legend.pure.m2.relational.AbstractPureRelationalTestWithCoreCom
 import org.finos.legend.pure.m3.tests.RuntimeTestScriptBuilder;
 import org.finos.legend.pure.m3.tests.RuntimeVerifier;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class TestRelationDatabaseAccessor extends AbstractPureRelationalTestWithCoreCompiled
 {
@@ -35,22 +35,26 @@ public class TestRelationDatabaseAccessor extends AbstractPureRelationalTestWith
     private static final String STORE_SOURCE_ID = "store.pure";
     private MutableMap<String, String> sources = Maps.mutable.empty();
 
-    @Before
+    @BeforeEach
     public void setUp()
     {
         this.sources.put(MODEL_SOURCE_ID,
-                "import test::*;\n" +
-                        "\n" +
-                        "function myFunc():Any[1]\n" +
-                        "{\n" +
-                        "   #>{test::TestDB.personTb}#\n" +
-                        "}");
+                """
+                import test::*;
+                
+                function myFunc():Any[1]
+                {
+                   #>{test::TestDB.personTb}#
+                }\
+                """);
         this.sources.put(STORE_SOURCE_ID,
-                "###Relational\n" +
-                        "Database test::TestDB\n" +
-                        "(\n" +
-                        "   Table personTb(name VARCHAR(200), firmId INT)\n" +
-                        ")");
+                """
+                ###Relational
+                Database test::TestDB
+                (
+                   Table personTb(name VARCHAR(200), firmId INT)
+                )\
+                """);
     }
 
     @Test
@@ -62,29 +66,33 @@ public class TestRelationDatabaseAccessor extends AbstractPureRelationalTestWith
         for (int i = 0; i < TEST_COUNT; i++)
         {
             compileSource(MODEL_SOURCE_ID);
-            Assert.assertNotNull(this.runtime.getCoreInstance("myFunc__Any_1_"));
+            Assertions.assertNotNull(this.runtime.getCoreInstance("myFunc__Any_1_"));
             deleteSource(MODEL_SOURCE_ID);
-            Assert.assertNull(this.runtime.getCoreInstance("myFunc__Any_1_"));
-            Assert.assertEquals(expectedInstances, this.context.getAllInstances());
-            Assert.assertEquals("Failed on iteration #" + i, expectedSize, this.repository.serialize().length);
+            Assertions.assertNull(this.runtime.getCoreInstance("myFunc__Any_1_"));
+            Assertions.assertEquals(expectedInstances, this.context.getAllInstances());
+            Assertions.assertEquals(expectedSize, this.repository.serialize().length, "Failed on iteration #" + i);
         }
     }
 
     @Test
     public void testCompileAndDeleteStore()
     {
-        String INITIAL_DATA = "import test::*;\n" +
-                "\n" +
-                "function myFunc():Any[1]\n" +
-                "{ \n" +
-                "   #>{test::TestDB.personTb}#->filter(t|$t.name == 'ee')\n" +
-                "}";
+        String INITIAL_DATA = """
+                import test::*;
+                
+                function myFunc():Any[1]
+                {\s
+                   #>{test::TestDB.personTb}#->filter(t|$t.name == 'ee')
+                }\
+                """;
 
-        String STORE = "###Relational\n" +
-                "Database test::TestDB\n" +
-                "(\n" +
-                "   Table personTb(name VARCHAR(200), firmId INT)\n" +
-                ")";
+        String STORE = """
+                ###Relational
+                Database test::TestDB
+                (
+                   Table personTb(name VARCHAR(200), firmId INT)
+                )\
+                """;
 
         RuntimeVerifier.verifyOperationIsStable(new RuntimeTestScriptBuilder().createInMemorySources(
                                 org.eclipse.collections.api.factory.Maps.mutable.with("source1.pure", INITIAL_DATA, "source3.pure", STORE))
@@ -101,25 +109,31 @@ public class TestRelationDatabaseAccessor extends AbstractPureRelationalTestWith
     @Test
     public void testCompileAndDeleteMutateStore()
     {
-        String INITIAL_DATA = "import test::*;\n" +
-                "\n" +
-                "function myFunc():Any[1]\n" +
-                "{ \n" +
-                "   #>{test::TestDB.personTb}#" +
-                "       ->filter(t|$t.name == 'ee')" +
-                "}";
+        String INITIAL_DATA = """
+                import test::*;
+                
+                function myFunc():Any[1]
+                {\s
+                   #>{test::TestDB.personTb}#\
+                       ->filter(t|$t.name == 'ee')\
+                }\
+                """;
 
-        String STORE = "###Relational\n" +
-                "Database test::TestDB\n" +
-                "(\n" +
-                "   Table personTb(name VARCHAR(200), firmId INT)\n" +
-                ")";
+        String STORE = """
+                ###Relational
+                Database test::TestDB
+                (
+                   Table personTb(name VARCHAR(200), firmId INT)
+                )\
+                """;
 
-        String STORE2 = "###Relational\n" +
-                "Database test::TestDB\n" +
-                "(\n" +
-                "   Table personTb(name22 VARCHAR(200), firmId INT)\n" +
-                ")";
+        String STORE2 = """
+                ###Relational
+                Database test::TestDB
+                (
+                   Table personTb(name22 VARCHAR(200), firmId INT)
+                )\
+                """;
 
         RuntimeVerifier.verifyOperationIsStable(new RuntimeTestScriptBuilder().createInMemorySources(
                                 org.eclipse.collections.api.factory.Maps.mutable.with("source1.pure", INITIAL_DATA, "source3.pure", STORE))
@@ -135,31 +149,39 @@ public class TestRelationDatabaseAccessor extends AbstractPureRelationalTestWith
     @Test
     public void testCompileAndDeleteRenameTable()
     {
-        String INITIAL_DATA = "import test::*;\n" +
-                "\n" +
-                "function myFunc():Any[1]\n" +
-                "{ \n" +
-                "   #>{test::mainDb.PersonTable}#" +
-                "}";
+        String INITIAL_DATA = """
+                import test::*;
+                
+                function myFunc():Any[1]
+                {\s
+                   #>{test::mainDb.PersonTable}#\
+                }\
+                """;
 
-        String STORE1 = "###Relational\n" +
-                "Database test::incDb\n" +
-                "( \n" +
-                "   Table PersonTable(firstName VARCHAR(200), lastName VARCHAR(200), firmId INTEGER)\n" +
-                ")\n";
+        String STORE1 = """
+                ###Relational
+                Database test::incDb
+                (\s
+                   Table PersonTable(firstName VARCHAR(200), lastName VARCHAR(200), firmId INTEGER)
+                )
+                """;
 
-        String STORE1_CHANGED = "###Relational\n" +
-                "Database test::incDb\n" +
-                "( \n" +
-                "   Table PersonTable_Renamed(firstName VARCHAR(200), lastName VARCHAR(200), firmId INTEGER)\n" +
-                ")\n";
+        String STORE1_CHANGED = """
+                ###Relational
+                Database test::incDb
+                (\s
+                   Table PersonTable_Renamed(firstName VARCHAR(200), lastName VARCHAR(200), firmId INTEGER)
+                )
+                """;
 
-        String STORE2 = "###Relational\n" +
-                "Database test::mainDb\n" +
-                "( \n" +
-                "   include test::incDb\n" +
-                "   Table FirmTable(legalName VARCHAR(200), firmId INTEGER)\n" +
-                ")\n";
+        String STORE2 = """
+                ###Relational
+                Database test::mainDb
+                (\s
+                   include test::incDb
+                   Table FirmTable(legalName VARCHAR(200), firmId INTEGER)
+                )
+                """;
 
         RuntimeVerifier.verifyOperationIsStable(new RuntimeTestScriptBuilder().createInMemorySources(
                                 org.eclipse.collections.api.factory.Maps.mutable.with("source1.pure", INITIAL_DATA, "source2.pure", STORE1, "source3.pure", STORE2))
@@ -175,25 +197,33 @@ public class TestRelationDatabaseAccessor extends AbstractPureRelationalTestWith
     @Test
     public void testCompileAndDeleteFull()
     {
-        String INITIAL_DATA = "import test::*;\n" +
-                "\n" +
-                "function myFunc():Any[1]\n" +
-                "{ \n" +
-                "   #>{test::TestDB.personTb}#" +
-                "       ->filter(t|$t.name == 'ee')" +
-                "}";
+        String INITIAL_DATA = """
+                import test::*;
+                
+                function myFunc():Any[1]
+                {\s
+                   #>{test::TestDB.personTb}#\
+                       ->filter(t|$t.name == 'ee')\
+                }\
+                """;
 
-        String STORE = "\n###Relational\n" +
-                "Database test::TestDB\n" +
-                "(\n" +
-                "   Table personTb(name VARCHAR(200), firmId INT)\n" +
-                ")";
+        String STORE = """
+                
+                ###Relational
+                Database test::TestDB
+                (
+                   Table personTb(name VARCHAR(200), firmId INT)
+                )\
+                """;
 
-        String STORE2 = "\n###Relational\n" +
-                "Database test::TestDB\n" +
-                "(\n" +
-                "   Table personTb(name22 VARCHAR(200), firmId INT)\n" +
-                ")";
+        String STORE2 = """
+                
+                ###Relational
+                Database test::TestDB
+                (
+                   Table personTb(name22 VARCHAR(200), firmId INT)
+                )\
+                """;
 
         RuntimeVerifier.verifyOperationIsStable(new RuntimeTestScriptBuilder().createInMemorySources(
                                 org.eclipse.collections.api.factory.Maps.mutable.with("source1.pure", INITIAL_DATA + STORE))

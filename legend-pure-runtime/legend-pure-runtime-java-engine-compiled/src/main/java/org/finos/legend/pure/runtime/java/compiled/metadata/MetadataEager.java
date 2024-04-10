@@ -214,10 +214,10 @@ public final class MetadataEager implements Metadata
             if (classifierMetaData != null)
             {
                 CoreInstance o = classifierMetaData.remove(identifier);
-                if (o != null && o instanceof PackageableElement)
+                if (o != null && o instanceof PackageableElement element)
                 {
                     Package _package = (Package) Objects.requireNonNull(this.getMetadata(packClassifier, packIdentifier));
-                    _package._childrenRemove((PackageableElement) o);
+                    _package._childrenRemove(element);
                 }
             }
         }

@@ -28,27 +28,29 @@ import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiledPlatform;
 import org.finos.legend.pure.m3.tools.GraphPath;
 import org.finos.legend.pure.m3.tools.GraphPathIterable;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestGraphPathIterable extends AbstractPureTestWithCoreCompiledPlatform
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getFunctionExecution(), new CompositeCodeStorage(new ClassLoaderCodeStorage(getCodeRepositories())), getFactoryRegistryOverride(), getOptions(), getExtra());
         compileTestSource("/test/testModel.pure",
-                "import test::domain::*;\n" +
-                        "Class test::domain::ClassA\n" +
-                        "{\n" +
-                        "  prop1 : String[1];\n" +
-                        "  prop2 : ClassB[*];\n" +
-                        "}\n" +
-                        "\n" +
-                        "Class test::domain::ClassB\n" +
-                        "{\n" +
-                        "  prop3 : String[0..1];\n" +
-                        "}\n");
+                """
+                import test::domain::*;
+                Class test::domain::ClassA
+                {
+                  prop1 : String[1];
+                  prop2 : ClassB[*];
+                }
+                
+                Class test::domain::ClassB
+                {
+                  prop3 : String[0..1];
+                }
+                """);
     }
 
     protected static RichIterable<? extends CodeRepository> getCodeRepositories()

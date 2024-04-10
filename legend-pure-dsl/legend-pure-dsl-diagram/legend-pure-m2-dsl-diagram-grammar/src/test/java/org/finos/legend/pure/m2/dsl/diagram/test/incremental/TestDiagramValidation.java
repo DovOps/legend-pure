@@ -19,13 +19,13 @@ import org.finos.legend.pure.m3.navigation.Instance;
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
 import org.finos.legend.pure.m4.serialization.grammar.antlr.PureParserException;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestDiagramValidation extends AbstractPureTestWithCoreCompiled
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime();
@@ -35,18 +35,22 @@ public class TestDiagramValidation extends AbstractPureTestWithCoreCompiled
     public void testDiagramNameConflict()
     {
         compileTestSource("diagram1.pure",
-                "###Diagram\n" +
-                        "Diagram test::MyDiagram {}");
+                """
+                ###Diagram
+                Diagram test::MyDiagram {}\
+                """);
         CoreInstance myDiagram = runtime.getCoreInstance("test::MyDiagram");
-        Assert.assertNotNull(myDiagram);
-        Assert.assertTrue(Instance.instanceOf(myDiagram, M2DiagramPaths.Diagram, processorSupport));
+        Assertions.assertNotNull(myDiagram);
+        Assertions.assertTrue(Instance.instanceOf(myDiagram, M2DiagramPaths.Diagram, processorSupport));
 
         try
         {
             compileTestSource("diagram2.pure",
-                    "###Diagram\n" +
-                            "Diagram test::MyDiagram {}");
-            Assert.fail("Expected compilation error");
+                    """
+                    ###Diagram
+                    Diagram test::MyDiagram {}\
+                    """);
+            Assertions.fail("Expected compilation error");
         }
         catch (Exception e)
         {

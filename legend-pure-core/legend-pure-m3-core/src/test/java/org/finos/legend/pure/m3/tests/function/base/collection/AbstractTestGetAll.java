@@ -15,7 +15,7 @@
 package org.finos.legend.pure.m3.tests.function.base.collection;
 
 import org.finos.legend.pure.m3.tests.function.base.PureExpressionTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public abstract class AbstractTestGetAll extends PureExpressionTest
 {
@@ -23,13 +23,15 @@ public abstract class AbstractTestGetAll extends PureExpressionTest
     public void testBasic()
     {
         compileTestSource("fromString.pure",
-                "function test():Boolean[1]\n" +
-                        "{\n" +
-                        "   assert(!Class.all()->isEmpty(),|'');\n" +
-                        "\n" +
-                        "   //let x = Class;\n" +
-                        "   //assertNotEmpty($x.all());\n" +
-                        "}\n");
+                """
+                function test():Boolean[1]
+                {
+                   assert(!Class.all()->isEmpty(),|'');
+                
+                   //let x = Class;
+                   //assertNotEmpty($x.all());
+                }
+                """);
         this.execute("test():Boolean[1]");
 }
 
@@ -37,10 +39,12 @@ public abstract class AbstractTestGetAll extends PureExpressionTest
     public void testEval()
     {
         compileTestSource("fromString.pure",
-                "function test():Boolean[1]\n" +
-                        "{\n" +
-                        "   assert(!getAll_Class_1__T_MANY_->eval(Class)->isEmpty(), |'');\n" +
-                        "}\n");
+                """
+                function test():Boolean[1]
+                {
+                   assert(!getAll_Class_1__T_MANY_->eval(Class)->isEmpty(), |'');
+                }
+                """);
         this.execute("test():Boolean[1]");
     }
 }

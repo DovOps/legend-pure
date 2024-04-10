@@ -36,10 +36,10 @@ import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiledPlatform;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
 import org.finos.legend.pure.m4.serialization.Writer;
 import org.finos.legend.pure.m4.serialization.binary.BinaryWriters;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -48,13 +48,13 @@ public abstract class AbstractPureRepositoryJarLibraryTest extends AbstractPureT
 {
     protected PureRepositoryJarLibrary library;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime();
     }
 
-    @Before
+    @BeforeEach
     public void setUpLibrary() throws IOException
     {
         this.library = buildLibrary(runtime, "platform");
@@ -63,35 +63,35 @@ public abstract class AbstractPureRepositoryJarLibraryTest extends AbstractPureT
     @Test
     public void testGetPlatformVersion()
     {
-        Assert.assertEquals(Version.PLATFORM, this.library.getPlatformVersion());
+        Assertions.assertEquals(Version.PLATFORM, this.library.getPlatformVersion());
     }
 
     @Test
     public void testIsKnownRepository()
     {
-        Assert.assertTrue(this.library.isKnownRepository("platform"));
-        Assert.assertFalse(this.library.isKnownRepository("not a repo"));
+        Assertions.assertTrue(this.library.isKnownRepository("platform"));
+        Assertions.assertFalse(this.library.isKnownRepository("not a repo"));
     }
 
     @Test
     public void testIsKnownFile()
     {
-        Assert.assertTrue(this.library.isKnownFile("platform/pure/grammar/m3.pc"));
-        Assert.assertTrue(this.library.isKnownFile("platform/pure/grammar/functions/lang/all.pc"));
+        Assertions.assertTrue(this.library.isKnownFile("platform/pure/grammar/m3.pc"));
+        Assertions.assertTrue(this.library.isKnownFile("platform/pure/grammar/functions/lang/all.pc"));
 
-        Assert.assertFalse(this.library.isKnownFile("not a file at all"));
-        Assert.assertFalse(this.library.isKnownFile("datamart_datamt/something/somethingelse.pure"));
+        Assertions.assertFalse(this.library.isKnownFile("not a file at all"));
+        Assertions.assertFalse(this.library.isKnownFile("datamart_datamt/something/somethingelse.pure"));
     }
 
     @Test
     public void testIsKnownInstance()
     {
-        Assert.assertTrue(this.library.isKnownInstance("meta::pure::metamodel::type::Class"));
-        Assert.assertTrue(this.library.isKnownInstance("meta::pure::metamodel::type::Type"));
-        Assert.assertTrue(this.library.isKnownInstance("meta::pure::metamodel::multiplicity::PureOne"));
+        Assertions.assertTrue(this.library.isKnownInstance("meta::pure::metamodel::type::Class"));
+        Assertions.assertTrue(this.library.isKnownInstance("meta::pure::metamodel::type::Type"));
+        Assertions.assertTrue(this.library.isKnownInstance("meta::pure::metamodel::multiplicity::PureOne"));
 
-        Assert.assertFalse(this.library.isKnownInstance("not an instance"));
-        Assert.assertFalse(this.library.isKnownInstance("meta::pure::metamodel::multiplicity::PureOneThousand"));
+        Assertions.assertFalse(this.library.isKnownInstance("not an instance"));
+        Assertions.assertFalse(this.library.isKnownInstance("meta::pure::metamodel::multiplicity::PureOneThousand"));
     }
 
     @Test
@@ -107,7 +107,7 @@ public abstract class AbstractPureRepositoryJarLibraryTest extends AbstractPureT
             expectedStream.reset();
             BinaryModelSourceSerializer.serialize(writer, source, runtime);
 
-            Assert.assertArrayEquals("Byte mismatch for " + purePath, expectedStream.toByteArray(), this.library.readFile(binPath));
+            Assertions.assertArrayEquals(expectedStream.toByteArray(), this.library.readFile(binPath), "Byte mismatch for " + purePath);
         }
     }
 
@@ -178,7 +178,7 @@ public abstract class AbstractPureRepositoryJarLibraryTest extends AbstractPureT
             {
                 String instancePath = PackageableElement.getUserPathForPackageableElement(instance);
                 SetIterable<String> actual = this.library.getRequiredFiles(instancePath);
-                Verify.assertSetsEqual(instancePath, expected, actual.toSet());
+                Verify.assertSetsEqual(expected, actual.toSet(), instancePath);
             }
         }
     }
@@ -192,7 +192,7 @@ public abstract class AbstractPureRepositoryJarLibraryTest extends AbstractPureT
         for (String instancePath : instancePaths)
         {
             CoreInstance instance = runtime.getCoreInstance(instancePath);
-            Assert.assertNotNull("Could not find " + instancePath, instance);
+            Assertions.assertNotNull(instance, "Could not find " + instancePath);
             instanceFiles.add(PureRepositoryJarTools.purePathToBinaryPath(instance.getSourceInformation().getSourceId()));
         }
         SetIterable<String> expected = this.library.getFileDependencies(instanceFiles);
@@ -228,8 +228,8 @@ public abstract class AbstractPureRepositoryJarLibraryTest extends AbstractPureT
         Verify.assertSetsEqual(m3Dependencies, this.library.getFileDependencies(m3Dependencies).toSet());
 
         MutableSet<String> collectionDependencies = this.library.getFileDependencies(collectionBinPath).toSet();
-        Verify.assertContains(m3BinPath, collectionDependencies);
-        Verify.assertContains(collectionBinPath, collectionDependencies);
+        Verify.assertContains(collectionDependencies, m3BinPath);
+        Verify.assertContains(collectionDependencies, collectionBinPath);
 
         Verify.assertSetsEqual(collectionDependencies, this.library.getFileDependencies(m3BinPath, collectionBinPath).toSet());
     }
@@ -257,10 +257,10 @@ public abstract class AbstractPureRepositoryJarLibraryTest extends AbstractPureT
             String binPath = PureRepositoryJarTools.purePathToBinaryPath(purePath);
             MutableSet<String> dependents = this.library.getDependentFiles(binPath).toSet();
             Verify.assertSetsEqual(allExpectedDependents.get(binPath), dependents);
-            Verify.assertContains(binPath, dependents);
+            Verify.assertContains(dependents, binPath);
             if (!m3BinPath.equals(binPath))
             {
-                Verify.assertNotContains(m3BinPath, dependents);
+                Verify.assertNotContains(dependents, m3BinPath);
             }
         }
     }
@@ -318,7 +318,7 @@ public abstract class AbstractPureRepositoryJarLibraryTest extends AbstractPureT
         {
             String purePath = PureRepositoryJarTools.binaryPathToPurePath(binPath);
             Source source = runtime.getSourceById(purePath);
-            Assert.assertNotNull("Could not find source: " + purePath, source);
+            Assertions.assertNotNull(source, "Could not find source: " + purePath);
 
             expectedStream.reset();
             BinaryModelSourceSerializer.serialize(writer, source, runtime);
@@ -378,13 +378,13 @@ public abstract class AbstractPureRepositoryJarLibraryTest extends AbstractPureT
 
     protected static void assertFileByteMapsEqual(MapIterable<String, byte[]> expected, MapIterable<String, byte[]> actual)
     {
-        Verify.assertSetsEqual("file paths", expected.keysView().toSet(), actual.keysView().toSet());
+        Verify.assertSetsEqual(expected.keysView().toSet(), actual.keysView().toSet(), "file paths");
         for (Pair<String, byte[]> expectedPair : expected.keyValuesView())
         {
             String filePath = expectedPair.getOne();
             byte[] expectedBytes = expectedPair.getTwo();
             byte[] actualBytes = actual.get(filePath);
-            Assert.assertArrayEquals("bytes differ for " + filePath, expectedBytes, actualBytes);
+            Assertions.assertArrayEquals(expectedBytes, actualBytes, "bytes differ for " + filePath);
         }
     }
 

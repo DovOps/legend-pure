@@ -48,11 +48,13 @@ public class Extend extends AbstractNative implements Native
     static void buildCollectFuncSpec(StringBuilder result)
     {
         result.append(".collect(");
-        result.append("new DefendedFunction<org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.relation.FuncColSpec<? extends Object, ? extends Object>, org.finos.legend.pure.runtime.java.extension.external.relation.compiled.RelationNativeImplementation.ColFuncSpecTrans>()\n" +
-                "{\n" +
-                "    @Override\n" +
-                "    public  org.finos.legend.pure.runtime.java.extension.external.relation.compiled.RelationNativeImplementation.ColFuncSpecTrans valueOf(org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.relation.FuncColSpec<?, ?> c)\n" +
-                "    {\n");
+        result.append("""
+                new DefendedFunction<org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.relation.FuncColSpec<? extends Object, ? extends Object>, org.finos.legend.pure.runtime.java.extension.external.relation.compiled.RelationNativeImplementation.ColFuncSpecTrans>()
+                {
+                    @Override
+                    public  org.finos.legend.pure.runtime.java.extension.external.relation.compiled.RelationNativeImplementation.ColFuncSpecTrans valueOf(org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.relation.FuncColSpec<?, ?> c)
+                    {
+                """);
 
         result.append("return new org.finos.legend.pure.runtime.java.extension.external.relation.compiled.RelationNativeImplementation.ColFuncSpecTrans(");
         result.append("c._name(),");
@@ -60,8 +62,10 @@ public class Extend extends AbstractNative implements Native
         result.append(" ((org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.type.FunctionType)c._function()._classifierGenericType()._typeArguments().toList().get(0)._rawType())._returnType()._rawType()._name()\n");
         result.append(");\n");
 
-        result.append("    }\n" +
-                "   }" +
-                ")");
+        result.append("""
+                    }
+                   }\
+                )\
+                """);
     }
 }

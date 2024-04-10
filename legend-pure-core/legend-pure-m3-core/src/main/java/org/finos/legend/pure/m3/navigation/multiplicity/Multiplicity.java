@@ -755,7 +755,7 @@ public class Multiplicity
     {
         if (!isMultiplicityConcrete(multiplicity))
         {
-            throw new IllegalArgumentException(String.format(messageFormat, print(multiplicity)));
+            throw new IllegalArgumentException(messageFormat.formatted(print(multiplicity)));
         }
     }
 

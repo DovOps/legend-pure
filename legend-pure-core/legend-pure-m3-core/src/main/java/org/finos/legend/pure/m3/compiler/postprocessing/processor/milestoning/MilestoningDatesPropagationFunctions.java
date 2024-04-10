@@ -98,9 +98,9 @@ public class MilestoningDatesPropagationFunctions
 
     private static ListIterable<String> getMilestoningDatesVarNames(CoreInstance value, InlineDSLLibrary inlineDSLLibrary, ProcessorSupport processorSupport)
     {
-        if (value instanceof InstanceValue)
+        if (value instanceof InstanceValue instanceValue)
         {
-            ListIterable<? extends CoreInstance> instanceValues = ((InstanceValue) value)._valuesCoreInstance().toList();
+            ListIterable<? extends CoreInstance> instanceValues = instanceValue._valuesCoreInstance().toList();
             return getMilestoningDatesVarNamesUnit(instanceValues, inlineDSLLibrary, processorSupport);
         }
         else
@@ -132,10 +132,10 @@ public class MilestoningDatesPropagationFunctions
     public static CoreInstance getMatchingMilestoningQualifiedPropertyWithDateArg(CoreInstance property, String propertyName, ProcessorSupport processorSupport)
     {
         //TODO clean up this vs validation Milestoning Functions etc
-        CoreInstance propertyReturnType = property instanceof AbstractProperty ? ImportStub.withImportStubByPass(((AbstractProperty<?>) property)._genericType()._rawTypeCoreInstance(), processorSupport) : null;
+        CoreInstance propertyReturnType = property instanceof AbstractProperty ap ? ImportStub.withImportStubByPass(ap._genericType()._rawTypeCoreInstance(), processorSupport) : null;
         MilestoningStereotypeEnum milestoningStereotypeEnum = MilestoningFunctions.getTemporalStereoTypesFromTopMostNonTopTypeGeneralizations(propertyReturnType, processorSupport).getFirst();
         ListIterable<String> temporalPropertyNames = milestoningStereotypeEnum.getTemporalDatePropertyNames();
-        PropertyOwner owner = property instanceof AbstractProperty ? ((AbstractProperty<?>) property)._owner() : null;
+        PropertyOwner owner = property instanceof AbstractProperty ap ? ap._owner() : null;
         int paramCount = temporalPropertyNames.size() + 1;
         PropertyOwnerStrategy propertyOwnerStrategy = PropertyOwnerStrategy.getPropertyOwnerStrategy(owner);
         return Lists.mutable.<QualifiedProperty<?>>withAll(propertyOwnerStrategy.qualifiedProperties(owner)).withAll(propertyOwnerStrategy.qualifiedPropertiesFromAssociations(owner))
@@ -182,7 +182,7 @@ public class MilestoningDatesPropagationFunctions
     public static MilestoningDates getMilestonedDates(FunctionExpression milestonedQualifiedProperty, ProcessorSupport processorSupport)
     {
         CoreInstance func = milestonedQualifiedProperty._funcCoreInstance();
-        CoreInstance propertyReturnType = (func instanceof AbstractProperty) ? ImportStub.withImportStubByPass(((AbstractProperty<?>) func)._genericType()._rawTypeCoreInstance(), processorSupport) : null;
+        CoreInstance propertyReturnType = (func instanceof AbstractProperty ap) ? ImportStub.withImportStubByPass(ap._genericType()._rawTypeCoreInstance(), processorSupport) : null;
         MilestoningStereotype milestoningStereotype = MilestoningFunctions.getTemporalStereoTypesFromTopMostNonTopTypeGeneralizations(propertyReturnType, processorSupport).getFirst();
         return new MilestoningDates(milestoningStereotype, ListHelper.tail(milestonedQualifiedProperty._parametersValues()).toList());
     }
@@ -192,7 +192,7 @@ public class MilestoningDatesPropagationFunctions
         CoreInstance sourceType = getMilestonedPropertyOwningType(func, processorSupport);
         MilestoningStereotypeEnum sourceTypeMilestoningEnum = MilestoningFunctions.getTemporalStereoTypesFromTopMostNonTopTypeGeneralizations(sourceType, processorSupport).getFirst();
 
-        CoreInstance targetType = func instanceof AbstractProperty ? ImportStub.withImportStubByPass(((AbstractProperty<?>) func)._genericType()._rawTypeCoreInstance(), processorSupport) : null;
+        CoreInstance targetType = func instanceof AbstractProperty ap ? ImportStub.withImportStubByPass(ap._genericType()._rawTypeCoreInstance(), processorSupport) : null;
         MilestoningStereotypeEnum targetTypeMilestoningEnum = MilestoningFunctions.getTemporalStereoTypesFromTopMostNonTopTypeGeneralizations(targetType, processorSupport).getFirst();
         return Tuples.pair(sourceTypeMilestoningEnum, targetTypeMilestoningEnum);
     }

@@ -26,44 +26,50 @@ import org.finos.legend.pure.m3.serialization.filesystem.usercodestorage.composi
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
 import org.finos.legend.pure.m3.tests.RuntimeTestScriptBuilder;
 import org.finos.legend.pure.m3.tests.RuntimeVerifier;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class TestView extends AbstractPureRelationalTestWithCoreCompiled
 {
     private static final String GroupByModel =
-            "###Pure\n" +
-                    "Class AccountPnl\n" +
-                    "{\n" +
-                    "   pnl:Float[1];\n" +
-                    "}";
+            """
+            ###Pure
+            Class AccountPnl
+            {
+               pnl:Float[1];
+            }\
+            """;
 
     private static final String GroupByStoreTemplate =
-            "###Relational\n" +
-                    "Database db(\n" +
-                    "   Table orderTable(ID INT PRIMARY KEY, accountID INT)\n" +
-                    "   Table orderPnlTable( ORDER_ID INT PRIMARY KEY, pnl FLOAT)\n" +
-                    "   Join OrderPnlTable_Order(orderPnlTable.ORDER_ID = orderTable.ID)\n" +
-                    "\n" +
-                    "   View accountOrderPnlView\n" +
-                    "   (\n" +
-                    "      ~groupBy (orderTable.accountID)\n" +
-                    "      accountId : orderTable.accountID PRIMARY KEY,\n" +
-                    "      %s : sum(@OrderPnlTable_Order | orderPnlTable.pnl)\n" +
-                    "   )\n" +
-                    ")";
+            """
+            ###Relational
+            Database db(
+               Table orderTable(ID INT PRIMARY KEY, accountID INT)
+               Table orderPnlTable( ORDER_ID INT PRIMARY KEY, pnl FLOAT)
+               Join OrderPnlTable_Order(orderPnlTable.ORDER_ID = orderTable.ID)
+            
+               View accountOrderPnlView
+               (
+                  ~groupBy (orderTable.accountID)
+                  accountId : orderTable.accountID PRIMARY KEY,
+                  %s : sum(@OrderPnlTable_Order | orderPnlTable.pnl)
+               )
+            )\
+            """;
 
     private static final String GroupByMappingTemplate =
-            "###Mapping\n" +
-                    "Mapping testMapping\n" +
-                    "(\n" +
-                    "   AccountPnl : Relational  \n" +
-                    "   {\n" +
-                    "      pnl : [db]accountOrderPnlView.%s \n" +
-                    "   }\n" +
-                    ")";
+            """
+            ###Mapping
+            Mapping testMapping
+            (
+               AccountPnl : Relational \s
+               {
+                  pnl : [db]accountOrderPnlView.%s\s
+               }
+            )\
+            """;
 
-    @Before
+    @BeforeEach
     @Override
     public void _setUp()
     {
@@ -81,8 +87,8 @@ public class TestView extends AbstractPureRelationalTestWithCoreCompiled
     public void testGroupByIncrementalSyntaticStoreChange()
     {
         String viewDynaColName = "orderPnl";
-        String groupByStore = String.format(GroupByStoreTemplate, viewDynaColName);
-        String groupByMapping = String.format(GroupByMappingTemplate, viewDynaColName);
+        String groupByStore = GroupByStoreTemplate.formatted(viewDynaColName);
+        String groupByMapping = GroupByMappingTemplate.formatted(viewDynaColName);
         RuntimeVerifier.verifyOperationIsStable(new RuntimeTestScriptBuilder().createInMemorySources(
                                 Maps.mutable.with("store.pure", groupByStore, "model.pure", GroupByModel, "mapping.pure", groupByMapping))
                         .compile(),
@@ -96,8 +102,8 @@ public class TestView extends AbstractPureRelationalTestWithCoreCompiled
     public void testGroupByIncrementalModelChange()
     {
         String viewDynaColName = "orderPnl";
-        String groupByStore = String.format(GroupByStoreTemplate, viewDynaColName);
-        String groupByMapping = String.format(GroupByMappingTemplate, viewDynaColName);
+        String groupByStore = GroupByStoreTemplate.formatted(viewDynaColName);
+        String groupByMapping = GroupByMappingTemplate.formatted(viewDynaColName);
         RuntimeVerifier.verifyOperationIsStable(new RuntimeTestScriptBuilder().createInMemorySources(
                                 Maps.mutable.with("store.pure", groupByStore, "model.pure", GroupByModel, "mapping.pure", groupByMapping))
                         .compile(),
@@ -113,11 +119,11 @@ public class TestView extends AbstractPureRelationalTestWithCoreCompiled
     public void testGroupByIncrementalStoreAndMappingChange()
     {
         String viewDynaColName = "orderPnl";
-        String groupByStore = String.format(GroupByStoreTemplate, viewDynaColName);
-        String groupByMapping = String.format(GroupByMappingTemplate, viewDynaColName);
+        String groupByStore = GroupByStoreTemplate.formatted(viewDynaColName);
+        String groupByMapping = GroupByMappingTemplate.formatted(viewDynaColName);
         String viewDynaColNameUpdated = "orderPnlUpdated";
-        String groupByStoreUpdated = String.format(GroupByStoreTemplate, viewDynaColNameUpdated);
-        String groupByMappingUpdated = String.format(GroupByMappingTemplate, viewDynaColNameUpdated);
+        String groupByStoreUpdated = GroupByStoreTemplate.formatted(viewDynaColNameUpdated);
+        String groupByMappingUpdated = GroupByMappingTemplate.formatted(viewDynaColNameUpdated);
         RuntimeVerifier.verifyOperationIsStable(new RuntimeTestScriptBuilder().createInMemorySources(
                                 Maps.mutable.with("store.pure", groupByStore, "model.pure", GroupByModel, "mapping.pure", groupByMapping))
                         .compile(),
@@ -133,29 +139,33 @@ public class TestView extends AbstractPureRelationalTestWithCoreCompiled
     public void testViewInSchemaReferencingTableInIncludedDB()
     {
         String includedDB1Source = "/test/includedDB1.pure";
-        String includedDB1 = "###Relational\n" +
-                "Database test::store::IncludedDB1\n" +
-                "(\n" +
-                "    Schema S1\n" +
-                "    (\n" +
-                "        Table T1 (ID INT PRIMARY KEY, NAME VARCHAR(200), OTHER_ID INT)\n" +
-                "    )\n" +
-                ")\n";
+        String includedDB1 = """
+                ###Relational
+                Database test::store::IncludedDB1
+                (
+                    Schema S1
+                    (
+                        Table T1 (ID INT PRIMARY KEY, NAME VARCHAR(200), OTHER_ID INT)
+                    )
+                )
+                """;
         String mainDBSource = "/test/mainDB.pure";
-        String mainDB = "###Relational\n" +
-                "Database test::store::MainDB\n" +
-                "(\n" +
-                "    include test::store::IncludedDB1\n" +
-                "\n" +
-                "    Schema S1\n" +
-                "    (\n" +
-                "        View V1\n" +
-                "        (\n" +
-                "            id: T1.ID PRIMARY KEY,\n" +
-                "            name: T1.NAME\n" +
-                "        )\n" +
-                "    )\n" +
-                ")\n";
+        String mainDB = """
+                ###Relational
+                Database test::store::MainDB
+                (
+                    include test::store::IncludedDB1
+                
+                    Schema S1
+                    (
+                        View V1
+                        (
+                            id: T1.ID PRIMARY KEY,
+                            name: T1.NAME
+                        )
+                    )
+                )
+                """;
         RuntimeVerifier.verifyOperationIsStable(new RuntimeTestScriptBuilder()
                         .createInMemorySource(includedDB1Source, includedDB1)
                         .createInMemorySource(mainDBSource, mainDB)

@@ -15,27 +15,27 @@
 package org.finos.legend.pure.m4;
 
 import org.finos.legend.pure.m4.ModelRepository;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class TestModelRepository
 {
     @Test
     public void testIsAnonymousInstanceName()
     {
-        Assert.assertTrue(ModelRepository.isAnonymousInstanceName("@_0000001234"));
+        Assertions.assertTrue(ModelRepository.isAnonymousInstanceName("@_0000001234"));
 
-        Assert.assertFalse(ModelRepository.isAnonymousInstanceName(null));
-        Assert.assertFalse(ModelRepository.isAnonymousInstanceName(""));
-        Assert.assertFalse(ModelRepository.isAnonymousInstanceName("Class"));
-        Assert.assertFalse(ModelRepository.isAnonymousInstanceName("Package"));
-        Assert.assertFalse(ModelRepository.isAnonymousInstanceName("@"));
-        Assert.assertFalse(ModelRepository.isAnonymousInstanceName("@1234"));
-        Assert.assertFalse(ModelRepository.isAnonymousInstanceName("@abcd"));
-        Assert.assertFalse(ModelRepository.isAnonymousInstanceName("@_"));
-        Assert.assertFalse(ModelRepository.isAnonymousInstanceName("@_abcd"));
-        Assert.assertFalse(ModelRepository.isAnonymousInstanceName("@_a234"));
-        Assert.assertFalse(ModelRepository.isAnonymousInstanceName("@_1234a"));
-        Assert.assertFalse(ModelRepository.isAnonymousInstanceName("@_1_5_67"));
+        Assertions.assertFalse(ModelRepository.isAnonymousInstanceName(null));
+        Assertions.assertFalse(ModelRepository.isAnonymousInstanceName(""));
+        Assertions.assertFalse(ModelRepository.isAnonymousInstanceName("Class"));
+        Assertions.assertFalse(ModelRepository.isAnonymousInstanceName("Package"));
+        Assertions.assertFalse(ModelRepository.isAnonymousInstanceName("@"));
+        Assertions.assertFalse(ModelRepository.isAnonymousInstanceName("@1234"));
+        Assertions.assertFalse(ModelRepository.isAnonymousInstanceName("@abcd"));
+        Assertions.assertFalse(ModelRepository.isAnonymousInstanceName("@_"));
+        Assertions.assertFalse(ModelRepository.isAnonymousInstanceName("@_abcd"));
+        Assertions.assertFalse(ModelRepository.isAnonymousInstanceName("@_a234"));
+        Assertions.assertFalse(ModelRepository.isAnonymousInstanceName("@_1234a"));
+        Assertions.assertFalse(ModelRepository.isAnonymousInstanceName("@_1_5_67"));
     }
 }

@@ -28,13 +28,13 @@ import org.finos.legend.pure.runtime.java.compiled.CompiledClassloaderStateVerif
 import org.finos.legend.pure.runtime.java.compiled.CompiledMetadataStateVerifier;
 import org.finos.legend.pure.runtime.java.compiled.execution.FunctionExecutionCompiledBuilder;
 import org.finos.legend.pure.runtime.java.compiled.factory.JavaModelFactoryRegistryLoader;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 public class TestPureRuntimeStereotypeCompiled extends TestPureRuntimeStereotype
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getFunctionExecution(), getCodeRepositories(), JavaModelFactoryRegistryLoader.loader());
@@ -50,7 +50,7 @@ public class TestPureRuntimeStereotypeCompiled extends TestPureRuntimeStereotype
 
     @Override
     @Test
-    @Ignore
+    @Disabled
     public void testPureRuntimeProfileWithEnumWithReferenceToEnum() throws Exception
     {
         super.testPureRuntimeProfileWithEnumWithReferenceToEnum();

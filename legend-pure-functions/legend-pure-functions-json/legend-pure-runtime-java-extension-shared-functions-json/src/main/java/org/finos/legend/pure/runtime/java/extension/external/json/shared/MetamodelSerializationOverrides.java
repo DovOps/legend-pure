@@ -87,6 +87,6 @@ class MetamodelSerializationOverrides
 
     static Object serializePackageableElement(CoreInstance pureObject, boolean serializeMultiplicityAsNumber)
     {
-        return serializeMultiplicityAsNumber && pureObject instanceof Multiplicity ? serializeMultiplicityAsNumber((Multiplicity)pureObject) : PackageableElement.getUserPathForPackageableElement(pureObject);
+        return serializeMultiplicityAsNumber && pureObject instanceof Multiplicity m ? serializeMultiplicityAsNumber(m) : PackageableElement.getUserPathForPackageableElement(pureObject);
     }
 }

@@ -16,8 +16,8 @@ package org.finos.legend.pure.m3.tests.function.base.lang;
 
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
 import org.finos.legend.pure.m3.exception.PureExecutionException;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public abstract class AbstractTestRawEvalProperty extends AbstractPureTestWithCoreCompiled
 {
@@ -26,22 +26,24 @@ public abstract class AbstractTestRawEvalProperty extends AbstractPureTestWithCo
     {
         try
         {
-            this.compileTestSource("Class Person\n" +
-                    "{\n" +
-                    "   name: String[1];\n" +
-                    "}\n" +
-                    "Class Alien\n" +
-                    "{\n" +
-                    "   species: String[1];\n" +
-                    "}\n" +
-                    "function test():Nil[0]\n" +
-                    "{\n" +
-                    "   let person = ^Person(name = 'Obi Wan');\n" +
-                    "   let alien = ^Alien(species='Wookiee');\n" +
-                    "   print(Person -> classPropertyByName('name') -> toOne() -> rawEvalProperty($alien), 1);\n" +
-                    "}");
+            this.compileTestSource("""
+                    Class Person
+                    {
+                       name: String[1];
+                    }
+                    Class Alien
+                    {
+                       species: String[1];
+                    }
+                    function test():Nil[0]
+                    {
+                       let person = ^Person(name = 'Obi Wan');
+                       let alien = ^Alien(species='Wookiee');
+                       print(Person -> classPropertyByName('name') -> toOne() -> rawEvalProperty($alien), 1);
+                    }\
+                    """);
             this.execute("test():Nil[0]");
-            Assert.fail();
+            Assertions.fail();
         }
         catch (Exception e)
         {

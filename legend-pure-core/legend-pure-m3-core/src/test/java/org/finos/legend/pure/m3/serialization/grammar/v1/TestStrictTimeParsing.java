@@ -15,8 +15,7 @@
 package org.finos.legend.pure.m3.serialization.grammar.v1;
 
 import org.finos.legend.pure.m4.ModelRepository;
-import org.junit.Test;
-
+import org.junit.jupiter.api.Test;
 
 
 public class TestStrictTimeParsing extends AbstractPrimitiveParsingTest

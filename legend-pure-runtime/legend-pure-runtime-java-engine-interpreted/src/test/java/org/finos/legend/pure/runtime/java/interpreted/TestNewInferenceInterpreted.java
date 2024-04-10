@@ -17,19 +17,19 @@ package org.finos.legend.pure.runtime.java.interpreted;
 import org.finos.legend.pure.m3.tests.function.base.lang.AbstractTestNewInferenceAtRuntime;
 import org.finos.legend.pure.m3.execution.FunctionExecution;
 import org.finos.legend.pure.runtime.java.interpreted.FunctionExecutionInterpreted;
-import org.junit.After;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestNewInferenceInterpreted extends AbstractTestNewInferenceAtRuntime
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getFunctionExecution());
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("fromString.pure");
@@ -44,19 +44,21 @@ public class TestNewInferenceInterpreted extends AbstractTestNewInferenceAtRunti
     public void newMapRuntimeResolution() throws Exception
     {
         compileTestSource("fromString.pure",
-                "Class A{}\n" +
-                        "Class B{}" +
-                        "function gb<U,K>(set:U[*], f:Function<{U[1]->K[1]}>[1]):Map<K,List<U>>[1]\n" +
-                        "{\n" +
-                        "   ^Map<K,List<U>>();\n" +
-                        "}\n" +
-                        "\n" +
-                        "function test():Any[*]\n" +
-                        "{\n" +
-                        "   let a = [A,B]->gb(a|$a->elementToPath());\n" +
-                        "   assert(String == $a.classifierGenericType.typeArguments->at(0).rawType, |'');\n" +
-                        "   assert(Class == $a.classifierGenericType.typeArguments->at(1).typeArguments->at(0).rawType, |'');\n" +
-                        "}");
+                """
+                Class A{}
+                Class B{}\
+                function gb<U,K>(set:U[*], f:Function<{U[1]->K[1]}>[1]):Map<K,List<U>>[1]
+                {
+                   ^Map<K,List<U>>();
+                }
+                
+                function test():Any[*]
+                {
+                   let a = [A,B]->gb(a|$a->elementToPath());
+                   assert(String == $a.classifierGenericType.typeArguments->at(0).rawType, |'');
+                   assert(Class == $a.classifierGenericType.typeArguments->at(1).typeArguments->at(0).rawType, |'');
+                }\
+                """);
         this.compileAndExecute("test():Any[*]");
     }
 }

@@ -19,88 +19,102 @@ import org.eclipse.collections.impl.factory.Maps;
 import org.finos.legend.pure.m2.relational.AbstractPureRelationalTestWithCoreCompiled;
 import org.finos.legend.pure.m3.tests.RuntimeTestScriptBuilder;
 import org.finos.legend.pure.m3.tests.RuntimeVerifier;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class TestPureRuntimeXStoreMapping extends AbstractPureRelationalTestWithCoreCompiled
 {
     public static String model =
-            "Class Firm\n" +
-                    "{\n" +
-                    "   legalName : String[1];\n" +
-                    "}\n" +
-                    "\n" +
-                    "Class Person\n" +
-                    "{\n" +
-                    "   lastName : String[1];\n" +
-                    "}\n" +
-                    "\n" +
-                    "Association Firm_Person\n" +
-                    "{\n" +
-                    "   firm : Firm[1];\n" +
-                    "   employees : Person[*];\n" +
-                    "}\n";
+            """
+            Class Firm
+            {
+               legalName : String[1];
+            }
+            
+            Class Person
+            {
+               lastName : String[1];
+            }
+            
+            Association Firm_Person
+            {
+               firm : Firm[1];
+               employees : Person[*];
+            }
+            """;
 
     public static String modelInheritanceSuper =
-            "Class SuperFirm" +
-                    "{" +
-                    "   id : Integer[1];\n" +
-                    "}";
+            """
+            Class SuperFirm\
+            {\
+               id : Integer[1];
+            }\
+            """;
 
     public static String modelInheritanceSuper2 =
-            "Class SuperFirm" +
-                    "{" +
-                    "   id2 : Integer[1];\n" +
-                    "}";
+            """
+            Class SuperFirm\
+            {\
+               id2 : Integer[1];
+            }\
+            """;
 
     public static String modelInheritance =
-            "Class Firm extends SuperFirm\n" +
-                    "{\n" +
-                    "   legalName : String[1];\n" +
-                    "}\n" +
-                    "\n" +
-                    "Class Person\n" +
-                    "{\n" +
-                    "   lastName : String[1];\n" +
-                    "}\n" +
-                    "\n" +
-                    "Association Firm_Person\n" +
-                    "{\n" +
-                    "   firm : Firm[1];\n" +
-                    "   employees : Person[*];\n" +
-                    "}\n";
+            """
+            Class Firm extends SuperFirm
+            {
+               legalName : String[1];
+            }
+            
+            Class Person
+            {
+               lastName : String[1];
+            }
+            
+            Association Firm_Person
+            {
+               firm : Firm[1];
+               employees : Person[*];
+            }
+            """;
 
     public static String coreMapping =
-            "   Firm[f1] : Relational\n" +
-                    "   {\n" +
-                    "      +id:String[1] : [db]FirmTable.id,\n" +
-                    "      legalName : [db]FirmTable.legal_name\n" +
-                    "   }\n" +
-                    "   \n" +
-                    "   Person[e] : Relational\n" +
-                    "   {\n" +
-                    "      +firmId:String[1] : [db]PersonTable.firmId,\n" +
-                    "      lastName : [db]PersonTable.lastName\n" +
-                    "   }\n";
+            """
+               Firm[f1] : Relational
+               {
+                  +id:String[1] : [db]FirmTable.id,
+                  legalName : [db]FirmTable.legal_name
+               }
+              \s
+               Person[e] : Relational
+               {
+                  +firmId:String[1] : [db]PersonTable.firmId,
+                  lastName : [db]PersonTable.lastName
+               }
+            """;
 
     public static String coreMappingInheritance =
-            "   Firm[f1] : Relational\n" +
-                    "   {\n" +
-                    "      id : [db]FirmTable.id,\n" +
-                    "      legalName : [db]FirmTable.legal_name\n" +
-                    "   }\n" +
-                    "   \n" +
-                    "   Person[e] : Relational\n" +
-                    "   {\n" +
-                    "      +firmId:String[1] : [db]PersonTable.firmId,\n" +
-                    "      lastName : [db]PersonTable.lastName\n" +
-                    "   }\n";
+            """
+               Firm[f1] : Relational
+               {
+                  id : [db]FirmTable.id,
+                  legalName : [db]FirmTable.legal_name
+               }
+              \s
+               Person[e] : Relational
+               {
+                  +firmId:String[1] : [db]PersonTable.firmId,
+                  lastName : [db]PersonTable.lastName
+               }
+            """;
 
     public static String assoMapping =
-            "   Firm_Person : XStore\n" +
-                    "   {\n" +
-                    "      firm[e, f1] : $this.firmId == $that.id,\n" +
-                    "      employees[f1, e] : $this.id == $that.firmId\n" +
-                    "   }\n";
+            """
+               Firm_Person : XStore
+               {
+                  firm[e, f1] : $this.firmId == $that.id,
+                  employees[f1, e] : $this.id == $that.firmId
+               }
+            """;
 
 
     public static String initialMapping = "###Mapping\nMapping FirmMapping\n(" + coreMapping + ")";
@@ -116,12 +130,14 @@ public class TestPureRuntimeXStoreMapping extends AbstractPureRelationalTestWith
     public static String mainMapping = "###Mapping\nMapping FirmMapping\n(\ninclude ModelMapping\n" + assoMapping + ")\n";
 
     public static String relational =
-            "###Relational\n" +
-                    "Database db\n" +
-                    "(\n" +
-                    "   Table FirmTable (id INTEGER, legal_name VARCHAR(200))\n" +
-                    "   Table PersonTable (firmId INTEGER, lastName VARCHAR(200))\n" +
-                    ")";
+            """
+            ###Relational
+            Database db
+            (
+               Table FirmTable (id INTEGER, legal_name VARCHAR(200))
+               Table PersonTable (firmId INTEGER, lastName VARCHAR(200))
+            )\
+            """;
 
     @Test
     public void testCreateAndDeleteAssoXStoreMapping() throws Exception

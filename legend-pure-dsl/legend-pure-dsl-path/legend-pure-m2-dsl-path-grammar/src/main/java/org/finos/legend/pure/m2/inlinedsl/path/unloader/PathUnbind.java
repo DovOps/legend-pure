@@ -48,9 +48,8 @@ public class PathUnbind implements MatchRunner<Path<?, ?>>
         Shared.cleanUpGenericType(start, (UnbindState) state, processorSupport);
         modelElement._path().forEach(pathElement ->
         {
-            if (pathElement instanceof PropertyPathElement)
+            if (pathElement instanceof PropertyPathElement propertyPathElement)
             {
-                PropertyPathElement propertyPathElement = (PropertyPathElement) pathElement;
                 PropertyStub property = (PropertyStub) propertyPathElement._propertyCoreInstance();
                 CoreInstance resolved = property._resolvedPropertyCoreInstance();
                 if (resolved != null)
@@ -62,9 +61,9 @@ public class PathUnbind implements MatchRunner<Path<?, ?>>
 
                 propertyPathElement._parameters().forEach(parameter ->
                 {
-                    if (parameter instanceof InstanceValue)
+                    if (parameter instanceof InstanceValue value)
                     {
-                        ((InstanceValue) parameter)._valuesCoreInstance().forEach(value -> Shared.cleanEnumStub(value, processorSupport));
+                        value._valuesCoreInstance().forEach(value -> Shared.cleanEnumStub(value, processorSupport));
                         parameter._multiplicityRemove();
                         parameter._genericTypeRemove();
                     }

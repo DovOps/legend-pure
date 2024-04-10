@@ -16,18 +16,18 @@ package org.finos.legend.pure.runtime.java.interpreted.incremental.enumeration;
 
 import org.finos.legend.pure.m3.tests.incremental.enumeration.AbstractPureRuntimeEnumerationTest;
 import org.finos.legend.pure.m4.exception.PureCompilationException;
-import org.junit.After;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 
 public class TestPureRuntimeEnumeration extends AbstractPureRuntimeEnumerationTest
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime();
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("sourceId.pure");

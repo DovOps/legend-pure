@@ -41,13 +41,15 @@ public class Get extends AbstractNative
     @Override
     public String buildBody()
     {
-        return "new DefendedPureFunction2<PureMap, Object, Object>()\n" +
-                "        {\n" +
-                "            @Override\n" +
-                "            public Object value(PureMap map, Object key, ExecutionSupport es)\n" +
-                "            {\n" +
-                "                return map.getMap().get(key);\n" +
-                "            }\n" +
-                "        }";
+        return """
+                new DefendedPureFunction2<PureMap, Object, Object>()
+                        {
+                            @Override
+                            public Object value(PureMap map, Object key, ExecutionSupport es)
+                            {
+                                return map.getMap().get(key);
+                            }
+                        }\
+                """;
     }
 }

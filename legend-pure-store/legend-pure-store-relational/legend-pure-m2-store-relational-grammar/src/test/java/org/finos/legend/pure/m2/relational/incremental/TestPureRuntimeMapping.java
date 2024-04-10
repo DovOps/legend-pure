@@ -21,9 +21,9 @@ import org.eclipse.collections.impl.factory.Sets;
 import org.finos.legend.pure.m2.relational.AbstractPureRelationalTestWithCoreCompiled;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
 import org.finos.legend.pure.m4.exception.PureCompilationException;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class TestPureRuntimeMapping extends AbstractPureRelationalTestWithCoreCompiled
 {
@@ -35,33 +35,39 @@ public class TestPureRuntimeMapping extends AbstractPureRelationalTestWithCoreCo
 
     private MutableMap<String, String> sources = Maps.mutable.empty();
 
-    @Before
+    @BeforeEach
     public void setUp()
     {
         this.sources.put(MODEL_SOURCE_ID,
-                "import test::*;\n" +
-                        "\n" +
-                        "Class test::Person\n" +
-                        "{\n" +
-                        "   name:String[1];\n" +
-                        "}");
+                """
+                import test::*;
+                
+                Class test::Person
+                {
+                   name:String[1];
+                }\
+                """);
         this.sources.put(STORE_SOURCE_ID,
-                "###Relational\n" +
-                        "Database test::TestDB\n" +
-                        "(\n" +
-                        "   Table personTb(name VARCHAR(200), firmId INT)\n" +
-                        ")");
+                """
+                ###Relational
+                Database test::TestDB
+                (
+                   Table personTb(name VARCHAR(200), firmId INT)
+                )\
+                """);
         this.sources.put(MAPPING_SOURCE_ID,
-                "###Mapping\n" +
-                        "import test::*;\n" +
-                        "\n" +
-                        "Mapping test::TestMapping\n" +
-                        "(\n" +
-                        "   Person : Relational\n" +
-                        "            {\n" +
-                        "               name:[TestDB]personTb.name\n" +
-                        "            }\n" +
-                        ")");
+                """
+                ###Mapping
+                import test::*;
+                
+                Mapping test::TestMapping
+                (
+                   Person : Relational
+                            {
+                               name:[TestDB]personTb.name
+                            }
+                )\
+                """);
     }
 
     @Test
@@ -73,12 +79,12 @@ public class TestPureRuntimeMapping extends AbstractPureRelationalTestWithCoreCo
         for (int i = 0; i < TEST_COUNT; i++)
         {
             compileSource(MAPPING_SOURCE_ID);
-            Assert.assertNotNull(this.runtime.getCoreInstance("test::TestMapping"));
+            Assertions.assertNotNull(this.runtime.getCoreInstance("test::TestMapping"));
             deleteSource(MAPPING_SOURCE_ID);
-            Assert.assertNull(this.runtime.getCoreInstance("test::TestMapping"));
+            Assertions.assertNull(this.runtime.getCoreInstance("test::TestMapping"));
 
-            Assert.assertEquals(expectedInstances, this.context.getAllInstances());
-            Assert.assertEquals("Failed on iteration #" + i, expectedSize, this.repository.serialize().length);
+            Assertions.assertEquals(expectedInstances, this.context.getAllInstances());
+            Assertions.assertEquals(expectedSize, this.repository.serialize().length, "Failed on iteration #" + i);
         }
     }
 
@@ -93,14 +99,14 @@ public class TestPureRuntimeMapping extends AbstractPureRelationalTestWithCoreCo
             try
             {
                 deleteSource(MODEL_SOURCE_ID);
-                Assert.fail("Expected compilation exception");
+                Assertions.fail("Expected compilation exception");
             }
             catch (Exception e)
             {
                 assertPureException(PureCompilationException.class, "Person has not been defined!", MAPPING_SOURCE_ID, 6, 4, e);
             }
             compileSource(MODEL_SOURCE_ID);
-            Assert.assertEquals("Failed on iteration #" + i, expectedSize, this.repository.serialize().length);
+            Assertions.assertEquals(expectedSize, this.repository.serialize().length, "Failed on iteration #" + i);
         }
     }
 
@@ -115,14 +121,14 @@ public class TestPureRuntimeMapping extends AbstractPureRelationalTestWithCoreCo
             try
             {
                 deleteSource(STORE_SOURCE_ID);
-                Assert.fail("Expected compilation exception");
+                Assertions.fail("Expected compilation exception");
             }
             catch (Exception e)
             {
                 assertPureException(PureCompilationException.class, "TestDB has not been defined!", MAPPING_SOURCE_ID, 8, 22, e);
             }
             compileSource(STORE_SOURCE_ID);
-            Assert.assertEquals("Failed on iteration #" + i, expectedSize, this.repository.serialize().length);
+            Assertions.assertEquals(expectedSize, this.repository.serialize().length, "Failed on iteration #" + i);
         }
     }
 

@@ -18,19 +18,19 @@ import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
 import org.finos.legend.pure.m3.execution.FunctionExecution;
 import org.finos.legend.pure.runtime.java.compiled.execution.FunctionExecutionCompiledBuilder;
 import org.finos.legend.pure.runtime.java.compiled.factory.JavaModelFactoryRegistryLoader;
-import org.junit.After;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestClassInInstanceValue extends AbstractPureTestWithCoreCompiled
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getFunctionExecution(), JavaModelFactoryRegistryLoader.loader());
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("fromString.pure");
@@ -39,72 +39,78 @@ public class TestClassInInstanceValue extends AbstractPureTestWithCoreCompiled
     @Test
     public void testListOfClassesValue()
     {
-        compileTestSource("fromString.pure", "Class A\n" +
-                          "{\n" +
-                          "    test : String[1];\n" +
-                          "}\n" +
-                          "\n" +
-                          "function test():Boolean[1]\n" +
-                          "{" +
-                          "   let classes = [A,A];\n" +
-                          "   assertEquals('A', $classes.name->removeDuplicates());\n" +
-                          "}\n");
+        compileTestSource("fromString.pure", """
+                          Class A
+                          {
+                              test : String[1];
+                          }
+                          
+                          function test():Boolean[1]
+                          {\
+                             let classes = [A,A];
+                             assertEquals('A', $classes.name->removeDuplicates());
+                          }
+                          """);
         this.compileAndExecute("test():Boolean[1]");
     }
 
     @Test
     public void testListOfClassesValueAsParams()
     {
-        compileTestSource("fromString.pure", "Class A\n" +
-                          "{\n" +
-                          "    test : String[1];\n" +
-                          "}\n" +
-                          "\n" +
-                          "function test():Boolean[1]\n" +
-                          "{" +
-                          "   assertEquals('x', fu([A,A]));\n" +
-                          "}" +
-                          "" +
-                          "function fu(a: Class<Any>[*]):Any[*]" +
-                          "{" +
-                          "     'x';" +
-                          "}\n");
+        compileTestSource("fromString.pure", """
+                          Class A
+                          {
+                              test : String[1];
+                          }
+                          
+                          function test():Boolean[1]
+                          {\
+                             assertEquals('x', fu([A,A]));
+                          }\
+                          function fu(a: Class<Any>[*]):Any[*]\
+                          {\
+                               'x';\
+                          }
+                          """);
         this.compileAndExecute("test():Boolean[1]");
     }
 
     @Test
     public void testListOfClassesValueOneValueInList()
     {
-        compileTestSource("fromString.pure", "Class A\n" +
-                          "{\n" +
-                          "    test : String[1];\n" +
-                          "}\n" +
-                          "\n" +
-                          "function test():Boolean[1]\n" +
-                          "{" +
-                          "   assertEquals('x', fu([A]));\n" +
-                          "}" +
-                          "" +
-                          "function fu(a: Class<Any>[*]):Any[*]" +
-                          "{" +
-                          "     'x';" +
-                          "}\n");
+        compileTestSource("fromString.pure", """
+                          Class A
+                          {
+                              test : String[1];
+                          }
+                          
+                          function test():Boolean[1]
+                          {\
+                             assertEquals('x', fu([A]));
+                          }\
+                          function fu(a: Class<Any>[*]):Any[*]\
+                          {\
+                               'x';\
+                          }
+                          """);
         this.compileAndExecute("test():Boolean[1]");
     }
 
     @Test
     public void testListOfClassesWithCommonSupertype()
     {
-        compileTestSource("fromString.pure", "import test::*;\n" +
-                "Class test::A {}\n" +
-                "Class test::B extends A {}\n" +
-                "Class test::C extends A {}\n" +
-                "Class test::D extends A {}\n" +
-                "function test():Any[*]\n" +
-                "{\n" +
-                "  let classes = [B, C, D];\n" +
-                "  assert('test::B, test::C, test::D' == $classes->map(c | $c->elementToPath())->joinStrings(', '), |'');\n" +
-                "}\n");
+        compileTestSource("fromString.pure", """
+                import test::*;
+                Class test::A {}
+                Class test::B extends A {}
+                Class test::C extends A {}
+                Class test::D extends A {}
+                function test():Any[*]
+                {
+                  let classes = [B, C, D];
+                  assert('test::B, test::C, test::D' == $classes->map(c | $c->elementToPath())->joinStrings(', '), |'');
+                }
+                """);
         compileAndExecute("test():Any[*]");
     }
 

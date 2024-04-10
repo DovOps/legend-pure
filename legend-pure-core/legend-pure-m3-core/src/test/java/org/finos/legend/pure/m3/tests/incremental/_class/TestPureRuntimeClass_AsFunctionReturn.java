@@ -31,14 +31,14 @@ import org.finos.legend.pure.m3.tests.RuntimeTestScriptBuilder;
 import org.finos.legend.pure.m3.tests.RuntimeVerifier;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
 import org.finos.legend.pure.m4.exception.PureCompilationException;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestPureRuntimeClass_AsFunctionReturn extends AbstractPureTestWithCoreCompiledPlatform
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getFunctionExecution(), new CompositeCodeStorage(new ClassLoaderCodeStorage(getCodeRepositories())), getFactoryRegistryOverride(), getOptions(), getExtra());
@@ -54,7 +54,7 @@ public class TestPureRuntimeClass_AsFunctionReturn extends AbstractPureTestWithC
         return repositories;
     }
 
-    @After
+    @AfterEach
     public void clearRuntime()
     {
         runtime.delete("other.pure");
@@ -70,8 +70,10 @@ public class TestPureRuntimeClass_AsFunctionReturn extends AbstractPureTestWithC
     public void testPureRuntimeClassAsFunctionReturn()
     {
         RuntimeVerifier.verifyOperationIsStable(new RuntimeTestScriptBuilder().createInMemorySource("sourceId.pure", "Class A{}")
-                        .createInMemorySource("userId.pure", "function q(a:A[0]):Nil[0]{[];}" +
-                                "function test():Nil[0]{q(f()->cast(@A));}")
+                        .createInMemorySource("userId.pure", """
+                                function q(a:A[0]):Nil[0]{[];}\
+                                function test():Nil[0]{q(f()->cast(@A));}\
+                                """)
                         .createInMemorySource("other.pure", "function f():Nil[0]{[]}")
                         .compile(),
                 new RuntimeTestScriptBuilder()
@@ -88,25 +90,31 @@ public class TestPureRuntimeClass_AsFunctionReturn extends AbstractPureTestWithC
         RuntimeVerifier.verifyOperationIsStable(new RuntimeTestScriptBuilder()
                         .createInMemorySource(
                                 "/test/testFileA.pure",
-                                "Class test::TestClassA\n" +
-                                        "{\n" +
-                                        "}\n")
+                                """
+                                Class test::TestClassA
+                                {
+                                }
+                                """)
                         .createInMemorySource(
                                 "/test/testFileB.pure",
-                                "import test::*;\n" +
-                                        "function test::testFn():Function<{FunctionDefinition<{->TestClassA[1]}>[1]->String[1]}>[0..1]\n" +
-                                        "{\n" +
-                                        "    []\n" +
-                                        "}\n")
+                                """
+                                import test::*;
+                                function test::testFn():Function<{FunctionDefinition<{->TestClassA[1]}>[1]->String[1]}>[0..1]
+                                {
+                                    []
+                                }
+                                """)
                         .compile(),
                 new RuntimeTestScriptBuilder()
                         .deleteSource("/test/testFileA.pure")
                         .compileWithExpectedCompileFailure("TestClassA has not been defined!", "/test/testFileB.pure", 2, 57)
                         .createInMemorySource(
                                 "/test/testFileA.pure",
-                                "Class test::TestClassA\n" +
-                                        "{\n" +
-                                        "}\n")
+                                """
+                                Class test::TestClassA
+                                {
+                                }
+                                """)
                         .compile(),
                 runtime, functionExecution, this.getAdditionalVerifiers());
     }
@@ -115,8 +123,10 @@ public class TestPureRuntimeClass_AsFunctionReturn extends AbstractPureTestWithC
     public void testPureRuntimeClassAsLambdaFunctionReturn()
     {
         RuntimeVerifier.verifyOperationIsStable(new RuntimeTestScriptBuilder().createInMemorySource("sourceId.pure", "Class A{}")
-                        .createInMemorySource("userId.pure", "function execute<T>(p:Function<{->T[*]}>[1]):T[*]{$p->eval()}" +
-                                "function test():A[*]{execute(|A.all())}")
+                        .createInMemorySource("userId.pure", """
+                                function execute<T>(p:Function<{->T[*]}>[1]):T[*]{$p->eval()}\
+                                function test():A[*]{execute(|A.all())}\
+                                """)
                         .compile(),
                 new RuntimeTestScriptBuilder()
                         .deleteSource("sourceId.pure")
@@ -130,8 +140,10 @@ public class TestPureRuntimeClass_AsFunctionReturn extends AbstractPureTestWithC
     public void testPureRuntimeClassAsFunctionReturnError()
     {
         RuntimeVerifier.verifyOperationIsStable(new RuntimeTestScriptBuilder().createInMemorySource("sourceId.pure", "Class A{}")
-                        .createInMemorySource("userId.pure", "function q(a:A[0]):Nil[0]{[];}" +
-                                "function test():Nil[0]{q(f());}")
+                        .createInMemorySource("userId.pure", """
+                                function q(a:A[0]):Nil[0]{[];}\
+                                function test():Nil[0]{q(f());}\
+                                """)
                         .createInMemorySource("other.pure", "function f():A[0]{[]}")
                         .compile(),
                 new RuntimeTestScriptBuilder()
@@ -197,25 +209,31 @@ public class TestPureRuntimeClass_AsFunctionReturn extends AbstractPureTestWithC
         RuntimeVerifier.verifyOperationIsStable(new RuntimeTestScriptBuilder()
                         .createInMemorySource(
                                 "/test/testFileA.pure",
-                                "Class test::TestClassA\n" +
-                                        "{\n" +
-                                        "}\n")
+                                """
+                                Class test::TestClassA
+                                {
+                                }
+                                """)
                         .createInMemorySource(
                                 "/test/testFileB.pure",
-                                "import test::*;\n" +
-                                        "Class test::TestClassB\n" +
-                                        "{\n" +
-                                        "    prop:Pair<TestClassA, String>[1];\n" +
-                                        "}\n")
+                                """
+                                import test::*;
+                                Class test::TestClassB
+                                {
+                                    prop:Pair<TestClassA, String>[1];
+                                }
+                                """)
                         .compile(),
                 new RuntimeTestScriptBuilder()
                         .deleteSource("/test/testFileA.pure")
                         .compileWithExpectedCompileFailure("TestClassA has not been defined!", "/test/testFileB.pure", 4, 15)
                         .createInMemorySource(
                                 "/test/testFileA.pure",
-                                "Class test::TestClassA\n" +
-                                        "{\n" +
-                                        "}\n")
+                                """
+                                Class test::TestClassA
+                                {
+                                }
+                                """)
                         .compile(),
                 runtime, functionExecution, this.getAdditionalVerifiers());
     }
@@ -226,25 +244,31 @@ public class TestPureRuntimeClass_AsFunctionReturn extends AbstractPureTestWithC
         RuntimeVerifier.verifyOperationIsStable(new RuntimeTestScriptBuilder()
                         .createInMemorySource(
                                 "/test/testFileA.pure",
-                                "Class test::TestClassA\n" +
-                                        "{\n" +
-                                        "}\n")
+                                """
+                                Class test::TestClassA
+                                {
+                                }
+                                """)
                         .createInMemorySource(
                                 "/test/testFileB.pure",
-                                "import test::*;\n" +
-                                        "Class test::TestClassB\n" +
-                                        "{\n" +
-                                        "    prop:Function<{->TestClassA[1]}>[0..1];\n" +
-                                        "}\n")
+                                """
+                                import test::*;
+                                Class test::TestClassB
+                                {
+                                    prop:Function<{->TestClassA[1]}>[0..1];
+                                }
+                                """)
                         .compile(),
                 new RuntimeTestScriptBuilder()
                         .deleteSource("/test/testFileA.pure")
                         .compileWithExpectedCompileFailure("TestClassA has not been defined!", "/test/testFileB.pure", 4, 22)
                         .createInMemorySource(
                                 "/test/testFileA.pure",
-                                "Class test::TestClassA\n" +
-                                        "{\n" +
-                                        "}\n")
+                                """
+                                Class test::TestClassA
+                                {
+                                }
+                                """)
                         .compile(),
                 runtime, functionExecution, this.getAdditionalVerifiers());
     }
@@ -255,25 +279,31 @@ public class TestPureRuntimeClass_AsFunctionReturn extends AbstractPureTestWithC
         RuntimeVerifier.verifyOperationIsStable(new RuntimeTestScriptBuilder()
                         .createInMemorySource(
                                 "/test/testFileA.pure",
-                                "Class test::TestClassA\n" +
-                                        "{\n" +
-                                        "}\n")
+                                """
+                                Class test::TestClassA
+                                {
+                                }
+                                """)
                         .createInMemorySource(
                                 "/test/testFileB.pure",
-                                "import test::*;\n" +
-                                        "Class test::TestClassB\n" +
-                                        "{\n" +
-                                        "    prop:Function<{FunctionDefinition<{->TestClassA[1]}>[1]->String[1]}>[0..1];\n" +
-                                        "}\n")
+                                """
+                                import test::*;
+                                Class test::TestClassB
+                                {
+                                    prop:Function<{FunctionDefinition<{->TestClassA[1]}>[1]->String[1]}>[0..1];
+                                }
+                                """)
                         .compile(),
                 new RuntimeTestScriptBuilder()
                         .deleteSource("/test/testFileA.pure")
                         .compileWithExpectedCompileFailure("TestClassA has not been defined!", "/test/testFileB.pure", 4, 42)
                         .createInMemorySource(
                                 "/test/testFileA.pure",
-                                "Class test::TestClassA\n" +
-                                        "{\n" +
-                                        "}\n")
+                                """
+                                Class test::TestClassA
+                                {
+                                }
+                                """)
                         .compile(),
                 runtime, functionExecution, this.getAdditionalVerifiers());
     }
@@ -308,20 +338,22 @@ public class TestPureRuntimeClass_AsFunctionReturn extends AbstractPureTestWithC
                         .compile(),
                 runtime, functionExecution, this.getAdditionalVerifiers());
 
-        Assert.assertEquals("B instance Class\n" +
-                "    classifierGenericType(Property):\n" +
-                "        Anonymous_StripedId instance GenericType\n" +
-                "            [... >0]\n" +
-                "    generalizations(Property):\n" +
-                "        Anonymous_StripedId instance Generalization\n" +
-                "            [... >0]\n" +
-                "    name(Property):\n" +
-                "        B instance String\n" +
-                "    package(Property):\n" +
-                "        Root instance Package\n" +
-                "    referenceUsages(Property):\n" +
-                "        Anonymous_StripedId instance ReferenceUsage\n" +
-                "            [... >0]", runtime.getCoreInstance("B").printWithoutDebug("", 0));
+        Assertions.assertEquals("""
+                B instance Class
+                    classifierGenericType(Property):
+                        Anonymous_StripedId instance GenericType
+                            [... >0]
+                    generalizations(Property):
+                        Anonymous_StripedId instance Generalization
+                            [... >0]
+                    name(Property):
+                        B instance String
+                    package(Property):
+                        Root instance Package
+                    referenceUsages(Property):
+                        Anonymous_StripedId instance ReferenceUsage
+                            [... >0]\
+                """, runtime.getCoreInstance("B").printWithoutDebug("", 0));
     }
 
     @Test
@@ -356,12 +388,12 @@ public class TestPureRuntimeClass_AsFunctionReturn extends AbstractPureTestWithC
         CoreInstance classA = processorSupport.package_getByUserPath("A");
         CoreInstance classB = processorSupport.package_getByUserPath("B");
         CoreInstance prop = _Class.getQualifiedPropertiesByName(classB, processorSupport).get("prop()");
-        Assert.assertSame(classA, Instance.getValueForMetaPropertyToOneResolved(prop, M3Properties.genericType, M3Properties.rawType, processorSupport));
+        Assertions.assertSame(classA, Instance.getValueForMetaPropertyToOneResolved(prop, M3Properties.genericType, M3Properties.rawType, processorSupport));
 
         for (int i = 0; i < 10; i++)
         {
             runtime.delete("sourceId.pure");
-            PureCompilationException e = Assert.assertThrows(PureCompilationException.class, runtime::compile);
+            PureCompilationException e = Assertions.assertThrows(PureCompilationException.class, runtime::compile);
             assertPureException(PureCompilationException.class, "A has not been defined!", "sourceId2.pure", e);
 
             runtime.createInMemorySource("sourceId.pure", sources.get("sourceId.pure"));
@@ -370,9 +402,9 @@ public class TestPureRuntimeClass_AsFunctionReturn extends AbstractPureTestWithC
             classA = processorSupport.package_getByUserPath("A");
             classB = processorSupport.package_getByUserPath("B");
             prop = _Class.getQualifiedPropertiesByName(classB, processorSupport).get("prop()");
-            Assert.assertSame(classA, Instance.getValueForMetaPropertyToOneResolved(prop, M3Properties.genericType, M3Properties.rawType, processorSupport));
+            Assertions.assertSame(classA, Instance.getValueForMetaPropertyToOneResolved(prop, M3Properties.genericType, M3Properties.rawType, processorSupport));
 
-            Assert.assertEquals(size, repository.serialize().length);
+            Assertions.assertEquals(size, repository.serialize().length);
         }
     }
 
@@ -413,8 +445,10 @@ public class TestPureRuntimeClass_AsFunctionReturn extends AbstractPureTestWithC
     public void testPureRuntimeClassAsFunctionReturnUsingParam()
     {
         RuntimeVerifier.verifyOperationIsStable(new RuntimeTestScriptBuilder().createInMemorySource("sourceId.pure", "Class A{}")
-                        .createInMemorySource("userId.pure", "function q(a:A[1]):Nil[0]{[];}" +
-                                "function test():Nil[0]{let p=f(); q($p);}")
+                        .createInMemorySource("userId.pure", """
+                                function q(a:A[1]):Nil[0]{[];}\
+                                function test():Nil[0]{let p=f(); q($p);}\
+                                """)
                         .createInMemorySource("other.pure", "function f():A[1]{^A()}")
                         .compile(),
                 new RuntimeTestScriptBuilder()
@@ -430,8 +464,10 @@ public class TestPureRuntimeClass_AsFunctionReturn extends AbstractPureTestWithC
     public void testPureRuntimeClassAsFunctionReturnUsingParamError()
     {
         RuntimeVerifier.verifyOperationIsStable(new RuntimeTestScriptBuilder().createInMemorySource("sourceId.pure", "Class A{}")
-                        .createInMemorySource("userId.pure", "function q(a:A[1]):Nil[0]{[];}" +
-                                "function test():Nil[0]{let p=f(); q($p);}")
+                        .createInMemorySource("userId.pure", """
+                                function q(a:A[1]):Nil[0]{[];}\
+                                function test():Nil[0]{let p=f(); q($p);}\
+                                """)
                         .createInMemorySource("other.pure", "function f():A[1]{^A()}")
                         .compile(),
                 new RuntimeTestScriptBuilder()

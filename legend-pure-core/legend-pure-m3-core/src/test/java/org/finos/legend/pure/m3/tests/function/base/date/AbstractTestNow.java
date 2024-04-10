@@ -20,8 +20,8 @@ import org.finos.legend.pure.m3.navigation.Instance;
 import org.finos.legend.pure.m3.navigation.PrimitiveUtilities;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
 import org.finos.legend.pure.m4.coreinstance.primitive.date.PureDate;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
 
@@ -50,11 +50,11 @@ public abstract class AbstractTestNow extends AbstractPureTestWithCoreCompiled
         PureDate pureDate = PrimitiveUtilities.getDateValue(date);
 
         // Check that the date has millisecond precision
-        Assert.assertTrue(pureDate.hasSubsecond());
-        Assert.assertEquals(3, pureDate.getSubsecond().length());
+        Assertions.assertTrue(pureDate.hasSubsecond());
+        Assertions.assertEquals(3, pureDate.getSubsecond().length());
 
         // Compare with before and after epoch millis
         long actual = pureDate.getCalendar().getTimeInMillis();
-        Assert.assertTrue("Expected actual (" + pureDate + ") to be between " + Instant.ofEpochMilli(before) + " and " + Instant.ofEpochMilli(after), (before <= actual) && (actual <= after));
+        Assertions.assertTrue((before <= actual) && (actual <= after), "Expected actual (" + pureDate + ") to be between " + Instant.ofEpochMilli(before) + " and " + Instant.ofEpochMilli(after));
     }
 }

@@ -16,15 +16,15 @@ package org.finos.legend.pure.m3.serialization.runtime;
 
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiledPlatform;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
-@Ignore
+@Disabled
 public class TestUnbindingScope extends AbstractPureTestWithCoreCompiledPlatform
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getExtra());
@@ -36,324 +36,380 @@ public class TestUnbindingScope extends AbstractPureTestWithCoreCompiledPlatform
     public void testScopeOfFunctionUndbindingForClass_ReturnType()
     {
         compileTestSource("/test/source1.pure",
-                "Class test::A\n" +
-                        "{\n" +
-                        "    name:String[1];\n" +
-                        "}\n");
+                """
+                Class test::A
+                {
+                    name:String[1];
+                }
+                """);
         compileTestSource("/test/source2.pure",
-                "import test::*;\n" +
-                        "function test::testFn():A[*]\n" +
-                        "{\n" +
-                        "    []\n" +
-                        "}\n");
+                """
+                import test::*;
+                function test::testFn():A[*]
+                {
+                    []
+                }
+                """);
         CoreInstance testFn = runtime.getFunction("test::testFn():A[*]");
-        Assert.assertTrue(testFn.hasBeenValidated());
+        Assertions.assertTrue(testFn.hasBeenValidated());
         runtime.delete("/test/source1.pure");
         runtime.getIncrementalCompiler().unload();
-        Assert.assertFalse(testFn.hasBeenProcessed());
+        Assertions.assertFalse(testFn.hasBeenProcessed());
     }
 
     @Test
     public void testScopeOfFunctionUndbindingForClass_ReturnTypeGeneric()
     {
         compileTestSource("/test/source1.pure",
-                "Class test::A\n" +
-                        "{\n" +
-                        "    name:String[1];\n" +
-                        "}\n");
+                """
+                Class test::A
+                {
+                    name:String[1];
+                }
+                """);
         compileTestSource("/test/source2.pure",
-                "import test::*;\n" +
-                        "function test::testFn():List<A>[*]\n" +
-                        "{\n" +
-                        "    []\n" +
-                        "}\n");
+                """
+                import test::*;
+                function test::testFn():List<A>[*]
+                {
+                    []
+                }
+                """);
         CoreInstance testFn = runtime.getFunction("test::testFn():List[*]");
-        Assert.assertTrue(testFn.hasBeenValidated());
+        Assertions.assertTrue(testFn.hasBeenValidated());
         runtime.delete("/test/source1.pure");
         runtime.getIncrementalCompiler().unload();
-        Assert.assertFalse(testFn.hasBeenProcessed());
+        Assertions.assertFalse(testFn.hasBeenProcessed());
     }
 
     @Test
     public void testScopeOfFunctionUndbindingForClass_ParameterType()
     {
         compileTestSource("/test/source1.pure",
-                "Class test::A\n" +
-                        "{\n" +
-                        "    name:String[1];\n" +
-                        "}\n");
+                """
+                Class test::A
+                {
+                    name:String[1];
+                }
+                """);
         compileTestSource("/test/source2.pure",
-                "import test::*;\n" +
-                        "function test::testFn(a:A[1]):String[*]\n" +
-                        "{\n" +
-                        "    []\n" +
-                        "}\n");
+                """
+                import test::*;
+                function test::testFn(a:A[1]):String[*]
+                {
+                    []
+                }
+                """);
         CoreInstance testFn = runtime.getFunction("test::testFn(A[1]):String[*]");
-        Assert.assertTrue(testFn.hasBeenValidated());
+        Assertions.assertTrue(testFn.hasBeenValidated());
         runtime.delete("/test/source1.pure");
         runtime.getIncrementalCompiler().unload();
-        Assert.assertFalse(testFn.hasBeenProcessed());
+        Assertions.assertFalse(testFn.hasBeenProcessed());
     }
 
     @Test
     public void testScopeOfFunctionUndbindingForClass_ParameterTypeGeneric()
     {
         compileTestSource("/test/source1.pure",
-                "Class test::A\n" +
-                        "{\n" +
-                        "    name:String[1];\n" +
-                        "}\n");
+                """
+                Class test::A
+                {
+                    name:String[1];
+                }
+                """);
         compileTestSource("/test/source2.pure",
-                "import test::*;\n" +
-                        "function test::testFn(a:List<A>[1]):String[*]\n" +
-                        "{\n" +
-                        "    []\n" +
-                        "}\n");
+                """
+                import test::*;
+                function test::testFn(a:List<A>[1]):String[*]
+                {
+                    []
+                }
+                """);
         CoreInstance testFn = runtime.getFunction("test::testFn(List[1]):String[*]");
-        Assert.assertTrue(testFn.hasBeenValidated());
+        Assertions.assertTrue(testFn.hasBeenValidated());
         runtime.delete("/test/source1.pure");
         runtime.getIncrementalCompiler().unload();
-        Assert.assertFalse(testFn.hasBeenProcessed());
+        Assertions.assertFalse(testFn.hasBeenProcessed());
     }
 
     @Test
     public void testScopeOfFunctionUndbindingForClass_FunctionBody_Explicit_New()
     {
         compileTestSource("/test/source1.pure",
-                "Class test::A\n" +
-                        "{\n" +
-                        "    name:String[1];\n" +
-                        "}\n");
+                """
+                Class test::A
+                {
+                    name:String[1];
+                }
+                """);
         compileTestSource("/test/source2.pure",
-                "import test::*;\n" +
-                        "function test::testFn(name:String[1]):Any[1]\n" +
-                        "{\n" +
-                        "    ^A(name=$name)\n" +
-                        "}\n");
+                """
+                import test::*;
+                function test::testFn(name:String[1]):Any[1]
+                {
+                    ^A(name=$name)
+                }
+                """);
         CoreInstance testFn = runtime.getFunction("test::testFn(String[1]):Any[1]");
-        Assert.assertTrue(testFn.hasBeenValidated());
+        Assertions.assertTrue(testFn.hasBeenValidated());
         runtime.delete("/test/source1.pure");
         runtime.getIncrementalCompiler().unload();
-        Assert.assertFalse(testFn.hasBeenProcessed());
+        Assertions.assertFalse(testFn.hasBeenProcessed());
     }
 
     @Test
     public void testScopeOfFunctionUndbindingForClass_FunctionBody_Explicit_NewGeneric()
     {
         compileTestSource("/test/source1.pure",
-                "Class test::A\n" +
-                        "{\n" +
-                        "    name:String[1];\n" +
-                        "}\n");
+                """
+                Class test::A
+                {
+                    name:String[1];
+                }
+                """);
         compileTestSource("/test/source2.pure",
-                "import test::*;\n" +
-                        "function test::testFn(name:String[1]):Any[1]\n" +
-                        "{\n" +
-                        "    ^List<A>()\n" +
-                        "}\n");
+                """
+                import test::*;
+                function test::testFn(name:String[1]):Any[1]
+                {
+                    ^List<A>()
+                }
+                """);
         CoreInstance testFn = runtime.getFunction("test::testFn(String[1]):Any[1]");
-        Assert.assertTrue(testFn.hasBeenValidated());
+        Assertions.assertTrue(testFn.hasBeenValidated());
         runtime.delete("/test/source1.pure");
         runtime.getIncrementalCompiler().unload();
-        Assert.assertFalse(testFn.hasBeenProcessed());
+        Assertions.assertFalse(testFn.hasBeenProcessed());
     }
 
     @Test
     public void testScopeOfFunctionUndbindingForClass_FunctionBody_Explicit_Cast()
     {
         compileTestSource("/test/source1.pure",
-                "Class test::A\n" +
-                        "{\n" +
-                        "    name:String[1];\n" +
-                        "}\n");
+                """
+                Class test::A
+                {
+                    name:String[1];
+                }
+                """);
         compileTestSource("/test/source2.pure",
-                "import test::*;\n" +
-                        "function test::testFn(a:Any[1]):String[1]\n" +
-                        "{\n" +
-                        "    $a->cast(@A).name\n" +
-                        "}\n");
+                """
+                import test::*;
+                function test::testFn(a:Any[1]):String[1]
+                {
+                    $a->cast(@A).name
+                }
+                """);
         CoreInstance testFn = runtime.getFunction("test::testFn(Any[1]):String[1]");
-        Assert.assertTrue(testFn.hasBeenValidated());
+        Assertions.assertTrue(testFn.hasBeenValidated());
         runtime.delete("/test/source1.pure");
         runtime.getIncrementalCompiler().unload();
-        Assert.assertFalse(testFn.hasBeenProcessed());
+        Assertions.assertFalse(testFn.hasBeenProcessed());
     }
 
     @Test
     public void testScopeOfFunctionUndbindingForClass_FunctionBody_Explicit_CastGeneric()
     {
         compileTestSource("/test/source1.pure",
-                "Class test::A\n" +
-                        "{\n" +
-                        "    name:String[1];\n" +
-                        "}\n");
+                """
+                Class test::A
+                {
+                    name:String[1];
+                }
+                """);
         compileTestSource("/test/source2.pure",
-                "import test::*;\n" +
-                        "function test::testFn(a:Any[1]):String[*]\n" +
-                        "{\n" +
-                        "    $a->cast(@List<A>).values->map(v | $v.name)\n" +
-                        "}\n");
+                """
+                import test::*;
+                function test::testFn(a:Any[1]):String[*]
+                {
+                    $a->cast(@List<A>).values->map(v | $v.name)
+                }
+                """);
         CoreInstance testFn = runtime.getFunction("test::testFn(Any[1]):String[*]");
-        Assert.assertTrue(testFn.hasBeenValidated());
+        Assertions.assertTrue(testFn.hasBeenValidated());
         runtime.delete("/test/source1.pure");
         runtime.getIncrementalCompiler().unload();
-        Assert.assertFalse(testFn.hasBeenProcessed());
+        Assertions.assertFalse(testFn.hasBeenProcessed());
     }
 
     @Test
     public void testScopeOfFunctionUndbindingForClass_FunctionBody_Inferred()
     {
         compileTestSource("/test/source1.pure",
-                "Class test::A\n" +
-                        "{\n" +
-                        "    name:String[1];\n" +
-                        "}\n");
+                """
+                Class test::A
+                {
+                    name:String[1];
+                }
+                """);
         compileTestSource("/test/source2.pure",
-                "import test::*;\n" +
-                        "function test::newA(name:String[1]):A[1]\n" +
-                        "{\n" +
-                        "    ^A(name=$name)\n" +
-                        "}\n" +
-                        "\n" +
-                        "function test::getAName(a:A[1]):String[1]\n" +
-                        "{\n" +
-                        "    $a.name\n" +
-                        "}\n" +
-                        "\n" +
-                        "function test::testFn(name:String[1]):String[1]\n" +
-                        "{\n" +
-                        "    $name->newA()->getAName()\n" +
-                        "}\n");
+                """
+                import test::*;
+                function test::newA(name:String[1]):A[1]
+                {
+                    ^A(name=$name)
+                }
+                
+                function test::getAName(a:A[1]):String[1]
+                {
+                    $a.name
+                }
+                
+                function test::testFn(name:String[1]):String[1]
+                {
+                    $name->newA()->getAName()
+                }
+                """);
         CoreInstance testFn = runtime.getFunction("test::testFn(String[1]):String[1]");
-        Assert.assertTrue(testFn.hasBeenValidated());
+        Assertions.assertTrue(testFn.hasBeenValidated());
         runtime.delete("/test/source1.pure");
         runtime.getIncrementalCompiler().unload();
-        Assert.assertFalse(testFn.hasBeenProcessed());
+        Assertions.assertFalse(testFn.hasBeenProcessed());
     }
 
     @Test
     public void testScopeOfFunctionUndbindingForClass_FunctionBody_Inferred2()
     {
         compileTestSource("/test/source1.pure",
-                "Class test::A\n" +
-                        "{\n" +
-                        "    name:String[1];\n" +
-                        "}\n");
+                """
+                Class test::A
+                {
+                    name:String[1];
+                }
+                """);
         compileTestSource("/test/source2.pure",
-                "import test::*;\n" +
-                        "function test::newA(name:String[1]):A[1]\n" +
-                        "{\n" +
-                        "    ^A(name=$name)\n" +
-                        "}\n" +
-                        "\n" +
-                        "function test::testFn(name:String[1]):Any[1]\n" +
-                        "{\n" +
-                        "    $name->newA()\n" +
-                        "}\n");
+                """
+                import test::*;
+                function test::newA(name:String[1]):A[1]
+                {
+                    ^A(name=$name)
+                }
+                
+                function test::testFn(name:String[1]):Any[1]
+                {
+                    $name->newA()
+                }
+                """);
         CoreInstance testFn = runtime.getFunction("test::testFn(String[1]):Any[1]");
-        Assert.assertTrue(testFn.hasBeenValidated());
+        Assertions.assertTrue(testFn.hasBeenValidated());
         runtime.delete("/test/source1.pure");
         runtime.getIncrementalCompiler().unload();
-        Assert.assertFalse(testFn.hasBeenProcessed());
+        Assertions.assertFalse(testFn.hasBeenProcessed());
     }
 
     @Test
     public void testScopeOfFunctionUndbindingForClass_Lambda_Explicit_New()
     {
         compileTestSource("/test/source1.pure",
-                "Class test::A\n" +
-                        "{\n" +
-                        "    name:String[1];\n" +
-                        "}\n");
+                """
+                Class test::A
+                {
+                    name:String[1];
+                }
+                """);
         compileTestSource("/test/source2.pure",
-                "import test::*;\n" +
-                        "function test::testFn(names:String[*]):Any[*]\n" +
-                        "{\n" +
-                        "    $names->map(name | ^A(name=$name))\n" +
-                        "}\n");
+                """
+                import test::*;
+                function test::testFn(names:String[*]):Any[*]
+                {
+                    $names->map(name | ^A(name=$name))
+                }
+                """);
         CoreInstance testFn = runtime.getFunction("test::testFn(String[*]):Any[*]");
-        Assert.assertTrue(testFn.hasBeenValidated());
+        Assertions.assertTrue(testFn.hasBeenValidated());
         runtime.delete("/test/source1.pure");
         runtime.getIncrementalCompiler().unload();
-        Assert.assertFalse(testFn.hasBeenProcessed());
+        Assertions.assertFalse(testFn.hasBeenProcessed());
     }
 
     @Test
     public void testScopeOfFunctionUndbindingForClass_Lambda_Explicit_Cast()
     {
         compileTestSource("/test/source1.pure",
-                "Class test::A\n" +
-                        "{\n" +
-                        "    name:String[1];\n" +
-                        "}\n");
+                """
+                Class test::A
+                {
+                    name:String[1];
+                }
+                """);
         compileTestSource("/test/source2.pure",
-                "import test::*;\n" +
-                        "function test::testFn(things:Any[*]):String[*]\n" +
-                        "{\n" +
-                        "    $things->map(thing | $thing->cast(@A).name)\n" +
-                        "}\n");
+                """
+                import test::*;
+                function test::testFn(things:Any[*]):String[*]
+                {
+                    $things->map(thing | $thing->cast(@A).name)
+                }
+                """);
         CoreInstance testFn = runtime.getFunction("test::testFn(Any[*]):String[*]");
-        Assert.assertTrue(testFn.hasBeenValidated());
+        Assertions.assertTrue(testFn.hasBeenValidated());
         runtime.delete("/test/source1.pure");
         runtime.getIncrementalCompiler().unload();
-        Assert.assertFalse(testFn.hasBeenProcessed());
+        Assertions.assertFalse(testFn.hasBeenProcessed());
     }
 
     @Test
     public void testScopeOfFunctionUndbindingForClass_Lambda_Inferred()
     {
         compileTestSource("/test/source1.pure",
-                "Class test::A\n" +
-                        "{\n" +
-                        "    name:String[1];\n" +
-                        "}\n");
+                """
+                Class test::A
+                {
+                    name:String[1];
+                }
+                """);
         compileTestSource("/test/source2.pure",
-                "import test::*;\n" +
-                        "function test::newA(name:String[1]):A[1]\n" +
-                        "{\n" +
-                        "    ^A(name=$name)\n" +
-                        "}\n" +
-                        "\n" +
-                        "function test::getAName(a:A[1]):String[1]\n" +
-                        "{\n" +
-                        "    $a.name\n" +
-                        "}\n" +
-                        "\n" +
-                        "function test::testFn(names:String[*]):String[*]\n" +
-                        "{\n" +
-                        "    $names->map(name | $name->newA()->getAName())\n" +
-                        "}\n");
+                """
+                import test::*;
+                function test::newA(name:String[1]):A[1]
+                {
+                    ^A(name=$name)
+                }
+                
+                function test::getAName(a:A[1]):String[1]
+                {
+                    $a.name
+                }
+                
+                function test::testFn(names:String[*]):String[*]
+                {
+                    $names->map(name | $name->newA()->getAName())
+                }
+                """);
         CoreInstance testFn = runtime.getFunction("test::testFn(String[*]):String[*]");
-        Assert.assertTrue(testFn.hasBeenValidated());
+        Assertions.assertTrue(testFn.hasBeenValidated());
         runtime.delete("/test/source1.pure");
         runtime.getIncrementalCompiler().unload();
-        Assert.assertFalse(testFn.hasBeenProcessed());
+        Assertions.assertFalse(testFn.hasBeenProcessed());
     }
 
     @Test
     public void testScopeOfFunctionUndbindingForClass_Lambda_Inferred2()
     {
         compileTestSource("/test/source1.pure",
-                "Class test::A\n" +
-                        "{\n" +
-                        "    name:String[1];\n" +
-                        "}\n");
+                """
+                Class test::A
+                {
+                    name:String[1];
+                }
+                """);
         compileTestSource("/test/source2.pure",
-                "import test::*;\n" +
-                        "function test::newA(name:String[1]):A[1]\n" +
-                        "{\n" +
-                        "    ^A(name=$name)\n" +
-                        "}\n" +
-                        "\n" +
-                        "function test::testFn(names:String[*]):Any[*]\n" +
-                        "{\n" +
-                        "    $names->map(name | $name->newA())\n" +
-                        "}\n");
+                """
+                import test::*;
+                function test::newA(name:String[1]):A[1]
+                {
+                    ^A(name=$name)
+                }
+                
+                function test::testFn(names:String[*]):Any[*]
+                {
+                    $names->map(name | $name->newA())
+                }
+                """);
         CoreInstance testFn = runtime.getFunction("test::testFn(String[*]):Any[*]");
-        Assert.assertTrue(testFn.hasBeenValidated());
+        Assertions.assertTrue(testFn.hasBeenValidated());
         runtime.delete("/test/source1.pure");
         runtime.getIncrementalCompiler().unload();
-        Assert.assertFalse(testFn.hasBeenProcessed());
+        Assertions.assertFalse(testFn.hasBeenProcessed());
     }
 
     // Class deletion / should NOT unbind
@@ -362,50 +418,58 @@ public class TestUnbindingScope extends AbstractPureTestWithCoreCompiledPlatform
     public void testScopeOfFunctionUndbindingForClass_Unrelated()
     {
         compileTestSource("/test/source1.pure",
-                "Class test::A\n" +
-                        "{\n" +
-                        "    name:String[1];\n" +
-                        "}\n");
+                """
+                Class test::A
+                {
+                    name:String[1];
+                }
+                """);
         compileTestSource("/test/source2.pure",
-                "import test::*;\n" +
-                        "function test::testFn(string:String[1]):String[1]\n" +
-                        "{\n" +
-                        "    $string\n" +
-                        "}\n");
+                """
+                import test::*;
+                function test::testFn(string:String[1]):String[1]
+                {
+                    $string
+                }
+                """);
         CoreInstance testFn = runtime.getFunction("test::testFn(String[1]):String[1]");
-        Assert.assertTrue(testFn.hasBeenValidated());
+        Assertions.assertTrue(testFn.hasBeenValidated());
         runtime.delete("/test/source1.pure");
         runtime.getIncrementalCompiler().unload();
-        Assert.assertTrue(testFn.hasBeenValidated());
+        Assertions.assertTrue(testFn.hasBeenValidated());
     }
 
     @Test
     public void testScopeOfFunctionUndbindingForClass_Indirect()
     {
         compileTestSource("/test/source1.pure",
-                "Class test::A\n" +
-                        "{\n" +
-                        "    name:String[1];\n" +
-                        "}\n");
+                """
+                Class test::A
+                {
+                    name:String[1];
+                }
+                """);
         compileTestSource("/test/source2.pure",
-                "import test::*;\n" +
-                        "function test::getName(name:String[1]):String[1]\n" +
-                        "{\n" +
-                        "    ^A(name=$name).name\n" +
-                        "}\n" +
-                        "\n" +
-                        "function test::testFn(string:String[1]):String[1]\n" +
-                        "{\n" +
-                        "    $string->getName()\n" +
-                        "}\n");
+                """
+                import test::*;
+                function test::getName(name:String[1]):String[1]
+                {
+                    ^A(name=$name).name
+                }
+                
+                function test::testFn(string:String[1]):String[1]
+                {
+                    $string->getName()
+                }
+                """);
         CoreInstance getName = runtime.getFunction("test::getName(String[1]):String[1]");
         CoreInstance testFn = runtime.getFunction("test::testFn(String[1]):String[1]");
-        Assert.assertTrue(getName.hasBeenValidated());
-        Assert.assertTrue(testFn.hasBeenValidated());
+        Assertions.assertTrue(getName.hasBeenValidated());
+        Assertions.assertTrue(testFn.hasBeenValidated());
         runtime.delete("/test/source1.pure");
         runtime.getIncrementalCompiler().unload();
-        Assert.assertFalse(getName.hasBeenProcessed());
-        Assert.assertTrue(testFn.hasBeenValidated());
+        Assertions.assertFalse(getName.hasBeenProcessed());
+        Assertions.assertTrue(testFn.hasBeenValidated());
     }
 
     // Function deletion / should unbind
@@ -414,42 +478,50 @@ public class TestUnbindingScope extends AbstractPureTestWithCoreCompiledPlatform
     public void testScopeOfFunctionUnbindingForFunction_Direct()
     {
         compileTestSource("/test/source1.pure",
-                "function test::testJoinStrings(strings:String[*]):String[1]\n" +
-                        "{\n" +
-                        "    $strings->joinStrings(' ')\n" +
-                        "}\n");
+                """
+                function test::testJoinStrings(strings:String[*]):String[1]
+                {
+                    $strings->joinStrings(' ')
+                }
+                """);
         compileTestSource("/test/source2.pure",
-                "import test::*;\n" +
-                        "function test::testFn(string:String[1]):String[1]\n" +
-                        "{\n" +
-                        "    $string->split('\\t')->testJoinStrings()\n" +
-                        "}\n");
+                """
+                import test::*;
+                function test::testFn(string:String[1]):String[1]
+                {
+                    $string->split('\\t')->testJoinStrings()
+                }
+                """);
         CoreInstance testFn = runtime.getFunction("test::testFn(String[1]):String[1]");
-        Assert.assertTrue(testFn.hasBeenValidated());
+        Assertions.assertTrue(testFn.hasBeenValidated());
         runtime.delete("/test/source1.pure");
         runtime.getIncrementalCompiler().unload();
-        Assert.assertFalse(testFn.hasBeenProcessed());
+        Assertions.assertFalse(testFn.hasBeenProcessed());
     }
 
     @Test
     public void testScopeOfFunctionUnbindingForFunction_DirectInLambda()
     {
         compileTestSource("/test/source1.pure",
-                "function test::testJoinStrings(strings:String[*]):String[1]\n" +
-                        "{\n" +
-                        "    $strings->joinStrings(' ')\n" +
-                        "}\n");
+                """
+                function test::testJoinStrings(strings:String[*]):String[1]
+                {
+                    $strings->joinStrings(' ')
+                }
+                """);
         compileTestSource("/test/source2.pure",
-                "import test::*;\n" +
-                        "function test::testFn(strings:String[*]):String[*]\n" +
-                        "{\n" +
-                        "    $strings->map(string | $string->split('\\t')->testJoinStrings())\n" +
-                        "}\n");
+                """
+                import test::*;
+                function test::testFn(strings:String[*]):String[*]
+                {
+                    $strings->map(string | $string->split('\\t')->testJoinStrings())
+                }
+                """);
         CoreInstance testFn = runtime.getFunction("test::testFn(String[*]):String[*]");
-        Assert.assertTrue(testFn.hasBeenValidated());
+        Assertions.assertTrue(testFn.hasBeenValidated());
         runtime.delete("/test/source1.pure");
         runtime.getIncrementalCompiler().unload();
-        Assert.assertFalse(testFn.hasBeenProcessed());
+        Assertions.assertFalse(testFn.hasBeenProcessed());
     }
 
     // Function deletion / should NOT unbind
@@ -458,49 +530,57 @@ public class TestUnbindingScope extends AbstractPureTestWithCoreCompiledPlatform
     public void testScopeOfFunctionUnbindingForFunction_Unrelated()
     {
         compileTestSource("/test/source1.pure",
-                "function test::testJoinStrings(strings:String[*]):String[1]\n" +
-                        "{\n" +
-                        "    $strings->joinStrings(' ')\n" +
-                        "}\n");
+                """
+                function test::testJoinStrings(strings:String[*]):String[1]
+                {
+                    $strings->joinStrings(' ')
+                }
+                """);
         compileTestSource("/test/source2.pure",
-                "import test::*;\n" +
-                        "function test::testFn(string:String[1]):String[1]\n" +
-                        "{\n" +
-                        "    $string->replace('a', 'b')\n" +
-                        "}\n");
+                """
+                import test::*;
+                function test::testFn(string:String[1]):String[1]
+                {
+                    $string->replace('a', 'b')
+                }
+                """);
         CoreInstance testFn = runtime.getFunction("test::testFn(String[1]):String[1]");
-        Assert.assertTrue(testFn.hasBeenValidated());
+        Assertions.assertTrue(testFn.hasBeenValidated());
         runtime.delete("/test/source1.pure");
         runtime.getIncrementalCompiler().unload();
-        Assert.assertTrue(testFn.hasBeenValidated());
+        Assertions.assertTrue(testFn.hasBeenValidated());
     }
 
     @Test
     public void testScopeOfFunctionUnbindingForFunction_Indirect()
     {
         compileTestSource("/test/source1.pure",
-                "function test::testJoinStrings(strings:String[*]):String[1]\n" +
-                        "{\n" +
-                        "    $strings->joinStrings(' ')\n" +
-                        "}\n");
+                """
+                function test::testJoinStrings(strings:String[*]):String[1]
+                {
+                    $strings->joinStrings(' ')
+                }
+                """);
         compileTestSource("/test/source2.pure",
-                "import test::*;\n" +
-                        "function test::replaceTabsWithSpaces(strings:String[*]):String[*]\n" +
-                        "{\n" +
-                        "    $strings->map(s | $s->split('\\t')->testJoinStrings())\n" +
-                        "}\n" +
-                        "\n" +
-                        "function test::testFn(string:String[1]):String[*]\n" +
-                        "{\n" +
-                        "    $string->split('\\n')->replaceTabsWithSpaces()\n" +
-                        "}\n");
+                """
+                import test::*;
+                function test::replaceTabsWithSpaces(strings:String[*]):String[*]
+                {
+                    $strings->map(s | $s->split('\\t')->testJoinStrings())
+                }
+                
+                function test::testFn(string:String[1]):String[*]
+                {
+                    $string->split('\\n')->replaceTabsWithSpaces()
+                }
+                """);
         CoreInstance replaceTabsWithSpaces = runtime.getFunction("test::replaceTabsWithSpaces(String[*]):String[*]");
         CoreInstance testFn = runtime.getFunction("test::testFn(String[1]):String[*]");
-        Assert.assertTrue(replaceTabsWithSpaces.hasBeenValidated());
-        Assert.assertTrue(testFn.hasBeenValidated());
+        Assertions.assertTrue(replaceTabsWithSpaces.hasBeenValidated());
+        Assertions.assertTrue(testFn.hasBeenValidated());
         runtime.delete("/test/source1.pure");
         runtime.getIncrementalCompiler().unload();
-        Assert.assertFalse(replaceTabsWithSpaces.hasBeenProcessed());
-        Assert.assertTrue(testFn.hasBeenValidated());
+        Assertions.assertFalse(replaceTabsWithSpaces.hasBeenProcessed());
+        Assertions.assertTrue(testFn.hasBeenValidated());
     }
 }

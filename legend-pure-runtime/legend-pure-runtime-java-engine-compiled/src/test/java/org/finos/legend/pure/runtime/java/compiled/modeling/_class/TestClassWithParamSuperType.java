@@ -18,19 +18,19 @@ import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
 import org.finos.legend.pure.m3.execution.FunctionExecution;
 import org.finos.legend.pure.runtime.java.compiled.execution.FunctionExecutionCompiledBuilder;
 import org.finos.legend.pure.runtime.java.compiled.factory.JavaModelFactoryRegistryLoader;
-import org.junit.After;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestClassWithParamSuperType extends AbstractPureTestWithCoreCompiled
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getFunctionExecution(), JavaModelFactoryRegistryLoader.loader());
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("fromString.pure");
@@ -41,78 +41,78 @@ public class TestClassWithParamSuperType extends AbstractPureTestWithCoreCompile
     {
         compileTestSource("fromString.pure",
                 // class with concrete field that has type arguments - i.e Pair
-                "Class A<K,V | m>\n" +
-                        "{\n" +
-                        "    test : Pair<K, V>[1];\n" +
-                        "    withMult: String[m];\n" +
-                        "}\n" +
-                        "\n" +
-                        // class that binds ALL type arguments of generalization
-                        "Class B extends A<Integer, String | 0..1>" +
-                        "{\n" +
-                        "}\n" +
-                        "\n" +
-                        // class that binds SOME type arguments of generalization
-                        "Class C<X|k> extends A<String, X | k>" +
-                        "{\n" +
-                        "}\n" +
-                        "\n" +
-                        // class that have multiple generalizations with type arguments bind at diff levels
-                        "Class D extends C<String | 1>" +
-                        "{\n" +
-                        "}\n" +
-                        "" +
-                        "function meta::pure::functions::collection::pair<U,V>(first:U[1], second:V[1]):Pair<U,V>[1]\n" +
-                        "{\n" +
-                        "   ^Pair<U,V>(first=$first, second=$second);\n" +
-                        "}\n" +
-                        "function test():Any[*]\n" +
-                        "{\n" +
-                        "  ^D(test = pair('eeee', 'ffff'), withMult = 'aaaa');\n" +
-                        "  ^C<Float|*>(test = pair('eeee', 1.2), withMult = ['aaaa', 'aaaa']);\n" +
-                        "  ^B(test = pair(2, 'eeee'),  withMult = []);\n" +
-                        "  ^A<Integer, String|1>(test = pair(2, 'eeee'), withMult = 'aaaa');\n" +
-                        "}\n");
+                """
+                Class A<K,V | m>
+                {
+                    test : Pair<K, V>[1];
+                    withMult: String[m];
+                }
+                
+                Class B extends A<Integer, String | 0..1>\
+                {
+                }
+                
+                Class C<X|k> extends A<String, X | k>\
+                {
+                }
+                
+                Class D extends C<String | 1>\
+                {
+                }
+                function meta::pure::functions::collection::pair<U,V>(first:U[1], second:V[1]):Pair<U,V>[1]
+                {
+                   ^Pair<U,V>(first=$first, second=$second);
+                }
+                function test():Any[*]
+                {
+                  ^D(test = pair('eeee', 'ffff'), withMult = 'aaaa');
+                  ^C<Float|*>(test = pair('eeee', 1.2), withMult = ['aaaa', 'aaaa']);
+                  ^B(test = pair(2, 'eeee'),  withMult = []);
+                  ^A<Integer, String|1>(test = pair(2, 'eeee'), withMult = 'aaaa');
+                }
+                """);
         this.compileAndExecute("test():Any[*]");
     }
 
     @Test
     public void testTypeParamsAndExtends()
     {
-        compileTestSource("fromString.pure", "Class A<P>\n" +
-                "{\n" +
-                "    test : P[1];\n" +
-                "}" +
-                "" +
-                "Class B<K> extends A<K>" +
-                "{" +
-                "}\n" +
-                "\n" +
-                "function test():Any[*]\n" +
-                "{" +
-                "  ^B<String>(test = 'eeee');" +
-                "  ^B<Integer>(test = 2);" +
-                "}\n");
+        compileTestSource("fromString.pure", """
+                Class A<P>
+                {
+                    test : P[1];
+                }\
+                Class B<K> extends A<K>\
+                {\
+                }
+                
+                function test():Any[*]
+                {\
+                  ^B<String>(test = 'eeee');\
+                  ^B<Integer>(test = 2);\
+                }
+                """);
         this.compileAndExecute("test():Any[*]");
     }
 
     @Test
     public void testTypeParamsMulParamsAndExtends()
     {
-        compileTestSource("fromString.pure", "Class A<P|m>\n" +
-                "{\n" +
-                "    test : P[m];\n" +
-                "}" +
-                "" +
-                "Class B<K|z> extends A<K|z>" +
-                "{" +
-                "}\n" +
-                "\n" +
-                "function test():Any[*]\n" +
-                "{" +
-                "  ^B<String|1>(test = 'eeee');" +
-                "  ^B<Integer|*>(test = [2,3]);" +
-                "}\n");
+        compileTestSource("fromString.pure", """
+                Class A<P|m>
+                {
+                    test : P[m];
+                }\
+                Class B<K|z> extends A<K|z>\
+                {\
+                }
+                
+                function test():Any[*]
+                {\
+                  ^B<String|1>(test = 'eeee');\
+                  ^B<Integer|*>(test = [2,3]);\
+                }
+                """);
         this.compileAndExecute("test():Any[*]");
     }
 

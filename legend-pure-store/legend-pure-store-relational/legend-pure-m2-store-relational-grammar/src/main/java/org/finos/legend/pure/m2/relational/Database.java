@@ -149,15 +149,15 @@ public class Database
         {
             String tableName = null;
             Schema tableSchema = null;
-            if (table instanceof Table)
+            if (table instanceof Table table1)
             {
-                tableName = ((Table) table)._name();
-                tableSchema = ((Table) table)._schema();
+                tableName = table1._name();
+                tableSchema = table1._schema();
             }
-            else if (table instanceof View)
+            else if (table instanceof View view)
             {
-                tableName = ((View) table)._name();
-                tableSchema = ((View) table)._schema();
+                tableName = view._name();
+                tableSchema = view._schema();
             }
             if (tableSchema != null)
             {

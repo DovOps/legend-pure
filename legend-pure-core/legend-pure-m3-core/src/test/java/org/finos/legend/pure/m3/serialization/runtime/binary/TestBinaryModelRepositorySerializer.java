@@ -36,9 +36,9 @@ import org.finos.legend.pure.m4.coreinstance.CoreInstance;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.io.*;
 import java.util.Arrays;
@@ -49,7 +49,7 @@ import java.util.jar.JarInputStream;
 
 public class TestBinaryModelRepositorySerializer extends AbstractPureTestWithCoreCompiledPlatform
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getExtra(), false);
@@ -92,26 +92,26 @@ public class TestBinaryModelRepositorySerializer extends AbstractPureTestWithCor
             PureManifest manifest = PureManifest.create(stream.getManifest());
             if (Version.PLATFORM == null)
             {
-                Assert.assertFalse(manifest.hasPurePlatformVersion());
-                Assert.assertNull(manifest.getPurePlatformVersion());
+                Assertions.assertFalse(manifest.hasPurePlatformVersion());
+                Assertions.assertNull(manifest.getPurePlatformVersion());
             }
             else
             {
-                Assert.assertTrue(manifest.hasPurePlatformVersion());
-                Assert.assertEquals(Version.PLATFORM, manifest.getPurePlatformVersion());
+                Assertions.assertTrue(manifest.hasPurePlatformVersion());
+                Assertions.assertEquals(Version.PLATFORM, manifest.getPurePlatformVersion());
             }
-            Assert.assertEquals("platform", manifest.getPureRepositoryName());
-            Assert.assertFalse(manifest.hasPureModelVersion());
-            Assert.assertNull(manifest.getPureModelVersion());
+            Assertions.assertEquals("platform", manifest.getPureRepositoryName());
+            Assertions.assertFalse(manifest.hasPureModelVersion());
+            Assertions.assertNull(manifest.getPureModelVersion());
 
             JarEntry definitionIndexEntry = stream.getNextJarEntry();
-            Assert.assertEquals(PureRepositoryJarTools.DEFINITION_INDEX_NAME, definitionIndexEntry.getName());
+            Assertions.assertEquals(PureRepositoryJarTools.DEFINITION_INDEX_NAME, definitionIndexEntry.getName());
             JSONObject definitionIndex = (JSONObject) JSONValue.parse(new InputStreamReader(stream));
             stream.closeEntry();
             Verify.assertMapsEqual(expectedDefinitionIndex, definitionIndex);
 
             JarEntry referenceIndexEntry = stream.getNextJarEntry();
-            Assert.assertEquals(PureRepositoryJarTools.REFERENCE_INDEX_NAME, referenceIndexEntry.getName());
+            Assertions.assertEquals(PureRepositoryJarTools.REFERENCE_INDEX_NAME, referenceIndexEntry.getName());
             JSONObject referenceIndex = (JSONObject) JSONValue.parse(new InputStreamReader(stream));
             stream.closeEntry();
             for (Entry<?, ?> entry : ((Map<?, ?>) referenceIndex).entrySet())
@@ -121,7 +121,7 @@ public class TestBinaryModelRepositorySerializer extends AbstractPureTestWithCor
                 Source source = runtime.getSourceById(PureRepositoryJarTools.binaryPathToPurePath((String) key));
                 if (source == null)
                 {
-                    Assert.fail("Invalid source in reference index: " + key);
+                    Assertions.fail("Invalid source in reference index: " + key);
                 }
 
                 Object value = entry.getValue();
@@ -130,8 +130,8 @@ public class TestBinaryModelRepositorySerializer extends AbstractPureTestWithCor
                 {
                     Verify.assertInstanceOf(String.class, subvalue);
                     CoreInstance instance = runtime.getCoreInstance((String) subvalue);
-                    Assert.assertNotNull("Invalid reference '" + subvalue + "' for source: " + key, instance);
-                    Assert.assertTrue("No definition found for '" + subvalue + "' for source: " + key, definitionIndex.containsKey(subvalue));
+                    Assertions.assertNotNull(instance, "Invalid reference '" + subvalue + "' for source: " + key);
+                    Assertions.assertTrue(definitionIndex.containsKey(subvalue), "No definition found for '" + subvalue + "' for source: " + key);
                 }
             }
 
@@ -205,7 +205,7 @@ public class TestBinaryModelRepositorySerializer extends AbstractPureTestWithCor
         }
         catch (IllegalArgumentException e)
         {
-            Assert.assertEquals("Unknown repository: not a repository at all", e.getMessage());
+            Assertions.assertEquals("Unknown repository: not a repository at all", e.getMessage());
         }
 
         // Real repository but not present
@@ -215,7 +215,7 @@ public class TestBinaryModelRepositorySerializer extends AbstractPureTestWithCor
         }
         catch (IllegalArgumentException e)
         {
-            Assert.assertEquals("Unknown repository: system", e.getMessage());
+            Assertions.assertEquals("Unknown repository: system", e.getMessage());
         }
     }
 
@@ -248,22 +248,22 @@ public class TestBinaryModelRepositorySerializer extends AbstractPureTestWithCor
                 while (entry1 != null && entry2 != null)
                 {
                     String name = entry1.getName();
-                    Assert.assertEquals("Entry name mismatch", name, entry2.getName());
+                    Assertions.assertEquals(name, entry2.getName(), "Entry name mismatch");
 
                     byte[] entry1Bytes = this.readEntryToByteArray(jarStream1);
                     byte[] entry2Bytes = this.readEntryToByteArray(jarStream2);
-                    Assert.assertArrayEquals("Byte mismatch for entry " + name, entry1Bytes, entry2Bytes);
+                    Assertions.assertArrayEquals(entry1Bytes, entry2Bytes, "Byte mismatch for entry " + name);
 
                     entry1 = jarStream1.getNextJarEntry();
                     entry2 = jarStream2.getNextJarEntry();
                 }
                 if (entry1 != null)
                 {
-                    Assert.fail("Jar 1 contains an entry not present in jar 2: " + entry1.getName());
+                    Assertions.fail("Jar 1 contains an entry not present in jar 2: " + entry1.getName());
                 }
                 if (entry2 != null)
                 {
-                    Assert.fail("Jar 2 contains an entry not present in jar 1: " + entry2.getName());
+                    Assertions.fail("Jar 2 contains an entry not present in jar 1: " + entry2.getName());
                 }
             }
             catch (IOException e)

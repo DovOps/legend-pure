@@ -102,11 +102,11 @@ public class ProjectionUtil
     public static AbstractProperty createPropertyCopy(AbstractProperty sourceProperty, PropertyOwner newOwner, ModelRepository repository, ProcessorSupport processorSupport)
     {
         AbstractProperty copy = createAbstractPropertyCopy(sourceProperty, newOwner, repository, processorSupport);
-        if (sourceProperty instanceof Property)
+        if (sourceProperty instanceof Property property)
         {
-            if (((Property) sourceProperty)._aggregation() != null)
+            if (property._aggregation() != null)
             {
-                ((Property) copy)._aggregation(((Property) sourceProperty)._aggregation());
+                ((Property) copy)._aggregation(property._aggregation());
             }
             else if (((Property) copy)._aggregation() != null)
             {
@@ -268,25 +268,25 @@ public class ProjectionUtil
         if (copy == null)
         {
             copy = (ValueSpecification) makeCopyAndProcessGenericProperties(valueSpecification, modelRepository, processorSupport, classProjection);
-            if (valueSpecification instanceof InstanceValue)
+            if (valueSpecification instanceof InstanceValue value)
             {
-                copyInstanceValue((InstanceValue) valueSpecification, modelRepository, context, processorSupport, processedMap, state, classProjection, (InstanceValue) copy);
+                copyInstanceValue(value, modelRepository, context, processorSupport, processedMap, state, classProjection, (InstanceValue) copy);
             }
-            if (valueSpecification instanceof FunctionExpression)
+            if (valueSpecification instanceof FunctionExpression expression)
             {
-                copyFunctionExpression((FunctionExpression) valueSpecification, modelRepository, context, processorSupport, processedMap, state, classProjection, (FunctionExpression) copy);
+                copyFunctionExpression(expression, modelRepository, context, processorSupport, processedMap, state, classProjection, (FunctionExpression) copy);
             }
-            if (valueSpecification instanceof VariableExpression)
+            if (valueSpecification instanceof VariableExpression expression)
             {
-                copyVariableExpression((VariableExpression) valueSpecification, processorSupport, (VariableExpression) copy);
+                copyVariableExpression(expression, processorSupport, (VariableExpression) copy);
             }
-            if (valueSpecification instanceof LambdaFunction)
+            if (valueSpecification instanceof LambdaFunction function)
             {
-                copyLambdaFunction((LambdaFunction) valueSpecification, processorSupport, (LambdaFunction) copy);
+                copyLambdaFunction(function, processorSupport, (LambdaFunction) copy);
             }
-            if (valueSpecification instanceof FunctionDefinition)
+            if (valueSpecification instanceof FunctionDefinition definition)
             {
-                copyFunctionDefinition((FunctionDefinition) valueSpecification, modelRepository, context, processorSupport, processedMap, state, classProjection, (FunctionDefinition) copy);
+                copyFunctionDefinition(definition, modelRepository, context, processorSupport, processedMap, state, classProjection, (FunctionDefinition) copy);
             }
             processedMap.put(valueSpecification, copy);
 
@@ -299,24 +299,24 @@ public class ProjectionUtil
     {
         Any copy;
         copy = (Any) modelRepository.newAnonymousCoreInstance(classProjection.getSourceInformation(), instance.getClassifier());
-        if (instance instanceof AbstractProperty)
+        if (instance instanceof AbstractProperty property)
         {
-            if (((AbstractProperty) instance)._multiplicity() != null)
+            if (property._multiplicity() != null)
             {
-                ((AbstractProperty) copy)._multiplicity(((AbstractProperty) instance)._multiplicity());
+                ((AbstractProperty) copy)._multiplicity(property._multiplicity());
             }
             else if (((AbstractProperty) copy)._multiplicity() != null)
             {
                 ((AbstractProperty) copy)._multiplicityRemove();
             }
         }
-        if (instance instanceof AbstractProperty && ((AbstractProperty) instance)._genericType() != null)
+        if (instance instanceof AbstractProperty property && property._genericType() != null)
         {
-            ((AbstractProperty) copy)._genericType((GenericType) org.finos.legend.pure.m3.navigation.generictype.GenericType.copyGenericType(((AbstractProperty) instance)._genericType(), processorSupport));
+            ((AbstractProperty) copy)._genericType((GenericType) org.finos.legend.pure.m3.navigation.generictype.GenericType.copyGenericType(property._genericType(), processorSupport));
         }
-        if (instance instanceof ValueSpecification && ((ValueSpecification) instance)._genericType() != null)
+        if (instance instanceof ValueSpecification specification && specification._genericType() != null)
         {
-            ((ValueSpecification) copy)._genericType((GenericType) org.finos.legend.pure.m3.navigation.generictype.GenericType.copyGenericType(((ValueSpecification) instance)._genericType(), processorSupport));
+            ((ValueSpecification) copy)._genericType((GenericType) org.finos.legend.pure.m3.navigation.generictype.GenericType.copyGenericType(specification._genericType(), processorSupport));
         }
         if (instance._classifierGenericType() != null)
         {
@@ -355,13 +355,13 @@ public class ProjectionUtil
         if (copy == null)
         {
             copy = (org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.function.Function) makeCopyAndProcessGenericProperties(function, modelRepository, processorSupport, classProjection);
-            if (function instanceof LambdaFunction)
+            if (function instanceof LambdaFunction lambdaFunction)
             {
-                copyLambdaFunction((LambdaFunction) function, processorSupport, (LambdaFunction) copy);
+                copyLambdaFunction(lambdaFunction, processorSupport, (LambdaFunction) copy);
             }
-            if (function instanceof FunctionDefinition)
+            if (function instanceof FunctionDefinition definition)
             {
-                copyFunctionDefinition((FunctionDefinition) function, modelRepository, context, processorSupport, processedMap, state, classProjection, (FunctionDefinition) copy);
+                copyFunctionDefinition(definition, modelRepository, context, processorSupport, processedMap, state, classProjection, (FunctionDefinition) copy);
             }
             processedMap.put(function, copy);
 

@@ -21,45 +21,50 @@ import org.finos.legend.pure.runtime.java.compiled.compiler.PureJavaCompileExcep
 import org.finos.legend.pure.runtime.java.compiled.execution.FunctionExecutionCompiledBuilder;
 import org.finos.legend.pure.runtime.java.compiled.factory.JavaModelFactoryRegistryLoader;
 import org.finos.legend.pure.runtime.java.compiled.generation.JavaPackageAndImportBuilder;
-import org.junit.*;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
-@Ignore
+@Disabled
 public class TestCompilationError extends AbstractPureTestWithCoreCompiled
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getFunctionExecution(), JavaModelFactoryRegistryLoader.loader());
     }
 
-    @Ignore
+    @Disabled
     @Test
     public void testCompileError()
     {
         try
         {
             compileTestSource("testSource.pure",
-                    "Class MyClass<T|m>\n" +
-                            "{\n" +
-                            "    values:T[m];\n" +
-                            "}\n" +
-                            "\n" +
-                            "function test():Integer[1]\n" +
-                            "{\n" +
-                            "    myClass(1).values;\n" +
-                            "}\n" +
-                            "\n" +
-                            "function myClass<T|m>(values:T[m]):MyClass<T|m>[1]\n" +
-                            "{\n" +
-                            "   ^MyClass<T|m>(values=$values);\n" +
-                            "}");
-            Assert.fail("Expected compile error");
+                    """
+                    Class MyClass<T|m>
+                    {
+                        values:T[m];
+                    }
+                    
+                    function test():Integer[1]
+                    {
+                        myClass(1).values;
+                    }
+                    
+                    function myClass<T|m>(values:T[m]):MyClass<T|m>[1]
+                    {
+                       ^MyClass<T|m>(values=$values);
+                    }\
+                    """);
+            Assertions.fail("Expected compile error");
         }
         catch (Exception e)
         {
             Throwable root = ThrowableTools.findRootThrowable(e);
-            Assert.assertTrue(root instanceof PureJavaCompileException);
-            Assert.assertTrue(e.getMessage().startsWith("org.finos.legend.pure.runtime.java.compiled.compiler.PureJavaCompileException: 1 error compiling /" + JavaPackageAndImportBuilder.rootPackage().replace(".", "/") + "/testSource.java"));
+            Assertions.assertTrue(root instanceof PureJavaCompileException);
+            Assertions.assertTrue(e.getMessage().startsWith("org.finos.legend.pure.runtime.java.compiled.compiler.PureJavaCompileException: 1 error compiling /" + JavaPackageAndImportBuilder.rootPackage().replace(".", "/") + "/testSource.java"));
         }
     }
 

@@ -20,8 +20,8 @@ import org.finos.legend.pure.m3.tests.RuntimeVerifier;
 import org.finos.legend.pure.m3.coreinstance.meta.pure.mapping.Mapping;
 import org.finos.legend.pure.m3.coreinstance.meta.pure.mapping.SetImplementation;
 import org.finos.legend.pure.m3.coreinstance.meta.relational.mapping.RootRelationalInstanceSetImplementation;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class TestMainTableForExtendedMapping extends AbstractPureRelationalTestWithCoreCompiled
 {
@@ -37,82 +37,88 @@ public class TestMainTableForExtendedMapping extends AbstractPureRelationalTestW
     private static final String MAIN_SOURCE_ID = "main.pure";
     private static final String TEST_SOURCE_ID = "test.pure";
 
-    private static final String MAIN_SOURCE_CODE = "###Pure\n" +
-            "import test::*;\n" +
-            "\n" +
-            "Class test::Vehicle\n" +
-            "{\n" +
-            "   vehicleId : Integer[1];\n" +
-            "   vehicleName : String[1];\n" +
-            "   vehicleType : String[1];\n" +
-            "}\n" +
-            "\n" +
-            "###Relational\n" +
-            "Database test::VehicleDatabase\n" +
-            "(\n" +
-            "   Table VehicleTable(vehicleId INT PRIMARY KEY, vehicleName VARCHAR(20), vehicleType VARCHAR(20))\n" +
-            ")\n" +
-            "\n" +
-            "###Mapping\n" +
-            "import test::*;\n" +
-            "\n" +
-            "Mapping test::VehicleMapping\n" +
-            "(   \n" +
-            "   Vehicle: Relational\n" +
-            "   {\n" +
-            "      vehicleId   : [VehicleDatabase]VehicleTable.vehicleId,\n" +
-            "      vehicleName : [VehicleDatabase]VehicleTable.vehicleName,\n" +
-            "      vehicleType : [VehicleDatabase]VehicleTable.vehicleType\n" +
-            "   }\n" +
-            ")\n";
+    private static final String MAIN_SOURCE_CODE = """
+            ###Pure
+            import test::*;
+            
+            Class test::Vehicle
+            {
+               vehicleId : Integer[1];
+               vehicleName : String[1];
+               vehicleType : String[1];
+            }
+            
+            ###Relational
+            Database test::VehicleDatabase
+            (
+               Table VehicleTable(vehicleId INT PRIMARY KEY, vehicleName VARCHAR(20), vehicleType VARCHAR(20))
+            )
+            
+            ###Mapping
+            import test::*;
+            
+            Mapping test::VehicleMapping
+            (  \s
+               Vehicle: Relational
+               {
+                  vehicleId   : [VehicleDatabase]VehicleTable.vehicleId,
+                  vehicleName : [VehicleDatabase]VehicleTable.vehicleName,
+                  vehicleType : [VehicleDatabase]VehicleTable.vehicleType
+               }
+            )
+            """;
 
     @Test
     public void testStableMainTableForSimpleMappingExtends()
     {
-        String testSourceCode = "###Pure\n" +
-                "import test::*;\n" +
-                "\n" +
-                "Class test::RoadVehicle extends Vehicle\n" +
-                "{\n" +
-                "   \n" +
-                "}\n" +
-                "\n" +
-                "###Mapping\n" +
-                "import test::*;\n" +
-                "\n" +
-                "Mapping test::RoadVehicleMapping\n" +
-                "(   \n" +
-                "   include VehicleMapping\n" +
-                "   \n" +
-                "   RoadVehicle extends [test_Vehicle]: Relational\n" +
-                "   {\n" +
-                "   }\n" +
-                ")\n";
+        String testSourceCode = """
+                ###Pure
+                import test::*;
+                
+                Class test::RoadVehicle extends Vehicle
+                {
+                  \s
+                }
+                
+                ###Mapping
+                import test::*;
+                
+                Mapping test::RoadVehicleMapping
+                (  \s
+                   include VehicleMapping
+                  \s
+                   RoadVehicle extends [test_Vehicle]: Relational
+                   {
+                   }
+                )
+                """;
         this.verifyValidMainTableForExtendedMapping(testSourceCode);
     }
 
     @Test
     public void testValidMainTableForSimpleExtendedMapping()
     {
-        String testSourceCode = "###Pure\n" +
-                "import test::*;\n" +
-                "\n" +
-                "Class test::RoadVehicle extends Vehicle\n" +
-                "{\n" +
-                "   \n" +
-                "}\n" +
-                "\n" +
-                "###Mapping\n" +
-                "import test::*;\n" +
-                "\n" +
-                "Mapping test::RoadVehicleMapping\n" +
-                "(   \n" +
-                "   include VehicleMapping\n" +
-                "   \n" +
-                "   RoadVehicle extends [test_Vehicle]: Relational\n" +
-                "   {\n" +
-                "   }\n" +
-                ")\n";
+        String testSourceCode = """
+                ###Pure
+                import test::*;
+                
+                Class test::RoadVehicle extends Vehicle
+                {
+                  \s
+                }
+                
+                ###Mapping
+                import test::*;
+                
+                Mapping test::RoadVehicleMapping
+                (  \s
+                   include VehicleMapping
+                  \s
+                   RoadVehicle extends [test_Vehicle]: Relational
+                   {
+                   }
+                )
+                """;
 
         this.runtime.createInMemorySource(MAIN_SOURCE_ID, MAIN_SOURCE_CODE);
         this.runtime.createInMemorySource(TEST_SOURCE_ID, testSourceCode);
@@ -124,85 +130,89 @@ public class TestMainTableForExtendedMapping extends AbstractPureRelationalTestW
         Mapping roadVehicleMapping = (Mapping)this.runtime.getCoreInstance("test::RoadVehicleMapping");
         RootRelationalInstanceSetImplementation roadVehicleSetImplementation = (RootRelationalInstanceSetImplementation)roadVehicleMapping._classMappings().selectWith(CLASS_MAPPING_BY_ID, "test_RoadVehicle").getFirst();
 
-        Assert.assertEquals(vehicleSetImplementation._mainTableAlias()._relationalElement(), roadVehicleSetImplementation._mainTableAlias()._relationalElement());
-        Assert.assertEquals(vehicleSetImplementation._mainTableAlias()._database(), roadVehicleSetImplementation._mainTableAlias()._database());
+        Assertions.assertEquals(vehicleSetImplementation._mainTableAlias()._relationalElement(), roadVehicleSetImplementation._mainTableAlias()._relationalElement());
+        Assertions.assertEquals(vehicleSetImplementation._mainTableAlias()._database(), roadVehicleSetImplementation._mainTableAlias()._database());
     }
 
     @Test
     public void testStableMainTableForNestedMappingExtends()
     {
-        String testSourceCode = "###Pure\n" +
-                "import test::*;\n" +
-                "\n" +
-                "Class test::RoadVehicle extends Vehicle\n" +
-                "{\n" +
-                "   \n" +
-                "}\n" +
-                "\n" +
-                "Class test::Bicycle extends RoadVehicle\n" +
-                "{\n" +
-                "   \n" +
-                "}\n" +
-                "\n" +
-                "###Mapping\n" +
-                "import test::*;\n" +
-                "\n" +
-                "Mapping test::RoadVehicleMapping\n" +
-                "(   \n" +
-                "   include VehicleMapping\n" +
-                "   \n" +
-                "   RoadVehicle extends [test_Vehicle]: Relational\n" +
-                "   {\n" +
-                "   }\n" +
-                ")\n" +
-                "\n" +
-                "Mapping test::BicycleMapping\n" +
-                "(   \n" +
-                "   include RoadVehicleMapping\n" +
-                "   \n" +
-                "   Bicycle extends [test_RoadVehicle]: Relational\n" +
-                "   {\n" +
-                "   }\n" +
-                ")\n";
+        String testSourceCode = """
+                ###Pure
+                import test::*;
+                
+                Class test::RoadVehicle extends Vehicle
+                {
+                  \s
+                }
+                
+                Class test::Bicycle extends RoadVehicle
+                {
+                  \s
+                }
+                
+                ###Mapping
+                import test::*;
+                
+                Mapping test::RoadVehicleMapping
+                (  \s
+                   include VehicleMapping
+                  \s
+                   RoadVehicle extends [test_Vehicle]: Relational
+                   {
+                   }
+                )
+                
+                Mapping test::BicycleMapping
+                (  \s
+                   include RoadVehicleMapping
+                  \s
+                   Bicycle extends [test_RoadVehicle]: Relational
+                   {
+                   }
+                )
+                """;
         this.verifyValidMainTableForExtendedMapping(testSourceCode);
     }
 
     @Test
     public void testValidMainTableForNestedExtendedMapping()
     {
-        String testSourceCode = "###Pure\n" +
-                "import test::*;\n" +
-                "\n" +
-                "Class test::RoadVehicle extends Vehicle\n" +
-                "{\n" +
-                "   \n" +
-                "}\n" +
-                "\n" +
-                "Class test::Bicycle extends RoadVehicle\n" +
-                "{\n" +
-                "   \n" +
-                "}\n" +
-                "\n" +
-                "###Mapping\n" +
-                "import test::*;\n" +
-                "\n" +
-                "Mapping test::RoadVehicleMapping\n" +
-                "(   \n" +
-                "   include VehicleMapping\n" +
-                "   \n" +
-                "   RoadVehicle extends [test_Vehicle]: Relational\n" +
-                "   {\n" +
-                "   }\n" +
-                ")\n" +
-                "\n" +
-                "Mapping test::BicycleMapping\n" +
-                "(   \n" +
-                "   include RoadVehicleMapping\n" +
-                "   \n" +
-                "   Bicycle extends [test_RoadVehicle]: Relational\n" +
-                "   {\n" +
-                "   }\n" +
-                ")\n";
+        String testSourceCode = """
+                ###Pure
+                import test::*;
+                
+                Class test::RoadVehicle extends Vehicle
+                {
+                  \s
+                }
+                
+                Class test::Bicycle extends RoadVehicle
+                {
+                  \s
+                }
+                
+                ###Mapping
+                import test::*;
+                
+                Mapping test::RoadVehicleMapping
+                (  \s
+                   include VehicleMapping
+                  \s
+                   RoadVehicle extends [test_Vehicle]: Relational
+                   {
+                   }
+                )
+                
+                Mapping test::BicycleMapping
+                (  \s
+                   include RoadVehicleMapping
+                  \s
+                   Bicycle extends [test_RoadVehicle]: Relational
+                   {
+                   }
+                )
+                """;
 
         this.runtime.createInMemorySource(MAIN_SOURCE_ID, MAIN_SOURCE_CODE);
         this.runtime.createInMemorySource(TEST_SOURCE_ID, testSourceCode);
@@ -217,36 +227,38 @@ public class TestMainTableForExtendedMapping extends AbstractPureRelationalTestW
         Mapping bicycleMapping = (Mapping)this.runtime.getCoreInstance("test::BicycleMapping");
         RootRelationalInstanceSetImplementation bicycleSetImplementation = (RootRelationalInstanceSetImplementation)bicycleMapping._classMappings().selectWith(CLASS_MAPPING_BY_ID, "test_Bicycle").getFirst();
 
-        Assert.assertEquals(vehicleSetImplementation._mainTableAlias()._relationalElement(), roadVehicleSetImplementation._mainTableAlias()._relationalElement());
-        Assert.assertEquals(vehicleSetImplementation._mainTableAlias()._database(), roadVehicleSetImplementation._mainTableAlias()._database());
+        Assertions.assertEquals(vehicleSetImplementation._mainTableAlias()._relationalElement(), roadVehicleSetImplementation._mainTableAlias()._relationalElement());
+        Assertions.assertEquals(vehicleSetImplementation._mainTableAlias()._database(), roadVehicleSetImplementation._mainTableAlias()._database());
 
-        Assert.assertEquals(roadVehicleSetImplementation._mainTableAlias()._relationalElement(), bicycleSetImplementation._mainTableAlias()._relationalElement());
-        Assert.assertEquals(roadVehicleSetImplementation._mainTableAlias()._database(), bicycleSetImplementation._mainTableAlias()._database());
+        Assertions.assertEquals(roadVehicleSetImplementation._mainTableAlias()._relationalElement(), bicycleSetImplementation._mainTableAlias()._relationalElement());
+        Assertions.assertEquals(roadVehicleSetImplementation._mainTableAlias()._database(), bicycleSetImplementation._mainTableAlias()._database());
     }
 
     @Test
     public void testUserDefinedMainTableNotAllowedForExtendedMapping()
     {
-        String testSourceCode = "###Pure\n" +
-                "import test::*;\n" +
-                "\n" +
-                "Class test::RoadVehicle extends Vehicle\n" +
-                "{\n" +
-                "   \n" +
-                "}\n" +
-                "\n" +
-                "###Mapping\n" +
-                "import test::*;\n" +
-                "\n" +
-                "Mapping test::RoadVehicleMapping\n" +
-                "(   \n" +
-                "   include VehicleMapping\n" +
-                "   \n" +
-                "   RoadVehicle extends [test_Vehicle]: Relational\n" +
-                "   {\n" +
-                "       ~mainTable[MainDatabase]VehicleTable\n" +
-                "   }\n" +
-                ")\n";
+        String testSourceCode = """
+                ###Pure
+                import test::*;
+                
+                Class test::RoadVehicle extends Vehicle
+                {
+                  \s
+                }
+                
+                ###Mapping
+                import test::*;
+                
+                Mapping test::RoadVehicleMapping
+                (  \s
+                   include VehicleMapping
+                  \s
+                   RoadVehicle extends [test_Vehicle]: Relational
+                   {
+                       ~mainTable[MainDatabase]VehicleTable
+                   }
+                )
+                """;
 
         this.verifyInValidMainTableForExtendedMapping("Cannot specify main table explicitly for extended mapping [test_RoadVehicle]", testSourceCode, 16, 4);
     }
@@ -254,64 +266,68 @@ public class TestMainTableForExtendedMapping extends AbstractPureRelationalTestW
     @Test
     public void testStableMainTableForSimpleExtendedMappingWithStoreSubstitution()
     {
-        String testSourceCode = "###Pure\n" +
-                "import test::*;\n" +
-                "\n" +
-                "Class test::RoadVehicle extends Vehicle\n" +
-                "{\n" +
-                "   \n" +
-                "}\n" +
-                "\n" +
-                "###Relational\n" +
-                "Database test::RoadVehicleDatabase\n" +
-                "(\n" +
-                "   include test::VehicleDatabase\n" +
-                ")\n" +
-                "\n" +
-                "###Mapping\n" +
-                "import test::*;\n" +
-                "\n" +
-                "Mapping test::RoadVehicleMapping\n" +
-                "(   \n" +
-                "   include VehicleMapping[VehicleDatabase->RoadVehicleDatabase]\n" +
-                "   \n" +
-                "   RoadVehicle extends [test_Vehicle]: Relational\n" +
-                "   {\n" +
-                "      vehicleName : concat(\'roadVehicle_\', [RoadVehicleDatabase]VehicleTable.vehicleName)\n" +
-                "   }\n" +
-                ")\n";
+        String testSourceCode = """
+                ###Pure
+                import test::*;
+                
+                Class test::RoadVehicle extends Vehicle
+                {
+                  \s
+                }
+                
+                ###Relational
+                Database test::RoadVehicleDatabase
+                (
+                   include test::VehicleDatabase
+                )
+                
+                ###Mapping
+                import test::*;
+                
+                Mapping test::RoadVehicleMapping
+                (  \s
+                   include VehicleMapping[VehicleDatabase->RoadVehicleDatabase]
+                  \s
+                   RoadVehicle extends [test_Vehicle]: Relational
+                   {
+                      vehicleName : concat('roadVehicle_', [RoadVehicleDatabase]VehicleTable.vehicleName)
+                   }
+                )
+                """;
         this.verifyValidMainTableForExtendedMapping(testSourceCode);
     }
 
     @Test
     public void testValidMainTableForSimpleExtendedMappingWithStoreSubstitution()
     {
-        String testSourceCode = "###Pure\n" +
-                "import test::*;\n" +
-                "\n" +
-                "Class test::RoadVehicle extends Vehicle\n" +
-                "{\n" +
-                "   \n" +
-                "}\n" +
-                "\n" +
-                "###Relational\n" +
-                "Database test::RoadVehicleDatabase\n" +
-                "(\n" +
-                "   include test::VehicleDatabase\n" +
-                ")\n" +
-                "\n" +
-                "###Mapping\n" +
-                "import test::*;\n" +
-                "\n" +
-                "Mapping test::RoadVehicleMapping\n" +
-                "(   \n" +
-                "   include VehicleMapping[VehicleDatabase->RoadVehicleDatabase]\n" +
-                "   \n" +
-                "   RoadVehicle extends [test_Vehicle]: Relational\n" +
-                "   {\n" +
-                "      vehicleName : concat(\'roadVehicle_\', [RoadVehicleDatabase]VehicleTable.vehicleName)\n" +
-                "   }\n" +
-                ")\n";
+        String testSourceCode = """
+                ###Pure
+                import test::*;
+                
+                Class test::RoadVehicle extends Vehicle
+                {
+                  \s
+                }
+                
+                ###Relational
+                Database test::RoadVehicleDatabase
+                (
+                   include test::VehicleDatabase
+                )
+                
+                ###Mapping
+                import test::*;
+                
+                Mapping test::RoadVehicleMapping
+                (  \s
+                   include VehicleMapping[VehicleDatabase->RoadVehicleDatabase]
+                  \s
+                   RoadVehicle extends [test_Vehicle]: Relational
+                   {
+                      vehicleName : concat('roadVehicle_', [RoadVehicleDatabase]VehicleTable.vehicleName)
+                   }
+                )
+                """;
 
         this.runtime.createInMemorySource(MAIN_SOURCE_ID, MAIN_SOURCE_CODE);
         this.runtime.createInMemorySource(TEST_SOURCE_ID, testSourceCode);
@@ -323,113 +339,117 @@ public class TestMainTableForExtendedMapping extends AbstractPureRelationalTestW
         Mapping roadVehicleMapping = (Mapping)this.runtime.getCoreInstance("test::RoadVehicleMapping");
         RootRelationalInstanceSetImplementation roadVehicleSetImplementation = (RootRelationalInstanceSetImplementation)roadVehicleMapping._classMappings().selectWith(CLASS_MAPPING_BY_ID, "test_RoadVehicle").getFirst();
 
-        Assert.assertEquals(vehicleSetImplementation._mainTableAlias()._relationalElement(), roadVehicleSetImplementation._mainTableAlias()._relationalElement());
-        Assert.assertNotEquals(vehicleSetImplementation._mainTableAlias()._database(), roadVehicleSetImplementation._mainTableAlias()._database());
+        Assertions.assertEquals(vehicleSetImplementation._mainTableAlias()._relationalElement(), roadVehicleSetImplementation._mainTableAlias()._relationalElement());
+        Assertions.assertNotEquals(vehicleSetImplementation._mainTableAlias()._database(), roadVehicleSetImplementation._mainTableAlias()._database());
     }
 
     @Test
     public void testStableMainTableForNestedExtendedMappingWithStoreSubstitution()
     {
-        String testSourceCode = "###Pure\n" +
-                "import test::*;\n" +
-                "\n" +
-                "Class test::RoadVehicle extends Vehicle\n" +
-                "{\n" +
-                "   \n" +
-                "}\n" +
-                "\n" +
-                "Class test::Bicycle extends RoadVehicle\n" +
-                "{\n" +
-                "   \n" +
-                "}\n" +
-                "\n" +
-                "###Relational\n" +
-                "Database test::RoadVehicleDatabase\n" +
-                "(\n" +
-                "   include test::VehicleDatabase\n" +
-                ")\n" +
-                "\n" +
-                "###Relational\n" +
-                "Database test::BicycleDatabase\n" +
-                "(\n" +
-                "   include test::RoadVehicleDatabase\n" +
-                ")\n" +
-                "\n" +
-                "###Mapping\n" +
-                "import test::*;\n" +
-                "\n" +
-                "Mapping test::RoadVehicleMapping\n" +
-                "(   \n" +
-                "   include VehicleMapping[VehicleDatabase->RoadVehicleDatabase]\n" +
-                "   \n" +
-                "   RoadVehicle extends [test_Vehicle]: Relational\n" +
-                "   {\n" +
-                "      vehicleName : concat(\'roadVehicle_\', [RoadVehicleDatabase]VehicleTable.vehicleName)\n" +
-                "   }\n" +
-                ")\n" +
-                "\n" +
-                "Mapping test::BicycleMapping\n" +
-                "(   \n" +
-                "   include RoadVehicleMapping[RoadVehicleDatabase->BicycleDatabase]\n" +
-                "   \n" +
-                "   Bicycle extends [test_RoadVehicle]: Relational\n" +
-                "   {\n" +
-                "      vehicleType : [BicycleDatabase]VehicleTable.vehicleType\n" +
-                "   }\n" +
-                ")\n";
+        String testSourceCode = """
+                ###Pure
+                import test::*;
+                
+                Class test::RoadVehicle extends Vehicle
+                {
+                  \s
+                }
+                
+                Class test::Bicycle extends RoadVehicle
+                {
+                  \s
+                }
+                
+                ###Relational
+                Database test::RoadVehicleDatabase
+                (
+                   include test::VehicleDatabase
+                )
+                
+                ###Relational
+                Database test::BicycleDatabase
+                (
+                   include test::RoadVehicleDatabase
+                )
+                
+                ###Mapping
+                import test::*;
+                
+                Mapping test::RoadVehicleMapping
+                (  \s
+                   include VehicleMapping[VehicleDatabase->RoadVehicleDatabase]
+                  \s
+                   RoadVehicle extends [test_Vehicle]: Relational
+                   {
+                      vehicleName : concat('roadVehicle_', [RoadVehicleDatabase]VehicleTable.vehicleName)
+                   }
+                )
+                
+                Mapping test::BicycleMapping
+                (  \s
+                   include RoadVehicleMapping[RoadVehicleDatabase->BicycleDatabase]
+                  \s
+                   Bicycle extends [test_RoadVehicle]: Relational
+                   {
+                      vehicleType : [BicycleDatabase]VehicleTable.vehicleType
+                   }
+                )
+                """;
         this.verifyValidMainTableForExtendedMapping(testSourceCode);
     }
 
     @Test
     public void testValidMainTableForNestedExtendedMappingWithStoreSubstitution()
     {
-        String testSourceCode = "###Pure\n" +
-                "import test::*;\n" +
-                "\n" +
-                "Class test::RoadVehicle extends Vehicle\n" +
-                "{\n" +
-                "   \n" +
-                "}\n" +
-                "\n" +
-                "Class test::Bicycle extends RoadVehicle\n" +
-                "{\n" +
-                "   \n" +
-                "}\n" +
-                "\n" +
-                "###Relational\n" +
-                "Database test::RoadVehicleDatabase\n" +
-                "(\n" +
-                "   include test::VehicleDatabase\n" +
-                ")\n" +
-                "\n" +
-                "###Relational\n" +
-                "Database test::BicycleDatabase\n" +
-                "(\n" +
-                "   include test::RoadVehicleDatabase\n" +
-                ")\n" +
-                "\n" +
-                "###Mapping\n" +
-                "import test::*;\n" +
-                "\n" +
-                "Mapping test::RoadVehicleMapping\n" +
-                "(   \n" +
-                "   include VehicleMapping[VehicleDatabase->RoadVehicleDatabase]\n" +
-                "   \n" +
-                "   RoadVehicle extends [test_Vehicle]: Relational\n" +
-                "   {\n" +
-                "      vehicleName : concat(\'roadVehicle_\', [RoadVehicleDatabase]VehicleTable.vehicleName)\n" +
-                "   }\n" +
-                ")\n" +
-                "\n" +
-                "Mapping test::BicycleMapping\n" +
-                "(   \n" +
-                "   include RoadVehicleMapping[RoadVehicleDatabase->BicycleDatabase]\n" +
-                "   \n" +
-                "   Bicycle extends [test_RoadVehicle]: Relational\n" +
-                "   {\n" +
-                "      vehicleType : [BicycleDatabase]VehicleTable.vehicleType\n" +
-                "   }\n" +
-                ")\n";
+        String testSourceCode = """
+                ###Pure
+                import test::*;
+                
+                Class test::RoadVehicle extends Vehicle
+                {
+                  \s
+                }
+                
+                Class test::Bicycle extends RoadVehicle
+                {
+                  \s
+                }
+                
+                ###Relational
+                Database test::RoadVehicleDatabase
+                (
+                   include test::VehicleDatabase
+                )
+                
+                ###Relational
+                Database test::BicycleDatabase
+                (
+                   include test::RoadVehicleDatabase
+                )
+                
+                ###Mapping
+                import test::*;
+                
+                Mapping test::RoadVehicleMapping
+                (  \s
+                   include VehicleMapping[VehicleDatabase->RoadVehicleDatabase]
+                  \s
+                   RoadVehicle extends [test_Vehicle]: Relational
+                   {
+                      vehicleName : concat('roadVehicle_', [RoadVehicleDatabase]VehicleTable.vehicleName)
+                   }
+                )
+                
+                Mapping test::BicycleMapping
+                (  \s
+                   include RoadVehicleMapping[RoadVehicleDatabase->BicycleDatabase]
+                  \s
+                   Bicycle extends [test_RoadVehicle]: Relational
+                   {
+                      vehicleType : [BicycleDatabase]VehicleTable.vehicleType
+                   }
+                )
+                """;
 
         this.runtime.createInMemorySource(MAIN_SOURCE_ID, MAIN_SOURCE_CODE);
         this.runtime.createInMemorySource(TEST_SOURCE_ID, testSourceCode);
@@ -444,42 +464,44 @@ public class TestMainTableForExtendedMapping extends AbstractPureRelationalTestW
         Mapping bicycleMapping = (Mapping)this.runtime.getCoreInstance("test::BicycleMapping");
         RootRelationalInstanceSetImplementation bicycleSetImplementation = (RootRelationalInstanceSetImplementation)bicycleMapping._classMappings().selectWith(CLASS_MAPPING_BY_ID, "test_Bicycle").getFirst();
 
-        Assert.assertEquals(vehicleSetImplementation._mainTableAlias()._relationalElement(), roadVehicleSetImplementation._mainTableAlias()._relationalElement());
-        Assert.assertNotEquals(vehicleSetImplementation._mainTableAlias()._database(), roadVehicleSetImplementation._mainTableAlias()._database());
+        Assertions.assertEquals(vehicleSetImplementation._mainTableAlias()._relationalElement(), roadVehicleSetImplementation._mainTableAlias()._relationalElement());
+        Assertions.assertNotEquals(vehicleSetImplementation._mainTableAlias()._database(), roadVehicleSetImplementation._mainTableAlias()._database());
 
-        Assert.assertEquals(roadVehicleSetImplementation._mainTableAlias()._relationalElement(), bicycleSetImplementation._mainTableAlias()._relationalElement());
-        Assert.assertNotEquals(roadVehicleSetImplementation._mainTableAlias()._database(), bicycleSetImplementation._mainTableAlias()._database());
+        Assertions.assertEquals(roadVehicleSetImplementation._mainTableAlias()._relationalElement(), bicycleSetImplementation._mainTableAlias()._relationalElement());
+        Assertions.assertNotEquals(roadVehicleSetImplementation._mainTableAlias()._database(), bicycleSetImplementation._mainTableAlias()._database());
     }
 
     @Test
     public void testInvalidMainTableForExtendedMappingWithoutStoreSubstitution()
     {
-        String testSourceCode = "###Pure\n" +
-                "import test::*;\n" +
-                "\n" +
-                "Class test::RoadVehicle extends Vehicle\n" +
-                "{\n" +
-                "   \n" +
-                "}\n" +
-                "\n" +
-                "###Relational\n" +
-                "Database test::RoadVehicleDatabase\n" +
-                "(\n" +
-                "   include test::VehicleDatabase\n" +
-                ")\n" +
-                "\n" +
-                "###Mapping\n" +
-                "import test::*;\n" +
-                "\n" +
-                "Mapping test::RoadVehicleMapping\n" +
-                "(   \n" +
-                "   include VehicleMapping\n" +
-                "   \n" +
-                "   RoadVehicle extends [test_Vehicle]: Relational\n" +
-                "   {\n" +
-                "      vehicleName : concat(\'roadVehicle_\', [RoadVehicleDatabase]VehicleTable.vehicleName)\n" +
-                "   }\n" +
-                ")\n";
+        String testSourceCode = """
+                ###Pure
+                import test::*;
+                
+                Class test::RoadVehicle extends Vehicle
+                {
+                  \s
+                }
+                
+                ###Relational
+                Database test::RoadVehicleDatabase
+                (
+                   include test::VehicleDatabase
+                )
+                
+                ###Mapping
+                import test::*;
+                
+                Mapping test::RoadVehicleMapping
+                (  \s
+                   include VehicleMapping
+                  \s
+                   RoadVehicle extends [test_Vehicle]: Relational
+                   {
+                      vehicleName : concat('roadVehicle_', [RoadVehicleDatabase]VehicleTable.vehicleName)
+                   }
+                )
+                """;
         this.verifyInValidMainTableForExtendedMapping("Can't find the main table for class 'RoadVehicle'. Inconsistent database definitions for the mapping",
                 testSourceCode, 22, 4);
     }

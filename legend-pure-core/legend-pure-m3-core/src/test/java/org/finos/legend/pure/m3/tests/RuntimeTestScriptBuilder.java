@@ -24,7 +24,7 @@ import org.finos.legend.pure.m3.serialization.runtime.PureRuntime;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
 import org.finos.legend.pure.m4.exception.PureCompilationException;
 import org.finos.legend.pure.m4.serialization.grammar.antlr.PureParserException;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 
 public final class RuntimeTestScriptBuilder extends RuntimeActionRunner
 {
@@ -313,13 +313,13 @@ public final class RuntimeTestScriptBuilder extends RuntimeActionRunner
             try
             {
                 this.action.execute(pureRuntime, functionExecution);
-                Assert.fail();
+                Assertions.fail();
             }
             catch (Exception e)
             {
                 if (this.message == null)
                 {
-                    Assert.assertTrue(e.getMessage(), e.getMessage().startsWith("Compilation error at (resource:"));
+                    Assertions.assertTrue(e.getMessage().startsWith("Compilation error at (resource:"), e.getMessage());
                 }
                 else
                 {
@@ -363,13 +363,13 @@ public final class RuntimeTestScriptBuilder extends RuntimeActionRunner
             try
             {
                 this.action.execute(pureRuntime, functionExecution);
-                Assert.fail();
+                Assertions.fail();
             }
             catch (Exception e)
             {
                 if (this.message == null)
                 {
-                    Assert.assertTrue(e.getMessage(), e.getMessage().startsWith("Compilation error at (resource:"));
+                    Assertions.assertTrue(e.getMessage().startsWith("Compilation error at (resource:"), e.getMessage());
                 }
                 else
                 {
@@ -379,19 +379,19 @@ public final class RuntimeTestScriptBuilder extends RuntimeActionRunner
                 for (String path : this.processed)
                 {
                     CoreInstance instance = pureRuntime.getCoreInstance(path);
-                    Assert.assertTrue(instance.hasBeenProcessed());
+                    Assertions.assertTrue(instance.hasBeenProcessed());
                 }
 
                 for (String path : this.notProcessed)
                 {
                     CoreInstance instance = pureRuntime.getCoreInstance(path);
-                    Assert.assertFalse(instance.hasBeenProcessed());
+                    Assertions.assertFalse(instance.hasBeenProcessed());
                 }
 
                 for (String path : this.removed)
                 {
                     CoreInstance instance = pureRuntime.getCoreInstance(path);
-                    Assert.assertNull(instance);
+                    Assertions.assertNull(instance);
                 }
             }
         }

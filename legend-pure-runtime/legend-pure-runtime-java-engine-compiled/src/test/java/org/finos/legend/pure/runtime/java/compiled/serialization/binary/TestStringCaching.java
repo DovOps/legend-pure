@@ -21,13 +21,13 @@ import org.finos.legend.pure.m4.tools.GraphNodeIterable;
 import org.finos.legend.pure.runtime.java.compiled.factory.JavaModelFactoryRegistryLoader;
 import org.finos.legend.pure.runtime.java.compiled.generation.processors.IdBuilder;
 import org.finos.legend.pure.runtime.java.compiled.serialization.GraphSerializer;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public abstract class TestStringCaching<T extends StringCache> extends AbstractPureTestWithCoreCompiled
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getFunctionExecution(), JavaModelFactoryRegistryLoader.loader());
@@ -39,7 +39,7 @@ public abstract class TestStringCaching<T extends StringCache> extends AbstractP
         GraphSerializer.ClassifierCaches classifierCaches = new GraphSerializer.ClassifierCaches(processorSupport);
         IdBuilder idBuilder = IdBuilder.newIdBuilder(processorSupport);
         T cache = newBuilder().withObjs(GraphNodeIterable.allInstancesFromRepository(repository).collect(node -> GraphSerializer.buildObj(node, idBuilder, classifierCaches, processorSupport))).build();
-        Assert.assertEquals(0, cache.getStringId(null));
+        Assertions.assertEquals(0, cache.getStringId(null));
 
         String[] expectedClassifiers = getExpectedClassifiers(cache);
         String[] expectedOtherStrings = getExpectedOtherStrings(cache);
@@ -47,16 +47,16 @@ public abstract class TestStringCaching<T extends StringCache> extends AbstractP
         MutableMap<String, byte[]> serialization = Maps.mutable.empty();
         serialize(cache, FileWriters.fromInMemoryByteArrayMap(serialization));
         StringIndex index = buildIndex(FileReaders.fromInMemoryByteArrays(serialization));
-        Assert.assertNull(index.getString(0));
+        Assertions.assertNull(index.getString(0));
 
         for (int i = 0; i < expectedClassifiers.length; i++)
         {
-            Assert.assertEquals(expectedClassifiers[i], index.getString(StringCacheOrIndex.classifierIdStringIndexToId(i)));
+            Assertions.assertEquals(expectedClassifiers[i], index.getString(StringCacheOrIndex.classifierIdStringIndexToId(i)));
         }
 
         for (int i = 0; i < expectedOtherStrings.length; i++)
         {
-            Assert.assertEquals(expectedOtherStrings[i], index.getString(StringCacheOrIndex.otherStringIndexToId(i)));
+            Assertions.assertEquals(expectedOtherStrings[i], index.getString(StringCacheOrIndex.otherStringIndexToId(i)));
         }
     }
 

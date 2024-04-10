@@ -19,13 +19,13 @@ import org.finos.legend.pure.m3.navigation.M3Paths;
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiledPlatform;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
 import org.finos.legend.pure.m4.serialization.grammar.antlr.PureParserException;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestNamespaces extends AbstractPureTestWithCoreCompiledPlatform
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getExtra());
@@ -37,14 +37,14 @@ public class TestNamespaces extends AbstractPureTestWithCoreCompiledPlatform
         compileTestSource("class1.pure",
                 "Class test::MyClass {}");
         CoreInstance myClass = runtime.getCoreInstance("test::MyClass");
-        Assert.assertNotNull(myClass);
-        Assert.assertTrue(Instance.instanceOf(myClass, M3Paths.Class, processorSupport));
+        Assertions.assertNotNull(myClass);
+        Assertions.assertTrue(Instance.instanceOf(myClass, M3Paths.Class, processorSupport));
 
         try
         {
             compileTestSource("class2.pure",
                     "Class test::MyClass {}");
-            Assert.fail("Expected compilation error");
+            Assertions.fail("Expected compilation error");
         }
         catch (Exception e)
         {
@@ -58,14 +58,14 @@ public class TestNamespaces extends AbstractPureTestWithCoreCompiledPlatform
         compileTestSource("enum1.pure",
                 "Enum test::MyEnum {VALUE}");
         CoreInstance myEnum = runtime.getCoreInstance("test::MyEnum");
-        Assert.assertNotNull(myEnum);
-        Assert.assertTrue(Instance.instanceOf(myEnum, M3Paths.Enumeration, processorSupport));
+        Assertions.assertNotNull(myEnum);
+        Assertions.assertTrue(Instance.instanceOf(myEnum, M3Paths.Enumeration, processorSupport));
 
         try
         {
             compileTestSource("enum2.pure",
                     "Enum test::MyEnum {VALUE}");
-            Assert.fail("Expected compilation error");
+            Assertions.fail("Expected compilation error");
         }
         catch (Exception e)
         {
@@ -77,25 +77,29 @@ public class TestNamespaces extends AbstractPureTestWithCoreCompiledPlatform
     public void testAssociationNameConflict()
     {
         compileTestSource("assoc1.pure",
-                "Class test::TestClass {}\n" +
-                        "Association test::MyAssociation" +
-                        "{\n" +
-                        "  prop1 : test::TestClass[*];\n" +
-                        "  prop2 : test::TestClass[*];\n" +
-                        "}");
+                """
+                Class test::TestClass {}
+                Association test::MyAssociation\
+                {
+                  prop1 : test::TestClass[*];
+                  prop2 : test::TestClass[*];
+                }\
+                """);
         CoreInstance myAssoc = runtime.getCoreInstance("test::MyAssociation");
-        Assert.assertNotNull(myAssoc);
-        Assert.assertTrue(Instance.instanceOf(myAssoc, M3Paths.Association, processorSupport));
+        Assertions.assertNotNull(myAssoc);
+        Assertions.assertTrue(Instance.instanceOf(myAssoc, M3Paths.Association, processorSupport));
 
         try
         {
             compileTestSource("assoc2.pure",
-                    "Association test::MyAssociation" +
-                            "{\n" +
-                            "  prop1 : test::TestClass[*];\n" +
-                            "  prop2 : test::TestClass[*];\n" +
-                            "}");
-            Assert.fail("Expected compilation error");
+                    """
+                    Association test::MyAssociation\
+                    {
+                      prop1 : test::TestClass[*];
+                      prop2 : test::TestClass[*];
+                    }\
+                    """);
+            Assertions.fail("Expected compilation error");
         }
         catch (Exception e)
         {

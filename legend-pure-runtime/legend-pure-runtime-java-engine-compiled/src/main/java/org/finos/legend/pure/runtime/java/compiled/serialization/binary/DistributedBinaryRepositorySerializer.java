@@ -126,17 +126,17 @@ class DistributedBinaryRepositorySerializer extends DistributedBinaryGraphSerial
 
     private PackageableElementUpdate<?> computeUpdate(PackageableElement element)
     {
-        if (element instanceof Type)
+        if (element instanceof Type type)
         {
-            return new TypeUpdate((Type) element);
+            return new TypeUpdate(type);
         }
-        if (element instanceof Profile)
+        if (element instanceof Profile profile)
         {
-            return new ProfileUpdate((Profile) element);
+            return new ProfileUpdate(profile);
         }
-        if (element instanceof PackageableFunction)
+        if (element instanceof PackageableFunction function)
         {
-            return new PackageableFunctionUpdate<>((PackageableFunction<?>) element);
+            return new PackageableFunctionUpdate<>(function);
         }
         return new PackageableElementUpdate<>(element);
     }

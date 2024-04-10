@@ -46,9 +46,9 @@ public class OperationSetImplementationUnbind implements MatchRunner<OperationSe
         {
             param._setImplementationRemove();
         }
-        if (operationSetImplementation instanceof  org.finos.legend.pure.m3.coreinstance.meta.pure.mapping.MergeOperationSetImplementation)
+        if (operationSetImplementation instanceof  org.finos.legend.pure.m3.coreinstance.meta.pure.mapping.MergeOperationSetImplementation implementation)
         {
-          ((MergeOperationSetImplementation) operationSetImplementation)._validationFunctionRemove();
+          implementation._validationFunctionRemove();
         }
 
     }

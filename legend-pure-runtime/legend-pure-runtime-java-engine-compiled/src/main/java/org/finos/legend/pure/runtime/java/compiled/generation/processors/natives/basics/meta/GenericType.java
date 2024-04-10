@@ -35,13 +35,15 @@ public class GenericType extends AbstractNative
     @Override
     public String buildBody()
     {
-        return "new DefendedPureFunction1<Object, Object>()\n" +
-                "        {\n" +
-                "            @Override\n" +
-                "            public Object value(Object o, ExecutionSupport es)\n" +
-                "            {\n" +
-                "               return CoreGen.safeGetGenericType(o, es);\n" +
-                "            }\n" +
-                "        }";
+        return """
+                new DefendedPureFunction1<Object, Object>()
+                        {
+                            @Override
+                            public Object value(Object o, ExecutionSupport es)
+                            {
+                               return CoreGen.safeGetGenericType(o, es);
+                            }
+                        }\
+                """;
     }
 }

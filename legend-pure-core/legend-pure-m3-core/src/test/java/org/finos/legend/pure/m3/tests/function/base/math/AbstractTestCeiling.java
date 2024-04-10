@@ -15,7 +15,7 @@
 package org.finos.legend.pure.m3.tests.function.base.math;
 
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public abstract class AbstractTestCeiling extends AbstractPureTestWithCoreCompiled
 {
@@ -23,10 +23,12 @@ public abstract class AbstractTestCeiling extends AbstractPureTestWithCoreCompil
     public void testBasic()
     {
         compileTestSource("fromString.pure",
-                "function test():Boolean[1]\n" +
-                        "{\n" +
-                        "   assert(2 == 1.3->ceiling(), |'');\n" +
-                        "}\n");
+                """
+                function test():Boolean[1]
+                {
+                   assert(2 == 1.3->ceiling(), |'');
+                }
+                """);
         this.execute("test():Boolean[1]");
     }
 
@@ -34,10 +36,12 @@ public abstract class AbstractTestCeiling extends AbstractPureTestWithCoreCompil
     public void testEval()
     {
         compileTestSource("fromString.pure",
-                "function test():Boolean[1]\n" +
-                        "{\n" +
-                        "   assert(2 == ceiling_Number_1__Integer_1_->eval(1.3), |'');\n" +
-                        "}\n");
+                """
+                function test():Boolean[1]
+                {
+                   assert(2 == ceiling_Number_1__Integer_1_->eval(1.3), |'');
+                }
+                """);
         this.execute("test():Boolean[1]");
     }
 }

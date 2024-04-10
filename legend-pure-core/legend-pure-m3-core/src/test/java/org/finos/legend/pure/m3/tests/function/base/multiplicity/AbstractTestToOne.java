@@ -15,7 +15,7 @@
 package org.finos.legend.pure.m3.tests.function.base.multiplicity;
 
 import org.finos.legend.pure.m3.tests.function.base.PureExpressionTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public abstract class AbstractTestToOne extends PureExpressionTest
 {
@@ -32,10 +32,12 @@ public abstract class AbstractTestToOne extends PureExpressionTest
     public void testBasic()
     {
         compileTestSource("fromString.pure",
-                "function test():Boolean[1]\n" +
-                        "{\n" +
-                        "   assert(1 == [1]->toOne(), |'');\n" +
-                        "}\n");
+                """
+                function test():Boolean[1]
+                {
+                   assert(1 == [1]->toOne(), |'');
+                }
+                """);
         this.execute("test():Boolean[1]");
     }
 
@@ -43,10 +45,12 @@ public abstract class AbstractTestToOne extends PureExpressionTest
     public void testEval()
     {
         compileTestSource("fromString.pure",
-                "function test():Boolean[1]\n" +
-                        "{\n" +
-                        "   assert(1 == toOne_T_MANY__T_1_->eval([1]), |'');\n" +
-                        "}\n");
+                """
+                function test():Boolean[1]
+                {
+                   assert(1 == toOne_T_MANY__T_1_->eval([1]), |'');
+                }
+                """);
         this.execute("test():Boolean[1]");
     }
 
@@ -54,10 +58,12 @@ public abstract class AbstractTestToOne extends PureExpressionTest
     public void testWithMessage()
     {
         compileTestSource("fromString.pure",
-                "function test():Boolean[1]\n" +
-                        "{\n" +
-                        "   assert(1 == [1]->toOne('Something wrong'), |'');\n" +
-                        "}\n");
+                """
+                function test():Boolean[1]
+                {
+                   assert(1 == [1]->toOne('Something wrong'), |'');
+                }
+                """);
         this.execute("test():Boolean[1]");
     }
 }

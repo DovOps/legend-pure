@@ -25,8 +25,8 @@ import org.finos.legend.pure.m2.relational.RelationalGraphWalker;
 import org.finos.legend.pure.m3.tests.RuntimeTestScriptBuilder;
 import org.finos.legend.pure.m3.tests.RuntimeVerifier;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
@@ -45,40 +45,48 @@ public class TestPureRuntimeClassMapping extends AbstractPureRelationalTestWithC
     private static final String CLASS_MAPPING_PERSON_RELATIONAL = "Mapping myMap(Person:Relational{name : [db]myTable.name})";
     private static final String CLASS_MAPPING = MAPPING + CLASS_MAPPING_PERSON_RELATIONAL;
 
-    private static final String FUNCTION_TEST_CLASS_MAPPINGS_SIZE = "###Pure\n" +
-            "function test():Boolean[1]{assert(1 == myMap.classMappings->size(), |'');}";
+    private static final String FUNCTION_TEST_CLASS_MAPPINGS_SIZE = """
+            ###Pure
+            function test():Boolean[1]{assert(1 == myMap.classMappings->size(), |'');}\
+            """;
 
-    private static final String CLASS_ORG = "Class Org\n" +
-            "{\n" +
-            "    name : String[1];\n" +
-            "    parent: Org[0..1];\n" +
-            "    childOrgEmployeeCount: Integer[0..1];\n" +
-            "    children: Org[*];\n" +
-            "}\n" +
-            "Association OrgSelf\n" +
-            "{\n" +
-            "   top : Org[1];\n" +
-            "   bottom : Org[*];\n" +
-            "}";
+    private static final String CLASS_ORG = """
+            Class Org
+            {
+                name : String[1];
+                parent: Org[0..1];
+                childOrgEmployeeCount: Integer[0..1];
+                children: Org[*];
+            }
+            Association OrgSelf
+            {
+               top : Org[1];
+               bottom : Org[*];
+            }\
+            """;
 
     private static final String ORG_TABLE =
-            "Table orgTable\n" +
-                    "    (\n" +
-                    "        id INT,\n" +
-                    "        filterVal INT,\n" +
-                    "        parentId INT,\n" +
-                    "        name VARCHAR(200),\n" +
-                    "        employeeCount INT\n" +
-                    "    )\n";
+            """
+            Table orgTable
+                (
+                    id INT,
+                    filterVal INT,
+                    parentId INT,
+                    name VARCHAR(200),
+                    employeeCount INT
+                )
+            """;
 
     private static final String ORG_TABLE_WITHOUT_EMPLOYEE_COUNT =
-            "Table orgTable\n" +
-                    "    (\n" +
-                    "        id INT,\n" +
-                    "        filterVal INT,\n" +
-                    "        parentId INT,\n" +
-                    "        name VARCHAR(200)\n" +
-                    "    )\n";
+            """
+            Table orgTable
+                (
+                    id INT,
+                    filterVal INT,
+                    parentId INT,
+                    name VARCHAR(200)
+                )
+            """;
 
     private static String getComplexDatabase(String orgTable)
     {
@@ -136,13 +144,15 @@ public class TestPureRuntimeClassMapping extends AbstractPureRelationalTestWithC
             CLASS_SOURCE_ID, CLASS_ORG,
             RELATIONAL_DB_SOURCE_ID, getComplexDatabase(ORG_TABLE));
 
-    private static final String CLASS_PERSON2 = "Class Person\n" +
-            "{\n" +
-            "    fullName(){$this.lastName+', '+$this.firstName}:String[1];\n" +
-            "    firstName : String[1];\n" +
-            "    lastName: String[1];\n" +
-            "    displayName : String[1];\n" +
-            "}\n";
+    private static final String CLASS_PERSON2 = """
+            Class Person
+            {
+                fullName(){$this.lastName+', '+$this.firstName}:String[1];
+                firstName : String[1];
+                lastName: String[1];
+                displayName : String[1];
+            }
+            """;
 
     private static final String CLASS_MAPPING_PERSON_WITH_TRANSFORM = MAPPING +
             "Mapping myMap\n" +
@@ -249,54 +259,60 @@ public class TestPureRuntimeClassMapping extends AbstractPureRelationalTestWithC
     @Test
     public void testEmbeddedUnbind()
     {
-        String classSource = "import other::*;\n" +
-                "\n" +
-                "Class other::Person\n" +
-                "{\n" +
-                "    name:String[1];\n" +
-                "    firm:Firm[1];\n" +
-                "}\n" +
-                "Class other::Firm\n" +
-                "{\n" +
-                "    legalName:String[1];\n" +
-                "    employees:Person[1];\n" +
-                "    address:Address[1];\n" +
-                "}\n" +
-                "Class other::Address\n" +
-                "{\n" +
-                "    line1:String[1];\n" +
-                "}\n";
-        String dbSource = "###Relational\n" +
-                "Database mapping::db(\n" +
-                "   Table employeeFirmDenormTable\n" +
-                "   (\n" +
-                "    id INT PRIMARY KEY,\n" +
-                "    name VARCHAR(200),\n" +
-                "    firmId INT,\n" +
-                "    legalName VARCHAR(200),\n" +
-                "    address VARCHAR(200)\n" +
-                "   )\n" +
-                ")\n";
+        String classSource = """
+                import other::*;
+                
+                Class other::Person
+                {
+                    name:String[1];
+                    firm:Firm[1];
+                }
+                Class other::Firm
+                {
+                    legalName:String[1];
+                    employees:Person[1];
+                    address:Address[1];
+                }
+                Class other::Address
+                {
+                    line1:String[1];
+                }
+                """;
+        String dbSource = """
+                ###Relational
+                Database mapping::db(
+                   Table employeeFirmDenormTable
+                   (
+                    id INT PRIMARY KEY,
+                    name VARCHAR(200),
+                    firmId INT,
+                    legalName VARCHAR(200),
+                    address VARCHAR(200)
+                   )
+                )
+                """;
         String mappingSource =
-                "###Mapping\n" +
-                        "import other::*;\n" +
-                        "import mapping::*;\n" +
-                        "Mapping mappingPackage::myMapping\n" +
-                        "(\n" +
-                        "    Person: Relational\n" +
-                        "    {\n" +
-                        "        name : [db]employeeFirmDenormTable.name,\n" +
-                        "        firm\n" +
-                        "        (\n" +
-                        "            ~primaryKey ([db]employeeFirmDenormTable.legalName)\n" +
-                        "            legalName : [db]employeeFirmDenormTable.legalName,\n" +
-                        "            address\n" +
-                        "            (\n" +
-                        "                line1: [db]employeeFirmDenormTable.address\n" +
-                        "            )\n" +
-                        "        )\n" +
-                        "    }\n" +
-                        ")\n";
+                """
+                ###Mapping
+                import other::*;
+                import mapping::*;
+                Mapping mappingPackage::myMapping
+                (
+                    Person: Relational
+                    {
+                        name : [db]employeeFirmDenormTable.name,
+                        firm
+                        (
+                            ~primaryKey ([db]employeeFirmDenormTable.legalName)
+                            legalName : [db]employeeFirmDenormTable.legalName,
+                            address
+                            (
+                                line1: [db]employeeFirmDenormTable.address
+                            )
+                        )
+                    }
+                )
+                """;
 
         this.testDeleteAndReloadEachSource(Maps.immutable.of("1.pure", classSource, "2.pure", dbSource, "3.pure", mappingSource),
                 "###Pure\n function test():Boolean[1]{assert(1 == mappingPackage::myMapping.classMappings->size(), |'');}");
@@ -306,59 +322,65 @@ public class TestPureRuntimeClassMapping extends AbstractPureRelationalTestWithC
     public void testOtherwiseEmbeddedUnbind()
     {
 
-        String classSource = "import other::*;\n" +
-                "\n" +
-                "Class other::Person\n" +
-                "{\n" +
-                "    name:String[1];\n" +
-                "    firm:Firm[1];\n" +
-                "}\n" +
-                "Class other::Firm\n" +
-                "{\n" +
-                "    legalName:String[1];\n" +
-                "    otherInformation:String[1];\n" +
-                "}\n";
+        String classSource = """
+                import other::*;
+                
+                Class other::Person
+                {
+                    name:String[1];
+                    firm:Firm[1];
+                }
+                Class other::Firm
+                {
+                    legalName:String[1];
+                    otherInformation:String[1];
+                }
+                """;
 
-        String dbSource = "###Relational\n" +
-                "Database mapping::db(\n" +
-                "   Table employeeFirmDenormTable\n" +
-                "   (\n" +
-                "    id INT PRIMARY KEY,\n" +
-                "    name VARCHAR(200),\n" +
-                "    firmId INT,\n" +
-                "    legalName VARCHAR(200),\n" +
-                "    address1 VARCHAR(200),\n" +
-                "    postcode VARCHAR(10)\n" +
-                "   )\n" +
-                "   Table FirmInfoTable\n" +
-                "   (\n" +
-                "    id INT PRIMARY KEY,\n" +
-                "    name VARCHAR(200),\n" +
-                "    other VARCHAR(200)\n" +
-                "   )\n" +
-                "   Join PersonFirmJoin(employeeFirmDenormTable.firmId = FirmInfoTable.id)\n" +
-                ")\n";
+        String dbSource = """
+                ###Relational
+                Database mapping::db(
+                   Table employeeFirmDenormTable
+                   (
+                    id INT PRIMARY KEY,
+                    name VARCHAR(200),
+                    firmId INT,
+                    legalName VARCHAR(200),
+                    address1 VARCHAR(200),
+                    postcode VARCHAR(10)
+                   )
+                   Table FirmInfoTable
+                   (
+                    id INT PRIMARY KEY,
+                    name VARCHAR(200),
+                    other VARCHAR(200)
+                   )
+                   Join PersonFirmJoin(employeeFirmDenormTable.firmId = FirmInfoTable.id)
+                )
+                """;
 
 
-        String mappingSource = "###Mapping\n" +
-                "import other::*;\n" +
-                "import mapping::*;\n" +
-                "Mapping mappingPackage::myMapping\n" +
-                "(\n" +
-                "    Firm[firm1]: Relational\n" +
-                "    {\n" +
-                "       legalName : [db]FirmInfoTable.name ,\n" +
-                "       otherInformation: [db]FirmInfoTable.other\n" +
-                "    }\n" +
-                "    Person[alias1]: Relational\n" +
-                "    {\n" +
-                "        name : [db]employeeFirmDenormTable.name,\n" +
-                "        firm\n" +
-                "        (\n" +
-                "            legalName : [db]employeeFirmDenormTable.legalName\n" +
-                "        ) Otherwise ( [firm1]:[db]@PersonFirmJoin) \n" +
-                "    }\n" +
-                ")\n";
+        String mappingSource = """
+                ###Mapping
+                import other::*;
+                import mapping::*;
+                Mapping mappingPackage::myMapping
+                (
+                    Firm[firm1]: Relational
+                    {
+                       legalName : [db]FirmInfoTable.name ,
+                       otherInformation: [db]FirmInfoTable.other
+                    }
+                    Person[alias1]: Relational
+                    {
+                        name : [db]employeeFirmDenormTable.name,
+                        firm
+                        (
+                            legalName : [db]employeeFirmDenormTable.legalName
+                        ) Otherwise ( [firm1]:[db]@PersonFirmJoin)\s
+                    }
+                )
+                """;
 
         this.testDeleteAndReloadEachSource(Maps.immutable.of("1.pure", classSource, "2.pure", dbSource, "3.pure", mappingSource),
                 "###Pure\n function test():Boolean[1]{assert(2 == mappingPackage::myMapping.classMappings->size(), |'');}");
@@ -373,11 +395,11 @@ public class TestPureRuntimeClassMapping extends AbstractPureRelationalTestWithC
         RelationalGraphWalker graphWalker = new RelationalGraphWalker(runtime, processorSupport);
 
         CoreInstance childOrgEmployeeCountsAttr = getPropertyMapping(graphWalker, "myMap", "Org", "childOrgEmployeeCount");
-        Assert.assertNotNull(childOrgEmployeeCountsAttr);
+        Assertions.assertNotNull(childOrgEmployeeCountsAttr);
 
         new RuntimeTestScriptBuilder().deleteSource(CLASS_MAPPING_SOURCE_ID).createInMemorySource(CLASS_MAPPING_SOURCE_ID, getComplexMapping(Lists.mutable.empty())).compile().run(runtime, functionExecution);
         CoreInstance childOrgEmployeeCountsAttr2 = getPropertyMapping(graphWalker, "myMap", "Org", "childOrgEmployeeCount");
-        Assert.assertNull(childOrgEmployeeCountsAttr2);
+        Assertions.assertNull(childOrgEmployeeCountsAttr2);
     }
 
     @Test
@@ -400,64 +422,71 @@ public class TestPureRuntimeClassMapping extends AbstractPureRelationalTestWithC
     public void testViewUnbind()
     {
         String classSource =
-                "import other::*;\n" +
-                        "Class other::Person\n" +
-                        "{\n" +
-                        "    name:String[1];\n" +
-                        "    firm:Firm[1];\n" +
-                        "    addressLine1:String[1];\n" +
-                        "}\n" +
-                        "Class other::Firm\n" +
-                        "{\n" +
-                        "    legalName:String[1];\n" +
-                        "    employees:Person[*];\n" +
-                        "}";
-        String dbSource = "###Relational\n" +
-                "Database mapping::db(\n" +
-                "   Table employeeTable\n" +
-                "   (\n" +
-                "    id INT PRIMARY KEY,\n" +
-                "    name VARCHAR(200),\n" +
-                "    firmId INT\n" +
-                "   )\n" +
-                "   Table firmTable\n" +
-                "   (\n" +
-                "    id INT PRIMARY KEY,\n" +
-                "    legalName VARCHAR(200)\n" +
-                "   )\n" +
-                "   Table addressTable\n" +
-                "   (\n" +
-                "    id INT PRIMARY KEY,\n" +
-                "    employeeId INT,\n" +
-                "    line VARCHAR(200)\n" +
-                "   )\n" +
-                "   View employeeAddressView   \n" +
-                "   (\n" +
-                "    employeeId : employeeTable.id,\n" +
-                "    employeeName : employeeTable.name,\n" +
-                "    employeeFirmId : employeeTable.firmId,\n" +
-                "    addressLine :  @employee_address | addressTable.line\n" +
-                "   )\n" +
-                "   Join employee_address(employeeTable.id=addressTable.id)\n " +
-                "   Join firm_employees(firmTable.id=employeeAddressView.employeeFirmId)\n" +
-                ")";
+                """
+                import other::*;
+                Class other::Person
+                {
+                    name:String[1];
+                    firm:Firm[1];
+                    addressLine1:String[1];
+                }
+                Class other::Firm
+                {
+                    legalName:String[1];
+                    employees:Person[*];
+                }\
+                """;
+        String dbSource = """
+                ###Relational
+                Database mapping::db(
+                   Table employeeTable
+                   (
+                    id INT PRIMARY KEY,
+                    name VARCHAR(200),
+                    firmId INT
+                   )
+                   Table firmTable
+                   (
+                    id INT PRIMARY KEY,
+                    legalName VARCHAR(200)
+                   )
+                   Table addressTable
+                   (
+                    id INT PRIMARY KEY,
+                    employeeId INT,
+                    line VARCHAR(200)
+                   )
+                   View employeeAddressView  \s
+                   (
+                    employeeId : employeeTable.id,
+                    employeeName : employeeTable.name,
+                    employeeFirmId : employeeTable.firmId,
+                    addressLine :  @employee_address | addressTable.line
+                   )
+                   Join employee_address(employeeTable.id=addressTable.id)
+                 \
+                   Join firm_employees(firmTable.id=employeeAddressView.employeeFirmId)
+                )\
+                """;
         String mappingSource =
-                "###Mapping\n" +
-                        "import other::*;\n" +
-                        "import mapping::*;\n" +
-                        "Mapping mappingPackage::myMapping\n" +
-                        "(\n" +
-                        "    Person: Relational\n" +
-                        "    {\n" +
-                        "        name : [db]employeeAddressView.employeeName,\n" +
-                        "         addressLine1 : [db]employeeAddressView.addressLine" +
-                        "    }\n" +
-                        "    Firm: Relational\n" +
-                        "    {\n" +
-                        "        legalName : [db]firmTable.legalName,\n" +
-                        "        employees : [db]@firm_employees\n" +
-                        "    }\n" +
-                        ")\n";
+                """
+                ###Mapping
+                import other::*;
+                import mapping::*;
+                Mapping mappingPackage::myMapping
+                (
+                    Person: Relational
+                    {
+                        name : [db]employeeAddressView.employeeName,
+                         addressLine1 : [db]employeeAddressView.addressLine\
+                    }
+                    Firm: Relational
+                    {
+                        legalName : [db]firmTable.legalName,
+                        employees : [db]@firm_employees
+                    }
+                )
+                """;
 
         this.testDeleteAndReloadEachSource(Maps.immutable.of("1.pure", classSource, "2.pure", dbSource, "3.pure", mappingSource),
                 "###Pure\n function test():Boolean[1]{assert(1 == mappingPackage::myMapping.classMappings->size(), |'');}");
@@ -466,33 +495,41 @@ public class TestPureRuntimeClassMapping extends AbstractPureRelationalTestWithC
     @Test
     public void testMilestoningMappingUnbindStability()
     {
-        String modelTrade = "Class my::Trade{\n" +
-                "   id:Integer[1];\n" +
-                "   product:my::Product[1];\n" +
-                "}";
-        String modelProduct = "Class my::Product{\n" +
-                "   id:Integer[1];\n" +
-                "}";
-        String modelProductTemporal = "Class <<temporal.businesstemporal>> my::Product{\n" +
-                "   id:Integer[1];\n" +
-                "}";
-        String storeAndMapping = "###Mapping\n" +
-                "import meta::relational::tests::*;\n" +
-                "import my::*;\n" +
-                "\n" +
-                "Mapping myMapping\n" +
-                "(\n" +
-                "   Trade : Relational {id : [myDB] tradeTable.ID, product : [myDB] @trade_product} \n" +
-                "   Product : Relational { id : [myDB] productTable.ID}\n" +
-                ")\n" +
-                "###Relational\n" +
-                "Database myDB\n" +
-                "(\n" +
-                "   Table tradeTable(ID INT PRIMARY KEY, PRODID INT)\n" +
-                "   Table productTable(ID INT PRIMARY KEY)\n" +
-                "   \n" +
-                "   Join trade_product(tradeTable.PRODID = productTable.ID)\n" +
-                ")";
+        String modelTrade = """
+                Class my::Trade{
+                   id:Integer[1];
+                   product:my::Product[1];
+                }\
+                """;
+        String modelProduct = """
+                Class my::Product{
+                   id:Integer[1];
+                }\
+                """;
+        String modelProductTemporal = """
+                Class <<temporal.businesstemporal>> my::Product{
+                   id:Integer[1];
+                }\
+                """;
+        String storeAndMapping = """
+                ###Mapping
+                import meta::relational::tests::*;
+                import my::*;
+                
+                Mapping myMapping
+                (
+                   Trade : Relational {id : [myDB] tradeTable.ID, product : [myDB] @trade_product}\s
+                   Product : Relational { id : [myDB] productTable.ID}
+                )
+                ###Relational
+                Database myDB
+                (
+                   Table tradeTable(ID INT PRIMARY KEY, PRODID INT)
+                   Table productTable(ID INT PRIMARY KEY)
+                  \s
+                   Join trade_product(tradeTable.PRODID = productTable.ID)
+                )\
+                """;
         String f = "function f():Any[0..1]{let m = myMapping}";
         RuntimeVerifier.verifyOperationIsStable(new RuntimeTestScriptBuilder()
                         .createInMemorySource("modelTrade.pure", modelTrade)

@@ -54,9 +54,9 @@ public class VisibilityValidation
 {
     public static void validateFunctionDefinition(FunctionDefinition<?> function, Context context, ValidatorState validatorState, ProcessorSupport processorSupport) throws PureCompilationException
     {
-        if (function instanceof PackageableFunction)
+        if (function instanceof PackageableFunction packageableFunction)
         {
-            Package pkg = ((PackageableFunction) function)._package();
+            Package pkg = packageableFunction._package();
             SourceInformation sourceInfo = function.getSourceInformation();
             validateFunctionDefinition(function, pkg, (sourceInfo == null) ? null : sourceInfo.getSourceId(), context, validatorState, processorSupport);
         }
@@ -120,9 +120,9 @@ public class VisibilityValidation
         function._expressionSequence().forEach(e -> validateValueSpecification(e, pkg, sourceId, context, validatorState, processorSupport));
 
         // Check annotations
-        if (function instanceof AnnotatedElement)
+        if (function instanceof AnnotatedElement element)
         {
-            validateAnnotatedElement((AnnotatedElement) function, sourceId, validatorState, processorSupport);
+            validateAnnotatedElement(element, sourceId, validatorState, processorSupport);
         }
     }
 
@@ -192,14 +192,14 @@ public class VisibilityValidation
         if (org.finos.legend.pure.m3.navigation.generictype.GenericType.isGenericTypeConcrete(genericType))
         {
             Type rawType = (Type) ImportStub.withImportStubByPass(genericType._rawTypeCoreInstance(), processorSupport);
-            if (rawType instanceof FunctionType)
+            if (rawType instanceof FunctionType type)
             {
-                ((FunctionType) rawType)._parameters().forEach(p -> validateGenericType(p._genericType(), pkg, sourceId, context, validatorState, processorSupport, checkSourceVisibility));
-                validateGenericType(((FunctionType) rawType)._returnType(), pkg, sourceId, context, validatorState, processorSupport, checkSourceVisibility);
+                type._parameters().forEach(p -> validateGenericType(p._genericType(), pkg, sourceId, context, validatorState, processorSupport, checkSourceVisibility));
+                validateGenericType(type._returnType(), pkg, sourceId, context, validatorState, processorSupport, checkSourceVisibility);
             }
             else
             {
-                if (rawType instanceof ElementWithStereotypes && !Visibility.isVisibleInPackage((ElementWithStereotypes) rawType, pkg, context, processorSupport))
+                if (rawType instanceof ElementWithStereotypes stereotypes && !Visibility.isVisibleInPackage(stereotypes, pkg, context, processorSupport))
                 {
                     throwAccessException(genericType.getSourceInformation(), rawType, pkg, processorSupport);
                 }
@@ -214,34 +214,34 @@ public class VisibilityValidation
 
     private static void validateValueSpecification(ValueSpecification valueSpec, CoreInstance pkg, String sourceId, Context context, ValidatorState validatorState, ProcessorSupport processorSupport) throws PureCompilationException
     {
-        if (valueSpec instanceof FunctionExpression)
+        if (valueSpec instanceof FunctionExpression expression)
         {
-            validateFunctionExpression((FunctionExpression) valueSpec, pkg, sourceId, context, validatorState, processorSupport);
+            validateFunctionExpression(expression, pkg, sourceId, context, validatorState, processorSupport);
         }
-        else if (valueSpec instanceof InstanceValue)
+        else if (valueSpec instanceof InstanceValue value)
         {
-            ImportStub.withImportStubByPasses(ListHelper.wrapListIterable(((InstanceValue) valueSpec)._valuesCoreInstance()), processorSupport).forEach(value ->
+            ImportStub.withImportStubByPasses(ListHelper.wrapListIterable(value._valuesCoreInstance()), processorSupport).forEach(value ->
             {
-                if (value instanceof LambdaFunction)
+                if (value instanceof LambdaFunction function)
                 {
-                    validateFunctionDefinition((LambdaFunction<?>) value, pkg, sourceId, context, validatorState, processorSupport);
+                    validateFunctionDefinition(function, pkg, sourceId, context, validatorState, processorSupport);
                 }
-                else if (value instanceof PackageableFunction)
+                else if (value instanceof PackageableFunction function)
                 {
-                    validatePackageAndSourceVisibility(valueSpec, pkg, sourceId, context, validatorState, processorSupport, (PackageableFunction<?>) value);
+                    validatePackageAndSourceVisibility(valueSpec, pkg, sourceId, context, validatorState, processorSupport, function);
                 }
-                else if (value instanceof ValueSpecification)
+                else if (value instanceof ValueSpecification specification)
                 {
-                    validateValueSpecification((ValueSpecification) value, pkg, sourceId, context, validatorState, processorSupport);
+                    validateValueSpecification(specification, pkg, sourceId, context, validatorState, processorSupport);
                 }
-                else if (value instanceof Class)
+                else if (value instanceof Class class1)
                 {
-                    validatePackageAndSourceVisibility(valueSpec, pkg, sourceId, context, validatorState, processorSupport, (Class<?>) value);
+                    validatePackageAndSourceVisibility(valueSpec, pkg, sourceId, context, validatorState, processorSupport, class1);
                 }
-                else if (value instanceof KeyExpression)
+                else if (value instanceof KeyExpression expression)
                 {
-                    validateValueSpecification(((KeyExpression) value)._key(), pkg, sourceId, context, validatorState, processorSupport);
-                    validateValueSpecification(((KeyExpression) value)._expression(), pkg, sourceId, context, validatorState, processorSupport);
+                    validateValueSpecification(expression._key(), pkg, sourceId, context, validatorState, processorSupport);
+                    validateValueSpecification(expression._expression(), pkg, sourceId, context, validatorState, processorSupport);
                 }
                 else if (Instance.instanceOf(value, M3Paths.PackageableElement, processorSupport))
                 {
@@ -282,9 +282,9 @@ public class VisibilityValidation
     private static void validateFunctionExpression(FunctionExpression expression, CoreInstance pkg, String sourceId, Context context, ValidatorState validatorState, ProcessorSupport processorSupport) throws PureCompilationException
     {
         Function<?> function = (Function<?>) ImportStub.withImportStubByPass(expression._funcCoreInstance(), processorSupport);
-        if (function instanceof PackageableFunction)
+        if (function instanceof PackageableFunction packageableFunction)
         {
-            validatePackageAndSourceVisibility(expression, pkg, sourceId, context, validatorState, processorSupport, (PackageableFunction<?>) function);
+            validatePackageAndSourceVisibility(expression, pkg, sourceId, context, validatorState, processorSupport, packageableFunction);
         }
         expression._parametersValues().forEach(pv -> validateValueSpecification(pv, pkg, sourceId, context, validatorState, processorSupport));
     }

@@ -368,9 +368,9 @@ public abstract class PureException extends RuntimeException
     {
         for (Throwable t = throwable; t != null; t = t.getCause())
         {
-            if (t instanceof PureException)
+            if (t instanceof PureException exception)
             {
-                return (PureException) t;
+                return exception;
             }
         }
         return null;

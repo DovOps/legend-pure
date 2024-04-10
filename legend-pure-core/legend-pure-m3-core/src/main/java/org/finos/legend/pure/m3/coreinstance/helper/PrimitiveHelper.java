@@ -34,17 +34,17 @@ public class PrimitiveHelper
 
     public static IntegerCoreInstance integerToCoreInstance(Number number, ModelRepository repository)
     {
-        if (number instanceof Integer)
+        if (number instanceof Integer integer)
         {
-            return repository.newIntegerCoreInstance((Integer) number);
+            return repository.newIntegerCoreInstance(integer);
         }
-        if (number instanceof Long)
+        if (number instanceof Long long1)
         {
-            return repository.newIntegerCoreInstance((Long) number);
+            return repository.newIntegerCoreInstance(long1);
         }
-        if (number instanceof BigInteger)
+        if (number instanceof BigInteger integer)
         {
-            return repository.newIntegerCoreInstance((BigInteger) number);
+            return repository.newIntegerCoreInstance(integer);
         }
         throw new IllegalArgumentException("Unhandled numeric type: " + number.getClass().getName() + " (value=" + number + ")");
     }

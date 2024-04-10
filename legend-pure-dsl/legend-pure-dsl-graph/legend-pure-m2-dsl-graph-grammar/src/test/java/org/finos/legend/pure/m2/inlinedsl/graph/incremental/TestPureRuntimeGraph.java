@@ -19,19 +19,19 @@ import org.eclipse.collections.impl.tuple.Tuples;
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
 import org.finos.legend.pure.m3.tests.RuntimeTestScriptBuilder;
 import org.finos.legend.pure.m3.tests.RuntimeVerifier;
-import org.junit.After;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestPureRuntimeGraph extends AbstractPureTestWithCoreCompiled
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime();
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("sourceId.pure");
@@ -157,24 +157,28 @@ public class TestPureRuntimeGraph extends AbstractPureTestWithCoreCompiled
     @Test
     public void testPureRuntimeGraphQualifiedPropertyWithEnumCompileError()
     {
-        String source = "Class EntityWithLocations\n" +
-                "{\n" +
-                "    locations : Location[*];\n" +
-                "    locationsByType(types:GeographicEntityType[*])\n" +
-                "    {\n" +
-                "        $this.locations->filter(l | $types->exists(type | is($l.type, $type)))\n" +
-                "    }:Location[*];\n" +
-                "}\n" +
-                "Class Location\n" +
-                "{\n" +
-                "    type : GeographicEntityType[1];\n" +
-                "}\n";
+        String source = """
+                Class EntityWithLocations
+                {
+                    locations : Location[*];
+                    locationsByType(types:GeographicEntityType[*])
+                    {
+                        $this.locations->filter(l | $types->exists(type | is($l.type, $type)))
+                    }:Location[*];
+                }
+                Class Location
+                {
+                    type : GeographicEntityType[1];
+                }
+                """;
 
-        String enumSource = "Enum GeographicEntityType\n" +
-                "{\n" +
-                "    CITY,\n" +
-                "    COUNTRY\n" +
-                "}";
+        String enumSource = """
+                Enum GeographicEntityType
+                {
+                    CITY,
+                    COUNTRY
+                }\
+                """;
         String sourceId = "sourceId.pure";
         String enumSourceId = "enumSourceId.pure";
         runtime.createInMemorySource(sourceId, source);
@@ -182,11 +186,13 @@ public class TestPureRuntimeGraph extends AbstractPureTestWithCoreCompiled
         runtime.createInMemorySource("userId.pure", "function test():Boolean[1]{print(#{EntityWithLocations{locationsByType(GeographicEntityType.CITY)}}#,0);true;}");
         runtime.compile();
 
-        String enumSourceChange = "Enum GeographicEntityType\n" +
-                "{\n" +
-                "    CTIY,\n" +
-                "    COUNTRY\n" +
-                "}";
+        String enumSourceChange = """
+                Enum GeographicEntityType
+                {
+                    CTIY,
+                    COUNTRY
+                }\
+                """;
 
         RuntimeVerifier.replaceWithCompileErrorCompileAndReloadMultipleTimesIsStable(runtime,
                 Lists.fixedSize.of(Tuples.pair(enumSourceId, enumSourceChange)), "The enum value 'CITY' can't be found in the enumeration GeographicEntityType", "userId.pure", 1, 93);
@@ -195,31 +201,37 @@ public class TestPureRuntimeGraph extends AbstractPureTestWithCoreCompiled
     @Test
     public void testPureRuntimeChangeEnumeration()
     {
-        String source = "Class EntityWithLocations\n" +
-                "{\n" +
-                "    locations : Location[*];\n" +
-                "    locationsByType(types:GeographicEntityType[*])\n" +
-                "    {\n" +
-                "        $this.locations->filter(l | $types->exists(type | is($l.type, $type)))\n" +
-                "    }:Location[*];\n" +
-                "}\n" +
-                "Class Location\n" +
-                "{\n" +
-                "    type : GeographicEntityType[1];\n" +
-                "}\n";
+        String source = """
+                Class EntityWithLocations
+                {
+                    locations : Location[*];
+                    locationsByType(types:GeographicEntityType[*])
+                    {
+                        $this.locations->filter(l | $types->exists(type | is($l.type, $type)))
+                    }:Location[*];
+                }
+                Class Location
+                {
+                    type : GeographicEntityType[1];
+                }
+                """;
 
-        String enumSource = "Enum GeographicEntityType\n" +
-                "{\n" +
-                "    CITY,\n" +
-                "    COUNTRY\n" +
-                "}";
+        String enumSource = """
+                Enum GeographicEntityType
+                {
+                    CITY,
+                    COUNTRY
+                }\
+                """;
 
-        String enumSource2 = "Enum GeographicEntityType\n" +
-                "{\n" +
-                "    CITY,\n" +
-                "    COUNTRY,\n" +
-                "    REGION\n" +
-                "}";
+        String enumSource2 = """
+                Enum GeographicEntityType
+                {
+                    CITY,
+                    COUNTRY,
+                    REGION
+                }\
+                """;
 
         RuntimeVerifier.verifyOperationIsStable(new RuntimeTestScriptBuilder()
                         .createInMemorySource("source1.pure", source)
@@ -237,24 +249,28 @@ public class TestPureRuntimeGraph extends AbstractPureTestWithCoreCompiled
     @Test
     public void testPureRuntimeAddEnumVar()
     {
-        String source = "Class EntityWithLocations\n" +
-                "{\n" +
-                "    locations : Location[*];\n" +
-                "    locationsByType(types:GeographicEntityType[*])\n" +
-                "    {\n" +
-                "        $this.locations->filter(l | $types->exists(type | is($l.type, $type)))\n" +
-                "    }:Location[*];\n" +
-                "}\n" +
-                "Class Location\n" +
-                "{\n" +
-                "    type : GeographicEntityType[1];\n" +
-                "}\n";
+        String source = """
+                Class EntityWithLocations
+                {
+                    locations : Location[*];
+                    locationsByType(types:GeographicEntityType[*])
+                    {
+                        $this.locations->filter(l | $types->exists(type | is($l.type, $type)))
+                    }:Location[*];
+                }
+                Class Location
+                {
+                    type : GeographicEntityType[1];
+                }
+                """;
 
-        String enumSource = "Enum GeographicEntityType\n" +
-                "{\n" +
-                "    CITY,\n" +
-                "    COUNTRY\n" +
-                "}";
+        String enumSource = """
+                Enum GeographicEntityType
+                {
+                    CITY,
+                    COUNTRY
+                }\
+                """;
 
         RuntimeVerifier.verifyOperationIsStable(new RuntimeTestScriptBuilder()
                         .createInMemorySource("source1.pure", source)
@@ -272,24 +288,28 @@ public class TestPureRuntimeGraph extends AbstractPureTestWithCoreCompiled
     @Test
     public void testPureRuntimeChangeEnum()
     {
-        String source = "Class EntityWithLocations\n" +
-                "{\n" +
-                "    locations : Location[*];\n" +
-                "    locationsByType(types:GeographicEntityType[*])\n" +
-                "    {\n" +
-                "        $this.locations->filter(l | $types->exists(type | is($l.type, $type)))\n" +
-                "    }:Location[*];\n" +
-                "}\n" +
-                "Class Location\n" +
-                "{\n" +
-                "    type : GeographicEntityType[1];\n" +
-                "}\n";
+        String source = """
+                Class EntityWithLocations
+                {
+                    locations : Location[*];
+                    locationsByType(types:GeographicEntityType[*])
+                    {
+                        $this.locations->filter(l | $types->exists(type | is($l.type, $type)))
+                    }:Location[*];
+                }
+                Class Location
+                {
+                    type : GeographicEntityType[1];
+                }
+                """;
 
-        String enumSource = "Enum GeographicEntityType\n" +
-                "{\n" +
-                "    CITY,\n" +
-                "    COUNTRY\n" +
-                "}";
+        String enumSource = """
+                Enum GeographicEntityType
+                {
+                    CITY,
+                    COUNTRY
+                }\
+                """;
 
         RuntimeVerifier.verifyOperationIsStable(new RuntimeTestScriptBuilder()
                         .createInMemorySource("source1.pure", source)

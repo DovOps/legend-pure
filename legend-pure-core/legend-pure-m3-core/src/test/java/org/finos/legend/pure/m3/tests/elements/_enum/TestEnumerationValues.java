@@ -16,13 +16,13 @@ package org.finos.legend.pure.m3.tests.elements._enum;
 
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiledPlatform;
 import org.finos.legend.pure.m4.exception.PureCompilationException;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestEnumerationValues extends AbstractPureTestWithCoreCompiledPlatform
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getExtra());
@@ -31,17 +31,19 @@ public class TestEnumerationValues extends AbstractPureTestWithCoreCompiledPlatf
     @Test
     public void testEnumerationWithDuplicateValues()
     {
-        PureCompilationException e = Assert.assertThrows(PureCompilationException.class, () -> compileTestSource(
+        PureCompilationException e = Assertions.assertThrows(PureCompilationException.class, () -> compileTestSource(
                 "testSource.pure",
-                "Enum test::TestEnum\n" +
-                        "{\n" +
-                        "    VAL1,\n" +
-                        "    VAL2,\n" +
-                        "    VAL1,\n" +
-                        "    VAL3,\n" +
-                        "    VAL2,\n" +
-                        "    VAL1\n" +
-                        "}"));
+                """
+                Enum test::TestEnum
+                {
+                    VAL1,
+                    VAL2,
+                    VAL1,
+                    VAL3,
+                    VAL2,
+                    VAL1
+                }\
+                """));
         assertPureException(PureCompilationException.class, "Enumeration test::TestEnum has duplicate values: VAL1, VAL2", "testSource.pure", 1, 1, 1, 12, 9, 1, e);
     }
 }

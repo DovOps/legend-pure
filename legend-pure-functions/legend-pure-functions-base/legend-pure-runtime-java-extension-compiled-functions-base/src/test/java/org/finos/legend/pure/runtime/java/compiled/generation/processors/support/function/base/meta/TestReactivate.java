@@ -21,16 +21,16 @@ import org.finos.legend.pure.runtime.java.compiled.compiler.PureJavaCompileExcep
 import org.finos.legend.pure.runtime.java.compiled.execution.FunctionExecutionCompiledBuilder;
 import org.finos.legend.pure.runtime.java.compiled.factory.JavaModelFactoryRegistryLoader;
 import org.finos.legend.pure.runtime.java.compiled.generation.JavaPackageAndImportBuilder;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class TestReactivate extends AbstractTestReactivate
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getFunctionExecution(), JavaModelFactoryRegistryLoader.loader());
@@ -39,9 +39,9 @@ public class TestReactivate extends AbstractTestReactivate
     @Test
     public void testVariableScopeFail()
     {
-        Exception e = Assert.assertThrows(Exception.class, this::compileAndExecuteVariableScopeFailure);
+        Exception e = Assertions.assertThrows(Exception.class, this::compileAndExecuteVariableScopeFailure);
         Throwable cause = ThrowableTools.findRootThrowable(e);
-        Assert.assertEquals(PureJavaCompileException.class, cause.getClass());
+        Assertions.assertEquals(PureJavaCompileException.class, cause.getClass());
 
         String expected = Pattern.quote("1 error compiling /" + JavaPackageAndImportBuilder.rootPackageFolder() + "/DynaClass.java\n" +
                 "/" + JavaPackageAndImportBuilder.rootPackageFolder() + "/DynaClass.java:") + "\\d*" + Pattern.quote(": error: cannot find symbol\n" +
@@ -51,7 +51,7 @@ public class TestReactivate extends AbstractTestReactivate
                 "  location: class " + JavaPackageAndImportBuilder.rootPackage() + ".DynaClass\n");
         Pattern expectedPattern = Pattern.compile(expected);
         Matcher matcher = expectedPattern.matcher(cause.getMessage());
-        Assert.assertTrue("Failed to find pattern in message:\n" + cause.getMessage(), matcher.find());
+        Assertions.assertTrue(matcher.find(), "Failed to find pattern in message:\n" + cause.getMessage());
     }
 
     protected static FunctionExecution getFunctionExecution()

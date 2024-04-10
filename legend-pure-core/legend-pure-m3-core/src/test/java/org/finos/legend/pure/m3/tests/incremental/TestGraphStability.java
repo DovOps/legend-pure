@@ -18,20 +18,20 @@ import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiledPlatform;
 import org.finos.legend.pure.m3.tests.RuntimeTestScriptBuilder;
 import org.finos.legend.pure.m3.tests.RuntimeVerifier;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestGraphStability extends AbstractPureTestWithCoreCompiledPlatform
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getExtra());
     }
 
-    @After
+    @AfterEach
     public void clearRuntime()
     {
         runtime.delete("sourceId.pure");
@@ -146,14 +146,16 @@ public class TestGraphStability extends AbstractPureTestWithCoreCompiledPlatform
     public void testImport()
     {
         CoreInstance systemImports = this.runtime.getCoreInstance("system::imports");
-        Assert.assertNotNull(systemImports);
+        Assertions.assertNotNull(systemImports);
         String sourceId = "/system/source.pure";
-        String source = "import meta::testPkg::*;\n" +
-                "\n" +
-                "function meta::testPkg::testFn(i:Integer[1]):Integer[1]\n" +
-                "{\n" +
-                "   if ($i <= 0, |$i, |testFn($i - 1))\n" +
-                "}";
+        String source = """
+                import meta::testPkg::*;
+                
+                function meta::testPkg::testFn(i:Integer[1]):Integer[1]
+                {
+                   if ($i <= 0, |$i, |testFn($i - 1))
+                }\
+                """;
 
         RuntimeVerifier.verifyOperationIsStable(new RuntimeTestScriptBuilder()
                         .createInMemorySource(sourceId, source)

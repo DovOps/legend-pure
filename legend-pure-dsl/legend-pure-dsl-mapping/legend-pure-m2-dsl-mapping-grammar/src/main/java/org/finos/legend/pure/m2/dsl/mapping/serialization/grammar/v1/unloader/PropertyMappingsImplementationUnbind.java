@@ -54,24 +54,24 @@ public class PropertyMappingsImplementationUnbind implements MatchRunner<Propert
             if (propertyMapping._localMappingProperty() != null && propertyMapping._localMappingProperty())
             {
                 CoreInstance propertyCI = ImportStub.withImportStubByPass(propertyMapping._propertyCoreInstance(), processorSupport);
-                if (propertyCI instanceof Property)
+                if (propertyCI instanceof Property property)
                 {
-                    String propertyName = ((Property) propertyCI)._name();
+                    String propertyName = property._name();
                     propertyMapping._propertyCoreInstance(modelRepository.newStringCoreInstance_cached(propertyName));
                 }
             }
-            if (propertyMapping instanceof PropertyMappingsImplementation)
+            if (propertyMapping instanceof PropertyMappingsImplementation implementation)
             {
                 //Embedded mappings
-                unbindPropertyMappings((PropertyMappingsImplementation) propertyMapping, modelRepository, processorSupport);
+                unbindPropertyMappings(implementation, modelRepository, processorSupport);
 
-                PropertyOwnerImplementationUnbind.unbindPropertyOwnerParent((PropertyOwnerImplementation) propertyMapping, processorSupport);
-                if (propertyMapping instanceof OtherwiseEmbeddedSetImplementation)
+                PropertyOwnerImplementationUnbind.unbindPropertyOwnerParent(implementation, processorSupport);
+                if (propertyMapping instanceof OtherwiseEmbeddedSetImplementation implementation)
                 {
-                    PropertyMapping otherwiseMapping = ((OtherwiseEmbeddedSetImplementation) propertyMapping)._otherwisePropertyMapping();
-                    if (otherwiseMapping instanceof PropertyMappingsImplementation)
+                    PropertyMapping otherwiseMapping = implementation._otherwisePropertyMapping();
+                    if (otherwiseMapping instanceof PropertyMappingsImplementation implementation)
                     {
-                        unbindPropertyMappings((PropertyMappingsImplementation) otherwiseMapping, modelRepository, processorSupport);
+                        unbindPropertyMappings(implementation, modelRepository, processorSupport);
                     }
                 }
             }

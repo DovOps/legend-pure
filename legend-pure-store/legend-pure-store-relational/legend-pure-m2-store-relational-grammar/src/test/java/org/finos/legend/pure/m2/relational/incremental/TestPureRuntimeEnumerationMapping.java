@@ -21,7 +21,7 @@ import org.eclipse.collections.api.tuple.Pair;
 import org.finos.legend.pure.m2.relational.AbstractPureRelationalTestWithCoreCompiled;
 import org.finos.legend.pure.m3.tests.RuntimeTestScriptBuilder;
 import org.finos.legend.pure.m3.tests.RuntimeVerifier;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
@@ -31,59 +31,67 @@ public class TestPureRuntimeEnumerationMapping extends AbstractPureRelationalTes
     private static final String RELATIONAL_DB_SOURCE_ID = "testDb.pure";
     private static final String TEST_ENUMERATION_MAPPING_SOURCE_ID = "testMapping.pure";
 
-    private static final String FUNCTION_TEST_ENUMERATION_MAPPINGS_SIZE = "###Pure\n" +
-            "function test():Boolean[1]{assert(1 == employeeTestMapping.enumerationMappings->size(), |'');}";
+    private static final String FUNCTION_TEST_ENUMERATION_MAPPINGS_SIZE = """
+            ###Pure
+            function test():Boolean[1]{assert(1 == employeeTestMapping.enumerationMappings->size(), |'');}\
+            """;
 
     private static final ImmutableMap<String, String> TEST_SOURCES = Maps.immutable.with(TEST_ENUM_MODEL_SOURCE_ID,
-            "Class Employee\n" +
-                    "{\n" +
-                    "    id: Integer[1];\n" +
-                    "    name: String[1];\n" +
-                    "    dateOfHire: Date[1];\n" +
-                    "    type: EmployeeType[0..1];\n" +
-                    "}\n" +
-                    "\n" +
-                    "Enum EmployeeType\n" +
-                    "{\n" +
-                    "    CONTRACT,\n" +
-                    "    FULL_TIME\n" +
-                    "}",
-            RELATIONAL_DB_SOURCE_ID, "###Relational\n" +
-                    "\n" +
-                    "Database myDB\n" +
-                    "(\n" +
-                    "    Table employeeTable\n" +
-                    "    (\n" +
-                    "        id INT,\n" +
-                    "        name VARCHAR(200),\n" +
-                    "        firmId INT,\n" +
-                    "        doh DATE,\n" +
-                    "        type VARCHAR(20)\n" +
-                    "    )\n" +
-                    ")\n",
+            """
+            Class Employee
+            {
+                id: Integer[1];
+                name: String[1];
+                dateOfHire: Date[1];
+                type: EmployeeType[0..1];
+            }
+            
+            Enum EmployeeType
+            {
+                CONTRACT,
+                FULL_TIME
+            }\
+            """,
+            RELATIONAL_DB_SOURCE_ID, """
+                    ###Relational
+                    
+                    Database myDB
+                    (
+                        Table employeeTable
+                        (
+                            id INT,
+                            name VARCHAR(200),
+                            firmId INT,
+                            doh DATE,
+                            type VARCHAR(20)
+                        )
+                    )
+                    """,
             TEST_ENUMERATION_MAPPING_SOURCE_ID,
-            "###Mapping\n" +
-                    "\n" +
-                    "Mapping employeeTestMapping\n" +
-                    "(\n" +
-                    "\n" +
-                    "    EmployeeType: EnumerationMapping Foo\n" +
-                    "    {\n" +
-                    "    /* comment */\n" +
-                    "        CONTRACT:  ['FTC', 'FTO'],\n" +
-                    "        FULL_TIME: 'FTE'\n" +
-                    "    }\n" +
-                    "   Employee: Relational\n" +
-                    "   {\n" +
-                    "        scope([myDB]default.employeeTable)\n" +
-                    "        (\n" +
-                    "            id: id,\n" +
-                    "            name: name,\n" +
-                    "            dateOfHire: doh,\n" +
-                    "            type : EnumerationMapping Foo : type\n" +
-                    "        )\n" +
-                    "   }\n" +
-                    ")\n"
+            """
+            ###Mapping
+            
+            Mapping employeeTestMapping
+            (
+            
+                EmployeeType: EnumerationMapping Foo
+                {
+                /* comment */
+                    CONTRACT:  ['FTC', 'FTO'],
+                    FULL_TIME: 'FTE'
+                }
+               Employee: Relational
+               {
+                    scope([myDB]default.employeeTable)
+                    (
+                        id: id,
+                        name: name,
+                        dateOfHire: doh,
+                        type : EnumerationMapping Foo : type
+                    )
+               }
+            )
+            """
     );
 
     @Test

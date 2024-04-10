@@ -20,12 +20,11 @@ import org.finos.legend.pure.m3.tests.function.base.string.AbstractTestSubstring
 import org.finos.legend.pure.m3.tests.function.base.string.AbstractTestToString;
 import org.finos.legend.pure.runtime.java.compiled.execution.FunctionExecutionCompiledBuilder;
 import org.finos.legend.pure.runtime.java.compiled.factory.JavaModelFactoryRegistryLoader;
-import org.junit.After;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.BeforeAll;
 
 public class TestSubstringCompiled extends AbstractTestSubstring
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getFunctionExecution(), JavaModelFactoryRegistryLoader.loader());

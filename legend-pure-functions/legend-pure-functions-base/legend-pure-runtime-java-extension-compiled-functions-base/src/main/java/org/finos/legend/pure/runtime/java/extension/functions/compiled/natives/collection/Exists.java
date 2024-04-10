@@ -51,23 +51,25 @@ public class Exists extends AbstractNativeFunctionGeneric
     public String buildBody()
     {
 
-        return "new DefendedPureFunction2<Object, Object, Boolean>()\n" +
-                "        {\n" +
-                "            @Override\n" +
-                "            public Boolean value(Object t, final Object obj, final ExecutionSupport es)\n" +
-                "            {\n" +
-                "                org.eclipse.collections.api.block.predicate.Predicate predicate = obj instanceof org.eclipse.collections.api.block.predicate.Predicate\n" +
-                "                   ? (org.eclipse.collections.api.block.predicate.Predicate) obj\n" +
-                "                   : new DefendedPredicate<Object>(){\n" +
-                "                           PureFunction1<Object, Boolean> func = (PureFunction1<Object, Boolean>)CoreGen.getSharedPureFunction((org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.function.Function) obj, es);\n" +
-                "                           @Override\n" +
-                "                           public boolean accept(Object param){\n" +
-                "                               return func.value(param, es);\n" +
-                "                           }\n" +
-                "                     };\n" +
-                "                return FunctionsGen.exists(t, predicate);\n" +
-                "            }\n" +
-                "        }";
+        return """
+                new DefendedPureFunction2<Object, Object, Boolean>()
+                        {
+                            @Override
+                            public Boolean value(Object t, final Object obj, final ExecutionSupport es)
+                            {
+                                org.eclipse.collections.api.block.predicate.Predicate predicate = obj instanceof org.eclipse.collections.api.block.predicate.Predicate
+                                   ? (org.eclipse.collections.api.block.predicate.Predicate) obj
+                                   : new DefendedPredicate<Object>(){
+                                           PureFunction1<Object, Boolean> func = (PureFunction1<Object, Boolean>)CoreGen.getSharedPureFunction((org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.function.Function) obj, es);
+                                           @Override
+                                           public boolean accept(Object param){
+                                               return func.value(param, es);
+                                           }
+                                     };
+                                return FunctionsGen.exists(t, predicate);
+                            }
+                        }\
+                """;
     }
 
 }

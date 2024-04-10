@@ -16,20 +16,20 @@ package org.finos.legend.pure.m3.tests.elements.function;
 
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiledPlatform;
 import org.finos.legend.pure.m4.exception.PureCompilationException;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestProperty extends AbstractPureTestWithCoreCompiledPlatform
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getExtra());
     }
 
-    @After
+    @AfterEach
     public void clearRuntime()
     {
         runtime.delete("fromString.pure");
@@ -42,12 +42,14 @@ public class TestProperty extends AbstractPureTestWithCoreCompiledPlatform
     {
         try
         {
-            compileTestSource("fromString.pure", "Class A{name : String[1];}\n" +
-                    "function myFunc():A[1]\n" +
-                    "{\n" +
-                    "    ^A(nameError = 'ok');\n" +
-                    "}\n");
-            Assert.fail();
+            compileTestSource("fromString.pure", """
+                    Class A{name : String[1];}
+                    function myFunc():A[1]
+                    {
+                        ^A(nameError = 'ok');
+                    }
+                    """);
+            Assertions.fail();
         }
         catch (Exception e)
         {
@@ -60,12 +62,14 @@ public class TestProperty extends AbstractPureTestWithCoreCompiledPlatform
     {
         try
         {
-            compileTestSource("fromString.pure", "Class A{'first name' : String[1];}\n" +
-                    "function myFunc():A[1]\n" +
-                    "{\n" +
-                    "    ^A('firstname' = 'ok');\n" +
-                    "}\n");
-            Assert.fail();
+            compileTestSource("fromString.pure", """
+                    Class A{'first name' : String[1];}
+                    function myFunc():A[1]
+                    {
+                        ^A('firstname' = 'ok');
+                    }
+                    """);
+            Assertions.fail();
         }
         catch (Exception e)
         {
@@ -77,22 +81,26 @@ public class TestProperty extends AbstractPureTestWithCoreCompiledPlatform
     @Test
     public void testNewWithPropertySpaceOk()
     {
-        compileTestSource("fromString.pure", "Class A{'first name' : String[1];}\n" +
-                "function myFunc():A[1]\n" +
-                "{\n" +
-                "    ^A('first name' = 'ok');\n" +
-                "}\n");
+        compileTestSource("fromString.pure", """
+                Class A{'first name' : String[1];}
+                function myFunc():A[1]
+                {
+                    ^A('first name' = 'ok');
+                }
+                """);
 
     }
 
     @Test
     public void testPropertyAccessOk()
     {
-        compileTestSource("fromString.pure", "Class A{'first name' : String[1];}\n" +
-                "function myFunc():A[1]\n" +
-                "{\n" +
-                "    A.all()->filter(a|$a.'first name' == 'ok')->toOne();\n" +
-                "}\n");
+        compileTestSource("fromString.pure", """
+                Class A{'first name' : String[1];}
+                function myFunc():A[1]
+                {
+                    A.all()->filter(a|$a.'first name' == 'ok')->toOne();
+                }
+                """);
 
     }
 
@@ -101,12 +109,14 @@ public class TestProperty extends AbstractPureTestWithCoreCompiledPlatform
     {
         try
         {
-            compileTestSource("fromString.pure", "Class A{'first name' : String[1];}\n" +
-                    "function myFunc():A[1]\n" +
-                    "{\n" +
-                    "    A.all()->filter(a|$a.'first _name' == 'ok')->toOne();\n" +
-                    "}\n");
-            Assert.fail();
+            compileTestSource("fromString.pure", """
+                    Class A{'first name' : String[1];}
+                    function myFunc():A[1]
+                    {
+                        A.all()->filter(a|$a.'first _name' == 'ok')->toOne();
+                    }
+                    """);
+            Assertions.fail();
         }
         catch (Exception e)
         {

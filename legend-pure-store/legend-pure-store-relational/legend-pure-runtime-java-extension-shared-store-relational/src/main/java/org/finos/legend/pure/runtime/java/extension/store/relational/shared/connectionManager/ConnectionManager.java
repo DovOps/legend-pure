@@ -164,7 +164,7 @@ public class ConnectionManager
                     "sql='" + this.sql.substring(0, 100) + '\'' +
                     ", fetchSize=" + this.fetchSize +
                     ", queryTimeoutSeconds=" + this.queryTimeoutSeconds +
-                    ", startTime=" + String.format("%1tY-%<tm-%<td %<tH:%<tM:%<tS.%<tL %<tZ", this.startTime) +
+                    ", startTime=" + "%1tY-%<tm-%<td %<tH:%<tM:%<tS.%<tL %<tZ".formatted(this.startTime) +
                     '}';
         }
     }

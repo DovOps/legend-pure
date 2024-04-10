@@ -42,9 +42,8 @@ public class RelationalOperationElementUnbind
 
     public static void cleanNode(RelationalOperationElement element, ModelRepository modelRepository, ProcessorSupport processorSupport) throws PureCompilationException
     {
-        if (element instanceof TableAliasColumn)
+        if (element instanceof TableAliasColumn tableAliasColumn)
         {
-            TableAliasColumn tableAliasColumn = (TableAliasColumn)element;
             ImportStub database = (ImportStub)tableAliasColumn._alias()._databaseCoreInstance();
             Shared.cleanUpReferenceUsage(database, tableAliasColumn, processorSupport);
             Shared.cleanImportStub(database, processorSupport);
@@ -52,22 +51,22 @@ public class RelationalOperationElementUnbind
             TableAlias alias = tableAliasColumn._alias();
             alias._relationalElementRemove();
         }
-        else if (element instanceof DynaFunction)
+        else if (element instanceof DynaFunction function)
         {
-            for (RelationalOperationElement val : ((DynaFunction)element)._parameters())
+            for (RelationalOperationElement val : function._parameters())
             {
                 cleanNode(val, modelRepository, processorSupport);
             }
         }
-        else if (element instanceof RelationalOperationElementWithJoin)
+        else if (element instanceof RelationalOperationElementWithJoin join)
         {
-            if (((RelationalOperationElementWithJoin)element)._relationalOperationElement() != null)
+            if (join._relationalOperationElement() != null)
             {
-                cleanNode(((RelationalOperationElementWithJoin)element)._relationalOperationElement(), modelRepository, processorSupport);
+                cleanNode(join._relationalOperationElement(), modelRepository, processorSupport);
             }
-            if (((RelationalOperationElementWithJoin)element)._joinTreeNode() != null)
+            if (join._joinTreeNode() != null)
             {
-                cleanJoinTreeNode(((RelationalOperationElementWithJoin)element)._joinTreeNode(), modelRepository, processorSupport);
+                cleanJoinTreeNode(join._joinTreeNode(), modelRepository, processorSupport);
             }
         }
         else if (element instanceof Literal)
@@ -90,9 +89,8 @@ public class RelationalOperationElementUnbind
             joinTreeNode._joinRemove();
             joinTreeNode._aliasRemove();
             CoreInstance joinTypeCoreInstance = joinTreeNode._joinTypeCoreInstance();
-            if (joinTypeCoreInstance instanceof Enum)
+            if (joinTypeCoreInstance instanceof Enum joinType)
             {
-                Enum joinType = (Enum) joinTypeCoreInstance;
                 joinTreeNode._joinTypeRemove();
                 StringCoreInstance joinTypeString = modelRepository.newStringCoreInstance_cached(joinType.getName());
                 joinTreeNode._joinTypeCoreInstance(joinTypeString);

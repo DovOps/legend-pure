@@ -16,10 +16,10 @@ package org.finos.legend.pure.m3.tests.lineinfo;
 
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiledPlatform;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.util.Scanner;
 
@@ -31,13 +31,13 @@ public class TestNavigateFromCoordinates extends AbstractPureTestWithCoreCompile
     //      profile in a tagged value (routes to the tag)
     //      value of an enum (routes to extractEnumValue)
 
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getExtra());
     }
 
-    @After
+    @AfterEach
     public void clearRuntime()
     {
         runtime.delete("sourceId.pure");
@@ -48,13 +48,13 @@ public class TestNavigateFromCoordinates extends AbstractPureTestWithCoreCompile
     {
         runtime.createInMemorySource("sourceId.pure", new Scanner(TestNavigateFromCoordinates.class.getResourceAsStream("/org/finos/legend/pure/m3/tests/lineinfo/file1.pure")).useDelimiter("\\Z").next());
         runtime.compile();
-        Assert.assertEquals(this.fromPackage("A"), this.get(28, 6));
-        Assert.assertEquals(this.fromPackage("B"), this.get(30, 16));
-        Assert.assertEquals(this.fromPackage("String"), this.get(17, 17));
-        Assert.assertEquals(this.fromPackage("meta::pure::metamodel::type::Any"), this.get(18, 20));
-        Assert.assertEquals(this.fromPackage("String"), this.get(35, 24));
-        Assert.assertEquals(this.fromPackage("Integer"), this.get(35, 35));
-        Assert.assertEquals(this.fromPackage("testFunc_String_1__Integer_1_"), this.get(32, 10));
+        Assertions.assertEquals(this.fromPackage("A"), this.get(28, 6));
+        Assertions.assertEquals(this.fromPackage("B"), this.get(30, 16));
+        Assertions.assertEquals(this.fromPackage("String"), this.get(17, 17));
+        Assertions.assertEquals(this.fromPackage("meta::pure::metamodel::type::Any"), this.get(18, 20));
+        Assertions.assertEquals(this.fromPackage("String"), this.get(35, 24));
+        Assertions.assertEquals(this.fromPackage("Integer"), this.get(35, 35));
+        Assertions.assertEquals(this.fromPackage("testFunc_String_1__Integer_1_"), this.get(32, 10));
     }
 
     @Test
@@ -62,11 +62,11 @@ public class TestNavigateFromCoordinates extends AbstractPureTestWithCoreCompile
     {
         runtime.createInMemorySource("sourceId.pure", new Scanner(TestNavigateFromCoordinates.class.getResourceAsStream("/org/finos/legend/pure/m3/tests/lineinfo/file2.pure")).useDelimiter("\\Z").next());
         runtime.compile();
-        Assert.assertEquals("deprecated", this.get(17, 10).getName());
-        Assert.assertEquals("deprecated", this.get(17, 20).getName());
-        Assert.assertEquals("doc", this.get(17, 28).getName());
-        Assert.assertEquals("doc", this.get(17, 32).getName());
-        Assert.assertEquals(this.fromPackage("myEnum"), this.get(29, 13));
+        Assertions.assertEquals("deprecated", this.get(17, 10).getName());
+        Assertions.assertEquals("deprecated", this.get(17, 20).getName());
+        Assertions.assertEquals("doc", this.get(17, 28).getName());
+        Assertions.assertEquals("doc", this.get(17, 32).getName());
+        Assertions.assertEquals(this.fromPackage("myEnum"), this.get(29, 13));
     }
 
     private CoreInstance fromPackage(String element)

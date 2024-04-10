@@ -77,13 +77,13 @@ public class Mapping
 
     private static MutableMap<String, SetImplementation> getEmbeddedMappingsByIdForPropertiesMapping(CoreInstance propertyMappingOwner, ProcessorSupport processorSupport, MutableMap<String, SetImplementation> embeddedMappingsById)
     {
-        RichIterable<? extends PropertyMapping> propertyMappings = propertyMappingOwner instanceof PureInstanceSetImplementation ? ((PureInstanceSetImplementation)propertyMappingOwner)._propertyMappings() : Lists.fixedSize.<PropertyMapping>empty();
+        RichIterable<? extends PropertyMapping> propertyMappings = propertyMappingOwner instanceof PureInstanceSetImplementation pisi ? pisi._propertyMappings() : Lists.fixedSize.<PropertyMapping>empty();
 
         for (PropertyMapping propertyMapping : propertyMappings)
         {
-            if (propertyMapping instanceof EmbeddedSetImplementation)
+            if (propertyMapping instanceof EmbeddedSetImplementation implementation)
             {
-                embeddedMappingsById.put(((EmbeddedSetImplementation)propertyMapping)._id(), (EmbeddedSetImplementation)propertyMapping);
+                embeddedMappingsById.put(implementation._id(), implementation);
                 getEmbeddedMappingsByIdForPropertiesMapping(propertyMapping, processorSupport, embeddedMappingsById);
             }
         }
@@ -135,7 +135,7 @@ public class Mapping
         {
             for (CoreInstance entity : entityProperty.equals(M2MappingProperties.classMappings) ? currentMapping._classMappings() : currentMapping._enumerationMappings())
             {
-                String id = entity instanceof SetImplementation ? ((SetImplementation)entity)._id() : ((EnumerationMapping)entity)._name();
+                String id = entity instanceof SetImplementation si ? si._id() : ((EnumerationMapping)entity)._name();
                 if (id == null)
                 {
                     StringBuilder message = new StringBuilder(entityType);

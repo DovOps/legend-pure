@@ -22,13 +22,13 @@ import org.finos.legend.pure.m3.tests.function.base.meta.AbstractTestCompileValu
 import org.finos.legend.pure.runtime.java.compiled.execution.FunctionExecutionCompiledBuilder;
 import org.finos.legend.pure.runtime.java.compiled.factory.JavaModelFactoryRegistryLoader;
 import org.finos.legend.pure.runtime.java.compiled.generation.processors.support.function.CompiledMetadataStateVerifier;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 public class TestCompileValueSpecification extends AbstractTestCompileValueSpecification
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getFunctionExecution(), JavaModelFactoryRegistryLoader.loader());
@@ -39,7 +39,7 @@ public class TestCompileValueSpecification extends AbstractTestCompileValueSpeci
         return new FunctionExecutionCompiledBuilder().build();
     }
 
-    @Ignore
+    @Disabled
     @Test
     public void testExecuteSimpleBlockDeactivated()
     {

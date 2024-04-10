@@ -18,13 +18,13 @@ import org.finos.legend.pure.m3.exception.PureExecutionException;
 import org.finos.legend.pure.m3.execution.FunctionExecution;
 import org.finos.legend.pure.m3.tests.function.base.lang.AbstractTestNewAtRuntime;
 import org.finos.legend.pure.runtime.java.interpreted.FunctionExecutionInterpreted;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestNew extends AbstractTestNewAtRuntime
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getFunctionExecution(), getCodeStorage());
@@ -34,15 +34,17 @@ public class TestNew extends AbstractTestNewAtRuntime
     public void testNewWithMultiplicityParameter()
     {
         compileTestSource("fromString.pure",
-                "Class MyClass<|m>\n" +
-                        "{\n" +
-                        "  value:String[m];\n" +
-                        "}\n" +
-                        "\n" +
-                        "function testFn():Any[*]\n" +
-                        "{\n" +
-                        "  ^MyClass<|1>(value='hello');\n" +
-                        "}");
+                """
+                Class MyClass<|m>
+                {
+                  value:String[m];
+                }
+                
+                function testFn():Any[*]
+                {
+                  ^MyClass<|1>(value='hello');
+                }\
+                """);
         execute("testFn():Any[*]");
         // TODO add asserts
     }
@@ -51,30 +53,32 @@ public class TestNew extends AbstractTestNewAtRuntime
     public void testNewWithMissingOneToOneProperty()
     {
         compileTestSource("fromString.pure",
-                "function test(): Any[*]\n" +
-                        "{\n" +
-                        "   ^test::Owner(firstName='John', lastName='Roe')\n" +
-                        "}\n" +
-                        "\n" +
-                        "Class\n" +
-                        "test::Car\n" +
-                        "{\n" +
-                        "   name : String[1];\n" +
-                        "}\n" +
-                        "\n" +
-                        "Class\n" +
-                        "test::Owner\n" +
-                        "{\n" +
-                        "   firstName: String[1];\n" +
-                        "   lastName: String[1];\n" +
-                        "}\n" +
-                        "\n" +
-                        "Association test::Car_Owner\n" +
-                        "{\n" +
-                        "   owner : test::Owner[1];\n" +
-                        "   car  : test::Car[1];\n" +
-                        "}");
-        PureExecutionException e = Assert.assertThrows(PureExecutionException.class, () -> execute("test():Any[*]"));
+                """
+                function test(): Any[*]
+                {
+                   ^test::Owner(firstName='John', lastName='Roe')
+                }
+                
+                Class
+                test::Car
+                {
+                   name : String[1];
+                }
+                
+                Class
+                test::Owner
+                {
+                   firstName: String[1];
+                   lastName: String[1];
+                }
+                
+                Association test::Car_Owner
+                {
+                   owner : test::Owner[1];
+                   car  : test::Car[1];
+                }\
+                """);
+        PureExecutionException e = Assertions.assertThrows(PureExecutionException.class, () -> execute("test():Any[*]"));
         assertPureException(PureExecutionException.class, "Error instantiating class 'Owner'.  The following properties have multiplicity violations: 'car' requires 1 value, got 0", "fromString.pure", 3, 4, e);
     }
 
@@ -82,30 +86,32 @@ public class TestNew extends AbstractTestNewAtRuntime
     public void testNewWithMissingOneToManyProperty()
     {
         compileTestSource("fromString.pure",
-                "function test(): Any[*]\n" +
-                        "{\n" +
-                        "   ^test::Owner(firstName='John', lastName='Roe')\n" +
-                        "}\n" +
-                        "\n" +
-                        "Class\n" +
-                        "test::Car\n" +
-                        "{\n" +
-                        "   name : String[1];\n" +
-                        "}\n" +
-                        "\n" +
-                        "Class\n" +
-                        "test::Owner\n" +
-                        "{\n" +
-                        "   firstName: String[1];\n" +
-                        "   lastName: String[1];\n" +
-                        "}\n" +
-                        "\n" +
-                        "Association test::Car_Owner\n" +
-                        "{\n" +
-                        "   owner : test::Owner[1];\n" +
-                        "   cars  : test::Car[1..*];\n" +
-                        "}");
-        PureExecutionException e = Assert.assertThrows(PureExecutionException.class, () -> execute("test():Any[*]"));
+                """
+                function test(): Any[*]
+                {
+                   ^test::Owner(firstName='John', lastName='Roe')
+                }
+                
+                Class
+                test::Car
+                {
+                   name : String[1];
+                }
+                
+                Class
+                test::Owner
+                {
+                   firstName: String[1];
+                   lastName: String[1];
+                }
+                
+                Association test::Car_Owner
+                {
+                   owner : test::Owner[1];
+                   cars  : test::Car[1..*];
+                }\
+                """);
+        PureExecutionException e = Assertions.assertThrows(PureExecutionException.class, () -> execute("test():Any[*]"));
         assertPureException(PureExecutionException.class, "Error instantiating class 'Owner'.  The following properties have multiplicity violations: 'cars' requires 1..* values, got 0", "fromString.pure", 3, 4, e);
     }
 
@@ -113,108 +119,114 @@ public class TestNew extends AbstractTestNewAtRuntime
     public void testNewWithChildWithMismatchedReverseOneToOneProperty()
     {
         compileTestSource("fromString.pure",
-                "function test(): Any[*]\n" +
-                        "{\n" +
-                        "   ^test::Car(name='Bugatti', owner= ^test::Owner(firstName='John', lastName='Roe', car=^test::Car(name='Audi')))\n" +
-                        "}\n" +
-                        "\n" +
-                        "Class\n" +
-                        "test::Car\n" +
-                        "{\n" +
-                        "   name : String[1];\n" +
-                        "}\n" +
-                        "\n" +
-                        "Class\n" +
-                        "test::Owner\n" +
-                        "{\n" +
-                        "   firstName: String[1];\n" +
-                        "   lastName: String[1];\n" +
-                        "}\n" +
-                        "\n" +
-                        "Association test::Car_Owner\n" +
-                        "{\n" +
-                        "   owner : test::Owner[1];\n" +
-                        "   car  : test::Car[1];\n" +
-                        "}");
-        PureExecutionException e = Assert.assertThrows(PureExecutionException.class, () -> execute("test():Any[*]"));
+                """
+                function test(): Any[*]
+                {
+                   ^test::Car(name='Bugatti', owner= ^test::Owner(firstName='John', lastName='Roe', car=^test::Car(name='Audi')))
+                }
+                
+                Class
+                test::Car
+                {
+                   name : String[1];
+                }
+                
+                Class
+                test::Owner
+                {
+                   firstName: String[1];
+                   lastName: String[1];
+                }
+                
+                Association test::Car_Owner
+                {
+                   owner : test::Owner[1];
+                   car  : test::Car[1];
+                }\
+                """);
+        PureExecutionException e = Assertions.assertThrows(PureExecutionException.class, () -> execute("test():Any[*]"));
         assertPureException(PureExecutionException.class, "Error instantiating the type 'Owner'. The property 'car' has a multiplicity range of [1] when the given list has a cardinality equal to 2", "fromString.pure", 3, 4, e);
     }
 
     @Override
+    @Test
     public void testNewWithInheritenceAndOverriddenAssociationEndWithReverseOneToOneProperty()
     {
         compileTestSource("fromString.pure",
-                "function test(): Any[*]\n" +
-                        "{\n" +
-                        "   let car = ^test::FastCar(name='Bugatti', owner= ^test::Owner(firstName='John', lastName='Roe'));\n" +
-                        "   print($car.owner.car->size()->toString(), 1);\n" +
-                        "   $car;" +
-                        "}\n" +
-                        "\n" +
-                        "Class\n" +
-                        "test::Car\n" +
-                        "{\n" +
-                        "   name : String[1];\n" +
-                        "}\n" +
-                        "\n" +
-                        "Class\n" +
-                        "test::FastCar extends test::Car\n" +
-                        "{\n" +
-                        "   owner : test::Owner[1];\n" +
-                        "}" +
-                        "\n" +
-                        "Class\n" +
-                        "test::Owner\n" +
-                        "{\n" +
-                        "   firstName: String[1];\n" +
-                        "   lastName: String[1];\n" +
-                        "}\n" +
-                        "\n" +
-                        "Association test::Car_Owner\n" +
-                        "{\n" +
-                        "   owner : test::Owner[1];\n" +
-                        "   car  : test::Car[1];\n" +
-                        "}");
-        PureExecutionException e = Assert.assertThrows(PureExecutionException.class, () -> execute("test():Any[*]"));
+                """
+                function test(): Any[*]
+                {
+                   let car = ^test::FastCar(name='Bugatti', owner= ^test::Owner(firstName='John', lastName='Roe'));
+                   print($car.owner.car->size()->toString(), 1);
+                   $car;\
+                }
+                
+                Class
+                test::Car
+                {
+                   name : String[1];
+                }
+                
+                Class
+                test::FastCar extends test::Car
+                {
+                   owner : test::Owner[1];
+                }
+                Class
+                test::Owner
+                {
+                   firstName: String[1];
+                   lastName: String[1];
+                }
+                
+                Association test::Car_Owner
+                {
+                   owner : test::Owner[1];
+                   car  : test::Car[1];
+                }\
+                """);
+        PureExecutionException e = Assertions.assertThrows(PureExecutionException.class, () -> execute("test():Any[*]"));
         assertPureException(PureExecutionException.class, "Error instantiating class 'Owner'.  The following properties have multiplicity violations: 'car' requires 1 value, got 0", "fromString.pure", 3, 14, e);
     }
 
     @Override
+    @Test
     public void testNewWithInheritenceAndOverriddenAssociationEndWithReverseOneToManyProperty()
     {
         compileTestSource("fromString.pure",
-                "function test(): Any[*]\n" +
-                        "{\n" +
-                        "   let car = ^test::FastCar(name='Bugatti', owner= ^test::Owner(firstName='John', lastName='Roe'));\n" +
-                        "   print($car.owner.cars->size()->toString(), 1);\n" +
-                        "   $car;" +
-                        "}\n" +
-                        "\n" +
-                        "Class\n" +
-                        "test::Car\n" +
-                        "{\n" +
-                        "   name : String[1];\n" +
-                        "}\n" +
-                        "\n" +
-                        "Class\n" +
-                        "test::FastCar extends test::Car\n" +
-                        "{\n" +
-                        "   owner : test::Owner[1];\n" +
-                        "}" +
-                        "\n" +
-                        "Class\n" +
-                        "test::Owner\n" +
-                        "{\n" +
-                        "   firstName: String[1];\n" +
-                        "   lastName: String[1];\n" +
-                        "}\n" +
-                        "\n" +
-                        "Association test::Car_Owner\n" +
-                        "{\n" +
-                        "   owner : test::Owner[1];\n" +
-                        "   cars  : test::Car[1..*];\n" +
-                        "}");
-        PureExecutionException e = Assert.assertThrows(PureExecutionException.class, () -> execute("test():Any[*]"));
+                """
+                function test(): Any[*]
+                {
+                   let car = ^test::FastCar(name='Bugatti', owner= ^test::Owner(firstName='John', lastName='Roe'));
+                   print($car.owner.cars->size()->toString(), 1);
+                   $car;\
+                }
+                
+                Class
+                test::Car
+                {
+                   name : String[1];
+                }
+                
+                Class
+                test::FastCar extends test::Car
+                {
+                   owner : test::Owner[1];
+                }
+                Class
+                test::Owner
+                {
+                   firstName: String[1];
+                   lastName: String[1];
+                }
+                
+                Association test::Car_Owner
+                {
+                   owner : test::Owner[1];
+                   cars  : test::Car[1..*];
+                }\
+                """);
+        PureExecutionException e = Assertions.assertThrows(PureExecutionException.class, () -> execute("test():Any[*]"));
         assertPureException(PureExecutionException.class, "Error instantiating class 'Owner'.  The following properties have multiplicity violations: 'cars' requires 1..* values, got 0", "fromString.pure", 3, 14, e);
     }
 

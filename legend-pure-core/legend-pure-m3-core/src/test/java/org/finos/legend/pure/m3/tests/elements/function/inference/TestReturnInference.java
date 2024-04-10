@@ -17,14 +17,14 @@ package org.finos.legend.pure.m3.tests.elements.function.inference;
 import org.finos.legend.pure.m3.exception.PureUnmatchedFunctionException;
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiledPlatform;
 import org.finos.legend.pure.m4.exception.PureCompilationException;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestReturnInference extends AbstractPureTestWithCoreCompiledPlatform
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getExtra());
@@ -33,7 +33,7 @@ public class TestReturnInference extends AbstractPureTestWithCoreCompiledPlatfor
 //        System.setProperty("pure.typeinference.test", "true");
     }
 
-    @After
+    @AfterEach
     public void clearRuntime()
     {
         runtime.delete("fromString.pure");
@@ -44,23 +44,25 @@ public class TestReturnInference extends AbstractPureTestWithCoreCompiledPlatfor
     {
         try
         {
-            runtime.createInMemorySource("fromString.pure", "function test(s:String[1]):Any[*]\n" +
-                    "{\n" +
-                    "   let r = '10';\n" +
-                    "   ex(w:String[1]|$w+$s+$r);\n" +
-                    "}\n" +
-                    "\n" +
-                    "function ex(f:Function<Any>[1]):Any[*]\n" +
-                    "{\n" +
-                    "   print($f->eval('ee'));\n" +
-                    "}\n" +
-                    "\n" +
-                    "function go():Any[*]\n" +
-                    "{\n" +
-                    "   print(test('www'),5);\n" +
-                    "}");
+            runtime.createInMemorySource("fromString.pure", """
+                    function test(s:String[1]):Any[*]
+                    {
+                       let r = '10';
+                       ex(w:String[1]|$w+$s+$r);
+                    }
+                    
+                    function ex(f:Function<Any>[1]):Any[*]
+                    {
+                       print($f->eval('ee'));
+                    }
+                    
+                    function go():Any[*]
+                    {
+                       print(test('www'),5);
+                    }\
+                    """);
             this.runtime.compile();
-            Assert.fail("Expected compilation exception");
+            Assertions.fail("Expected compilation exception");
         }
         catch (Exception e)
         {

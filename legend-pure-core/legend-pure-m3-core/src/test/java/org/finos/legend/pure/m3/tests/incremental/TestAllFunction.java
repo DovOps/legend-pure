@@ -19,20 +19,20 @@ import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiledPlatform;
 import org.finos.legend.pure.m3.navigation.M3Paths;
 import org.finos.legend.pure.m3.tests.RuntimeTestScriptBuilder;
 import org.finos.legend.pure.m3.tests.RuntimeVerifier;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestAllFunction extends AbstractPureTestWithCoreCompiledPlatform
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getExtra());
     }
 
-    @After
+    @AfterEach
     public void clearRuntime()
     {
         runtime.delete("sourceId.pure");
@@ -73,15 +73,17 @@ public class TestAllFunction extends AbstractPureTestWithCoreCompiledPlatform
         int oldValue = 0;
         for (int i = 0; i < 10; i++)
         {
-            this.runtime.createInMemorySource("sourceId.pure", "Class A\n" +
-                    "{\n" +
-                    "     b:String[*];\n" +
-                    "     a(s:String[1]){$this.b->filter(a|true)->at(0)}:String[1];\n" +
-                    "}\n" +
-                    "function test():Integer[1]\n" +
-                    "{\n" +
-                    "     ConcreteFunctionDefinition.all()->size();\n" +
-                    "}\n");
+            this.runtime.createInMemorySource("sourceId.pure", """
+                    Class A
+                    {
+                         b:String[*];
+                         a(s:String[1]){$this.b->filter(a|true)->at(0)}:String[1];
+                    }
+                    function test():Integer[1]
+                    {
+                         ConcreteFunctionDefinition.all()->size();
+                    }
+                    """);
             this.runtime.compile();
             int newValue = this.context.getClassifierInstances(this.runtime.getCoreInstance(M3Paths.ConcreteFunctionDefinition)).size();
             if (oldValue != 0 && oldValue != newValue)
@@ -91,7 +93,7 @@ public class TestAllFunction extends AbstractPureTestWithCoreCompiledPlatform
             oldValue = newValue;
             this.runtime.delete("sourceId.pure");
             this.runtime.compile();
-            Assert.assertEquals(size, this.repository.serialize().length);
+            Assertions.assertEquals(size, this.repository.serialize().length);
         }
     }
 }

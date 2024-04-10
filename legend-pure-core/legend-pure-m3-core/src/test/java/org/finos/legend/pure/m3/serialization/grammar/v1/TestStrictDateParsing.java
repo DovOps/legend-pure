@@ -15,7 +15,7 @@
 package org.finos.legend.pure.m3.serialization.grammar.v1;
 
 import org.finos.legend.pure.m3.navigation.M3Paths;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class TestStrictDateParsing extends AbstractPrimitiveParsingTest
 {

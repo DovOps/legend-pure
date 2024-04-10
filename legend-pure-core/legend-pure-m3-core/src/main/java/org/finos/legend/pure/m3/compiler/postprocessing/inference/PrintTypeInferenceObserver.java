@@ -135,9 +135,9 @@ public class PrintTypeInferenceObserver implements TypeInferenceObserver
     public TypeInferenceObserver processingParameter(CoreInstance functionExpression, int i, ValueSpecification value)
     {
         printTab().print("Process param: ").print(i + 1).print('/').print(((FunctionExpression) functionExpression)._parametersValues().size());
-        if (value instanceof VariableExpression)
+        if (value instanceof VariableExpression expression)
         {
-            print(' ').print(((VariableExpression) value)._name());
+            print(' ').print(expression._name());
         }
         SourceInformation sourceInfo = value.getSourceInformation();
         if (sourceInfo != null)

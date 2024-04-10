@@ -19,145 +19,159 @@ import org.eclipse.collections.api.factory.Maps;
 import org.finos.legend.pure.m2.relational.AbstractPureRelationalTestWithCoreCompiled;
 import org.finos.legend.pure.m3.tests.RuntimeTestScriptBuilder;
 import org.finos.legend.pure.m3.tests.RuntimeVerifier;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class TestPureRuntimeOtherwiseEmbeddedMapping extends AbstractPureRelationalTestWithCoreCompiled
 {
-    private static final String INITIAL_DATA = "import other::*;\n" +
-            "Class other::Person\n" +
-            "{\n" +
-            "    name:String[1];\n" +
-            "    firm:Firm[1];\n" +
-            "}\n" +
-            "Class other::Firm\n" +
-            "{\n" +
-            "    legalName:String[1];\n" +
-            "    otherInformation:String[1];\n" +
-            "}\n";
+    private static final String INITIAL_DATA = """
+            import other::*;
+            Class other::Person
+            {
+                name:String[1];
+                firm:Firm[1];
+            }
+            Class other::Firm
+            {
+                legalName:String[1];
+                otherInformation:String[1];
+            }
+            """;
 
 
     private static final String STORE =
-            "###Relational\n" +
-                    "Database mapping::db(\n" +
-                    "   Table employeeFirmDenormTable\n" +
-                    "   (\n" +
-                    "    id INT PRIMARY KEY,\n" +
-                    "    name VARCHAR(200),\n" +
-                    "    firmId INT,\n" +
-                    "    legalName VARCHAR(200),\n" +
-                    "    address1 VARCHAR(200),\n" +
-                    "    postcode VARCHAR(10)\n" +
-                    "   )\n" +
-                    "   Table FirmInfoTable\n" +
-                    "   (\n" +
-                    "    id INT PRIMARY KEY,\n" +
-                    "    name VARCHAR(200),\n" +
-                    "    other VARCHAR(200)\n" +
-                    "   )\n" +
-                    "   Join PersonFirmJoin(employeeFirmDenormTable.firmId = FirmInfoTable.id)\n" +
-                    ")\n";
+            """
+            ###Relational
+            Database mapping::db(
+               Table employeeFirmDenormTable
+               (
+                id INT PRIMARY KEY,
+                name VARCHAR(200),
+                firmId INT,
+                legalName VARCHAR(200),
+                address1 VARCHAR(200),
+                postcode VARCHAR(10)
+               )
+               Table FirmInfoTable
+               (
+                id INT PRIMARY KEY,
+                name VARCHAR(200),
+                other VARCHAR(200)
+               )
+               Join PersonFirmJoin(employeeFirmDenormTable.firmId = FirmInfoTable.id)
+            )
+            """;
 
     private static final String STORE_NO_JOIN =
-            "###Relational\n" +
-                    "Database mapping::db(\n" +
-                    "   Table employeeFirmDenormTable\n" +
-                    "   (\n" +
-                    "    id INT PRIMARY KEY,\n" +
-                    "    name VARCHAR(200),\n" +
-                    "    firmId INT,\n" +
-                    "    legalName VARCHAR(200),\n" +
-                    "    address1 VARCHAR(200),\n" +
-                    "    postcode VARCHAR(10)\n" +
-                    "   )\n" +
-                    "   Table FirmInfoTable\n" +
-                    "   (\n" +
-                    "    id INT PRIMARY KEY,\n" +
-                    "    name VARCHAR(200),\n" +
-                    "    other VARCHAR(200)\n" +
-                    "   )\n" +
-                    ")\n";
+            """
+            ###Relational
+            Database mapping::db(
+               Table employeeFirmDenormTable
+               (
+                id INT PRIMARY KEY,
+                name VARCHAR(200),
+                firmId INT,
+                legalName VARCHAR(200),
+                address1 VARCHAR(200),
+                postcode VARCHAR(10)
+               )
+               Table FirmInfoTable
+               (
+                id INT PRIMARY KEY,
+                name VARCHAR(200),
+                other VARCHAR(200)
+               )
+            )
+            """;
 
     private static final String INITIAL_MAPPING =
-            "###Mapping\n" +
-                    "import other::*;\n" +
-                    "import mapping::*;\n" +
-                    "Mapping mappingPackage::myMapping\n" +
-                    "(\n" +
-                    "    Firm[firm1]: Relational\n" +
-                    "    {\n" +
-                    "       legalName : [db]FirmInfoTable.name ,\n" +
-                    "       otherInformation: [db]FirmInfoTable.other\n" +
-                    "    }\n" +
-                    "    Person[alias1]: Relational\n" +
-                    "    {\n" +
-                    "        name : [db]employeeFirmDenormTable.name,\n" +
-                    "        firm(\n" +
-                    "            ~primaryKey ([db]employeeFirmDenormTable.legalName)\n" +
-                    "            legalName : [db]employeeFirmDenormTable.legalName\n" +
-                    "        ) Otherwise ( [firm1]:[db]@PersonFirmJoin) \n" +
-                    "    }\n" +
-                    ")\n";
+            """
+            ###Mapping
+            import other::*;
+            import mapping::*;
+            Mapping mappingPackage::myMapping
+            (
+                Firm[firm1]: Relational
+                {
+                   legalName : [db]FirmInfoTable.name ,
+                   otherInformation: [db]FirmInfoTable.other
+                }
+                Person[alias1]: Relational
+                {
+                    name : [db]employeeFirmDenormTable.name,
+                    firm(
+                        ~primaryKey ([db]employeeFirmDenormTable.legalName)
+                        legalName : [db]employeeFirmDenormTable.legalName
+                    ) Otherwise ( [firm1]:[db]@PersonFirmJoin)\s
+                }
+            )
+            """;
 
     private static final String MAPPING_WITH_JOIN =
-            "###Mapping\n" +
-                    "import other::*;\n" +
-                    "import mapping::*;\n" +
-                    "Mapping mappingPackage::myMapping\n" +
-                    "(\n" +
-                    "    Firm[firm1]: Relational\n" +
-                    "    {\n" +
-                    "       legalName : [db]FirmInfoTable.name ,\n" +
-                    "       otherInformation: [db]FirmInfoTable.other\n" +
-                    "    }\n" +
-                    "    Person[alias1]: Relational\n" +
-                    "    {\n" +
-                    "        name : [db]employeeFirmDenormTable.name,\n" +
-                    "        firm[alias1,firm1]:[db]@PersonFirmJoin \n" +
-                    "    }\n" +
-                    ")\n";
+            """
+            ###Mapping
+            import other::*;
+            import mapping::*;
+            Mapping mappingPackage::myMapping
+            (
+                Firm[firm1]: Relational
+                {
+                   legalName : [db]FirmInfoTable.name ,
+                   otherInformation: [db]FirmInfoTable.other
+                }
+                Person[alias1]: Relational
+                {
+                    name : [db]employeeFirmDenormTable.name,
+                    firm[alias1,firm1]:[db]@PersonFirmJoin\s
+                }
+            )
+            """;
 
     private static final String MAPPING1 =
-            "###Mapping\n" +
-                    "import other::*;\n" +
-                    "import mapping::*;\n" +
-                    "Mapping mappingPackage::myMapping\n" +
-                    "(\n" +
-                    "    Firm[firm1]: Relational\n" +
-                    "    {\n" +
-                    "       legalName : [db]FirmInfoTable.name ,\n" +
-                    "       otherInformation: [db]FirmInfoTable.other\n" +
-                    "    }\n" +
-                    "    Person[alias1]: Relational\n" +
-                    "    {\n" +
-                    "        name : [db]employeeFirmDenormTable.name,\n" +
-                    "        firm(\n" +
-                    "            ~primaryKey ([db]employeeFirmDenormTable.legalName)\n" +
-                    "            legalName : [db]employeeFirmDenormTable.legalName\n" +
-                    "        ) Otherwise ( [firm2]:[db]@PersonFirmJoin) \n" +
-                    "    }\n" +
-                    ")\n";
+            """
+            ###Mapping
+            import other::*;
+            import mapping::*;
+            Mapping mappingPackage::myMapping
+            (
+                Firm[firm1]: Relational
+                {
+                   legalName : [db]FirmInfoTable.name ,
+                   otherInformation: [db]FirmInfoTable.other
+                }
+                Person[alias1]: Relational
+                {
+                    name : [db]employeeFirmDenormTable.name,
+                    firm(
+                        ~primaryKey ([db]employeeFirmDenormTable.legalName)
+                        legalName : [db]employeeFirmDenormTable.legalName
+                    ) Otherwise ( [firm2]:[db]@PersonFirmJoin)\s
+                }
+            )
+            """;
 
 
     private static final String MAPPING2 =
-            "###Mapping\n" +
-                    "import other::*;\n" +
-                    "import mapping::*;\n" +
-                    "Mapping mappingPackage::myMapping\n" +
-                    "(\n" +
-                    "    Firm[firm1]: Relational\n" +
-                    "    {\n" +
-                    "       legalName : [db]FirmInfoTable.name ,\n" +
-                    "       otherInformation: [db]FirmInfoTable.other\n" +
-                    "    }\n" +
-                    "    Person[alias1]: Relational\n" +
-                    "    {\n" +
-                    "        name : [db]employeeFirmDenormTable.name,\n" +
-                    "        firm(\n" +
-                    "            ~primaryKey ([db]employeeFirmDenormTable.legalName)\n" +
-                    "            legalName : [db]employeeFirmDenormTable.legalName\n" +
-                    "        ) Otherwise ( [firm2]:[db]employeeFirmDenormTable.legalName) \n" +
-                    "    }\n" +
-                    ")\n";
+            """
+            ###Mapping
+            import other::*;
+            import mapping::*;
+            Mapping mappingPackage::myMapping
+            (
+                Firm[firm1]: Relational
+                {
+                   legalName : [db]FirmInfoTable.name ,
+                   otherInformation: [db]FirmInfoTable.other
+                }
+                Person[alias1]: Relational
+                {
+                    name : [db]employeeFirmDenormTable.name,
+                    firm(
+                        ~primaryKey ([db]employeeFirmDenormTable.legalName)
+                        legalName : [db]employeeFirmDenormTable.legalName
+                    ) Otherwise ( [firm2]:[db]employeeFirmDenormTable.legalName)\s
+                }
+            )
+            """;
 
 
     @Test

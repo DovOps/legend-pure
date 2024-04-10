@@ -15,32 +15,36 @@
 package org.finos.legend.pure.m2.relational;
 
 import org.finos.legend.pure.m4.exception.PureCompilationException;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class TestAssociationMappingValidation extends AbstractPureRelationalTestWithCoreCompiled
 {
-    private static final String CLASSES = "import other::*;\n" +
-            "\n" +
-            "Class other::Person\n" +
-            "{\n" +
-            "    name:String[1];\n" +
-            "}\n" +
-            "Class other::Firm\n" +
-            "{\n" +
-            "    legalName:String[1];\n" +
-            "}\n";
-    private static final String STORE = "###Relational\n" +
-            "Database mapping::db(\n" +
-            "   Table employeeFirmDenormTable\n" +
-            "   (\n" +
-            "    id INT PRIMARY KEY,\n" +
-            "    name VARCHAR(200),\n" +
-            "    firmId INT,\n" +
-            "    legalName VARCHAR(200)\n" +
-            "   )\n" +
-            "   Join firmJoin(employeeFirmDenormTable.firmId = {target}.firmId)\n" +
-            ")\n";
+    private static final String CLASSES = """
+            import other::*;
+            
+            Class other::Person
+            {
+                name:String[1];
+            }
+            Class other::Firm
+            {
+                legalName:String[1];
+            }
+            """;
+    private static final String STORE = """
+            ###Relational
+            Database mapping::db(
+               Table employeeFirmDenormTable
+               (
+                id INT PRIMARY KEY,
+                name VARCHAR(200),
+                firmId INT,
+                legalName VARCHAR(200)
+               )
+               Join firmJoin(employeeFirmDenormTable.firmId = {target}.firmId)
+            )
+            """;
 
     @Test
     public void testMappingAssociationToNonExistentAssociationFails()
@@ -73,7 +77,7 @@ public class TestAssociationMappingValidation extends AbstractPureRelationalTest
                     "        )\n" +
                     "    }\n" +
                     ")\n");
-            Assert.fail("Expected validation error");
+            Assertions.fail("Expected validation error");
         }
         catch (RuntimeException e)
         {
@@ -121,7 +125,7 @@ public class TestAssociationMappingValidation extends AbstractPureRelationalTest
                     "        )\n" +
                     "    }\n" +
                     ")\n");
-            Assert.fail("Expected validation error");
+            Assertions.fail("Expected validation error");
         }
         catch (RuntimeException e)
         {
@@ -155,7 +159,7 @@ public class TestAssociationMappingValidation extends AbstractPureRelationalTest
                     "        )\n" +
                     "    }\n" +
                     ")\n");
-            Assert.fail("Expected validation error");
+            Assertions.fail("Expected validation error");
         }
         catch (RuntimeException e)
         {
@@ -199,7 +203,7 @@ public class TestAssociationMappingValidation extends AbstractPureRelationalTest
                     "        )\n" +
                     "    }\n" +
                     ")\n");
-            Assert.fail("Expected validation error");
+            Assertions.fail("Expected validation error");
         }
         catch (RuntimeException e)
         {
@@ -242,7 +246,7 @@ public class TestAssociationMappingValidation extends AbstractPureRelationalTest
                     "        )\n" +
                     "    }\n" +
                     ")\n");
-            Assert.fail("Expected validation error");
+            Assertions.fail("Expected validation error");
         }
         catch (RuntimeException e)
         {
@@ -261,64 +265,70 @@ public class TestAssociationMappingValidation extends AbstractPureRelationalTest
                 "}");
         compileTestSource("store.pure", STORE);
         compileTestSource("mapping1.pure",
-                "###Mapping\n" +
-                        "import other::*;\n" +
-                        "import mapping::*;\n" +
-                        "Mapping mappingPackage::TopMapping\n" +
-                        "(\n" +
-                        "    Person[per1]: Relational\n" +
-                        "    {\n" +
-                        "        name : [db]employeeFirmDenormTable.name\n" +
-                        "    }\n" +
-                        ")\n" +
-                        "\n" +
-                        "Mapping mappingPackage::MiddleMapping\n" +
-                        "(\n" +
-                        "    include mappingPackage::TopMapping\n" +
-                        "    Firm[fir1]: Relational\n" +
-                        "    {\n" +
-                        "        legalName : [db]employeeFirmDenormTable.legalName\n" +
-                        "    }\n" +
-                        ")");
+                """
+                ###Mapping
+                import other::*;
+                import mapping::*;
+                Mapping mappingPackage::TopMapping
+                (
+                    Person[per1]: Relational
+                    {
+                        name : [db]employeeFirmDenormTable.name
+                    }
+                )
+                
+                Mapping mappingPackage::MiddleMapping
+                (
+                    include mappingPackage::TopMapping
+                    Firm[fir1]: Relational
+                    {
+                        legalName : [db]employeeFirmDenormTable.legalName
+                    }
+                )\
+                """);
 
         // This should work
         compileTestSource("mapping2.pure",
-                "###Mapping\n" +
-                        "import other::*;\n" +
-                        "import mapping::*;\n" +
-                        "Mapping mappingPackage::BottomMapping1\n" +
-                        "(\n" +
-                        "    include mappingPackage::MiddleMapping\n" +
-                        "    Firm_Person: Relational\n" +
-                        "    {\n" +
-                        "        AssociationMapping\n" +
-                        "        (\n" +
-                        "           employees[fir1,per1] : [db]@firmJoin,\n" +
-                        "           firm[per1,fir1] : [db]@firmJoin\n" +
-                        "        )\n" +
-                        "    }\n" +
-                        ")");
+                """
+                ###Mapping
+                import other::*;
+                import mapping::*;
+                Mapping mappingPackage::BottomMapping1
+                (
+                    include mappingPackage::MiddleMapping
+                    Firm_Person: Relational
+                    {
+                        AssociationMapping
+                        (
+                           employees[fir1,per1] : [db]@firmJoin,
+                           firm[per1,fir1] : [db]@firmJoin
+                        )
+                    }
+                )\
+                """);
 
         try
         {
             // This should not work
             compileTestSource("mapping3.pure",
-                    "###Mapping\n" +
-                            "import other::*;\n" +
-                            "import mapping::*;\n" +
-                            "Mapping mappingPackage::BottomMapping2\n" +
-                            "(\n" +
-                            "    include mappingPackage::MiddleMapping\n" +
-                            "    Firm_Person: Relational\n" +
-                            "    {\n" +
-                            "        AssociationMapping\n" +
-                            "        (\n" +
-                            "           employees[fir1,foo] : [db]@firmJoin,\n" +
-                            "           firm[per1,fir1] : [db]@firmJoin\n" +
-                            "        )\n" +
-                            "    }\n" +
-                            ")");
-            Assert.fail("Expected a compilation error");
+                    """
+                    ###Mapping
+                    import other::*;
+                    import mapping::*;
+                    Mapping mappingPackage::BottomMapping2
+                    (
+                        include mappingPackage::MiddleMapping
+                        Firm_Person: Relational
+                        {
+                            AssociationMapping
+                            (
+                               employees[fir1,foo] : [db]@firmJoin,
+                               firm[per1,fir1] : [db]@firmJoin
+                            )
+                        }
+                    )\
+                    """);
+            Assertions.fail("Expected a compilation error");
         }
         catch (Exception e)
         {
@@ -362,7 +372,7 @@ public class TestAssociationMappingValidation extends AbstractPureRelationalTest
                     "        )\n" +
                     "    }\n" +
                     ")\n");
-            Assert.fail("Expected validation error");
+            Assertions.fail("Expected validation error");
         }
         catch (RuntimeException e)
         {
@@ -375,46 +385,52 @@ public class TestAssociationMappingValidation extends AbstractPureRelationalTest
     {
         compileTestSource("testClasses.pure", CLASSES);
         compileTestSource("testStore.pure",
-                "###Relational\n" +
-                        "Database other::db\n" +
-                        "(\n" +
-                        "  Table firmTable(id INT PRIMARY KEY, legalName VARCHAR(200), parentId INT)\n" +
-                        "  Table employeeTable(id INT PRIMARY KEY, name VARCHAR(200), firmId INT)\n" +
-                        "  Join Employer(employeeTable.firmId = firmTable.id)\n" +
-                        "  Join FirmParent(firmTable.parentId = {target}.id)\n" +
-                        ")\n");
+                """
+                ###Relational
+                Database other::db
+                (
+                  Table firmTable(id INT PRIMARY KEY, legalName VARCHAR(200), parentId INT)
+                  Table employeeTable(id INT PRIMARY KEY, name VARCHAR(200), firmId INT)
+                  Join Employer(employeeTable.firmId = firmTable.id)
+                  Join FirmParent(firmTable.parentId = {target}.id)
+                )
+                """);
         compileTestSource("testAssociations.pure",
-                "import other::*;\n" +
-                        "Association other::Employment\n" +
-                        "{\n" +
-                        "   employer : Firm[0..1];\n" +
-                        "   employees : Person[*];\n" +
-                        "}\n" +
-                        "\n");
+                """
+                import other::*;
+                Association other::Employment
+                {
+                   employer : Firm[0..1];
+                   employees : Person[*];
+                }
+                
+                """);
         try
         {
             compileTestSource("testMapping.pure",
-                    "###Mapping\n" +
-                            "import other::*;\n" +
-                            "Mapping other::mapping\n" +
-                            "(\n" +
-                            "  Firm : Relational\n" +
-                            "  {\n" +
-                            "    legalName : [db]firmTable.legalName\n" +
-                            "  }\n" +
-                            "  Person : Relational\n" +
-                            "  {\n" +
-                            "    name : [db]employeeTable.name\n" +
-                            "  }\n" +
-                            "  Employment : Relational\n" +
-                            "  {\n" +
-                            "    AssociationMapping\n" +
-                            "    (\n" +
-                            "      employer : [db]@FirmParent,\n" +
-                            "      employees : [db]@Employer\n" +
-                            "    )\n" +
-                            "  }\n" +
-                            ")");
+                    """
+                    ###Mapping
+                    import other::*;
+                    Mapping other::mapping
+                    (
+                      Firm : Relational
+                      {
+                        legalName : [db]firmTable.legalName
+                      }
+                      Person : Relational
+                      {
+                        name : [db]employeeTable.name
+                      }
+                      Employment : Relational
+                      {
+                        AssociationMapping
+                        (
+                          employer : [db]@FirmParent,
+                          employees : [db]@Employer
+                        )
+                      }
+                    )\
+                    """);
         }
         catch (Exception e)
         {
@@ -459,7 +475,7 @@ public class TestAssociationMappingValidation extends AbstractPureRelationalTest
                     "        )\n" +
                     "    }\n" +
                     ")\n");
-            Assert.fail("Expected validation error");
+            Assertions.fail("Expected validation error");
         }
         catch (RuntimeException e)
         {
@@ -473,46 +489,52 @@ public class TestAssociationMappingValidation extends AbstractPureRelationalTest
     {
         compileTestSource("testClasses.pure", CLASSES);
         compileTestSource("testStore.pure",
-                "###Relational\n" +
-                        "Database other::db\n" +
-                        "(\n" +
-                        "  Table firmTable(id INT PRIMARY KEY, legalName VARCHAR(200), parentId INT)\n" +
-                        "  Table employeeTable(id INT PRIMARY KEY, name VARCHAR(200), firmId INT)\n" +
-                        "  Join Employer(employeeTable.firmId = firmTable.id)\n" +
-                        "  Join FirmParent(firmTable.parentId = {target}.id)\n" +
-                        ")\n");
+                """
+                ###Relational
+                Database other::db
+                (
+                  Table firmTable(id INT PRIMARY KEY, legalName VARCHAR(200), parentId INT)
+                  Table employeeTable(id INT PRIMARY KEY, name VARCHAR(200), firmId INT)
+                  Join Employer(employeeTable.firmId = firmTable.id)
+                  Join FirmParent(firmTable.parentId = {target}.id)
+                )
+                """);
         compileTestSource("testAssociations.pure",
-                "import other::*;\n" +
-                        "Association other::Employment\n" +
-                        "{\n" +
-                        "   employer : Firm[0..1];\n" +
-                        "   employees : Person[*];\n" +
-                        "}\n" +
-                        "\n");
+                """
+                import other::*;
+                Association other::Employment
+                {
+                   employer : Firm[0..1];
+                   employees : Person[*];
+                }
+                
+                """);
         try
         {
             compileTestSource("testMapping.pure",
-                    "###Mapping\n" +
-                            "import other::*;\n" +
-                            "Mapping other::mapping\n" +
-                            "(\n" +
-                            "  Firm : Relational\n" +
-                            "  {\n" +
-                            "    legalName : [db]firmTable.legalName\n" +
-                            "  }\n" +
-                            "  Person : Relational\n" +
-                            "  {\n" +
-                            "    name : [db]employeeTable.name\n" +
-                            "  }\n" +
-                            "  Employment : Relational\n" +
-                            "  {\n" +
-                            "    AssociationMapping\n" +
-                            "    (\n" +
-                            "      employer : [db]@Employer,\n" +
-                            "      employees : [db]@FirmParent\n" +
-                            "    )\n" +
-                            "  }\n" +
-                            ")");
+                    """
+                    ###Mapping
+                    import other::*;
+                    Mapping other::mapping
+                    (
+                      Firm : Relational
+                      {
+                        legalName : [db]firmTable.legalName
+                      }
+                      Person : Relational
+                      {
+                        name : [db]employeeTable.name
+                      }
+                      Employment : Relational
+                      {
+                        AssociationMapping
+                        (
+                          employer : [db]@Employer,
+                          employees : [db]@FirmParent
+                        )
+                      }
+                    )\
+                    """);
         }
         catch (Exception e)
         {
@@ -525,47 +547,53 @@ public class TestAssociationMappingValidation extends AbstractPureRelationalTest
     {
         compileTestSource("testClasses.pure", CLASSES);
         compileTestSource("testStore.pure",
-                "###Relational\n" +
-                        "Database other::db\n" +
-                        "(\n" +
-                        "  Table firmTable(id INT PRIMARY KEY, legalName VARCHAR(200), parentId INT)\n" +
-                        "  Table employeeTable(id INT PRIMARY KEY, name VARCHAR(200), firmId INT, otherFirmId INT)\n" +
-                        "  Table otherFirmTable(id INT, legalName VARCHAR(200))\n" +
-                        "  Join Employer(employeeTable.firmId = firmTable.id)\n" +
-                        "  Join FirmParent(firmTable.parentId = {target}.id)\n" +
-                        "  Join EmployeeOther(employeeTable.otherFirmId = otherFirmTable.id)" +
-                        ")\n");
+                """
+                ###Relational
+                Database other::db
+                (
+                  Table firmTable(id INT PRIMARY KEY, legalName VARCHAR(200), parentId INT)
+                  Table employeeTable(id INT PRIMARY KEY, name VARCHAR(200), firmId INT, otherFirmId INT)
+                  Table otherFirmTable(id INT, legalName VARCHAR(200))
+                  Join Employer(employeeTable.firmId = firmTable.id)
+                  Join FirmParent(firmTable.parentId = {target}.id)
+                  Join EmployeeOther(employeeTable.otherFirmId = otherFirmTable.id)\
+                )
+                """);
         compileTestSource("testAssociations.pure",
-                "import other::*;\n" +
-                        "Association other::Employment\n" +
-                        "{\n" +
-                        "   employer : Firm[0..1];\n" +
-                        "   employees : Person[*];\n" +
-                        "}\n");
+                """
+                import other::*;
+                Association other::Employment
+                {
+                   employer : Firm[0..1];
+                   employees : Person[*];
+                }
+                """);
         try
         {
             compileTestSource("testMapping.pure",
-                    "###Mapping\n" +
-                            "import other::*;\n" +
-                            "Mapping other::mapping\n" +
-                            "(\n" +
-                            "  Firm : Relational\n" +
-                            "  {\n" +
-                            "    legalName : [db]firmTable.legalName\n" +
-                            "  }\n" +
-                            "  Person : Relational\n" +
-                            "  {\n" +
-                            "    name : [db]employeeTable.name\n" +
-                            "  }\n" +
-                            "  Employment : Relational\n" +
-                            "  {\n" +
-                            "    AssociationMapping\n" +
-                            "    (\n" +
-                            "      employer : [db]@EmployeeOther > @Employer,\n" +
-                            "      employees : [db]@Employer\n" +
-                            "    )\n" +
-                            "  }\n" +
-                            ")");
+                    """
+                    ###Mapping
+                    import other::*;
+                    Mapping other::mapping
+                    (
+                      Firm : Relational
+                      {
+                        legalName : [db]firmTable.legalName
+                      }
+                      Person : Relational
+                      {
+                        name : [db]employeeTable.name
+                      }
+                      Employment : Relational
+                      {
+                        AssociationMapping
+                        (
+                          employer : [db]@EmployeeOther > @Employer,
+                          employees : [db]@Employer
+                        )
+                      }
+                    )\
+                    """);
         }
         catch (Exception e)
         {
@@ -578,54 +606,60 @@ public class TestAssociationMappingValidation extends AbstractPureRelationalTest
     {
         compileTestSource("testClasses.pure", CLASSES);
         compileTestSource("testStore.pure",
-                "###Relational\n" +
-                        "Database other::db\n" +
-                        "(\n" +
-                        "  Table firmTable(id INT PRIMARY KEY, legalName VARCHAR(200), parentId INT)\n" +
-                        "  Table employeeTable(id INT PRIMARY KEY, name VARCHAR(200), firmId INT)\n" +
-                        "  Join Employer(employeeTable.firmId = firmTable.id)\n" +
-                        ")\n");
+                """
+                ###Relational
+                Database other::db
+                (
+                  Table firmTable(id INT PRIMARY KEY, legalName VARCHAR(200), parentId INT)
+                  Table employeeTable(id INT PRIMARY KEY, name VARCHAR(200), firmId INT)
+                  Join Employer(employeeTable.firmId = firmTable.id)
+                )
+                """);
         compileTestSource("testAssociations.pure",
-                "import other::*;\n" +
-                        "Association other::Employment\n" +
-                        "{\n" +
-                        "   employer : Firm[0..1];\n" +
-                        "   employees : Person[*];\n" +
-                        "}\n" +
-                        "\n");
+                """
+                import other::*;
+                Association other::Employment
+                {
+                   employer : Firm[0..1];
+                   employees : Person[*];
+                }
+                
+                """);
         try
         {
             compileTestSource("testMapping.pure",
-                    "###Mapping\n" +
-                            "import other::*;\n" +
-                            "Mapping other::mapping\n" +
-                            "(\n" +
-                            "  Firm : Relational\n" +
-                            "  {\n" +
-                            "    legalName : [db]firmTable.legalName\n" +
-                            "  }\n" +
-                            "  Person : Relational\n" +
-                            "  {\n" +
-                            "    name : [db]employeeTable.name\n" +
-                            "  }\n" +
-                            "  Employment : Relational\n" +
-                            "  {\n" +
-                            "    AssociationMapping\n" +
-                            "    (\n" +
-                            "      employer : [db]@Employer,\n" +
-                            "      employees : [db]@Employer\n" +
-                            "    )\n" +
-                            "  }\n" +
-                            "  Employment : Relational\n" +
-                            "  {\n" +
-                            "    AssociationMapping\n" +
-                            "    (\n" +
-                            "      employer : [db]@Employer,\n" +
-                            "      employees : [db]@Employer\n" +
-                            "    )\n" +
-                            "  }\n" +
-                            ")");
-            Assert.fail("Expected validation error");
+                    """
+                    ###Mapping
+                    import other::*;
+                    Mapping other::mapping
+                    (
+                      Firm : Relational
+                      {
+                        legalName : [db]firmTable.legalName
+                      }
+                      Person : Relational
+                      {
+                        name : [db]employeeTable.name
+                      }
+                      Employment : Relational
+                      {
+                        AssociationMapping
+                        (
+                          employer : [db]@Employer,
+                          employees : [db]@Employer
+                        )
+                      }
+                      Employment : Relational
+                      {
+                        AssociationMapping
+                        (
+                          employer : [db]@Employer,
+                          employees : [db]@Employer
+                        )
+                      }
+                    )\
+                    """);
+            Assertions.fail("Expected validation error");
         }
         catch (Exception e)
         {
@@ -717,7 +751,7 @@ public class TestAssociationMappingValidation extends AbstractPureRelationalTest
                     "        )\n" +
                     "    }\n" +
                     ")\n");
-            Assert.fail();
+            Assertions.fail();
         }
         catch (PureCompilationException e)
         {
@@ -772,7 +806,7 @@ public class TestAssociationMappingValidation extends AbstractPureRelationalTest
                     "        )\n" +
                     "    }\n" +
                     ")\n");
-            Assert.fail();
+            Assertions.fail();
         }
         catch (PureCompilationException e)
         {

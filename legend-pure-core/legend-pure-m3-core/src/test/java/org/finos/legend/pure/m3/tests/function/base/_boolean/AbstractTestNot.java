@@ -15,12 +15,12 @@
 package org.finos.legend.pure.m3.tests.function.base._boolean;
 
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 public abstract class AbstractTestNot extends AbstractPureTestWithCoreCompiled
 {
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("fromString.pure");
@@ -31,11 +31,13 @@ public abstract class AbstractTestNot extends AbstractPureTestWithCoreCompiled
     public void testBasicParse()
     {
         compileTestSource("fromString.pure",
-                "function test():Boolean[1]\n" +
-                        "{\n" +
-                        "   assert(true == not(false), |'');\n" +
-                        "   assert(false == not(true), |'');\n" +
-                        "}\n");
+                """
+                function test():Boolean[1]
+                {
+                   assert(true == not(false), |'');
+                   assert(false == not(true), |'');
+                }
+                """);
         execute("test():Boolean[1]");
     }
 
@@ -43,11 +45,13 @@ public abstract class AbstractTestNot extends AbstractPureTestWithCoreCompiled
     public void testEvalParse()
     {
         compileTestSource("fromString.pure",
-                "function test():Boolean[1]\n" +
-                        "{\n" +
-                        "   assert(true == not_Boolean_1__Boolean_1_->eval(false), |'');\n" +
-                        "   assert(false == not_Boolean_1__Boolean_1_->eval(true), |'');\n" +
-                        "}\n");
+                """
+                function test():Boolean[1]
+                {
+                   assert(true == not_Boolean_1__Boolean_1_->eval(false), |'');
+                   assert(false == not_Boolean_1__Boolean_1_->eval(true), |'');
+                }
+                """);
         execute("test():Boolean[1]");
     }
 }

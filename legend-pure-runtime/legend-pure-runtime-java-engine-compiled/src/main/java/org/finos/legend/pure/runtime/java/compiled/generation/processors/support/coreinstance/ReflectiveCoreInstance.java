@@ -142,9 +142,9 @@ public abstract class ReflectiveCoreInstance extends AbstractCompiledCoreInstanc
         {
             newValues = Lists.mutable.empty();
         }
-        else if (rawCurrentValue instanceof Iterable)
+        else if (rawCurrentValue instanceof Iterable iterable)
         {
-            newValues = Lists.mutable.withAll((Iterable<?>) rawCurrentValue);
+            newValues = Lists.mutable.withAll(iterable);
         }
         else
         {
@@ -323,14 +323,13 @@ public abstract class ReflectiveCoreInstance extends AbstractCompiledCoreInstanc
         Object values = getRawValueForMetaProperty(keyName);
 
         // TODO think about how to handle non-CoreInstances
-        if (values instanceof Iterable)
+        if (values instanceof Iterable iterable)
         {
             CoreInstance result = null;
-            for (Object value : (Iterable<?>) values)
+            for (Object value : iterable)
             {
-                if (value instanceof CoreInstance)
+                if (value instanceof CoreInstance instance)
                 {
-                    CoreInstance instance = (CoreInstance) value;
                     if (keyInIndex.equals(indexSpec.getIndexKey(instance)))
                     {
                         if (result != null)
@@ -343,9 +342,8 @@ public abstract class ReflectiveCoreInstance extends AbstractCompiledCoreInstanc
             }
             return result;
         }
-        if (values instanceof CoreInstance)
+        if (values instanceof CoreInstance instance)
         {
-            CoreInstance instance = (CoreInstance) values;
             return keyInIndex.equals(indexSpec.getIndexKey(instance)) ? instance : null;
         }
         return null;
@@ -357,14 +355,13 @@ public abstract class ReflectiveCoreInstance extends AbstractCompiledCoreInstanc
         Object values = getRawValueForMetaProperty(keyName);
 
         // TODO think about how to handle non-CoreInstances
-        if (values instanceof Iterable)
+        if (values instanceof Iterable iterable)
         {
             MutableList<CoreInstance> results = Lists.mutable.empty();
-            for (Object value : (Iterable<?>) values)
+            for (Object value : iterable)
             {
-                if (value instanceof CoreInstance)
+                if (value instanceof CoreInstance instance)
                 {
-                    CoreInstance instance = (CoreInstance) value;
                     if (keyInIndex.equals(indexSpec.getIndexKey(instance)))
                     {
                         results.add(instance);
@@ -373,9 +370,8 @@ public abstract class ReflectiveCoreInstance extends AbstractCompiledCoreInstanc
             }
             return results;
         }
-        if (values instanceof CoreInstance)
+        if (values instanceof CoreInstance instance)
         {
-            CoreInstance instance = (CoreInstance) values;
             return keyInIndex.equals(indexSpec.getIndexKey(instance)) ? Lists.immutable.with(instance) : Lists.immutable.empty();
         }
         return null;
@@ -385,7 +381,7 @@ public abstract class ReflectiveCoreInstance extends AbstractCompiledCoreInstanc
     public boolean isValueDefinedForKey(String keyName)
     {
         Object value = getRawValueForMetaProperty(keyName);
-        return (value != null) && !((value instanceof Iterable) && Iterate.isEmpty((Iterable<?>) value));
+        return (value != null) && !((value instanceof Iterable i) && Iterate.isEmpty(i));
     }
 
     @Override
@@ -658,9 +654,9 @@ public abstract class ReflectiveCoreInstance extends AbstractCompiledCoreInstanc
 
     private static Object toJavaForInvocation(CoreInstance instance)
     {
-        if (instance instanceof ValCoreInstance)
+        if (instance instanceof ValCoreInstance coreInstance)
         {
-            return invokeMethodWithJavaType((ValCoreInstance) instance);
+            return invokeMethodWithJavaType(coreInstance);
         }
 
         if (instance instanceof PrimitiveCoreInstance)

@@ -26,15 +26,15 @@ import org.finos.legend.pure.m3.serialization.filesystem.usercodestorage.composi
 import org.finos.legend.pure.m3.serialization.filesystem.repository.CodeRepository;
 import org.finos.legend.pure.m3.serialization.filesystem.repository.CodeRepositoryProviderHelper;
 import org.finos.legend.pure.m3.serialization.filesystem.usercodestorage.classpath.ClassLoaderCodeStorage;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestRepositoryComparator extends AbstractPureTestWithCoreCompiledPlatform
 {
     private static MapIterable<String, CodeRepository> repositoriesByName;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         ImmutableList<CodeRepository> repositories = Lists.immutable.<CodeRepository>with(
@@ -81,7 +81,7 @@ public class TestRepositoryComparator extends AbstractPureTestWithCoreCompiledPl
         int actualSignum = Integer.signum(actual);
         if (expectedSignum != actualSignum)
         {
-            Assert.assertEquals("comparing \"" + first + "\" and \"" + second + "\"", expected, actual);
+            Assertions.assertEquals(expected, actual, "comparing \"" + first + "\" and \"" + second + "\"");
         }
     }
 
@@ -94,7 +94,7 @@ public class TestRepositoryComparator extends AbstractPureTestWithCoreCompiledPl
             // check that no repo later in the list is visible to the current repo
             if ((start < repoNames.size()) && repoNames.subList(start, repoNames.size()).anySatisfy(rn2 -> repo1.isVisible(repositoriesByName.get(rn2))))
             {
-                Assert.fail(repoNames.makeString("Repositories not properly sorted: ", ", ", ""));
+                Assertions.fail(repoNames.makeString("Repositories not properly sorted: ", ", ", ""));
             }
         });
     }

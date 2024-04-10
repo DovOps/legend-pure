@@ -15,7 +15,7 @@
 package org.finos.legend.pure.m3.tests.function.base.string;
 
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public abstract class AbstractTestParseFloat extends AbstractPureTestWithCoreCompiled
 {
@@ -23,10 +23,12 @@ public abstract class AbstractTestParseFloat extends AbstractPureTestWithCoreCom
     public void testBasicParse()
     {
             compileTestSource("fromString.pure",
-                    "function test():Boolean[1]\n" +
-                            "{\n" +
-                            "   assert(1.5 == '1.5'->parseFloat(), |'');\n" +
-                            "}\n");
+                    """
+                    function test():Boolean[1]
+                    {
+                       assert(1.5 == '1.5'->parseFloat(), |'');
+                    }
+                    """);
             this.execute("test():Boolean[1]");
     }
 
@@ -34,10 +36,12 @@ public abstract class AbstractTestParseFloat extends AbstractPureTestWithCoreCom
     public void testEvalParse()
     {
         compileTestSource("fromString.pure",
-                "function test():Boolean[1]\n" +
-                        "{\n" +
-                        "   assert(1.5 == parseFloat_String_1__Float_1_->eval('1.5'), |'');\n" +
-                        "}\n");
+                """
+                function test():Boolean[1]
+                {
+                   assert(1.5 == parseFloat_String_1__Float_1_->eval('1.5'), |'');
+                }
+                """);
         this.execute("test():Boolean[1]");
     }
 }

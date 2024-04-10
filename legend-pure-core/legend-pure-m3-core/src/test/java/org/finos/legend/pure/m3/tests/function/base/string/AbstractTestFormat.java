@@ -19,13 +19,13 @@ import org.finos.legend.pure.m3.navigation.M3Properties;
 import org.finos.legend.pure.m3.navigation.PrimitiveUtilities;
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public abstract class AbstractTestFormat extends AbstractPureTestWithCoreCompiled
 {
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("fromString.pure");
@@ -37,11 +37,13 @@ public abstract class AbstractTestFormat extends AbstractPureTestWithCoreCompile
     {
         compileTestSource(
                 "fromString.pure",
-                "function test():Nil[0]\n" +
-                        "{\n" +
-                        "   print('Hello %s %s'->format(['Catherine']), 1);\n" +
-                        "}\n");
-        PureExecutionException e = Assert.assertThrows(PureExecutionException.class, () -> execute("test():Nil[0]"));
+                """
+                function test():Nil[0]
+                {
+                   print('Hello %s %s'->format(['Catherine']), 1);
+                }
+                """);
+        PureExecutionException e = Assertions.assertThrows(PureExecutionException.class, () -> execute("test():Nil[0]"));
         assertPureException(PureExecutionException.class, "Too few arguments passed to format function. Format expression \"Hello %s %s\", number of arguments [1]", e);
     }
 
@@ -50,11 +52,13 @@ public abstract class AbstractTestFormat extends AbstractPureTestWithCoreCompile
     {
         compileTestSource(
                 "fromString.pure",
-                "function test():Nil[0]\n" +
-                        "{\n" +
-                        "   print('Hello %s %s'->format(['Catherine', 'Joe', 'Katie']), 1);\n" +
-                        "}\n");
-        PureExecutionException e = Assert.assertThrows(PureExecutionException.class, () -> execute("test():Nil[0]"));
+                """
+                function test():Nil[0]
+                {
+                   print('Hello %s %s'->format(['Catherine', 'Joe', 'Katie']), 1);
+                }
+                """);
+        PureExecutionException e = Assertions.assertThrows(PureExecutionException.class, () -> execute("test():Nil[0]"));
         assertPureException(PureExecutionException.class, "Unused format args. [3] arguments provided to expression \"Hello %s %s\"", e);
     }
 
@@ -63,12 +67,14 @@ public abstract class AbstractTestFormat extends AbstractPureTestWithCoreCompile
     {
         compileTestSource(
                 "fromString.pure",
-                "function test():Boolean[1]\n" +
-                        "{\n" +
-                        "    assertEq('the quick brown fox jumps over the lazy dog', format_String_1__Any_MANY__String_1_->eval('the quick brown %s jumps over the lazy %s', ['fox', 'dog']));\n" +
-                        "}\n");
+                """
+                function test():Boolean[1]
+                {
+                    assertEq('the quick brown fox jumps over the lazy dog', format_String_1__Any_MANY__String_1_->eval('the quick brown %s jumps over the lazy %s', ['fox', 'dog']));
+                }
+                """);
         CoreInstance result = execute("test():Boolean[1]");
-        Assert.assertTrue(PrimitiveUtilities.getBooleanValue(result.getValueForMetaPropertyToOne(M3Properties.values)));
+        Assertions.assertTrue(PrimitiveUtilities.getBooleanValue(result.getValueForMetaPropertyToOne(M3Properties.values)));
     }
 
     @Test
@@ -76,11 +82,13 @@ public abstract class AbstractTestFormat extends AbstractPureTestWithCoreCompile
     {
         compileTestSource(
                 "fromString.pure",
-                "function test():Boolean[1]\n" +
-                        "{\n" +
-                        "    assertEquals('the quick brown fox jumps over the lazy dog', format_String_1__Any_MANY__String_1_->evaluate([^List<String>(values='the quick brown %s jumps over the lazy %s'), ^List<Any>(values=['fox', 'dog'])]));\n" +
-                        "}\n");
+                """
+                function test():Boolean[1]
+                {
+                    assertEquals('the quick brown fox jumps over the lazy dog', format_String_1__Any_MANY__String_1_->evaluate([^List<String>(values='the quick brown %s jumps over the lazy %s'), ^List<Any>(values=['fox', 'dog'])]));
+                }
+                """);
         CoreInstance result = execute("test():Boolean[1]");
-        Assert.assertTrue(PrimitiveUtilities.getBooleanValue(result.getValueForMetaPropertyToOne(M3Properties.values)));
+        Assertions.assertTrue(PrimitiveUtilities.getBooleanValue(result.getValueForMetaPropertyToOne(M3Properties.values)));
     }
 }

@@ -60,9 +60,9 @@ public abstract class NativeFunction
     protected VariableContext getParentOrEmptyVariableContextForLambda(VariableContext variableContext, CoreInstance lambdaFunction)
     {
         VariableContext context = getParentOrEmptyVariableContext(variableContext);
-        if (lambdaFunction instanceof LambdaWithContext)
+        if (lambdaFunction instanceof LambdaWithContext withContext)
         {
-            context = ((LambdaWithContext)lambdaFunction).getVariableContext();
+            context = withContext.getVariableContext();
         }
         return context;
     }

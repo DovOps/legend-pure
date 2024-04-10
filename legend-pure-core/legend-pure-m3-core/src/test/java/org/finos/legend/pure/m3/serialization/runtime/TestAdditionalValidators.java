@@ -30,14 +30,14 @@ import org.finos.legend.pure.m3.tools.matcher.Matcher;
 import org.finos.legend.pure.m3.tools.matcher.MatcherState;
 import org.finos.legend.pure.m4.ModelRepository;
 import org.finos.legend.pure.m4.exception.PureCompilationException;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestAdditionalValidators extends AbstractPureTestWithCoreCompiled
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getFunctionExecution(), new CompositeCodeStorage(new ClassLoaderCodeStorage(getCodeRepositories())), getFactoryRegistryOverride(), getOptions(), getExtra());
@@ -49,7 +49,7 @@ public class TestAdditionalValidators extends AbstractPureTestWithCoreCompiled
                 GenericCodeRepository.build("test", "test(::.*)?", "platform", "system"));
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("/test/testClass.pure");
@@ -73,7 +73,7 @@ public class TestAdditionalValidators extends AbstractPureTestWithCoreCompiled
 
         // Add validator and compile again (this should fail)
         runtime.getIncrementalCompiler().addValidator(new TestValidator());
-        PureCompilationException e = Assert.assertThrows(PureCompilationException.class, () -> compileTestSource(sourceId, sourceCode));
+        PureCompilationException e = Assertions.assertThrows(PureCompilationException.class, () -> compileTestSource(sourceId, sourceCode));
         assertPureException(PureCompilationException.class, TestValidator.ERROR_MESSAGE, sourceId, 1, 1, 1, 13, 3, 1, e);
     }
 

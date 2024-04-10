@@ -15,8 +15,8 @@
 package org.finos.legend.pure.m3.tests.tools;
 
 import org.finos.legend.pure.m3.tools.IdUtils;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.security.SecureRandom;
 
@@ -34,11 +34,11 @@ public class IdUtilsTests
         try
         {
             IdUtils.IdComponents deconstructedComponents = IdUtils.deconstructId(id);
-            Assert.assertEquals(components, deconstructedComponents);
+            Assertions.assertEquals(components, deconstructedComponents);
         }
         catch (Exception exp)
         {
-            Assert.fail(exp.getMessage());
+            Assertions.fail(exp.getMessage());
         }
 
     }

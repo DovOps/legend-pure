@@ -347,7 +347,7 @@ public class AbstractCoreInstanceWrapper implements CoreInstance
     @Override
     public boolean equals(Object o)
     {
-        return (this == o) || (this.instance == o) || this.instance.equals((o instanceof AbstractCoreInstanceWrapper) ? ((AbstractCoreInstanceWrapper)o).instance : o);
+        return (this == o) || (this.instance == o) || this.instance.equals((o instanceof AbstractCoreInstanceWrapper aciw) ? aciw.instance : o);
     }
 
     @Override

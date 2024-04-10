@@ -64,13 +64,13 @@ public class PureStringFormat
                         case 'd':
                         {
                             Object arg = argIterator.next();
-                            if (arg instanceof Long)
+                            if (arg instanceof Long long1)
                             {
-                                builder.append(((Long) arg).longValue());
+                                builder.append(long1.longValue());
                             }
-                            else if (arg instanceof Integer)
+                            else if (arg instanceof Integer integer)
                             {
-                                builder.append(((Integer) arg).intValue());
+                                builder.append(integer.intValue());
                             }
                             else if (arg instanceof BigInteger)
                             {

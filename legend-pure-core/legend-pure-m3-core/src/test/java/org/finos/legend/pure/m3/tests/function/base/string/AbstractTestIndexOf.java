@@ -15,7 +15,7 @@
 package org.finos.legend.pure.m3.tests.function.base.string;
 
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public abstract class AbstractTestIndexOf extends AbstractPureTestWithCoreCompiled
 {
@@ -23,10 +23,12 @@ public abstract class AbstractTestIndexOf extends AbstractPureTestWithCoreCompil
     public void testBasicParse()
     {
         compileTestSource("fromString.pure",
-                "function test():Boolean[1]\n" +
-                        "{\n" +
-                        "   assert(2 == indexOf('abc', 'c'), |'');\n" +
-                        "}\n");
+                """
+                function test():Boolean[1]
+                {
+                   assert(2 == indexOf('abc', 'c'), |'');
+                }
+                """);
         this.execute("test():Boolean[1]");
     }
 
@@ -34,10 +36,12 @@ public abstract class AbstractTestIndexOf extends AbstractPureTestWithCoreCompil
     public void testBasicParse2()
     {
         compileTestSource("fromString.pure",
-                "function test():Boolean[1]\n" +
-                        "{\n" +
-                        "   assert(2 == indexOf('abc', 'c', 2), |'');\n" +
-                        "}\n");
+                """
+                function test():Boolean[1]
+                {
+                   assert(2 == indexOf('abc', 'c', 2), |'');
+                }
+                """);
         this.execute("test():Boolean[1]");
     }
 
@@ -45,10 +49,12 @@ public abstract class AbstractTestIndexOf extends AbstractPureTestWithCoreCompil
     public void testEvalParse()
     {
         compileTestSource("fromString.pure",
-                "function test():Boolean[1]\n" +
-                        "{\n" +
-                        "   assert(2 == indexOf_String_1__String_1__Integer_1_->eval('abc', 'c'), |'');\n" +
-                        "}\n");
+                """
+                function test():Boolean[1]
+                {
+                   assert(2 == indexOf_String_1__String_1__Integer_1_->eval('abc', 'c'), |'');
+                }
+                """);
         this.execute("test():Boolean[1]");
     }
 
@@ -56,10 +62,12 @@ public abstract class AbstractTestIndexOf extends AbstractPureTestWithCoreCompil
     public void testEvalParse2()
     {
         compileTestSource("fromString.pure",
-                "function test():Boolean[1]\n" +
-                        "{\n" +
-                        "   assert(2 == indexOf_String_1__String_1__Integer_1__Integer_1_->eval('abc', 'c', 2), |'');\n" +
-                        "}\n");
+                """
+                function test():Boolean[1]
+                {
+                   assert(2 == indexOf_String_1__String_1__Integer_1__Integer_1_->eval('abc', 'c', 2), |'');
+                }
+                """);
         this.execute("test():Boolean[1]");
     }
 }

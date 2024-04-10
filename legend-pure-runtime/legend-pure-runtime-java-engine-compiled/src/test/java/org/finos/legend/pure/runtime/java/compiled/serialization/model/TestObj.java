@@ -18,8 +18,8 @@ import org.eclipse.collections.api.factory.Lists;
 import org.eclipse.collections.api.list.ListIterable;
 import org.eclipse.collections.impl.list.fixed.ArrayAdapter;
 import org.finos.legend.pure.m4.coreinstance.SourceInformation;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 
@@ -35,16 +35,16 @@ public class TestObj
         ListIterable<PropertyValue> propertyValues = Lists.mutable.with(newPrimitivePropertyValue("prop1", "val1"), newPrimitivePropertyValue("prop2", 1, 2, 3));
 
         Obj sourceInfoObj = Obj.newObj(classifier, identifier, name, propertyValues, sourceInfo, false);
-        Assert.assertSame(sourceInfoObj, Obj.merge(sourceInfoObj));
+        Assertions.assertSame(sourceInfoObj, Obj.merge(sourceInfoObj));
 
         Obj sourceInfoEnum = Obj.newObj(classifier, identifier, name, propertyValues, sourceInfo, true);
-        Assert.assertSame(sourceInfoEnum, Obj.merge(sourceInfoEnum));
+        Assertions.assertSame(sourceInfoEnum, Obj.merge(sourceInfoEnum));
 
         Obj noSourceInfoObj = Obj.newObj(classifier, identifier, name, propertyValues, null, false);
-        Assert.assertSame(noSourceInfoObj, Obj.merge(noSourceInfoObj));
+        Assertions.assertSame(noSourceInfoObj, Obj.merge(noSourceInfoObj));
 
         Obj noSourceInfoEnum = Obj.newObj(classifier, identifier, name, propertyValues, null, true);
-        Assert.assertSame(noSourceInfoEnum, Obj.merge(noSourceInfoEnum));
+        Assertions.assertSame(noSourceInfoEnum, Obj.merge(noSourceInfoEnum));
     }
 
     @Test
@@ -59,10 +59,10 @@ public class TestObj
 
         Obj first = Obj.newObj(classifier, identifier, name, Lists.mutable.with(newPrimitivePropertyValue(prop1, "a", "b")), sourceInfo, false);
         Obj second = Obj.newObj(classifier, identifier, null, Lists.mutable.with(newPrimitivePropertyValue(prop1, "c", "d"), newPrimitivePropertyValue(prop2, 7)), null, false);
-        Assert.assertEquals(
+        Assertions.assertEquals(
                 Obj.newObj(classifier, identifier, name, Lists.mutable.with(newPrimitivePropertyValue(prop1, "a", "b", "c", "d"), newPrimitivePropertyValue(prop2, 7)), sourceInfo, false),
                 Obj.merge(first, second));
-        Assert.assertEquals(
+        Assertions.assertEquals(
                 Obj.newObj(classifier, identifier, name, Lists.mutable.with(newPrimitivePropertyValue(prop1, "c", "d", "a", "b"), newPrimitivePropertyValue(prop2, 7)), sourceInfo, false),
                 Obj.merge(second, first));
     }
@@ -78,10 +78,10 @@ public class TestObj
 
         Obj first = Obj.newObj(classifier, identifier, name, Lists.mutable.empty(), sourceInfo, true);
         Obj second = Obj.newObj(classifier, identifier, null, Lists.mutable.with(newPrimitivePropertyValue(prop1, "c", "d")), null, true);
-        Assert.assertEquals(
+        Assertions.assertEquals(
                 Obj.newObj(classifier, identifier, name, Lists.mutable.with(newPrimitivePropertyValue(prop1, "c", "d")), sourceInfo, true),
                 Obj.merge(first, second));
-        Assert.assertEquals(
+        Assertions.assertEquals(
                 Obj.newObj(classifier, identifier, name, Lists.mutable.with(newPrimitivePropertyValue(prop1, "c", "d")), sourceInfo, true),
                 Obj.merge(second, first));
     }
@@ -102,19 +102,19 @@ public class TestObj
         Obj third = Obj.newObj(classifier, identifier, null, Lists.mutable.with(newPrimitivePropertyValue(prop1, "d", "e", "f", "g"), newPrimitivePropertyValue(prop3, true, false)), null, false);
         Obj fourth = Obj.newObj(classifier, identifier, name, Lists.mutable.with(newPrimitivePropertyValue(prop2, 8), newPrimitivePropertyValue(prop1, "a", "c"), newPrimitivePropertyValue(prop3, false)), sourceInfo, false);
 
-        Assert.assertEquals(
+        Assertions.assertEquals(
                 Obj.newObj(classifier, identifier, name, Lists.mutable.with(newPrimitivePropertyValue(prop1, "a", "b", "c", "d", "e", "f", "g"), newPrimitivePropertyValue(prop2, 7, 8), newPrimitivePropertyValue(prop3, true, false)), sourceInfo, false),
                 Obj.merge(first, second, third, fourth));
 
-        Assert.assertEquals(
+        Assertions.assertEquals(
                 Obj.newObj(classifier, identifier, name, Lists.mutable.with(newPrimitivePropertyValue(prop2, 8, 7), newPrimitivePropertyValue(prop1, "a", "c", "d", "e", "f", "g", "b"), newPrimitivePropertyValue(prop3, false, true)), sourceInfo, false),
                 Obj.merge(fourth, third, second, first));
 
-        Assert.assertEquals(
+        Assertions.assertEquals(
                 Obj.newObj(classifier, identifier, name, Lists.mutable.with(newPrimitivePropertyValue(prop2, 8, 7), newPrimitivePropertyValue(prop1, "a", "c", "b", "d", "e", "f", "g"), newPrimitivePropertyValue(prop3, false, true)), sourceInfo, false),
                 Obj.merge(fourth, first, third, second));
 
-        Assert.assertEquals(
+        Assertions.assertEquals(
                 Obj.newObj(classifier, identifier, name, Lists.mutable.with(newPrimitivePropertyValue(prop1, "d", "e", "f", "g", "c", "a", "b"), newPrimitivePropertyValue(prop3, true, false), newPrimitivePropertyValue(prop2, 7, 8)), sourceInfo, false),
                 Obj.merge(third, second, fourth, first));
     }
@@ -132,38 +132,38 @@ public class TestObj
         SourceInformation sourceInfo2 = new SourceInformation("/some/source2.pure", 4, 3, 2, 5, 6, 1);
 
         // Classifier mismatch
-        IllegalArgumentException classifierMismatch = Assert.assertThrows(IllegalArgumentException.class, () -> Obj.merge(
+        IllegalArgumentException classifierMismatch = Assertions.assertThrows(IllegalArgumentException.class, () -> Obj.merge(
                 Obj.newObj(classifier1, identifier1, name1, Lists.immutable.empty(), sourceInfo1, false),
                 Obj.newObj(classifier2, identifier1, name1, Lists.immutable.empty(), sourceInfo1, false)));
-        Assert.assertEquals("Cannot merge, classifier mismatch: meta::yet::another::Classifier1 vs meta::yet::another::Classifier2", classifierMismatch.getMessage());
+        Assertions.assertEquals("Cannot merge, classifier mismatch: meta::yet::another::Classifier1 vs meta::yet::another::Classifier2", classifierMismatch.getMessage());
 
         // Identifier mismatch
-        IllegalArgumentException idMismatch = Assert.assertThrows(IllegalArgumentException.class, () -> Obj.merge(
+        IllegalArgumentException idMismatch = Assertions.assertThrows(IllegalArgumentException.class, () -> Obj.merge(
                 Obj.newObj(classifier1, identifier1, name1, Lists.immutable.empty(), sourceInfo1, false),
                 Obj.newObj(classifier1, identifier2, name1, Lists.immutable.empty(), sourceInfo1, false)));
-        Assert.assertEquals("Cannot merge, identifier mismatch: id1 vs id2", idMismatch.getMessage());
+        Assertions.assertEquals("Cannot merge, identifier mismatch: id1 vs id2", idMismatch.getMessage());
 
         // Name mismatch
-        IllegalArgumentException nameMismatch = Assert.assertThrows(IllegalArgumentException.class, () -> Obj.merge(
+        IllegalArgumentException nameMismatch = Assertions.assertThrows(IllegalArgumentException.class, () -> Obj.merge(
                 Obj.newObj(classifier1, identifier1, name1, Lists.immutable.empty(), sourceInfo1, false),
                 Obj.newObj(classifier1, identifier1, name2, Lists.immutable.empty(), sourceInfo1, false)));
-        Assert.assertEquals("Cannot merge, name mismatch: name1 vs name2", nameMismatch.getMessage());
+        Assertions.assertEquals("Cannot merge, name mismatch: name1 vs name2", nameMismatch.getMessage());
 
         // SourceInformation mismatch
-        IllegalArgumentException sourceInfoMismatch = Assert.assertThrows(IllegalArgumentException.class, () -> Obj.merge(
+        IllegalArgumentException sourceInfoMismatch = Assertions.assertThrows(IllegalArgumentException.class, () -> Obj.merge(
                 Obj.newObj(classifier1, identifier1, name1, Lists.immutable.empty(), sourceInfo1, false),
                 Obj.newObj(classifier1, identifier1, name1, Lists.immutable.empty(), sourceInfo2, false)));
-        Assert.assertEquals("Cannot merge, source information mismatch: /some/source1.pure:1c6-3c4 vs /some/source2.pure:4c3-6c1", sourceInfoMismatch.getMessage());
+        Assertions.assertEquals("Cannot merge, source information mismatch: /some/source1.pure:1c6-3c4 vs /some/source2.pure:4c3-6c1", sourceInfoMismatch.getMessage());
 
         // isEnum mismatch
-        IllegalArgumentException isEnumMismatch = Assert.assertThrows(IllegalArgumentException.class, () -> Obj.merge(
+        IllegalArgumentException isEnumMismatch = Assertions.assertThrows(IllegalArgumentException.class, () -> Obj.merge(
                 Obj.newObj(classifier1, identifier1, name1, Lists.immutable.empty(), sourceInfo1, true),
                 Obj.newObj(classifier1, identifier1, name1, Lists.immutable.empty(), sourceInfo1, false)));
-        Assert.assertEquals("Cannot merge, isEnum mismatch: true vs false", isEnumMismatch.getMessage());
+        Assertions.assertEquals("Cannot merge, isEnum mismatch: true vs false", isEnumMismatch.getMessage());
 
         // No Objs
-        IllegalArgumentException empty = Assert.assertThrows(IllegalArgumentException.class, Obj::merge);
-        Assert.assertEquals("No Objs to merge", empty.getMessage());
+        IllegalArgumentException empty = Assertions.assertThrows(IllegalArgumentException.class, Obj::merge);
+        Assertions.assertEquals("No Objs to merge", empty.getMessage());
     }
 
     private PropertyValue newPrimitivePropertyValue(String property, Object... values)

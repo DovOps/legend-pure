@@ -19,13 +19,13 @@ import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
 import org.finos.legend.pure.m3.tests.function.base.lang.AbstractTestMatch;
 import org.finos.legend.pure.runtime.java.compiled.execution.FunctionExecutionCompiledBuilder;
 import org.finos.legend.pure.runtime.java.compiled.factory.JavaModelFactoryRegistryLoader;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestMatchCompiled extends AbstractTestMatch
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         AbstractPureTestWithCoreCompiled.setUpRuntime(getFunctionExecution(), JavaModelFactoryRegistryLoader.loader());
@@ -41,35 +41,37 @@ public class TestMatchCompiled extends AbstractTestMatch
     {
         try
         {
-            String func = "function testMatch(v:Any[1]):String[1]\n" +
-                    "{\n" +
-                    "   $v->match(  [\n" +
-                    "                    a:AA[1] | 'AA',\n" +
-                    "                    b:BB[1] | 'BB'\n" +
-                    "                ]\n" +
-                    "             );\n" +
-                    "\n" +
-                    "   $v->match(  [\n" +
-                    "                    a:AA[1] | 'AA',\n" +
-                    "                    b:BB[1] | 'BB'\n" +
-                    "                ]\n" +
-                    "             );\n" +
-                    "}\n" +
-                    "\n" +
-                    "Class AA\n" +
-                    "{\n" +
-                    "   name:String[*];\n" +
-                    "}\n" +
-                    "\n" +
-                    "Class BB\n" +
-                    "{\n" +
-                    "   name:String[*];\n" +
-                    "}\n";
+            String func = """
+                    function testMatch(v:Any[1]):String[1]
+                    {
+                       $v->match(  [
+                                        a:AA[1] | 'AA',
+                                        b:BB[1] | 'BB'
+                                    ]
+                                 );
+                    
+                       $v->match(  [
+                                        a:AA[1] | 'AA',
+                                        b:BB[1] | 'BB'
+                                    ]
+                                 );
+                    }
+                    
+                    Class AA
+                    {
+                       name:String[*];
+                    }
+                    
+                    Class BB
+                    {
+                       name:String[*];
+                    }
+                    """;
             this.compileTestSource("fromString.pure", func);
         }
         catch (Exception e)
         {
-            Assert.fail(e.getMessage());
+            Assertions.fail(e.getMessage());
         }
     }
 }

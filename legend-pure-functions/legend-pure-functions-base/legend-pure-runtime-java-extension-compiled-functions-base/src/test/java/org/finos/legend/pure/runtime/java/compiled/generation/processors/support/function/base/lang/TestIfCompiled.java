@@ -22,20 +22,20 @@ import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
 import org.finos.legend.pure.runtime.java.compiled.execution.FunctionExecutionCompiledBuilder;
 import org.finos.legend.pure.runtime.java.compiled.factory.JavaModelFactoryRegistryLoader;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestIfCompiled extends AbstractPureTestWithCoreCompiled
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getFunctionExecution(), JavaModelFactoryRegistryLoader.loader());
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("fromString.pure");
@@ -47,16 +47,18 @@ public class TestIfCompiled extends AbstractPureTestWithCoreCompiled
     {
         compileTestSource(
                 "fromString.pure",
-                "function meta::pure::functions::lang::tests::if::testUnAssignedIfInFuncExpression():String[1]\n" +
-                "{\n" +
-                "   let ifVar =  if(true, | let b = 'true', | if(true, | let b = 'true', | 'false'););\n" +
-                "   if(true, | let b = 'true', | if(true, | let b = 'true', | 'false'););\n" +
-                "   if(true, | let b = 'true', | if(true, | let b = 'true', | 'false'););\n" +
-                "   let iff = if(true, | let b = 'true', | if(true, | let b = 'true', | 'false'););\n" +
-                "   if(true, | let b = 'true'; if(true, | let b = 'true', | 'false'); let bb = 'bb';, | let c = 'see');\n" +
-                "   let a = 'be';\n" +
-                "   if(true, | let b = 'true', | 'false');\n" +
-                "}");
+                """
+                function meta::pure::functions::lang::tests::if::testUnAssignedIfInFuncExpression():String[1]
+                {
+                   let ifVar =  if(true, | let b = 'true', | if(true, | let b = 'true', | 'false'););
+                   if(true, | let b = 'true', | if(true, | let b = 'true', | 'false'););
+                   if(true, | let b = 'true', | if(true, | let b = 'true', | 'false'););
+                   let iff = if(true, | let b = 'true', | if(true, | let b = 'true', | 'false'););
+                   if(true, | let b = 'true'; if(true, | let b = 'true', | 'false'); let bb = 'bb';, | let c = 'see');
+                   let a = 'be';
+                   if(true, | let b = 'true', | 'false');
+                }\
+                """);
     }
 
     @Test
@@ -64,64 +66,68 @@ public class TestIfCompiled extends AbstractPureTestWithCoreCompiled
     {
         compileTestSource(
                 "fromString.pure",
-                "Class A\n" +
-                    "{\n" +
-                    "  id : Integer[1];\n" +
-                    "}\n" +
-                    "\n" +
-                    "function testFn(ids:Integer[*]):A[*]\n" +
-                    "{\n" +
-                    "  if ($ids->isEmpty(),\n" +
-                    "      | let id = -1;\n" +
-                    "        ^A(id=$id);,\n" +
-                    "      | let newIds = $ids->tail();\n" +
-                    "        $ids->map(id | $newIds->testFn());)\n" +
-                    "}");
+                """
+                Class A
+                {
+                  id : Integer[1];
+                }
+                
+                function testFn(ids:Integer[*]):A[*]
+                {
+                  if ($ids->isEmpty(),
+                      | let id = -1;
+                        ^A(id=$id);,
+                      | let newIds = $ids->tail();
+                        $ids->map(id | $newIds->testFn());)
+                }\
+                """);
     }
 
     @Test
     public void testIfWithFloatVersusInteger()
     {
-        AbstractPureTestWithCoreCompiled.compileTestSource("fromString.pure", "import test::*;\n" +
-                "function test::testFn(test:Boolean[1]):Number[1]\n" +
-                "{\n" +
-                "    let result = if($test, |1.0, |3);\n" +
-                "    $result;\n" +
-                "}\n" +
-                "\n" +
-                "function test::testTrue():Any[*]\n" +
-                "{\n" +
-                "  let result = testFn(true);\n" +
-                "  assert(1.0 == $result, |'');\n" +
-                "  $result;\n" +
-                "}\n" +
-                "\n" +
-                "function test::testFalse():Any[*]\n" +
-                "{\n" +
-                "  let result = testFn(false);\n" +
-                "  assert(3 == $result, |'');\n" +
-                "  $result;\n" +
-                "}\n");
+        AbstractPureTestWithCoreCompiled.compileTestSource("fromString.pure", """
+                import test::*;
+                function test::testFn(test:Boolean[1]):Number[1]
+                {
+                    let result = if($test, |1.0, |3);
+                    $result;
+                }
+                
+                function test::testTrue():Any[*]
+                {
+                  let result = testFn(true);
+                  assert(1.0 == $result, |'');
+                  $result;
+                }
+                
+                function test::testFalse():Any[*]
+                {
+                  let result = testFn(false);
+                  assert(3 == $result, |'');
+                  $result;
+                }
+                """);
 
         CoreInstance testTrue = runtime.getFunction("test::testTrue():Any[*]");
-        Assert.assertNotNull(testTrue);
+        Assertions.assertNotNull(testTrue);
         CoreInstance resultTrue = functionExecution.start(testTrue, Lists.immutable.empty());
         Verify.assertInstanceOf(InstanceValue.class, resultTrue);
         InstanceValue trueInstanceValue = (InstanceValue) resultTrue;
         Verify.assertSize(1, trueInstanceValue._values());
         Object trueValue = trueInstanceValue._values().getFirst();
         Verify.assertInstanceOf(Double.class, trueValue);
-        Assert.assertEquals(1.0d, trueValue);
+        Assertions.assertEquals(1.0d, trueValue);
 
         CoreInstance testFalse = runtime.getFunction("test::testFalse():Any[*]");
-        Assert.assertNotNull(testFalse);
+        Assertions.assertNotNull(testFalse);
         CoreInstance resultFalse = functionExecution.start(testFalse, Lists.immutable.empty());
         Verify.assertInstanceOf(InstanceValue.class, resultFalse);
         InstanceValue falseInstanceValue = (InstanceValue) resultFalse;
         Verify.assertSize(1, falseInstanceValue._values());
         Object falseValue = falseInstanceValue._values().getFirst();
         Verify.assertInstanceOf(Long.class, falseValue);
-        Assert.assertEquals(3L, falseValue);
+        Assertions.assertEquals(3L, falseValue);
     }
 
     public static FunctionExecution getFunctionExecution()

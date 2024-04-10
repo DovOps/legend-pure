@@ -465,7 +465,7 @@ public class FunctionExpressionProcessor extends Processor<FunctionExpression>
             Multiplicity resolvedMultiplicity = (Multiplicity) org.finos.legend.pure.m3.navigation.multiplicity.Multiplicity.makeMultiplicityAsConcreteAsPossible(templateMultiplicity, state.getTypeInferenceContext().getMultiplicityParameterToMultiplicity());
 
             state.pushTypeInferenceContextAhead();
-            state.getTypeInferenceContext().setScope(instance instanceof FunctionExpression ? ((FunctionExpression) instance)._funcCoreInstance() : null);
+            state.getTypeInferenceContext().setScope(instance instanceof FunctionExpression fe ? fe._funcCoreInstance() : null);
             observer.processingParameter(functionExpression, z, instance).shiftTab();
             TypeInferenceContext typeInferenceContext = state.getTypeInferenceContext();
             typeInferenceContext.register(instance._genericType(), resolvedGenericType, typeInferenceContext.getParent(), observer);
@@ -568,7 +568,7 @@ public class FunctionExpressionProcessor extends Processor<FunctionExpression>
 
         state.pushTypeInferenceContextAhead();
         TypeInferenceContext typeInferenceContext = state.getTypeInferenceContext();
-        typeInferenceContext.setScope(instance instanceof SimpleFunctionExpression ? ((SimpleFunctionExpression) instance)._funcCoreInstance() : null);
+        typeInferenceContext.setScope(instance instanceof SimpleFunctionExpression sfe ? sfe._funcCoreInstance() : null);
 
         typeInferenceContext.register(instance._genericType(), resolvedGenericType, typeInferenceContext.getParent(), observer);
         typeInferenceContext.registerMul(instance._multiplicity(), resolvedMultiplicity, typeInferenceContext.getParent(), observer);
@@ -586,11 +586,11 @@ public class FunctionExpressionProcessor extends Processor<FunctionExpression>
 
         for (CoreInstance val : ((InstanceValue) instance)._valuesCoreInstance())
         {
-            if (val instanceof LambdaFunction)
+            if (val instanceof LambdaFunction function)
             {
                 try (MilestoningDateContextScope ignore = MilestoningDatesPropagationFunctions.withNewMilestoningDateContext(functionExpression, val, state, repository, context, processorSupport))
                 {
-                    lambdaParametersInferenceSuccess = lambdaParametersInferenceSuccess && !TypeInference.processParamTypesOfLambdaUsedAsAFunctionExpressionParamValue(instance, (LambdaFunction<?>) val, templateToMatchLambdaTo, matcher, state, repository, processorSupport);
+                    lambdaParametersInferenceSuccess = lambdaParametersInferenceSuccess && !TypeInference.processParamTypesOfLambdaUsedAsAFunctionExpressionParamValue(instance, function, templateToMatchLambdaTo, matcher, state, repository, processorSupport);
                 }
 
                 // Manage return type in any case
@@ -607,7 +607,7 @@ public class FunctionExpressionProcessor extends Processor<FunctionExpression>
 
                         if (templateReturnType != null)
                         {
-                            FunctionType lambdaFunctionType = Objects.requireNonNull(getRawTypeFromGenericType((LambdaFunction<?>) val, processorSupport));
+                            FunctionType lambdaFunctionType = Objects.requireNonNull(getRawTypeFromGenericType(function, processorSupport));
                             GenericType concreteGenericType = (GenericType) org.finos.legend.pure.m3.navigation.generictype.GenericType.makeTypeArgumentAsConcreteAsPossible(lambdaFunctionType._returnType(), lambdaInferenceContext.getTypeParameterToGenericType(), lambdaInferenceContext.getMultiplicityParameterToMultiplicity(), processorSupport);
                             lambdaFunctionType._returnTypeRemove();
                             lambdaFunctionType._returnType(concreteGenericType);
@@ -621,7 +621,7 @@ public class FunctionExpressionProcessor extends Processor<FunctionExpression>
                         Multiplicity templateReturnMultiplicity = Optional.ofNullable(ImportStub.withImportStubByPass(templateGenFunctionType._rawTypeCoreInstance(), processorSupport)).map(i -> ((FunctionType) i)._returnMultiplicity()).orElse(null);
                         if (templateReturnMultiplicity != null)
                         {
-                            FunctionType lambdaFunctionType = Objects.requireNonNull(getRawTypeFromGenericType((LambdaFunction<?>) val, processorSupport));
+                            FunctionType lambdaFunctionType = Objects.requireNonNull(getRawTypeFromGenericType(function, processorSupport));
                             Multiplicity concreteMultiplicity = (Multiplicity) org.finos.legend.pure.m3.navigation.multiplicity.Multiplicity.makeMultiplicityAsConcreteAsPossible(Instance.getValueForMetaPropertyToOneResolved(lambdaFunctionType, M3Properties.returnMultiplicity, processorSupport), lambdaInferenceContext.getMultiplicityParameterToMultiplicity());
 
                             lambdaFunctionType._returnMultiplicityRemove();
@@ -770,7 +770,7 @@ public class FunctionExpressionProcessor extends Processor<FunctionExpression>
         {
             processorState.removeVisited(visitedNode);
             visitedNode.markNotProcessed();
-            String functionName = visitedNode instanceof FunctionExpression ? ((FunctionExpression) visitedNode)._functionName() : null;
+            String functionName = visitedNode instanceof FunctionExpression fe ? fe._functionName() : null;
             if (functionName != null)
             {
                 ListIterable<? extends ValueSpecification> parametersValues = ListHelper.wrapListIterable(((FunctionExpression) visitedNode)._parametersValues());
@@ -796,17 +796,17 @@ public class FunctionExpressionProcessor extends Processor<FunctionExpression>
         {
             return false;
         }
-        if (boundVariable instanceof InstanceValue)
+        if (boundVariable instanceof InstanceValue value)
         {
-            return ((InstanceValue) boundVariable)._valuesCoreInstance().allSatisfy(v -> isInferenceSuccess(v, processorSupport));
+            return value._valuesCoreInstance().allSatisfy(v -> isInferenceSuccess(v, processorSupport));
         }
-        if (boundVariable instanceof FunctionExpression)
+        if (boundVariable instanceof FunctionExpression expression)
         {
-            Function<?> func = (Function<?>) ImportStub.withImportStubByPass(((FunctionExpression) boundVariable)._funcCoreInstance(), processorSupport);
+            Function<?> func = (Function<?>) ImportStub.withImportStubByPass(expression._funcCoreInstance(), processorSupport);
             if (!(func instanceof AbstractProperty))
             {
                 FunctionType fType = (FunctionType) processorSupport.function_getFunctionType(func);
-                RichIterable<? extends GenericType> resolved = ((FunctionExpression) boundVariable)._resolvedTypeParameters();
+                RichIterable<? extends GenericType> resolved = expression._resolvedTypeParameters();
                 return fType._typeParameters().isEmpty() || (resolved.notEmpty() && resolved.select(c -> isColumnWithEmptyTypeGenericType(c, processorSupport)).isEmpty());
             }
         }
@@ -815,8 +815,8 @@ public class FunctionExpressionProcessor extends Processor<FunctionExpression>
 
     public static boolean isLambdaWithEmptyParamType(CoreInstance boundVariable, ProcessorSupport processorSupport)
     {
-        return (boundVariable instanceof InstanceValue) &&
-                ((InstanceValue) boundVariable)._valuesCoreInstance().anySatisfy(v -> (v instanceof FunctionDefinition) && shouldInferTypesForFunctionParameters((FunctionDefinition<?>) v, processorSupport));
+        return (boundVariable instanceof InstanceValue iv) &&
+                iv._valuesCoreInstance().anySatisfy(v -> (v instanceof FunctionDefinition fd) && shouldInferTypesForFunctionParameters(fd, processorSupport));
     }
 
     public static boolean isColumnWithEmptyType(CoreInstance boundVariable, ProcessorSupport processorSupport)
@@ -874,12 +874,12 @@ public class FunctionExpressionProcessor extends Processor<FunctionExpression>
         {
             ImportStub.withImportStubByPasses(ListHelper.wrapListIterable(((InstanceValue) params.get(2))._valuesCoreInstance()), processorSupport).forEachWithIndex((keyValue, z) ->
             {
-                if (keyValue instanceof KeyExpression)
+                if (keyValue instanceof KeyExpression expression)
                 {
                     KeyValueValueSpecificationContext usageContext = ((KeyValueValueSpecificationContext) processorSupport.newAnonymousCoreInstance(null, M3Paths.KeyValueValueSpecificationContext))
                             ._offset(z)
                             ._functionExpression(functionExpression);
-                    ((KeyExpression) keyValue)._expression()._usageContext(usageContext);
+                    expression._expression()._usageContext(usageContext);
                 }
             });
         }

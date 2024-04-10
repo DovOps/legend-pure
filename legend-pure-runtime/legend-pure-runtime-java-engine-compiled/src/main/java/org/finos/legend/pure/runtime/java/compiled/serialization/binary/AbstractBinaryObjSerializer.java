@@ -86,9 +86,8 @@ abstract class AbstractBinaryObjSerializer implements BinaryObjSerializer
 
     protected void writePropertyValue(Writer writer, PropertyValue propertyValue)
     {
-        if (propertyValue instanceof PropertyValueMany)
+        if (propertyValue instanceof PropertyValueMany many)
         {
-            PropertyValueMany many = (PropertyValueMany)propertyValue;
             writer.writeBoolean(true);
             writeString(writer, many.getProperty());
             ListIterable<RValue> values = many.getValues();
@@ -109,53 +108,50 @@ abstract class AbstractBinaryObjSerializer implements BinaryObjSerializer
 
     protected void writeRValue(Writer writer, RValue rValue)
     {
-        if (rValue instanceof EnumRef)
+        if (rValue instanceof EnumRef enumeration)
         {
-            EnumRef enumeration = (EnumRef)rValue;
             writer.writeByte(BinaryGraphSerializationTypes.ENUM_REF);
             writeString(writer, enumeration.getEnumerationId());
             writeString(writer, enumeration.getEnumName());
         }
-        else if (rValue instanceof ObjRef)
+        else if (rValue instanceof ObjRef objRef)
         {
-            ObjRef objRef = (ObjRef)rValue;
             writer.writeByte(BinaryGraphSerializationTypes.OBJ_REF);
             writeString(writer, objRef.getClassifierId());
             writeString(writer, objRef.getId());
         }
-        else if (rValue instanceof Primitive)
+        else if (rValue instanceof Primitive primitive)
         {
-            Primitive primitive = (Primitive)rValue;
             Object value = primitive.getValue();
-            if (value instanceof Boolean)
+            if (value instanceof Boolean boolean1)
             {
                 writer.writeByte(BinaryGraphSerializationTypes.PRIMITIVE_BOOLEAN);
-                writer.writeBoolean((Boolean)value);
+                writer.writeBoolean(boolean1);
             }
-            else if (value instanceof Double)
+            else if (value instanceof Double double1)
             {
                 writer.writeByte(BinaryGraphSerializationTypes.PRIMITIVE_DOUBLE);
-                writer.writeDouble((Double)value);
+                writer.writeDouble(double1);
             }
-            else if (value instanceof Long)
+            else if (value instanceof Long long1)
             {
                 writer.writeByte(BinaryGraphSerializationTypes.PRIMITIVE_LONG);
-                writer.writeLong((Long)value);
+                writer.writeLong(long1);
             }
-            else if (value instanceof String)
+            else if (value instanceof String string)
             {
                 writer.writeByte(BinaryGraphSerializationTypes.PRIMITIVE_STRING);
-                writeString(writer, (String)value);
+                writeString(writer, string);
             }
             else if (value instanceof PureDate)
             {
                 writer.writeByte(BinaryGraphSerializationTypes.PRIMITIVE_DATE);
                 writeString(writer, value.toString());
             }
-            else if (value instanceof BigDecimal)
+            else if (value instanceof BigDecimal decimal)
             {
                 writer.writeByte(BinaryGraphSerializationTypes.PRIMITIVE_DECIMAL);
-                writer.writeString(((BigDecimal)value).toPlainString());
+                writer.writeString(decimal.toPlainString());
             }
             else
             {

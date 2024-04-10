@@ -46,20 +46,19 @@ public class PureMapSerializer
 
     private static Object toJson(Object value, JsonSerializationContext context)
     {
-        if (value instanceof CoreInstance)
+        if (value instanceof CoreInstance valueCoreInstance)
         {
-            CoreInstance valueCoreInstance = (CoreInstance)value;
             CoreInstance valueClassifier = context.getProcessorSupport().getClassifier(valueCoreInstance);
             Conversion<Object, ?> valConcreteConversion = (Conversion<Object, ?>)context.getConversionCache().getConversion(TypeCoreInstanceWrapper.toType(valueClassifier), context);
             return valConcreteConversion.apply(value, context);
         }
-        if (value instanceof PureMap)
+        if (value instanceof PureMap map)
         {
-            return toJson((PureMap)value, context);
+            return toJson(map, context);
         }
-        if (value instanceof String)
+        if (value instanceof String string)
         {
-            return JSONValue.escape((String)value);
+            return JSONValue.escape(string);
         }
         // non-string primitive type (hopefully)
         return value;

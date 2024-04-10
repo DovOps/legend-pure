@@ -17,13 +17,13 @@ package org.finos.legend.pure.runtime.java.interpreted.path;
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
 import org.finos.legend.pure.m3.execution.FunctionExecution;
 import org.finos.legend.pure.runtime.java.interpreted.FunctionExecutionInterpreted;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestDSLExecution extends AbstractPureTestWithCoreCompiled
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getFunctionExecution());
@@ -32,92 +32,96 @@ public class TestDSLExecution extends AbstractPureTestWithCoreCompiled
     @Test
     public void testSimple() throws Exception
     {
-        this.runtime.createInMemorySource("file.pure", "Class Person{address:Address[1];} Class Firm<T> {employees : Person[1];address:Address[1];} Class Address{}\n" +
-                               "function test():Any[*]\n" +
-                               "{\n" +
-                               "    print(#/Firm<Any>/employees/address#, 2);\n" +
-                               "}\n");
+        this.runtime.createInMemorySource("file.pure", """
+                               Class Person{address:Address[1];} Class Firm<T> {employees : Person[1];address:Address[1];} Class Address{}
+                               function test():Any[*]
+                               {
+                                   print(#/Firm<Any>/employees/address#, 2);
+                               }
+                               """);
         this.runtime.compile();
         this.execute("test():Any[*]");
-        Assert.assertEquals("Anonymous_StripedId instance Path\n" +
-                "    classifierGenericType(Property):\n" +
-                "        Anonymous_StripedId instance GenericType\n" +
-                "            multiplicityArguments(Property):\n" +
-                "                [X] PureOne instance PackageableMultiplicity\n" +
-                "            rawType(Property):\n" +
-                "                [X] Path instance Class\n" +
-                "            typeArguments(Property):\n" +
-                "                Anonymous_StripedId instance GenericType\n" +
-                "                    rawType(Property):\n" +
-                "                        [~>] Firm instance Class\n" +
-                "                    typeArguments(Property):\n" +
-                "                        [>2] Anonymous_StripedId instance GenericType\n" +
-                "                Anonymous_StripedId instance GenericType\n" +
-                "                    rawType(Property):\n" +
-                "                        [~>] Address instance Class\n" +
-                "    name(Property):\n" +
-                "         instance String\n" +
-                "    path(Property):\n" +
-                "        Anonymous_StripedId instance PropertyPathElement\n" +
-                "            classifierGenericType(Property):\n" +
-                "                Anonymous_StripedId instance GenericType\n" +
-                "                    rawType(Property):\n" +
-                "                        [X] PropertyPathElement instance Class\n" +
-                "            property(Property):\n" +
-                "                Anonymous_StripedId instance PropertyStub\n" +
-                "                    owner(Property):\n" +
-                "                        [X] Firm instance Class\n" +
-                "                    propertyName(Property):\n" +
-                "                        [>2] employees instance String\n" +
-                "                    resolvedProperty(Property):\n" +
-                "                        [>2] employees instance Property\n" +
-                "        Anonymous_StripedId instance PropertyPathElement\n" +
-                "            classifierGenericType(Property):\n" +
-                "                Anonymous_StripedId instance GenericType\n" +
-                "                    rawType(Property):\n" +
-                "                        [X] PropertyPathElement instance Class\n" +
-                "            property(Property):\n" +
-                "                Anonymous_StripedId instance PropertyStub\n" +
-                "                    owner(Property):\n" +
-                "                        [X] Person instance Class\n" +
-                "                    propertyName(Property):\n" +
-                "                        [>2] address instance String\n" +
-                "                    resolvedProperty(Property):\n" +
-                "                        [>2] address instance Property\n" +
-                "    referenceUsages(Property):\n" +
-                "        Anonymous_StripedId instance ReferenceUsage\n" +
-                "            offset(Property):\n" +
-                "                0 instance Integer\n" +
-                "            owner(Property):\n" +
-                "                Anonymous_StripedId instance InstanceValue\n" +
-                "                    genericType(Property):\n" +
-                "                        [>2] Anonymous_StripedId instance GenericType\n" +
-                "                    multiplicity(Property):\n" +
-                "                        [X] PureOne instance PackageableMultiplicity\n" +
-                "                    usageContext(Property):\n" +
-                "                        [>2] Anonymous_StripedId instance ParameterValueSpecificationContext\n" +
-                "                    values(Property):\n" +
-                "                        [>2] Anonymous_StripedId instance Path\n" +
-                "            propertyName(Property):\n" +
-                "                values instance String\n" +
-                "    start(Property):\n" +
-                "        Anonymous_StripedId instance GenericType\n" +
-                "            rawType(Property):\n" +
-                "                [~>] Firm instance Class\n" +
-                "            referenceUsages(Property):\n" +
-                "                Anonymous_StripedId instance ReferenceUsage\n" +
-                "                    offset(Property):\n" +
-                "                        [>2] 0 instance Integer\n" +
-                "                    owner(Property):\n" +
-                "                        [>2] Anonymous_StripedId instance Path\n" +
-                "                    propertyName(Property):\n" +
-                "                        [>2] start instance String\n" +
-                "            typeArguments(Property):\n" +
-                "                Anonymous_StripedId instance GenericType\n" +
-                "                    rawType(Property):\n" +
-                "                        [~>] Any instance Class\n" +
-                "                    referenceUsages(Property):\n" +
-                "                        [>2] Anonymous_StripedId instance ReferenceUsage", this.functionExecution.getConsole().getLine(0));
+        Assertions.assertEquals("""
+                Anonymous_StripedId instance Path
+                    classifierGenericType(Property):
+                        Anonymous_StripedId instance GenericType
+                            multiplicityArguments(Property):
+                                [X] PureOne instance PackageableMultiplicity
+                            rawType(Property):
+                                [X] Path instance Class
+                            typeArguments(Property):
+                                Anonymous_StripedId instance GenericType
+                                    rawType(Property):
+                                        [~>] Firm instance Class
+                                    typeArguments(Property):
+                                        [>2] Anonymous_StripedId instance GenericType
+                                Anonymous_StripedId instance GenericType
+                                    rawType(Property):
+                                        [~>] Address instance Class
+                    name(Property):
+                         instance String
+                    path(Property):
+                        Anonymous_StripedId instance PropertyPathElement
+                            classifierGenericType(Property):
+                                Anonymous_StripedId instance GenericType
+                                    rawType(Property):
+                                        [X] PropertyPathElement instance Class
+                            property(Property):
+                                Anonymous_StripedId instance PropertyStub
+                                    owner(Property):
+                                        [X] Firm instance Class
+                                    propertyName(Property):
+                                        [>2] employees instance String
+                                    resolvedProperty(Property):
+                                        [>2] employees instance Property
+                        Anonymous_StripedId instance PropertyPathElement
+                            classifierGenericType(Property):
+                                Anonymous_StripedId instance GenericType
+                                    rawType(Property):
+                                        [X] PropertyPathElement instance Class
+                            property(Property):
+                                Anonymous_StripedId instance PropertyStub
+                                    owner(Property):
+                                        [X] Person instance Class
+                                    propertyName(Property):
+                                        [>2] address instance String
+                                    resolvedProperty(Property):
+                                        [>2] address instance Property
+                    referenceUsages(Property):
+                        Anonymous_StripedId instance ReferenceUsage
+                            offset(Property):
+                                0 instance Integer
+                            owner(Property):
+                                Anonymous_StripedId instance InstanceValue
+                                    genericType(Property):
+                                        [>2] Anonymous_StripedId instance GenericType
+                                    multiplicity(Property):
+                                        [X] PureOne instance PackageableMultiplicity
+                                    usageContext(Property):
+                                        [>2] Anonymous_StripedId instance ParameterValueSpecificationContext
+                                    values(Property):
+                                        [>2] Anonymous_StripedId instance Path
+                            propertyName(Property):
+                                values instance String
+                    start(Property):
+                        Anonymous_StripedId instance GenericType
+                            rawType(Property):
+                                [~>] Firm instance Class
+                            referenceUsages(Property):
+                                Anonymous_StripedId instance ReferenceUsage
+                                    offset(Property):
+                                        [>2] 0 instance Integer
+                                    owner(Property):
+                                        [>2] Anonymous_StripedId instance Path
+                                    propertyName(Property):
+                                        [>2] start instance String
+                            typeArguments(Property):
+                                Anonymous_StripedId instance GenericType
+                                    rawType(Property):
+                                        [~>] Any instance Class
+                                    referenceUsages(Property):
+                                        [>2] Anonymous_StripedId instance ReferenceUsage\
+                """, this.functionExecution.getConsole().getLine(0));
     }
 
     protected static FunctionExecution getFunctionExecution()

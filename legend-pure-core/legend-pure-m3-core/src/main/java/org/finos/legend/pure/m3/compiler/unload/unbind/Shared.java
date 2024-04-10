@@ -37,9 +37,9 @@ public class Shared
         if (rawType != null)
         {
             cleanUpReferenceUsage(rawType, genericType, processorSupport);
-            if (rawType instanceof FunctionType)
+            if (rawType instanceof FunctionType type)
             {
-                cleanUpFunctionType((FunctionType) rawType, state, processorSupport);
+                cleanUpFunctionType(type, state, processorSupport);
             }
             else
             {
@@ -54,32 +54,32 @@ public class Shared
 
     public static void cleanImportStub(CoreInstance importStub, ProcessorSupport processorSupport)
     {
-        if (importStub instanceof ImportStub)
+        if (importStub instanceof ImportStub stub)
         {
-            ((ImportStub) importStub)._resolvedNodeRemove();
+            stub._resolvedNodeRemove();
         }
     }
 
     public static void cleanPropertyStub(CoreInstance propertyStub, ProcessorSupport processorSupport)
     {
-        if (propertyStub instanceof PropertyStub)
+        if (propertyStub instanceof PropertyStub stub)
         {
-            if (((PropertyStub) propertyStub)._ownerCoreInstance() != null)
+            if (stub._ownerCoreInstance() != null)
             {
-                cleanImportStub(((PropertyStub) propertyStub)._ownerCoreInstance(), processorSupport);
-                ((PropertyStub) propertyStub)._resolvedPropertyRemove();
+                cleanImportStub(stub._ownerCoreInstance(), processorSupport);
+                stub._resolvedPropertyRemove();
             }
         }
     }
 
     public static void cleanEnumStub(CoreInstance enumStub, ProcessorSupport processorSupport)
     {
-        if (enumStub instanceof EnumStub)
+        if (enumStub instanceof EnumStub stub)
         {
-            if (((EnumStub) enumStub)._enumerationCoreInstance() != null)
+            if (stub._enumerationCoreInstance() != null)
             {
-                cleanImportStub(((EnumStub) enumStub)._enumerationCoreInstance(), processorSupport);
-                ((EnumStub) enumStub)._resolvedEnumRemove();
+                cleanImportStub(stub._enumerationCoreInstance(), processorSupport);
+                stub._resolvedEnumRemove();
             }
         }
     }

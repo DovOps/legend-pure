@@ -108,17 +108,17 @@ public class GraphSerializer
         }
 
         // Special handling for PrimitiveCoreInstances
-        if (instance instanceof FloatCoreInstance)
+        if (instance instanceof FloatCoreInstance coreInstance)
         {
-            return ((FloatCoreInstance) instance).getValue().doubleValue();
+            return coreInstance.getValue().doubleValue();
         }
-        if (instance instanceof IntegerCoreInstance)
+        if (instance instanceof IntegerCoreInstance coreInstance)
         {
-            return ((IntegerCoreInstance) instance).getValue().longValue();
+            return coreInstance.getValue().longValue();
         }
-        if (instance instanceof PrimitiveCoreInstance<?>)
+        if (instance instanceof PrimitiveCoreInstance<?> coreInstance)
         {
-            return ((PrimitiveCoreInstance<?>) instance).getValue();
+            return coreInstance.getValue();
         }
 
         // General handling

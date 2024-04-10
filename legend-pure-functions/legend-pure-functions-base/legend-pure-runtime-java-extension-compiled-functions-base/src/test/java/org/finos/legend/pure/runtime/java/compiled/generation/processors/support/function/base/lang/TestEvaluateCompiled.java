@@ -20,19 +20,20 @@ import org.finos.legend.pure.m3.tests.function.base.lang.AbstractTestEvaluate;
 import org.finos.legend.pure.m3.tools.test.ToFix;
 import org.finos.legend.pure.runtime.java.compiled.execution.FunctionExecutionCompiledBuilder;
 import org.finos.legend.pure.runtime.java.compiled.factory.JavaModelFactoryRegistryLoader;
-import org.junit.After;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 public class TestEvaluateCompiled extends AbstractTestEvaluate
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         AbstractPureTestWithCoreCompiled.setUpRuntime(getFunctionExecution(), JavaModelFactoryRegistryLoader.loader());
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         AbstractPureTestWithCoreCompiled.runtime.delete("fromString.pure");
@@ -50,35 +51,40 @@ public class TestEvaluateCompiled extends AbstractTestEvaluate
     }
 
     @Override
-    @Ignore
+    @Test
+    @Disabled
     @ToFix
     public void testEvaluateAssert()
     {
     }
 
     @Override
-    @Ignore
+    @Test
+    @Disabled
     @ToFix
     public void testEvaluateUnboundedMultiplicity()
     {
     }
 
     @Override
-    @Ignore
+    @Test
+    @Disabled
     @ToFix
     public void testEvaluateViolateUpperBound()
     {
     }
 
     @Override
-    @Ignore
+    @Test
+    @Disabled
     @ToFix
     public void testEvaluateViolateLowerBound()
     {
     }
 
     @Override
-    @Ignore
+    @Test
+    @Disabled
     @ToFix
     public void testEvaluateAnyWrongMultiplicity()
     {

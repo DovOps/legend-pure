@@ -21,10 +21,10 @@ import org.eclipse.collections.impl.tuple.Tuples;
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
 import org.finos.legend.pure.m3.tests.RuntimeTestScriptBuilder;
 import org.finos.legend.pure.m3.tests.RuntimeVerifier;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestPureRuntimeDiagram extends AbstractPureTestWithCoreCompiled
 {
@@ -33,64 +33,67 @@ public class TestPureRuntimeDiagram extends AbstractPureTestWithCoreCompiled
     private static final String TEST_DIAGRAM_SOURCE_ID = "testDiagram.pure";
     private static final ImmutableMap<String, String> TEST_SOURCES = Maps.immutable.with(
             TEST_MODEL_SOURCE_ID,
-            "import model::test::*;\n" +
-                    "Class model::test::A\n" +
-                    "{\n" +
-                    "  prop:model::test::B[0..1];\n" +
-                    "}\n" +
-                    "Class model::test::B extends A {}\n" +
-                    "Association model::test::A2B\n" +
-                    "{\n" +
-                    "  a : A[1];\n" +
-                    "  b : B[*];\n" +
-                    "}\n",
+            """
+            import model::test::*;
+            Class model::test::A
+            {
+              prop:model::test::B[0..1];
+            }
+            Class model::test::B extends A {}
+            Association model::test::A2B
+            {
+              a : A[1];
+              b : B[*];
+            }
+            """,
             TEST_DIAGRAM_SOURCE_ID,
-            "###Diagram\n" +
-                    "import model::test::*;" +
-                    "\n" +
-                    "Diagram model::test::TestDiagram(width=5000.3, height=2700.6)\n" +
-                    "{\n" +
-                    "    TypeView A(type=model::test::A, stereotypesVisible=true, attributesVisible=true,\n" +
-                    "               attributeStereotypesVisible=true, attributeTypesVisible=true,\n" +
-                    "               color=#FFFFCC, lineWidth=1.0,\n" +
-                    "               position=(874.0, 199.46875), width=353.0, height=57.1875)\n" +
-                    "    TypeView B(type=model::test::B, stereotypesVisible=true, attributesVisible=true,\n" +
-                    "               attributeStereotypesVisible=true, attributeTypesVisible=true,\n" +
-                    "               color=#FFFFCC, lineWidth=1.0,\n" +
-                    "               position=(75.0, 97.1875), width=113.0, height=57.1875)\n" +
-                    "    AssociationView A2B(association=model::test::A2B, stereotypesVisible=true, nameVisible=false,\n" +
-                    "                        color=#000000, lineWidth=1.0,\n" +
-                    "                        lineStyle=SIMPLE, points=[(132.5, 77.0), (155.2, 77.0)],\n" +
-                    "                        label='A to B',\n" +
-                    "                        source=A,\n" +
-                    "                        target=B,\n" +
-                    "                        sourcePropertyPosition=(132.5, 76.2),\n" +
-                    "                        sourceMultiplicityPosition=(132.5, 80.0),\n" +
-                    "                        targetPropertyPosition=(155.2, 76.2),\n" +
-                    "                        targetMultiplicityPosition=(155.2, 80.0))\n" +
-                    "    PropertyView A_prop(property=A.prop, stereotypesVisible=true, nameVisible=false,\n" +
-                    "                        color=#000000, lineWidth=1.0,\n" +
-                    "                        lineStyle=SIMPLE, points=[(132.5, 77.0), (155.2, 77.0)],\n" +
-                    "                        label='A.prop',\n" +
-                    "                        source=A,\n" +
-                    "                        target=B,\n" +
-                    "                        propertyPosition=(132.5, 76.2),\n" +
-                    "                        multiplicityPosition=(132.5, 80.0))\n" +
-                    "    GeneralizationView B_A(color=#000000, lineWidth=1.0,\n" +
-                    "                           lineStyle=SIMPLE, points=[(132.5, 77.0), (155.2, 77.0)],\n" +
-                    "                           label='',\n" +
-                    "                           source=B,\n" +
-                    "                           target=A)\n" +
-                    "}\n"
+            """
+            ###Diagram
+            import model::test::*;
+            Diagram model::test::TestDiagram(width=5000.3, height=2700.6)
+            {
+                TypeView A(type=model::test::A, stereotypesVisible=true, attributesVisible=true,
+                           attributeStereotypesVisible=true, attributeTypesVisible=true,
+                           color=#FFFFCC, lineWidth=1.0,
+                           position=(874.0, 199.46875), width=353.0, height=57.1875)
+                TypeView B(type=model::test::B, stereotypesVisible=true, attributesVisible=true,
+                           attributeStereotypesVisible=true, attributeTypesVisible=true,
+                           color=#FFFFCC, lineWidth=1.0,
+                           position=(75.0, 97.1875), width=113.0, height=57.1875)
+                AssociationView A2B(association=model::test::A2B, stereotypesVisible=true, nameVisible=false,
+                                    color=#000000, lineWidth=1.0,
+                                    lineStyle=SIMPLE, points=[(132.5, 77.0), (155.2, 77.0)],
+                                    label='A to B',
+                                    source=A,
+                                    target=B,
+                                    sourcePropertyPosition=(132.5, 76.2),
+                                    sourceMultiplicityPosition=(132.5, 80.0),
+                                    targetPropertyPosition=(155.2, 76.2),
+                                    targetMultiplicityPosition=(155.2, 80.0))
+                PropertyView A_prop(property=A.prop, stereotypesVisible=true, nameVisible=false,
+                                    color=#000000, lineWidth=1.0,
+                                    lineStyle=SIMPLE, points=[(132.5, 77.0), (155.2, 77.0)],
+                                    label='A.prop',
+                                    source=A,
+                                    target=B,
+                                    propertyPosition=(132.5, 76.2),
+                                    multiplicityPosition=(132.5, 80.0))
+                GeneralizationView B_A(color=#000000, lineWidth=1.0,
+                                       lineStyle=SIMPLE, points=[(132.5, 77.0), (155.2, 77.0)],
+                                       label='',
+                                       source=B,
+                                       target=A)
+            }
+            """
     );
 
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime();
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete(TEST_DIAGRAM_SOURCE_ID);
@@ -108,7 +111,7 @@ public class TestPureRuntimeDiagram extends AbstractPureTestWithCoreCompiled
             runtime.delete(TEST_MODEL_SOURCE_ID);
             runtime.createInMemoryAndCompile(Tuples.pair(TEST_MODEL_SOURCE_ID, TEST_SOURCES.get(TEST_MODEL_SOURCE_ID)));
             runtime.compile();
-            Assert.assertEquals("Graph size mismatch at iteration #" + i, size, repository.serialize().length);
+            Assertions.assertEquals(size, repository.serialize().length, "Graph size mismatch at iteration #" + i);
         }
     }
 
@@ -139,7 +142,7 @@ public class TestPureRuntimeDiagram extends AbstractPureTestWithCoreCompiled
             runtime.delete(TEST_DIAGRAM_SOURCE_ID);
             runtime.compile();
 
-            Assert.assertEquals("Graph size mismatch at iteration #" + i, size, repository.serialize().length);
+            Assertions.assertEquals(size, repository.serialize().length, "Graph size mismatch at iteration #" + i);
         }
     }
 }

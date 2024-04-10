@@ -14,8 +14,8 @@
 
 package org.finos.legend.pure.m4.coreinstance;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class TestSourceInformation
 {
@@ -112,7 +112,7 @@ public class TestSourceInformation
             }
             builder.append("contain ");
             sourceInfo2.appendMessage(builder);
-            Assert.fail(builder.toString());
+            Assertions.fail(builder.toString());
         }
     }
 }

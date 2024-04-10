@@ -22,17 +22,13 @@ import org.finos.legend.pure.m3.serialization.filesystem.usercodestorage.Reposit
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
 import org.finos.legend.pure.m4.exception.PureException;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public abstract class AbstractTestFromJson extends AbstractPureTestWithCoreCompiled
 {
-    @Rule
-    public final ExpectedException exception = ExpectedException.none();
 
     private void runShouldFailTestCase(String testName, String expectedType, String actualJson, String expectedExceptionSnippet)
     {
@@ -73,7 +69,7 @@ public abstract class AbstractTestFromJson extends AbstractPureTestWithCoreCompi
             CoreInstance func = this.runtime.getFunction(testName + "():Any[*]");
             this.functionExecution.start(func, FastList.<CoreInstance>newList());
 
-            Assert.fail("Expected exception evaluating: \n" + source);
+            Assertions.fail("Expected exception evaluating: \n" + source);
         }
         catch (PureExecutionException e)
         {
@@ -380,7 +376,7 @@ public abstract class AbstractTestFromJson extends AbstractPureTestWithCoreCompi
             CoreInstance func = this.runtime.getFunction("Association():Any[*]");
             this.functionExecution.start(func, FastList.<CoreInstance>newList());
 
-            Assert.fail("Expected exception evaluating: \n" + associationSource);
+            Assertions.fail("Expected exception evaluating: \n" + associationSource);
         }
         catch (PureExecutionException e)
         {
@@ -418,7 +414,7 @@ public abstract class AbstractTestFromJson extends AbstractPureTestWithCoreCompi
             CoreInstance func = this.runtime.getFunction("Association():Any[*]");
             this.functionExecution.start(func, FastList.<CoreInstance>newList());
 
-            Assert.fail("Expected exception evaluating: \n" + associationSource);
+            Assertions.fail("Expected exception evaluating: \n" + associationSource);
         }
         catch (PureExecutionException e)
         {
@@ -459,13 +455,15 @@ public abstract class AbstractTestFromJson extends AbstractPureTestWithCoreCompi
             CoreInstance func = this.runtime.getFunction("Association():Any[*]");
             this.functionExecution.start(func, FastList.<CoreInstance>newList());
 
-            Assert.fail("Expected exception evaluating: \n" + associationSource);
+            Assertions.fail("Expected exception evaluating: \n" + associationSource);
         }
         catch (PureExecutionException e)
         {
-            this.assertException(e, "Error populating property 'occupant' on class 'meta::pure::functions::json::tests::OfficeBuilding': \n" +
-                    "Error populating property 'employees' on class 'meta::pure::functions::json::tests::Firm': \n" +
-                    "Expected value(s) of multiplicity [7], found 1 value(s).");
+            this.assertException(e, """
+                    Error populating property 'occupant' on class 'meta::pure::functions::json::tests::OfficeBuilding':\s
+                    Error populating property 'employees' on class 'meta::pure::functions::json::tests::Firm':\s
+                    Expected value(s) of multiplicity [7], found 1 value(s).\
+                    """);
         }
     }
 
@@ -475,13 +473,17 @@ public abstract class AbstractTestFromJson extends AbstractPureTestWithCoreCompi
         String[] rawAssociationSource = {
                 "import meta::json::*;",
                 "import meta::pure::functions::json::tests::*;",
-                "Class meta::pure::functions::json::tests::Foo {" +
-                        "bar : Bar[1];\n" +
-                        "check : String[1];\n" +
-                        "}",
-                "Class meta::pure::functions::json::tests::Bar {" +
-                        "foo : Foo[*];\n" +
-                        "}",
+                """
+                Class meta::pure::functions::json::tests::Foo {\
+                bar : Bar[1];
+                check : String[1];
+                }\
+                """,
+                """
+                Class meta::pure::functions::json::tests::Bar {\
+                foo : Foo[*];
+                }\
+                """,
                 "function mimic():Any[*]",
                 "{",
                 "let json = '{\"check\": \"passes here\", \"bar\": {\"foo\": {\"check\": \"and here\", \"bar\": {}}}}';",
@@ -508,9 +510,11 @@ public abstract class AbstractTestFromJson extends AbstractPureTestWithCoreCompi
                 "}",
                 "Class meta::pure::functions::json::tests::Firm {}",
                 "Class meta::pure::functions::json::tests::OfficeBuilding {}",
-                "Class meta::pure::functions::json::tests::Campus {" +
-                        "buildings : OfficeBuilding[1];" +
-                        "}",
+                """
+                Class meta::pure::functions::json::tests::Campus {\
+                buildings : OfficeBuilding[1];\
+                }\
+                """,
                 "function foo():Any[*]",
                 "{",
                 "let json = '{\"buildings\": {\"occupant\": {\"building\": {}}}}';",
@@ -585,13 +589,15 @@ public abstract class AbstractTestFromJson extends AbstractPureTestWithCoreCompi
             CoreInstance func = this.runtime.getFunction("foo():Any[*]");
             this.functionExecution.start(func, FastList.<CoreInstance>newList());
 
-            Assert.fail("Expected exception evaluating: \n" + associationSource);
+            Assertions.fail("Expected exception evaluating: \n" + associationSource);
         }
         catch (PureExecutionException e)
         {
-            this.assertException(e, "Error populating property 'b' on class 'meta::pure::functions::json::tests::C': \n" +
-                    "Error populating property 'a' on class 'meta::pure::functions::json::tests::B': \n" +
-                    "Property 'str' can't be found in class meta::pure::functions::json::tests::A. ");
+            this.assertException(e, """
+                    Error populating property 'b' on class 'meta::pure::functions::json::tests::C':\s
+                    Error populating property 'a' on class 'meta::pure::functions::json::tests::B':\s
+                    Property 'str' can't be found in class meta::pure::functions::json::tests::A. \
+                    """);
         }
     }
 
@@ -614,7 +620,7 @@ public abstract class AbstractTestFromJson extends AbstractPureTestWithCoreCompi
             CoreInstance func = this.runtime.getFunction("InRangeToOne():Any[*]");
             this.functionExecution.start(func, FastList.<CoreInstance>newList());
 
-            Assert.fail("Expected exception evaluating: \n" + inRangeToOneSources);
+            Assertions.fail("Expected exception evaluating: \n" + inRangeToOneSources);
         }
         catch (PureExecutionException e)
         {
@@ -649,7 +655,7 @@ public abstract class AbstractTestFromJson extends AbstractPureTestWithCoreCompi
             CoreInstance func = this.runtime.getFunction("missing():Any[*]");
             this.functionExecution.start(func, FastList.<CoreInstance>newList());
 
-            Assert.fail("Expected exception evaluating: \n" + source);
+            Assertions.fail("Expected exception evaluating: \n" + source);
         }
         catch (PureExecutionException e)
         {
@@ -677,7 +683,7 @@ public abstract class AbstractTestFromJson extends AbstractPureTestWithCoreCompi
             CoreInstance func = this.runtime.getFunction("failUnknown():Any[*]");
             this.functionExecution.start(func, FastList.<CoreInstance>newList());
 
-            Assert.fail("Expected exception evaluating: \n" + source);
+            Assertions.fail("Expected exception evaluating: \n" + source);
         }
         catch (PureExecutionException e)
         {
@@ -705,7 +711,7 @@ public abstract class AbstractTestFromJson extends AbstractPureTestWithCoreCompi
             CoreInstance func = this.runtime.getFunction("TypeKey():Any[*]");
             this.functionExecution.start(func, FastList.<CoreInstance>newList());
 
-            Assert.fail("Expected exception evaluating: \n" + associationSource);
+            Assertions.fail("Expected exception evaluating: \n" + associationSource);
         }
         catch (PureExecutionException e)
         {
@@ -735,7 +741,7 @@ public abstract class AbstractTestFromJson extends AbstractPureTestWithCoreCompi
             CoreInstance func = this.runtime.getFunction("go():Any[*]");
             this.functionExecution.start(func, FastList.<CoreInstance>newList());
 
-            Assert.fail("Expected exception evaluating: \n" + source);
+            Assertions.fail("Expected exception evaluating: \n" + source);
         }
         catch (PureExecutionException e)
         {
@@ -757,8 +763,10 @@ public abstract class AbstractTestFromJson extends AbstractPureTestWithCoreCompi
                 "{ a:String[1]; }",
                 "",
                 "function go():Any[*]",
-                "{\n" +
-                        " let config = ^JSONDeserializationConfig(typeKeyName='@type', failOnUnknownProperties=true, constraintsHandler=^ConstraintsOverride(constraintsManager=myFunc_Any_1__Any_1_));\n",
+                """
+                {
+                 let config = ^JSONDeserializationConfig(typeKeyName='@type', failOnUnknownProperties=true, constraintsHandler=^ConstraintsOverride(constraintsManager=myFunc_Any_1__Any_1_));
+                """,
                 " let json='{ \"a\": \"fred\" }'->meta::json::fromJson(meta::pure::functions::json::tests::A, $config);",
                 " assert(!$json->isEmpty(), |''); ",
                 " assert(\'fred\' == $json.a, |''); ",
@@ -795,7 +803,7 @@ public abstract class AbstractTestFromJson extends AbstractPureTestWithCoreCompi
             CoreInstance func = this.runtime.getFunction("go():Any[*]");
             this.functionExecution.start(func, FastList.<CoreInstance>newList());
 
-            Assert.fail("Expected exception evaluating: \n" + source);
+            Assertions.fail("Expected exception evaluating: \n" + source);
         }
         catch (PureExecutionException e)
         {
@@ -826,7 +834,7 @@ public abstract class AbstractTestFromJson extends AbstractPureTestWithCoreCompi
             CoreInstance func = this.runtime.getFunction("go():Any[*]");
             this.functionExecution.start(func, FastList.<CoreInstance>newList());
 
-            Assert.fail("Expected exception evaluating: \n" + source);
+            Assertions.fail("Expected exception evaluating: \n" + source);
         }
         catch (PureExecutionException e)
         {
@@ -858,7 +866,7 @@ public abstract class AbstractTestFromJson extends AbstractPureTestWithCoreCompi
             CoreInstance func = this.runtime.getFunction("go():Any[*]");
             this.functionExecution.start(func, FastList.<CoreInstance>newList());
 
-            Assert.fail("Expected exception evaluating: \n" + source);
+            Assertions.fail("Expected exception evaluating: \n" + source);
         }
         catch (PureExecutionException e)
         {
@@ -893,7 +901,7 @@ public abstract class AbstractTestFromJson extends AbstractPureTestWithCoreCompi
             CoreInstance func = this.runtime.getFunction("go():Any[*]");
             this.functionExecution.start(func, FastList.<CoreInstance>newList());
 
-            Assert.fail("Expected exception evaluating: \n" + source);
+            Assertions.fail("Expected exception evaluating: \n" + source);
         }
         catch (PureExecutionException e)
         {
@@ -910,9 +918,9 @@ public abstract class AbstractTestFromJson extends AbstractPureTestWithCoreCompi
         int recursiveDepth = 2;
         for (int i = 0; i < recursiveDepth - 1; i++)
         {
-            json = String.format(json, recursivePattern);
+            json = json.formatted(recursivePattern);
         }
-        json = String.format(json, basePattern);
+        json = json.formatted(basePattern);
 
 
         String foo = "import meta::json::*;\n" +
@@ -1048,9 +1056,11 @@ public abstract class AbstractTestFromJson extends AbstractPureTestWithCoreCompi
         String[] rawAssociationSource = {
                 "import meta::json::*;",
                 "import meta::pure::functions::json::tests::*;",
-                "Class meta::pure::functions::json::tests::Parent {" +
-                        "   a : A[2];" +
-                        "}",
+                """
+                Class meta::pure::functions::json::tests::Parent {\
+                   a : A[2];\
+                }\
+                """,
                 "Class meta::pure::functions::json::tests::A {}",
                 "Class meta::pure::functions::json::tests::B extends A ",
                 "{",
@@ -1105,9 +1115,11 @@ public abstract class AbstractTestFromJson extends AbstractPureTestWithCoreCompi
         String[] rawSource = {
                 "import meta::json::*;",
                 "import meta::pure::functions::json::tests::*;",
-                "Class meta::pure::functions::json::tests::Parent {" +
-                        "   a : A[1];" +
-                        "}",
+                """
+                Class meta::pure::functions::json::tests::Parent {\
+                   a : A[1];\
+                }\
+                """,
                 "Class meta::pure::functions::json::tests::A {}",
                 "Class meta::pure::functions::json::tests::B extends A {}",
                 "function go():Any[*]",
@@ -1142,7 +1154,7 @@ public abstract class AbstractTestFromJson extends AbstractPureTestWithCoreCompi
             CoreInstance func = this.runtime.getFunction("go():Any[*]");
             this.functionExecution.start(func, FastList.<CoreInstance>newList());
 
-            Assert.fail("Expected exception evaluating: \n" + source);
+            Assertions.fail("Expected exception evaluating: \n" + source);
         }
         catch (PureExecutionException e)
         {
@@ -1226,7 +1238,7 @@ public abstract class AbstractTestFromJson extends AbstractPureTestWithCoreCompi
             CoreInstance func = this.runtime.getFunction("go():Any[*]");
             this.functionExecution.start(func, FastList.<CoreInstance>newList());
 
-            Assert.fail("Expected exception evaluating: \n" + source);
+            Assertions.fail("Expected exception evaluating: \n" + source);
         }
         catch (PureExecutionException e)
         {
@@ -1252,7 +1264,7 @@ public abstract class AbstractTestFromJson extends AbstractPureTestWithCoreCompi
             CoreInstance func = this.runtime.getFunction("go():Any[*]");
             this.functionExecution.start(func, FastList.<CoreInstance>newList());
 
-            Assert.fail("Expected exception evaluating: \n" + source);
+            Assertions.fail("Expected exception evaluating: \n" + source);
         }
         catch (PureExecutionException e)
         {
@@ -1266,10 +1278,12 @@ public abstract class AbstractTestFromJson extends AbstractPureTestWithCoreCompi
     {
         String[] source = {
                 "import meta::json::*;\n",
-                "Class meta::json::test::Foo" +
-                        "{" +
-                        "  name : String[1];" +
-                        "}\n",
+                """
+                Class meta::json::test::Foo\
+                {\
+                  name : String[1];\
+                }
+                """,
                 "function go():Any[*]\n",
                 "{\n",
                 "'{\"_type\":\"z\",\"name\":\"bla\"}'->fromJson(meta::json::test::Foo, ^meta::json::JSONDeserializationConfig(failOnUnknownProperties=true, typeKeyName='_type', typeLookup = [pair('z','meta::json::test::Foo')]));\n",
@@ -1286,12 +1300,14 @@ public abstract class AbstractTestFromJson extends AbstractPureTestWithCoreCompi
     public void testDeserializeUnitInstanceAsClassProperty()
     {
         String massDefinition =
-                "Measure pkg::Mass\n" +
-                        "{\n" +
-                        "   *Gram: x -> $x;\n" +
-                        "   Kilogram: x -> $x*1000;\n" +
-                        "   Pound: x -> $x*453.59;\n" +
-                        "}";
+                """
+                Measure pkg::Mass
+                {
+                   *Gram: x -> $x;
+                   Kilogram: x -> $x*1000;
+                   Pound: x -> $x*453.59;
+                }\
+                """;
 
         this.compileTestSource("fromString.pure",
                 "import pkg::*;\n" +
@@ -1308,20 +1324,22 @@ public abstract class AbstractTestFromJson extends AbstractPureTestWithCoreCompi
 
         CoreInstance func = this.runtime.getFunction("testUnitToJson():Any[*]");
         CoreInstance result = this.functionExecution.start(func, FastList.<CoreInstance>newList());
-        Assert.assertTrue("Mass~Kilogram".equals(GenericType.print(result.getValueForMetaPropertyToOne("genericType"), this.processorSupport)));
-        Assert.assertEquals("5.5", result.getValueForMetaPropertyToOne("values").getValueForMetaPropertyToOne("values").getName());
+        Assertions.assertTrue("Mass~Kilogram".equals(GenericType.print(result.getValueForMetaPropertyToOne("genericType"), this.processorSupport)));
+        Assertions.assertEquals("5.5", result.getValueForMetaPropertyToOne("values").getValueForMetaPropertyToOne("values").getName());
     }
 
     @Test
     public void testDeserializeUnitInstanceAsClassPropertyMany()
     {
         String massDefinition =
-                "Measure pkg::Mass\n" +
-                        "{\n" +
-                        "   *Gram: x -> $x;\n" +
-                        "   Kilogram: x -> $x*1000;\n" +
-                        "   Pound: x -> $x*453.59;\n" +
-                        "}";
+                """
+                Measure pkg::Mass
+                {
+                   *Gram: x -> $x;
+                   Kilogram: x -> $x*1000;
+                   Pound: x -> $x*453.59;
+                }\
+                """;
 
         this.compileTestSource("fromString.pure",
                 "import pkg::*;\n" +
@@ -1338,20 +1356,22 @@ public abstract class AbstractTestFromJson extends AbstractPureTestWithCoreCompi
 
         CoreInstance func = this.runtime.getFunction("testUnitToJson():Any[*]");
         CoreInstance result = this.functionExecution.start(func, FastList.<CoreInstance>newList());
-        Assert.assertTrue("Mass~Kilogram".equals(GenericType.print(result.getValueForMetaPropertyToOne("genericType"), this.processorSupport)));
-        Assert.assertEquals("5", result.getValueForMetaPropertyToOne("values").getValueForMetaPropertyToOne("values").getName());
+        Assertions.assertTrue("Mass~Kilogram".equals(GenericType.print(result.getValueForMetaPropertyToOne("genericType"), this.processorSupport)));
+        Assertions.assertEquals("5", result.getValueForMetaPropertyToOne("values").getValueForMetaPropertyToOne("values").getName());
     }
 
     @Test
     public void testDeserializeUnitInstanceAsSuperTypeProperty()
     {
         String massDefinition =
-                "Measure pkg::Mass\n" +
-                        "{\n" +
-                        "   *Gram: x -> $x;\n" +
-                        "   Kilogram: x -> $x*1000;\n" +
-                        "   Pound: x -> $x*453.59;\n" +
-                        "}";
+                """
+                Measure pkg::Mass
+                {
+                   *Gram: x -> $x;
+                   Kilogram: x -> $x*1000;
+                   Pound: x -> $x*453.59;
+                }\
+                """;
 
         this.compileTestSource("fromString.pure",
                 "import pkg::*;\n" +
@@ -1368,20 +1388,22 @@ public abstract class AbstractTestFromJson extends AbstractPureTestWithCoreCompi
 
         CoreInstance func = this.runtime.getFunction("testUnitToJson():Any[*]");
         CoreInstance result = this.functionExecution.start(func, FastList.<CoreInstance>newList());
-        Assert.assertTrue("Mass~Kilogram".equals(GenericType.print(result.getValueForMetaPropertyToOne("genericType"), this.processorSupport)));
-        Assert.assertEquals("5.5", result.getValueForMetaPropertyToOne("values").getValueForMetaPropertyToOne("values").getName());
+        Assertions.assertTrue("Mass~Kilogram".equals(GenericType.print(result.getValueForMetaPropertyToOne("genericType"), this.processorSupport)));
+        Assertions.assertEquals("5.5", result.getValueForMetaPropertyToOne("values").getValueForMetaPropertyToOne("values").getName());
     }
 
     @Test
     public void testDeserializeClassWithOptionalUnitPropertyNotRemoved()
     {
         String massDefinition =
-                "Measure pkg::Mass\n" +
-                        "{\n" +
-                        "   *Gram: x -> $x;\n" +
-                        "   Kilogram: x -> $x*1000;\n" +
-                        "   Pound: x -> $x*453.59;\n" +
-                        "}";
+                """
+                Measure pkg::Mass
+                {
+                   *Gram: x -> $x;
+                   Kilogram: x -> $x*1000;
+                   Pound: x -> $x*453.59;
+                }\
+                """;
 
         this.compileTestSource("fromString.pure",
                 "import pkg::*;\n" +
@@ -1399,20 +1421,22 @@ public abstract class AbstractTestFromJson extends AbstractPureTestWithCoreCompi
 
         CoreInstance funcTwo = this.runtime.getFunction("testUnitToJsonWithType():Any[*]");
         CoreInstance resultTwo = this.functionExecution.start(funcTwo, FastList.<CoreInstance>newList());
-        Assert.assertTrue("Mass~Kilogram".equals(GenericType.print(resultTwo.getValueForMetaPropertyToOne("genericType"), this.processorSupport)));
-        Assert.assertEquals("5.5", resultTwo.getValueForMetaPropertyToOne("values").getValueForMetaPropertyToOne("values").getName());
+        Assertions.assertTrue("Mass~Kilogram".equals(GenericType.print(resultTwo.getValueForMetaPropertyToOne("genericType"), this.processorSupport)));
+        Assertions.assertEquals("5.5", resultTwo.getValueForMetaPropertyToOne("values").getValueForMetaPropertyToOne("values").getName());
     }
 
     @Test
     public void testDeserializeWrongUnitTypeInJsonThrowsError()
     {
         String massDefinition =
-                "Measure pkg::Mass\n" +
-                        "{\n" +
-                        "   *Gram: x -> $x;\n" +
-                        "   Kilogram: x -> $x*1000;\n" +
-                        "   Pound: x -> $x*453.59;\n" +
-                        "}";
+                """
+                Measure pkg::Mass
+                {
+                   *Gram: x -> $x;
+                   Kilogram: x -> $x*1000;
+                   Pound: x -> $x*453.59;
+                }\
+                """;
 
        String testSourceStr = "import pkg::*;\n" +
                         massDefinition +
@@ -1432,12 +1456,14 @@ public abstract class AbstractTestFromJson extends AbstractPureTestWithCoreCompi
             CoreInstance func = this.runtime.getFunction("testUnitToJsonWithType():Any[*]");
             this.functionExecution.start(func, FastList.<CoreInstance>newList());
 
-            Assert.fail("Expected exception evaluating: \n" + testSourceStr);
+            Assertions.fail("Expected exception evaluating: \n" + testSourceStr);
         }
         catch (PureExecutionException e)
         {
-            this.assertException(e, "Error populating property 'myWeight' on class 'A': \n" +
-                    "Could not create new instance of Unit");
+            this.assertException(e, """
+                    Error populating property 'myWeight' on class 'A':\s
+                    Could not create new instance of Unit\
+                    """);
         }
     }
 
@@ -1445,12 +1471,14 @@ public abstract class AbstractTestFromJson extends AbstractPureTestWithCoreCompi
     public void testDeserializeWrongUnitValueTypeInJsonThrowsError()
     {
         String massDefinition =
-                "Measure pkg::Mass\n" +
-                        "{\n" +
-                        "   *Gram: x -> $x;\n" +
-                        "   Kilogram: x -> $x*1000;\n" +
-                        "   Pound: x -> $x*453.59;\n" +
-                        "}";
+                """
+                Measure pkg::Mass
+                {
+                   *Gram: x -> $x;
+                   Kilogram: x -> $x*1000;
+                   Pound: x -> $x*453.59;
+                }\
+                """;
 
         String testSourceStr = "import pkg::*;\n" +
                 massDefinition +
@@ -1470,12 +1498,14 @@ public abstract class AbstractTestFromJson extends AbstractPureTestWithCoreCompi
             CoreInstance func = this.runtime.getFunction("testUnitToJsonWithType():Any[*]");
             this.functionExecution.start(func, FastList.<CoreInstance>newList());
 
-            Assert.fail("Expected exception evaluating: \n" + testSourceStr);
+            Assertions.fail("Expected exception evaluating: \n" + testSourceStr);
         }
         catch (PureExecutionException e)
         {
-            this.assertException(e, "Error populating property 'myWeight' on class 'A': \n" +
-                    "Value from unitValue field must be of Number type, getting java.lang.String type instead.");
+            this.assertException(e, """
+                    Error populating property 'myWeight' on class 'A':\s
+                    Value from unitValue field must be of Number type, getting java.lang.String type instead.\
+                    """);
         }
     }
 
@@ -1483,12 +1513,14 @@ public abstract class AbstractTestFromJson extends AbstractPureTestWithCoreCompi
     public void testDeserializeNonOneExponentInJsonThrowsError()
     {
         String massDefinition =
-                "Measure pkg::Mass\n" +
-                        "{\n" +
-                        "   *Gram: x -> $x;\n" +
-                        "   Kilogram: x -> $x*1000;\n" +
-                        "   Pound: x -> $x*453.59;\n" +
-                        "}";
+                """
+                Measure pkg::Mass
+                {
+                   *Gram: x -> $x;
+                   Kilogram: x -> $x*1000;
+                   Pound: x -> $x*453.59;
+                }\
+                """;
 
         String testSourceStr = "import pkg::*;\n" +
                 massDefinition +
@@ -1507,12 +1539,14 @@ public abstract class AbstractTestFromJson extends AbstractPureTestWithCoreCompi
             CoreInstance func = this.runtime.getFunction("testUnitToJsonWithType():Any[*]");
             this.functionExecution.start(func, FastList.<CoreInstance>newList());
 
-            Assert.fail("Expected exception evaluating: \n" + testSourceStr);
+            Assertions.fail("Expected exception evaluating: \n" + testSourceStr);
         }
         catch (PureExecutionException e)
         {
-            this.assertException(e, "Error populating property 'myWeight' on class 'A': \n" +
-                    "Currently non-one exponent for unit is not supported. Got: 3.");
+            this.assertException(e, """
+                    Error populating property 'myWeight' on class 'A':\s
+                    Currently non-one exponent for unit is not supported. Got: 3.\
+                    """);
         }
     }
 
@@ -1520,12 +1554,14 @@ public abstract class AbstractTestFromJson extends AbstractPureTestWithCoreCompi
     public void testDeserializeCompositeJsonResultThrowsError()
     {
         String massDefinition =
-                "Measure pkg::Mass\n" +
-                        "{\n" +
-                        "   *Gram: x -> $x;\n" +
-                        "   Kilogram: x -> $x*1000;\n" +
-                        "   Pound: x -> $x*453.59;\n" +
-                        "}";
+                """
+                Measure pkg::Mass
+                {
+                   *Gram: x -> $x;
+                   Kilogram: x -> $x*1000;
+                   Pound: x -> $x*453.59;
+                }\
+                """;
 
         String testSourceStr = "import pkg::*;\n" +
                 massDefinition +
@@ -1544,12 +1580,14 @@ public abstract class AbstractTestFromJson extends AbstractPureTestWithCoreCompi
             CoreInstance func = this.runtime.getFunction("testUnitToJsonWithType():Any[*]");
             this.functionExecution.start(func, FastList.<CoreInstance>newList());
 
-            Assert.fail("Expected exception evaluating: \n" + testSourceStr);
+            Assertions.fail("Expected exception evaluating: \n" + testSourceStr);
         }
         catch (PureExecutionException e)
         {
-            this.assertException(e, "Error populating property 'myWeight' on class 'A': \n" +
-                    "Currently composite units are not supported.");
+            this.assertException(e, """
+                    Error populating property 'myWeight' on class 'A':\s
+                    Currently composite units are not supported.\
+                    """);
         }
     }
 }

@@ -58,7 +58,7 @@ public class InstanceValueValidator implements MatchRunner<InstanceValue>
     {
         for (CoreInstance value : values)
         {
-            Multiplicity multiplicity = value instanceof ValueSpecification ? ((ValueSpecification)value)._multiplicity() : null;
+            Multiplicity multiplicity = value instanceof ValueSpecification vs ? vs._multiplicity() : null;
             if ((multiplicity != null) && !org.finos.legend.pure.m3.navigation.multiplicity.Multiplicity.isToOne(multiplicity, true))
             {
                 StringBuilder message = new StringBuilder("Required multiplicity: 1, found: ");

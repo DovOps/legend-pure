@@ -18,8 +18,8 @@ import org.finos.legend.pure.m3.navigation.Instance;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
 import org.finos.legend.pure.m4.exception.PureCompilationException;
 import org.finos.legend.pure.m4.serialization.grammar.antlr.PureParserException;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class TestNameSpaces extends AbstractPureRelationalTestWithCoreCompiled
 {
@@ -27,18 +27,22 @@ public class TestNameSpaces extends AbstractPureRelationalTestWithCoreCompiled
     public void testDatabaseNameConflict()
     {
         compileTestSource("db1.pure",
-                "###Relational\n" +
-                        "Database test::MyDB ()");
+                """
+                ###Relational
+                Database test::MyDB ()\
+                """);
         CoreInstance myDB = runtime.getCoreInstance("test::MyDB");
-        Assert.assertNotNull(myDB);
-        Assert.assertTrue(Instance.instanceOf(myDB, M2RelationalPaths.Database, processorSupport));
+        Assertions.assertNotNull(myDB);
+        Assertions.assertTrue(Instance.instanceOf(myDB, M2RelationalPaths.Database, processorSupport));
 
         try
         {
             compileTestSource("db2.pure",
-                    "###Relational\n" +
-                            "Database test::MyDB ()");
-            Assert.fail("Expected compilation error");
+                    """
+                    ###Relational
+                    Database test::MyDB ()\
+                    """);
+            Assertions.fail("Expected compilation error");
         }
         catch (Exception e)
         {
@@ -52,13 +56,15 @@ public class TestNameSpaces extends AbstractPureRelationalTestWithCoreCompiled
         try
         {
             compileTestSource("/test/testDB.pure",
-                    "###Relational\n" +
-                            "\n" +
-                            "Database test::MyTestDB\n" +
-                            "(\n" +
-                            "  Table T1 (col1 INT, col2 VARCHAR(32), col1 INT)\n" +
-                            ")");
-            Assert.fail("Expected compilation exception");
+                    """
+                    ###Relational
+                    
+                    Database test::MyTestDB
+                    (
+                      Table T1 (col1 INT, col2 VARCHAR(32), col1 INT)
+                    )\
+                    """);
+            Assertions.fail("Expected compilation exception");
         }
         catch (Exception e)
         {

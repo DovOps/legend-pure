@@ -46,7 +46,7 @@ public class DateWithSubsecond extends AbstractDateWithSubsecond
     {
         GregorianCalendar calendar = new GregorianCalendar(DateFunctions.GMT_TIME_ZONE);
         calendar.setTime(timestamp);
-        String subsecond = String.format("%09d", timestamp.getNanos());
+        String subsecond = "%09d".formatted(timestamp.getNanos());
         return new DateWithSubsecond(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), calendar.get(Calendar.SECOND), subsecond);
     }
 
@@ -65,7 +65,7 @@ public class DateWithSubsecond extends AbstractDateWithSubsecond
         {
             return null;
         }
-        String string = String.format("%09d", time.getNano());
+        String string = "%09d".formatted(time.getNano());
         return (subsecondPrecision == 9) ? string : string.substring(0, subsecondPrecision);
     }
 }

@@ -125,50 +125,49 @@ public class FromJson extends NativeFunction
 
     private CoreInstance convertValue(String key, Object value, ProcessorSupport processorSupport, SourceInformation sourceInfo)
     {
-        if (value instanceof String)
+        if (value instanceof String string)
         {
-            return this.repository.newStringCoreInstance((String) value);
+            return this.repository.newStringCoreInstance(string);
         }
-        if (value instanceof Boolean)
+        if (value instanceof Boolean boolean1)
         {
-            return this.repository.newBooleanCoreInstance((Boolean) value);
+            return this.repository.newBooleanCoreInstance(boolean1);
         }
-        if (value instanceof Integer)
+        if (value instanceof Integer integer)
         {
-            this.repository.newIntegerCoreInstance((Integer) value);
+            this.repository.newIntegerCoreInstance(integer);
         }
-        if (value instanceof Long)
+        if (value instanceof Long long1)
         {
-            return this.repository.newIntegerCoreInstance((Long) value);
+            return this.repository.newIntegerCoreInstance(long1);
         }
-        if (value instanceof BigDecimal)
+        if (value instanceof BigDecimal decimal)
         {
-            return this.repository.newDecimalCoreInstance((BigDecimal) value);
+            return this.repository.newDecimalCoreInstance(decimal);
         }
-        if (value instanceof Double)
+        if (value instanceof Double double1)
         {
-            return this.repository.newFloatCoreInstance(BigDecimal.valueOf((Double) value));
+            return this.repository.newFloatCoreInstance(BigDecimal.valueOf(double1));
         }
         if (value instanceof Number)
         {
             this.repository.newFloatCoreInstance(new BigDecimal(value.toString()));
         }
-        if (value instanceof PureDate)
+        if (value instanceof PureDate date)
         {
-            return this.repository.newDateCoreInstance((PureDate) value);
+            return this.repository.newDateCoreInstance(date);
         }
-        if (value instanceof InstanceValue)
+        if (value instanceof InstanceValue asInstanceValue)
         {
-            InstanceValue asInstanceValue = (InstanceValue) value;
             if (Measure.isUnitOrMeasureInstance(asInstanceValue, processorSupport))
             {
                 return asInstanceValue;
             }
             return (CoreInstance) asInstanceValue._values().getFirst();
         }
-        if (value instanceof EnumInstance)
+        if (value instanceof EnumInstance instance)
         {
-            return (CoreInstance) value;
+            return instance;
         }
         throw new PureExecutionException(sourceInfo, "Unknown type from output of JsonDeserializer for property: " + key);
     }

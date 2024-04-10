@@ -86,9 +86,9 @@ public class StringEscape
 
     private static Writer asWriter(Appendable appendable)
     {
-        if (appendable instanceof Writer)
+        if (appendable instanceof Writer writer)
         {
-            return (Writer) appendable;
+            return writer;
         }
 
         return new Writer()
@@ -140,9 +140,9 @@ public class StringEscape
             @Override
             public void flush() throws IOException
             {
-                if (appendable instanceof Flushable)
+                if (appendable instanceof Flushable flushable)
                 {
-                    ((Flushable) appendable).flush();
+                    flushable.flush();
                 }
             }
             

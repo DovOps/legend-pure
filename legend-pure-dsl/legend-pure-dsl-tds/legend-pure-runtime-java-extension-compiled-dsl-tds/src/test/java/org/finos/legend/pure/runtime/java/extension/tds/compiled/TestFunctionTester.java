@@ -18,18 +18,19 @@ import org.finos.legend.pure.m3.execution.FunctionExecution;
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
 import org.finos.legend.pure.m3.tests.function.base.PureExpressionTest;
 import org.finos.legend.pure.runtime.java.compiled.execution.FunctionExecutionCompiledBuilder;
-import org.junit.After;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestFunctionTester extends PureExpressionTest
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         AbstractPureTestWithCoreCompiled.setUpRuntime(getFunctionExecution());
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         AbstractPureTestWithCoreCompiled.runtime.delete("fromString.pure");
@@ -40,14 +41,16 @@ public class TestFunctionTester extends PureExpressionTest
         return new FunctionExecutionCompiledBuilder().build();
     }
 
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testFunction()
     {
         AbstractPureTestWithCoreCompiled.compileTestSource("fromString.pure",
-                                "function test():Any[*]\n" +
-                                        "{" +
-                                        " meta::pure::metamodel::relation::stringToTDS('a\\n1');" +
-                                        "}");
+                                """
+                                function test():Any[*]
+                                {\
+                                 meta::pure::metamodel::relation::stringToTDS('a\\n1');\
+                                }\
+                                """);
         this.execute("test():Any[*]");
         AbstractPureTestWithCoreCompiled.runtime.delete("fromString.pure");
     }

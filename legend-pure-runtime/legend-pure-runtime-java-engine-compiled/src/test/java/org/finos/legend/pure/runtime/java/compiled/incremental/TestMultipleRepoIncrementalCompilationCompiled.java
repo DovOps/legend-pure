@@ -24,11 +24,11 @@ import org.finos.legend.pure.runtime.java.compiled.CompiledMetadataStateVerifier
 import org.finos.legend.pure.runtime.java.compiled.execution.FunctionExecutionCompiledBuilder;
 import org.finos.legend.pure.runtime.java.compiled.factory.JavaModelFactoryRegistryLoader;
 import org.finos.legend.pure.runtime.java.compiled.statelistener.PrintJavaCompilerEventObserver;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.BeforeAll;
 
 public class TestMultipleRepoIncrementalCompilationCompiled extends TestMultipleRepoIncrementalCompilation
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getFunctionExecution(), getCodeStorage(), JavaModelFactoryRegistryLoader.loader());

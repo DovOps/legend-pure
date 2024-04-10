@@ -55,29 +55,29 @@ class RelationalOperationElementProcessor
 
     static void processColumnExpr(RelationalOperationElement impl, CoreInstance implementation, CoreInstance mappingOwner, MutableSet<TableAlias> tableAliases, Matcher matcher, ProcessorState state, ModelRepository repository, ProcessorSupport processorSupport) throws PureCompilationException
     {
-        if (impl instanceof TableAliasColumn)
+        if (impl instanceof TableAliasColumn column)
         {
-            processTableAliasColumn((TableAliasColumn)impl, mappingOwner, tableAliases, processorSupport);
+            processTableAliasColumn(column, mappingOwner, tableAliases, processorSupport);
         }
-        else if (impl instanceof DynaFunction)
+        else if (impl instanceof DynaFunction function)
         {
-            processDynaFunction((DynaFunction)impl, implementation, mappingOwner, tableAliases, matcher, state, repository, processorSupport);
+            processDynaFunction(function, implementation, mappingOwner, tableAliases, matcher, state, repository, processorSupport);
         }
-        else if (impl instanceof RelationalOperationElementWithJoin)
+        else if (impl instanceof RelationalOperationElementWithJoin join)
         {
-            RelationalOperationElement relationalOperationElement = ((RelationalOperationElementWithJoin)impl)._relationalOperationElement();
+            RelationalOperationElement relationalOperationElement = join._relationalOperationElement();
             if (relationalOperationElement != null)
             {
-                if (relationalOperationElement instanceof DynaFunction)
+                if (relationalOperationElement instanceof DynaFunction function)
                 {
-                    processDynaFunction((DynaFunction)relationalOperationElement, implementation, mappingOwner, tableAliases, matcher, state, repository, processorSupport);
+                    processDynaFunction(function, implementation, mappingOwner, tableAliases, matcher, state, repository, processorSupport);
                 }
-                else if (relationalOperationElement instanceof TableAliasColumn)
+                else if (relationalOperationElement instanceof TableAliasColumn column)
                 {
-                    processTableAliasColumn((TableAliasColumn)relationalOperationElement, mappingOwner, tableAliases, processorSupport);
+                    processTableAliasColumn(column, mappingOwner, tableAliases, processorSupport);
                 }
             }
-            JoinTreeNode joinTreeNode = ((RelationalOperationElementWithJoin)impl)._joinTreeNode();
+            JoinTreeNode joinTreeNode = join._joinTreeNode();
             if (joinTreeNode != null)
             {
                 processJoinTreeNode(joinTreeNode, mappingOwner, matcher, state, repository, processorSupport);
@@ -96,30 +96,30 @@ class RelationalOperationElementProcessor
 
     static void populateColumnExpressionReferenceUsages(CoreInstance columnExpression, ModelRepository repository, ProcessorSupport processorSupport)
     {
-        if (columnExpression instanceof TableAliasColumn)
+        if (columnExpression instanceof TableAliasColumn column)
         {
-            populateTableAliasColumnReferenceUsages((TableAliasColumn)columnExpression, repository, processorSupport);
+            populateTableAliasColumnReferenceUsages(column, repository, processorSupport);
         }
-        else if (columnExpression instanceof DynaFunction)
+        else if (columnExpression instanceof DynaFunction function)
         {
-            populateDynaFunctionReferenceUsages((DynaFunction)columnExpression, repository, processorSupport);
+            populateDynaFunctionReferenceUsages(function, repository, processorSupport);
         }
-        else if (columnExpression instanceof RelationalOperationElementWithJoin)
+        else if (columnExpression instanceof RelationalOperationElementWithJoin join)
         {
-            RelationalOperationElement relationalOperationElement = ((RelationalOperationElementWithJoin)columnExpression)._relationalOperationElement();
+            RelationalOperationElement relationalOperationElement = join._relationalOperationElement();
             if (relationalOperationElement != null)
             {
-                if (relationalOperationElement instanceof DynaFunction)
+                if (relationalOperationElement instanceof DynaFunction function)
                 {
-                    populateDynaFunctionReferenceUsages((DynaFunction)relationalOperationElement, repository, processorSupport);
+                    populateDynaFunctionReferenceUsages(function, repository, processorSupport);
                 }
-                else if (relationalOperationElement instanceof TableAliasColumn)
+                else if (relationalOperationElement instanceof TableAliasColumn column)
                 {
-                    populateTableAliasColumnReferenceUsages((TableAliasColumn)relationalOperationElement, repository, processorSupport);
+                    populateTableAliasColumnReferenceUsages(column, repository, processorSupport);
                 }
             }
 
-            JoinTreeNode joinTreeNode = ((RelationalOperationElementWithJoin)columnExpression)._joinTreeNode();
+            JoinTreeNode joinTreeNode = join._joinTreeNode();
             if (joinTreeNode != null)
             {
                 populateJoinTreeNodeReferenceUsages(joinTreeNode, repository, processorSupport);
@@ -167,17 +167,17 @@ class RelationalOperationElementProcessor
 
     static void collectJoinTreeNodes(Collection<? super JoinTreeNode> targetCollection, CoreInstance implementation)
     {
-        if (implementation instanceof RelationalOperationElementWithJoin)
+        if (implementation instanceof RelationalOperationElementWithJoin join)
         {
-            JoinTreeNode joinTreeNode = ((RelationalOperationElementWithJoin)implementation)._joinTreeNode();
+            JoinTreeNode joinTreeNode = join._joinTreeNode();
             if (joinTreeNode != null)
             {
                 targetCollection.add(joinTreeNode);
             }
         }
-        else if (implementation instanceof DynaFunction)
+        else if (implementation instanceof DynaFunction function)
         {
-            for (RelationalOperationElement param : ((DynaFunction)implementation)._parameters())
+            for (RelationalOperationElement param : function._parameters())
             {
                 collectJoinTreeNodes(targetCollection, param);
             }

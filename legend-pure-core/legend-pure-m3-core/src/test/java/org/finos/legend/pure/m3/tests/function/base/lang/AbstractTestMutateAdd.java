@@ -17,8 +17,8 @@ package org.finos.legend.pure.m3.tests.function.base.lang;
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
 import org.finos.legend.pure.m3.tools.ThrowableTools;
 import org.finos.legend.pure.m4.exception.PureException;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public abstract class AbstractTestMutateAdd extends AbstractPureTestWithCoreCompiled
 {
@@ -27,14 +27,16 @@ public abstract class AbstractTestMutateAdd extends AbstractPureTestWithCoreComp
     {
         try
         {
-            this.compileTestSource("Class SimpleClass{att:String[*];}\n"
-                    + "function test():Any[*]\n"
-                    + "{\n"
-                    + "  let sc = ^SimpleClass();\n"
-                    + "  $sc->mutateAdd('nonExistingAttribute', [42, 1]);"
-                    + "}");
+            this.compileTestSource("""
+                    Class SimpleClass{att:String[*];}
+                    function test():Any[*]
+                    {
+                      let sc = ^SimpleClass();
+                      $sc->mutateAdd('nonExistingAttribute', [42, 1]);\
+                    }\
+                    """);
             this.execute("test():Any[*]");
-            Assert.fail("Expected cast error");
+            Assertions.fail("Expected cast error");
         }
         catch (Exception e)
         {

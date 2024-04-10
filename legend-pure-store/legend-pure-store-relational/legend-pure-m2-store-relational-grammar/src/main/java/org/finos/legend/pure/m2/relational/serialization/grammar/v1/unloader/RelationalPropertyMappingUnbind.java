@@ -40,9 +40,8 @@ public class RelationalPropertyMappingUnbind
             {
                 MilestoningPropertyMappingUnbind.unbindMilestoningPropertyMapping((RelationalInstanceSetImplementation)relationalInstanceSetImplementation, processorSupport);
             }
-            else if (propertyMapping instanceof EmbeddedRelationalInstanceSetImplementation)
+            else if (propertyMapping instanceof EmbeddedRelationalInstanceSetImplementation embeddedRelationalInstanceSetImplementation)
             {
-                EmbeddedRelationalInstanceSetImplementation embeddedRelationalInstanceSetImplementation = (EmbeddedRelationalInstanceSetImplementation)propertyMapping;
                 embeddedRelationalInstanceSetImplementation._sourceSetImplementationIdRemove();
                 cleanPropertyMappings(embeddedRelationalInstanceSetImplementation, repository, processorSupport, mappingImportStub);
                 CoreInstance _class = embeddedRelationalInstanceSetImplementation._classCoreInstance();
@@ -55,24 +54,24 @@ public class RelationalPropertyMappingUnbind
                 {
                     RelationalOperationElementUnbind.cleanNode(pk, repository, processorSupport);
                 }
-                if (embeddedRelationalInstanceSetImplementation instanceof OtherwiseEmbeddedRelationalInstanceSetImplementation)
+                if (embeddedRelationalInstanceSetImplementation instanceof OtherwiseEmbeddedRelationalInstanceSetImplementation implementation)
                 {
-                    PropertyMapping otherwiseMapping = ((OtherwiseEmbeddedRelationalInstanceSetImplementation)embeddedRelationalInstanceSetImplementation)._otherwisePropertyMapping();
+                    PropertyMapping otherwiseMapping = implementation._otherwisePropertyMapping();
                     otherwiseMapping._sourceSetImplementationIdRemove();
-                    RelationalOperationElement val = otherwiseMapping instanceof RelationalPropertyMapping ? ((RelationalPropertyMapping)otherwiseMapping)._relationalOperationElement() : null;
+                    RelationalOperationElement val = otherwiseMapping instanceof RelationalPropertyMapping rpm ? rpm._relationalOperationElement() : null;
                     RelationalOperationElementUnbind.cleanNode(val, repository, processorSupport);
                 }
             }
             else
             {
-                GrammarInfoStub transformer = propertyMapping instanceof RelationalPropertyMapping ? (GrammarInfoStub)((RelationalPropertyMapping)propertyMapping)._transformerCoreInstance() : null;
+                GrammarInfoStub transformer = propertyMapping instanceof RelationalPropertyMapping rpm ? (GrammarInfoStub)rpm._transformerCoreInstance() : null;
                 // TODO figure out why we sometimes unbind twice (which is why we check if this has already been unbound and is a string)
                 if (transformer != null && transformer._original() != null)
                 {
                     transformer._value(transformer._original());
                     transformer._originalRemove();
                 }
-                RelationalOperationElement val = propertyMapping instanceof RelationalPropertyMapping ? ((RelationalPropertyMapping)propertyMapping)._relationalOperationElement() : null;
+                RelationalOperationElement val = propertyMapping instanceof RelationalPropertyMapping rpm ? rpm._relationalOperationElement() : null;
                 RelationalOperationElementUnbind.cleanNode(val, repository, processorSupport);
             }
         }

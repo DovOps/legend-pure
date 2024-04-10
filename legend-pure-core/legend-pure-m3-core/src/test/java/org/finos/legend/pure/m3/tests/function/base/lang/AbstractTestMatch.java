@@ -15,7 +15,7 @@
 package org.finos.legend.pure.m3.tests.function.base.lang;
 
 import org.finos.legend.pure.m3.tests.function.base.PureExpressionTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.regex.Pattern;
 
@@ -59,9 +59,11 @@ public abstract class AbstractTestMatch extends PureExpressionTest
     @Test
     public void testMatchEnum()
     {
-        compileTestSource("Enum test::Enum1 { VALUE1, VALUE2 }\n" +
-                "Enum test::Enum2 { VALUE3, VALUE4 }\n" +
-                "Enum test::Enum3 { VALUE5 }\n");
+        compileTestSource("""
+                Enum test::Enum1 { VALUE1, VALUE2 }
+                Enum test::Enum2 { VALUE3, VALUE4 }
+                Enum test::Enum3 { VALUE5 }
+                """);
         assertExpressionTrue("test::Enum1.VALUE1->match([e:test::Enum1[1] | true, e:test::Enum2[1] | false])");
         assertExpressionTrue("test::Enum1.VALUE2->match([e:test::Enum1[1] | true, e:test::Enum2[1] | false])");
         assertExpressionFalse("test::Enum2.VALUE3->match([e:test::Enum1[1] | true, e:test::Enum2[1] | false])");

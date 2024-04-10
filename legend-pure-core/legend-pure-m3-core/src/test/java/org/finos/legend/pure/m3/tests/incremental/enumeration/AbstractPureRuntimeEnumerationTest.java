@@ -17,7 +17,7 @@ package org.finos.legend.pure.m3.tests.incremental.enumeration;
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
 import org.finos.legend.pure.m3.tests.RuntimeTestScriptBuilder;
 import org.finos.legend.pure.m3.tests.RuntimeVerifier;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public abstract class AbstractPureRuntimeEnumerationTest extends AbstractPureTestWithCoreCompiled
 {
@@ -71,8 +71,10 @@ public abstract class AbstractPureRuntimeEnumerationTest extends AbstractPureTes
     public void testPureRuntimeEnumerationAsReturn() throws Exception
     {
         RuntimeVerifier.verifyOperationIsStable(new RuntimeTestScriptBuilder().createInMemorySource("sourceId.pure", "Enum myEnum{VAL1, VAL2}")
-                        .createInMemorySource("userId.pure", "function func():myEnum[1]{myEnum.VAL2}" +
-                                "function test():Any[1]{func();}")
+                        .createInMemorySource("userId.pure", """
+                                function func():myEnum[1]{myEnum.VAL2}\
+                                function test():Any[1]{func();}\
+                                """)
                         .compile(),
                 new RuntimeTestScriptBuilder()
                         .deleteSource("sourceId.pure")
@@ -86,8 +88,10 @@ public abstract class AbstractPureRuntimeEnumerationTest extends AbstractPureTes
     public void testPureRuntimeEnumerationAsReturnError() throws Exception
     {
         RuntimeVerifier.verifyOperationIsStable(new RuntimeTestScriptBuilder().createInMemorySource("sourceId.pure", "Enum test::myEnum{VAL1, VAL2}")
-                        .createInMemorySource("userId.pure", "function func():test::myEnum[1]{test::myEnum.VAL2}\n" +
-                                "function test():Any[1]{func();}")
+                        .createInMemorySource("userId.pure", """
+                                function func():test::myEnum[1]{test::myEnum.VAL2}
+                                function test():Any[1]{func();}\
+                                """)
                         .compile(),
                 new RuntimeTestScriptBuilder()
                         .deleteSource("sourceId.pure")
@@ -104,8 +108,10 @@ public abstract class AbstractPureRuntimeEnumerationTest extends AbstractPureTes
     public void testPureRuntimeEnumerationAsParameter() throws Exception
     {
         RuntimeVerifier.verifyOperationIsStable(new RuntimeTestScriptBuilder().createInMemorySource("sourceId.pure", "Enum myEnum{VAL1, VAL2}")
-                        .createInMemorySource("userId.pure", "function func(f:myEnum[1]):Boolean[1]{true}" +
-                                "function test():Any[1]{func(myEnum.VAL1);}")
+                        .createInMemorySource("userId.pure", """
+                                function func(f:myEnum[1]):Boolean[1]{true}\
+                                function test():Any[1]{func(myEnum.VAL1);}\
+                                """)
                         .compile(),
                 new RuntimeTestScriptBuilder()
                         .deleteSource("sourceId.pure")
@@ -121,8 +127,10 @@ public abstract class AbstractPureRuntimeEnumerationTest extends AbstractPureTes
     public void testPureRuntimeEnumerationAsParameterError() throws Exception
     {
         RuntimeVerifier.verifyOperationIsStable(new RuntimeTestScriptBuilder().createInMemorySource("sourceId.pure", "Enum test::myEnum{VAL1, VAL2}")
-                        .createInMemorySource("userId.pure", "function func(f:test::myEnum[1]):Boolean[1]{true}\n" +
-                                "function test():Any[1]{func(test::myEnum.VAL1);}")
+                        .createInMemorySource("userId.pure", """
+                                function func(f:test::myEnum[1]):Boolean[1]{true}
+                                function test():Any[1]{func(test::myEnum.VAL1);}\
+                                """)
                         .compile(),
                 new RuntimeTestScriptBuilder()
                         .deleteSource("sourceId.pure")
@@ -156,8 +164,10 @@ public abstract class AbstractPureRuntimeEnumerationTest extends AbstractPureTes
                 .createInMemorySource("userId.pure", "Profile testProfile{tags:[t1,t2];}")
                 .compile(),
                 new RuntimeTestScriptBuilder()
-                        .updateSource("sourceId.pure", "////Some comment\n" +
-                                "Enum myEnum{ {testProfile.t1='bb'} VAL1, VAL2}")
+                        .updateSource("sourceId.pure", """
+                                ////Some comment
+                                Enum myEnum{ {testProfile.t1='bb'} VAL1, VAL2}\
+                                """)
                         .compile(),
 
                 this.runtime, this.functionExecution, this.getAdditionalVerifiers());

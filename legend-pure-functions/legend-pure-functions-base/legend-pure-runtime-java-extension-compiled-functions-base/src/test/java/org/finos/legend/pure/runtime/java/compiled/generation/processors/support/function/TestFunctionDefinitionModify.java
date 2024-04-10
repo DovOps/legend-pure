@@ -19,13 +19,13 @@ import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
 import org.finos.legend.pure.m3.tests.function.AbstractTestFunctionDefinitionModify;
 import org.finos.legend.pure.runtime.java.compiled.execution.FunctionExecutionCompiledBuilder;
 import org.finos.legend.pure.runtime.java.compiled.factory.JavaModelFactoryRegistryLoader;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 public class TestFunctionDefinitionModify extends AbstractTestFunctionDefinitionModify
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         AbstractPureTestWithCoreCompiled.setUpRuntime(getFunctionExecution(), AbstractTestFunctionDefinitionModify.getCodeStorage(), JavaModelFactoryRegistryLoader.loader());
@@ -37,7 +37,7 @@ public class TestFunctionDefinitionModify extends AbstractTestFunctionDefinition
     }
 
     @Test
-    @Ignore(value = "Further fixes needed for clone as source information is copied over currently")
+    @Disabled(value = "Further fixes needed for clone as source information is copied over currently")
     @Override
     public void testConcreteFunctionDefinitionModifyWithCopyConstructor()
     {

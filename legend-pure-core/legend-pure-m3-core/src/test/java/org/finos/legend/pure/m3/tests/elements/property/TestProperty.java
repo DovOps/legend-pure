@@ -20,20 +20,20 @@ import org.finos.legend.pure.m3.navigation.M3Properties;
 import org.finos.legend.pure.m3.navigation.property.Property;
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiledPlatform;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestProperty extends AbstractPureTestWithCoreCompiledPlatform
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getExtra());
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("fromString.pure");
@@ -43,93 +43,97 @@ public class TestProperty extends AbstractPureTestWithCoreCompiledPlatform
     @Test
     public void testGetPath()
     {
-        compileTestSource("fromString.pure", "import test::*;\n" +
-                "Class test::A\n" +
-                "{\n" +
-                "   prop1 : String[1];\n" +
-                "   prop2 : String[0..1];\n" +
-                "}\n" +
-                "\n" +
-                "Class test::B\n" +
-                "{\n" +
-                "  prop3 : Integer[0..1];\n" +
-                "}\n" +
-                "\n" +
-                "Association test::AB\n" +
-                "{\n" +
-                "  aToB : B[*];\n" +
-                "  bToA : A[*];\n" +
-                "}\n" +
-                "\n" +
-                "Class test::subpackage::C extends A\n" +
-                "{\n" +
-                "  prop2 : String[0..1];\n" +
-                "  prop4 : String[1];\n" +
-                "}");
+        compileTestSource("fromString.pure", """
+                import test::*;
+                Class test::A
+                {
+                   prop1 : String[1];
+                   prop2 : String[0..1];
+                }
+                
+                Class test::B
+                {
+                  prop3 : Integer[0..1];
+                }
+                
+                Association test::AB
+                {
+                  aToB : B[*];
+                  bToA : A[*];
+                }
+                
+                Class test::subpackage::C extends A
+                {
+                  prop2 : String[0..1];
+                  prop4 : String[1];
+                }\
+                """);
 
         CoreInstance classA = runtime.getCoreInstance("test::A");
-        Assert.assertNotNull(classA);
+        Assertions.assertNotNull(classA);
         MapIterable<String, CoreInstance> classAProperties = processorSupport.class_getSimplePropertiesByName(classA);
-        Assert.assertEquals(Lists.immutable.with("Root", "children", "test", "children", "A", "properties", "prop1"), processorSupport.property_getPath(classAProperties.get("prop1")));
-        Assert.assertEquals(Lists.immutable.with("Root", "children", "test", "children", "A", "properties", "prop2"), processorSupport.property_getPath(classAProperties.get("prop2")));
-        Assert.assertEquals(Lists.immutable.with("Root", "children", "test", "children", "A", "propertiesFromAssociations", "aToB"), processorSupport.property_getPath(classAProperties.get("aToB")));
+        Assertions.assertEquals(Lists.immutable.with("Root", "children", "test", "children", "A", "properties", "prop1"), processorSupport.property_getPath(classAProperties.get("prop1")));
+        Assertions.assertEquals(Lists.immutable.with("Root", "children", "test", "children", "A", "properties", "prop2"), processorSupport.property_getPath(classAProperties.get("prop2")));
+        Assertions.assertEquals(Lists.immutable.with("Root", "children", "test", "children", "A", "propertiesFromAssociations", "aToB"), processorSupport.property_getPath(classAProperties.get("aToB")));
 
         CoreInstance classB = runtime.getCoreInstance("test::B");
-        Assert.assertNotNull(classB);
+        Assertions.assertNotNull(classB);
         MapIterable<String, CoreInstance> classBProperties = processorSupport.class_getSimplePropertiesByName(classB);
-        Assert.assertEquals(Lists.immutable.with("Root", "children", "test", "children", "B", "properties", "prop3"), processorSupport.property_getPath(classBProperties.get("prop3")));
-        Assert.assertEquals(Lists.immutable.with("Root", "children", "test", "children", "B", "propertiesFromAssociations", "bToA"), processorSupport.property_getPath(classBProperties.get("bToA")));
+        Assertions.assertEquals(Lists.immutable.with("Root", "children", "test", "children", "B", "properties", "prop3"), processorSupport.property_getPath(classBProperties.get("prop3")));
+        Assertions.assertEquals(Lists.immutable.with("Root", "children", "test", "children", "B", "propertiesFromAssociations", "bToA"), processorSupport.property_getPath(classBProperties.get("bToA")));
 
         CoreInstance classC = runtime.getCoreInstance("test::subpackage::C");
-        Assert.assertNotNull(classC);
+        Assertions.assertNotNull(classC);
         MapIterable<String, CoreInstance> classCProperties = processorSupport.class_getSimplePropertiesByName(classC);
-        Assert.assertEquals(Lists.immutable.with("Root", "children", "test", "children", "A", "properties", "prop1"), processorSupport.property_getPath(classCProperties.get("prop1")));
-        Assert.assertEquals(Lists.immutable.with("Root", "children", "test", "children", "subpackage", "children", "C", "properties", "prop2"), processorSupport.property_getPath(classCProperties.get("prop2")));
-        Assert.assertEquals(Lists.immutable.with("Root", "children", "test", "children", "subpackage", "children", "C", "properties", "prop4"), processorSupport.property_getPath(classCProperties.get("prop4")));
-        Assert.assertEquals(Lists.immutable.with("Root", "children", "test", "children", "A", "propertiesFromAssociations", "aToB"), processorSupport.property_getPath(classCProperties.get("aToB")));
+        Assertions.assertEquals(Lists.immutable.with("Root", "children", "test", "children", "A", "properties", "prop1"), processorSupport.property_getPath(classCProperties.get("prop1")));
+        Assertions.assertEquals(Lists.immutable.with("Root", "children", "test", "children", "subpackage", "children", "C", "properties", "prop2"), processorSupport.property_getPath(classCProperties.get("prop2")));
+        Assertions.assertEquals(Lists.immutable.with("Root", "children", "test", "children", "subpackage", "children", "C", "properties", "prop4"), processorSupport.property_getPath(classCProperties.get("prop4")));
+        Assertions.assertEquals(Lists.immutable.with("Root", "children", "test", "children", "A", "propertiesFromAssociations", "aToB"), processorSupport.property_getPath(classCProperties.get("aToB")));
     }
 
     @Test
     public void testGetSourceType()
     {
-        compileTestSource("fromString.pure", "import test::*;\n" +
-                "Class test::A\n" +
-                "{\n" +
-                "   prop1 : String[1];\n" +
-                "}\n" +
-                "\n" +
-                "Class test::B\n" +
-                "{\n" +
-                "  prop2 : Integer[0..1];\n" +
-                "}\n" +
-                "\n" +
-                "Association test::AB\n" +
-                "{\n" +
-                "  aToB : B[*];\n" +
-                "  bToA : A[*];\n" +
-                "}");
+        compileTestSource("fromString.pure", """
+                import test::*;
+                Class test::A
+                {
+                   prop1 : String[1];
+                }
+                
+                Class test::B
+                {
+                  prop2 : Integer[0..1];
+                }
+                
+                Association test::AB
+                {
+                  aToB : B[*];
+                  bToA : A[*];
+                }\
+                """);
 
         CoreInstance classA = runtime.getCoreInstance("test::A");
         CoreInstance classB = runtime.getCoreInstance("test::B");
         CoreInstance associationAB = runtime.getCoreInstance("test::AB");
 
-        Assert.assertNotNull(classA);
-        Assert.assertNotNull(classB);
-        Assert.assertNotNull(associationAB);
+        Assertions.assertNotNull(classA);
+        Assertions.assertNotNull(classB);
+        Assertions.assertNotNull(associationAB);
 
         CoreInstance prop1 = classA.getValueInValueForMetaPropertyToMany(M3Properties.properties, "prop1");
         CoreInstance prop2 = classB.getValueInValueForMetaPropertyToMany(M3Properties.properties, "prop2");
         CoreInstance aToB = associationAB.getValueInValueForMetaPropertyToMany(M3Properties.properties, "aToB");
         CoreInstance bToA = associationAB.getValueInValueForMetaPropertyToMany(M3Properties.properties, "bToA");
 
-        Assert.assertNotNull(prop1);
-        Assert.assertNotNull(prop2);
-        Assert.assertNotNull(aToB);
-        Assert.assertNotNull(bToA);
+        Assertions.assertNotNull(prop1);
+        Assertions.assertNotNull(prop2);
+        Assertions.assertNotNull(aToB);
+        Assertions.assertNotNull(bToA);
 
-        Assert.assertSame(classA, Property.getSourceType(prop1, processorSupport));
-        Assert.assertSame(classB, Property.getSourceType(prop2, processorSupport));
-        Assert.assertSame(classA, Property.getSourceType(aToB, processorSupport));
-        Assert.assertSame(classB, Property.getSourceType(bToA, processorSupport));
+        Assertions.assertSame(classA, Property.getSourceType(prop1, processorSupport));
+        Assertions.assertSame(classB, Property.getSourceType(prop2, processorSupport));
+        Assertions.assertSame(classA, Property.getSourceType(aToB, processorSupport));
+        Assertions.assertSame(classB, Property.getSourceType(bToA, processorSupport));
     }
 }

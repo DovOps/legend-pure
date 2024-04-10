@@ -184,8 +184,8 @@ public class CompiledSupport
 
     public static RichIterable<String> split(Object string, Object delimiter)
     {
-        String str = (String) ((string instanceof Iterable) ? Iterate.getFirst((Iterable<?>) string) : string);
-        String delim = (String) ((delimiter instanceof Iterable) ? Iterate.getFirst((Iterable<?>) delimiter) : delimiter);
+        String str = (String) ((string instanceof Iterable i) ? Iterate.getFirst(i) : string);
+        String delim = (String) ((delimiter instanceof Iterable i) ? Iterate.getFirst(i) : delimiter);
 
         MutableList<String> result = Lists.mutable.with();
         StringTokenizer tokenizer = new StringTokenizer(str, delim);
@@ -203,39 +203,39 @@ public class CompiledSupport
             String message = "The system is trying to get an element at offset " + offset + " where the collection is of size 0";
             throw new PureExecutionException(sourceInformation, message);
         }
-        if (list instanceof ListIterable)
+        if (list instanceof ListIterable iterable)
         {
             try
             {
-                return ((ListIterable<?>) list).get((int) offset);
+                return iterable.get((int) offset);
             }
             catch (IndexOutOfBoundsException e)
             {
-                String message = "The system is trying to get an element at offset " + offset + " where the collection is of size " + ((ListIterable<?>) list).size();
+                String message = "The system is trying to get an element at offset " + offset + " where the collection is of size " + iterable.size();
                 throw new PureExecutionException(sourceInformation, message);
             }
         }
-        if (list instanceof List)
+        if (list instanceof List list1)
         {
             try
             {
-                return ((List<?>) list).get((int) offset);
+                return list1.get((int) offset);
             }
             catch (IndexOutOfBoundsException e)
             {
-                String message = "The system is trying to get an element at offset " + offset + " where the collection is of size " + ((List<?>) list).size();
+                String message = "The system is trying to get an element at offset " + offset + " where the collection is of size " + list1.size();
                 throw new PureExecutionException(sourceInformation, message);
             }
         }
-        if (list instanceof Iterable)
+        if (list instanceof Iterable iterable)
         {
             if (offset < 0)
             {
-                String message = "The system is trying to get an element at offset " + offset + " where the collection is of size " + Iterate.sizeOf((Iterable<?>) list);
+                String message = "The system is trying to get an element at offset " + offset + " where the collection is of size " + Iterate.sizeOf(iterable);
                 throw new PureExecutionException(sourceInformation, message);
             }
             long size = 0;
-            for (Object item : (Iterable<?>) list)
+            for (Object item : iterable)
             {
                 if (size == offset)
                 {
@@ -284,14 +284,14 @@ public class CompiledSupport
         {
             return 0;
         }
-        if (object instanceof JavaCompiledCoreInstance)
+        if (object instanceof JavaCompiledCoreInstance instance)
         {
-            return ((JavaCompiledCoreInstance) object).pureHashCode();
+            return instance.pureHashCode();
         }
-        if (object instanceof Iterable)
+        if (object instanceof Iterable iterable)
         {
             int hashCode = 0;
-            for (Object item : (Iterable<?>) object)
+            for (Object item : iterable)
             {
                 hashCode = 31 * hashCode + safeHashCode(item);
             }
@@ -317,9 +317,9 @@ public class CompiledSupport
         {
             throw new PureExecutionException(sourceInformation, message != null ? message : "Cannot cast a collection of size 0 to multiplicity [1]");
         }
-        if (object instanceof RichIterable)
+        if (object instanceof RichIterable iterable)
         {
-            return toOne((RichIterable<? extends T>) object, sourceInformation);
+            return toOne(iterable, sourceInformation);
         }
         return object;
     }
@@ -341,9 +341,9 @@ public class CompiledSupport
 
     public static Object makeOne(Object object)
     {
-        if (object instanceof RichIterable)
+        if (object instanceof RichIterable iterable)
         {
-            return ((RichIterable<?>) object).getAny();
+            return iterable.getAny();
         }
         return object;
     }
@@ -375,18 +375,18 @@ public class CompiledSupport
             throw new PureExecutionException(sourceInformation, message != null ? message : "Cannot cast a collection of size 0 to multiplicity [1..*]");
         }
         // TODO remove this hack
-        if (object instanceof RichIterable)
+        if (object instanceof RichIterable iterable)
         {
-            if (((RichIterable<?>) object).isEmpty())
+            if (iterable.isEmpty())
             {
                 throw new PureExecutionException(sourceInformation, message != null ? message : "Cannot cast a collection of size 0 to multiplicity [1..*]");
             }
             return (RichIterable<T>) object;
         }
         // TODO remove this hack
-        if (object instanceof Iterable)
+        if (object instanceof Iterable iterable)
         {
-            if (Iterate.isEmpty((Iterable<?>) object))
+            if (Iterate.isEmpty(iterable))
             {
                 throw new PureExecutionException(sourceInformation, message != null ? message : "Cannot cast a collection of size 0 to multiplicity [1..*]");
             }
@@ -411,7 +411,7 @@ public class CompiledSupport
 
     public static boolean isEmpty(Object object)
     {
-        return (object == null) || ((object instanceof Iterable) && Iterate.isEmpty((Iterable<?>) object));
+        return (object == null) || ((object instanceof Iterable i) && Iterate.isEmpty(i));
     }
 
 
@@ -473,13 +473,13 @@ public class CompiledSupport
         Class<?> rightClass = right.getClass();
         if (leftClass != rightClass)
         {
-            if ((left instanceof Number) && (right instanceof Number))
+            if ((left instanceof Number number) && (right instanceof Number number))
             {
-                return compareUnmatchedNumbers((Number) left, (Number) right);
+                return compareUnmatchedNumbers(number, number);
             }
-            if ((left instanceof PureDate) && (right instanceof PureDate))
+            if ((left instanceof PureDate date) && (right instanceof PureDate date))
             {
-                return ((PureDate) left).compareTo((PureDate) right);
+                return date.compareTo(date);
             }
 
             int leftIndex = PRIMITIVE_CLASS_COMPARISON_ORDER.indexOf(leftClass);
@@ -493,9 +493,9 @@ public class CompiledSupport
             return (rightIndex == -1) ? -1 : Integer.compare(leftIndex, rightIndex);
         }
 
-        if (left instanceof Comparable)
+        if (left instanceof Comparable comparable)
         {
-            return ((Comparable<? super T>) left).compareTo(right);
+            return comparable.compareTo(right);
         }
 
         // TODO maybe do something smarter here
@@ -514,14 +514,12 @@ public class CompiledSupport
 
     private static boolean isSpecial(Number number)
     {
-        if (number instanceof Double)
+        if (number instanceof Double d)
         {
-            Double d = (Double) number;
             return d.isNaN() || d.isInfinite();
         }
-        if (number instanceof Float)
+        if (number instanceof Float f)
         {
-            Float f = (Float) number;
             return f.isNaN() || f.isInfinite();
         }
         return false;
@@ -529,13 +527,13 @@ public class CompiledSupport
 
     private static BigDecimal toBigDecimal(Number number)
     {
-        if (number instanceof BigDecimal)
+        if (number instanceof BigDecimal decimal)
         {
-            return (BigDecimal) number;
+            return decimal;
         }
-        if (number instanceof BigInteger)
+        if (number instanceof BigInteger integer)
         {
-            return new BigDecimal((BigInteger) number);
+            return new BigDecimal(integer);
         }
         if (number instanceof Byte || number instanceof Short || number instanceof Integer || number instanceof Long)
         {
@@ -588,32 +586,32 @@ public class CompiledSupport
         }
         if (list1 == null)
         {
-            return (list2 instanceof RichIterable) ? (RichIterable<?>) list2 : Lists.immutable.with(list2);
+            return (list2 instanceof RichIterable ri) ? ri : Lists.immutable.with(list2);
         }
         if (list2 == null)
         {
-            return (list1 instanceof RichIterable) ? (RichIterable<?>) list1 : Lists.immutable.with(list1);
+            return (list1 instanceof RichIterable ri) ? ri : Lists.immutable.with(list1);
         }
 
         if ((list1 instanceof LazyIterable) || (list2 instanceof LazyIterable))
         {
-            Iterable it1 = (list1 instanceof Iterable) ? (Iterable) list1 : Lists.immutable.with(list1);
-            Iterable it2 = (list2 instanceof Iterable) ? (Iterable) list2 : Lists.immutable.with(list2);
+            Iterable it1 = (list1 instanceof Iterable i) ? i : Lists.immutable.with(list1);
+            Iterable it2 = (list2 instanceof Iterable i) ? i : Lists.immutable.with(list2);
             return LazyIterate.concatenate(it1, it2);
         }
 
         MutableList<Object> result = Lists.mutable.empty();
-        if (list1 instanceof Iterable)
+        if (list1 instanceof Iterable iterable)
         {
-            result.addAllIterable((Iterable<?>) list1);
+            result.addAllIterable(iterable);
         }
         else
         {
             result.add(list1);
         }
-        if (list2 instanceof Iterable)
+        if (list2 instanceof Iterable iterable)
         {
-            result.addAllIterable((Iterable<?>) list2);
+            result.addAllIterable(iterable);
         }
         else
         {
@@ -770,13 +768,13 @@ public class CompiledSupport
         {
             return Math.abs(n.doubleValue());
         }
-        if (n instanceof BigDecimal)
+        if (n instanceof BigDecimal decimal)
         {
-            return ((BigDecimal) n).abs();
+            return decimal.abs();
         }
-        if (n instanceof BigInteger)
+        if (n instanceof BigInteger integer)
         {
-            return ((BigInteger) n).abs();
+            return integer.abs();
         }
         throw new IllegalArgumentException("Unhandled Number Type " + n);
     }
@@ -820,7 +818,7 @@ public class CompiledSupport
 
     public static String format(String formatString, Object formatArgs, BiFunction<Object, ? super ExecutionSupport, ? extends String> toRepresentationFunction, ExecutionSupport executionSupport)
     {
-        return PureStringFormat.format(formatString, (formatArgs instanceof Iterable) ? (Iterable<?>) formatArgs : Lists.immutable.with(formatArgs), toRepresentationFunction, executionSupport);
+        return PureStringFormat.format(formatString, (formatArgs instanceof Iterable i) ? i : Lists.immutable.with(formatArgs), toRepresentationFunction, executionSupport);
     }
 
     /**
@@ -910,9 +908,9 @@ public class CompiledSupport
         {
             return false;
         }
-        if (left instanceof Number)
+        if (left instanceof Number number)
         {
-            return eq((Number) left, (Number) right);
+            return eq(number, (Number) right);
         }
         if ((left instanceof String) || (left instanceof PureDate))
         {
@@ -959,18 +957,18 @@ public class CompiledSupport
         }
         if (left == null)
         {
-            return (right instanceof RichIterable) && ((RichIterable<?>) right).isEmpty();
+            return (right instanceof RichIterable ri) && ri.isEmpty();
         }
         if (right == null)
         {
-            return (left instanceof RichIterable) && ((RichIterable<?>) left).isEmpty();
+            return (left instanceof RichIterable ri) && ri.isEmpty();
         }
-        if (left instanceof LazyIterable)
+        if (left instanceof LazyIterable iterable)
         {
-            Iterator<?> leftIterator = ((Iterable<?>) left).iterator();
-            if (right instanceof Iterable)
+            Iterator<?> leftIterator = iterable.iterator();
+            if (right instanceof Iterable iterable)
             {
-                return iteratorsEqual(leftIterator, ((Iterable<?>) right).iterator());
+                return iteratorsEqual(leftIterator, iterable.iterator());
             }
             if (!leftIterator.hasNext())
             {
@@ -979,12 +977,12 @@ public class CompiledSupport
             Object leftFirst = leftIterator.next();
             return !leftIterator.hasNext() && equal(leftFirst, right);
         }
-        if (right instanceof LazyIterable)
+        if (right instanceof LazyIterable iterable)
         {
-            Iterator<?> rightIterator = ((Iterable<?>) right).iterator();
-            if (left instanceof Iterable)
+            Iterator<?> rightIterator = iterable.iterator();
+            if (left instanceof Iterable iterable)
             {
-                return iteratorsEqual(((Iterable<?>) left).iterator(), rightIterator);
+                return iteratorsEqual(iterable.iterator(), rightIterator);
             }
             if (!rightIterator.hasNext())
             {
@@ -993,34 +991,31 @@ public class CompiledSupport
             Object rightFirst = rightIterator.next();
             return !rightIterator.hasNext() && equal(left, rightFirst);
         }
-        if (left instanceof RichIterable)
+        if (left instanceof RichIterable leftList)
         {
-            RichIterable<?> leftList = (RichIterable<?>) left;
             int size = leftList.size();
-            if (right instanceof RichIterable)
+            if (right instanceof RichIterable rightList)
             {
-                RichIterable<?> rightList = (RichIterable<?>) right;
                 return (size == rightList.size()) && iteratorsEqual(leftList.iterator(), rightList.iterator());
             }
             return (size == 1) && equal(leftList.getAny(), right);
         }
-        if (right instanceof RichIterable)
+        if (right instanceof RichIterable rightList)
         {
-            RichIterable<?> rightList = (RichIterable<?>) right;
             return (rightList.size() == 1) && equal(left, rightList.getAny());
         }
         if (left instanceof Number)
         {
-            return (right instanceof Number) && eq((Number) left, (Number) right);
+            return (right instanceof Number n) && eq((Number) left, n);
         }
 
-        if (left instanceof JavaCompiledCoreInstance)
+        if (left instanceof JavaCompiledCoreInstance instance)
         {
-            return ((JavaCompiledCoreInstance) left).pureEquals(right);
+            return instance.pureEquals(right);
         }
-        if (right instanceof JavaCompiledCoreInstance)
+        if (right instanceof JavaCompiledCoreInstance instance)
         {
-            return ((JavaCompiledCoreInstance) right).pureEquals(left);
+            return instance.pureEquals(left);
         }
 
         return left.equals(right);
@@ -1114,29 +1109,29 @@ public class CompiledSupport
         {
             return "NULL";
         }
-        if (instance instanceof Boolean)
+        if (instance instanceof Boolean boolean1)
         {
-            return pureToString(((Boolean) instance).booleanValue(), es);
+            return pureToString(boolean1.booleanValue(), es);
         }
-        if (instance instanceof Number)
+        if (instance instanceof Number number)
         {
-            return pureToString((Number) instance, es);
+            return pureToString(number, es);
         }
-        if (instance instanceof PureDate)
+        if (instance instanceof PureDate date)
         {
-            return pureToString((PureDate) instance, es);
+            return pureToString(date, es);
         }
-        if (instance instanceof String)
+        if (instance instanceof String string)
         {
-            return pureToString((String) instance, es);
+            return pureToString(string, es);
         }
-        if (instance instanceof ReflectiveCoreInstance)
+        if (instance instanceof ReflectiveCoreInstance coreInstance)
         {
-            return ((ReflectiveCoreInstance) instance).toString(es);
+            return coreInstance.toString(es);
         }
-        if (instance instanceof BaseCoreInstance)
+        if (instance instanceof BaseCoreInstance coreInstance)
         {
-            String id = ((BaseCoreInstance) instance).getName();
+            String id = coreInstance.getName();
             return ModelRepository.possiblyReplaceAnonymousId(id);
         }
 
@@ -1211,9 +1206,9 @@ public class CompiledSupport
         {
             return primitiveToString(value.doubleValue());
         }
-        if (value instanceof BigDecimal)
+        if (value instanceof BigDecimal decimal)
         {
-            return primitiveToString((BigDecimal) value);
+            return primitiveToString(decimal);
         }
         return value.toString();
     }
@@ -1225,21 +1220,21 @@ public class CompiledSupport
 
     public static String primitiveToString(Object value)
     {
-        if (value instanceof Boolean)
+        if (value instanceof Boolean boolean1)
         {
-            return primitiveToString(((Boolean) value).booleanValue());
+            return primitiveToString(boolean1.booleanValue());
         }
-        if (value instanceof Number)
+        if (value instanceof Number number)
         {
-            return primitiveToString((Number) value);
+            return primitiveToString(number);
         }
-        if (value instanceof PureDate)
+        if (value instanceof PureDate date)
         {
-            return primitiveToString((PureDate) value);
+            return primitiveToString(date);
         }
-        if (value instanceof String)
+        if (value instanceof String string)
         {
-            return primitiveToString((String) value);
+            return primitiveToString(string);
         }
         throw new IllegalArgumentException("Unhandled primitive: " + value + " (" + value.getClass() + ")");
     }
@@ -1291,9 +1286,9 @@ public class CompiledSupport
 
     public static Number minus(Number number)
     {
-        if (number instanceof BigDecimal)
+        if (number instanceof BigDecimal decimal)
         {
-            return ((BigDecimal) number).negate();
+            return decimal.negate();
         }
         if ((number instanceof Long) || (number instanceof Integer))
         {
@@ -1493,7 +1488,7 @@ public class CompiledSupport
     public static Object matchFailure(Object obj, SourceInformation sourceInformation)
     {
         throw new PureExecutionException(sourceInformation,
-                "Match failure: " + (obj == null ? null : ((obj instanceof RichIterable) ? ((RichIterable<?>) obj).collect(o -> o == null ? null : getErrorMessageForMatchFunctionBasedOnObjectType(o)).makeString("[", ", ", "]") : getErrorMessageForMatchFunctionBasedOnObjectType(obj))));
+                "Match failure: " + (obj == null ? null : ((obj instanceof RichIterable ri) ? ri.collect(o -> o == null ? null : getErrorMessageForMatchFunctionBasedOnObjectType(o)).makeString("[", ", ", "]") : getErrorMessageForMatchFunctionBasedOnObjectType(obj))));
     }
 
     private static String getErrorMessageForMatchFunctionBasedOnObjectType(Object obj)
@@ -1550,7 +1545,7 @@ public class CompiledSupport
     private static boolean isPureGeneratedClass(Object obj)
     {
         return hasField(obj, TEMP_TYPE_NAME) ||
-                obj instanceof Class && ((Class<?>) obj).getCanonicalName().contains(JavaPackageAndImportBuilder.buildPackageFromSystemPath(null));
+                obj instanceof Class c && c.getCanonicalName().contains(JavaPackageAndImportBuilder.buildPackageFromSystemPath(null));
     }
 
     private static String getFieldValue(Object obj, String fieldName)
@@ -1624,7 +1619,7 @@ public class CompiledSupport
             ListIterable<? extends CoreInstance> l = valueSpecification.getValueForMetaPropertyToMany(M3Properties.values);
             if (l.noneSatisfy(instance -> Instance.instanceOf(instance, M3Paths.ValueSpecification, processorContext.getSupport()) || Instance.instanceOf(instance, M3Paths.LambdaFunction, processorContext.getSupport())))
             {
-                ListIterable<Object> result = l.collect(instance -> instance instanceof ValCoreInstance ? ((ValCoreInstance) instance).getValue() : instance);
+                ListIterable<Object> result = l.collect(instance -> instance instanceof ValCoreInstance vci ? vci.getValue() : instance);
                 return result.size() == 1 ? result.get(0) : result;
             }
         }
@@ -1980,9 +1975,9 @@ public class CompiledSupport
         {
             return 0L;
         }
-        if (obj instanceof RichIterable)
+        if (obj instanceof RichIterable iterable)
         {
-            return ((RichIterable<?>) obj).size();
+            return iterable.size();
         }
         return 1L;
     }
@@ -1995,13 +1990,13 @@ public class CompiledSupport
         }
         if (isPureGeneratedClass(obj))
         {
-            if (!(obj instanceof Class && ((Class<?>) obj).isInterface()))
+            if (!(obj instanceof Class class1 && class1.isInterface()))
             {
                 return getPureGeneratedClassName(obj);
             }
         }
-        String primitiveJavaToPureType = obj instanceof Class ?
-                JavaPurePrimitiveTypeMapping.getPureM3TypeFromJavaPrimitivesAndDates((Class<?>) obj) :
+        String primitiveJavaToPureType = obj instanceof Class c ?
+                JavaPurePrimitiveTypeMapping.getPureM3TypeFromJavaPrimitivesAndDates(c) :
                 JavaPurePrimitiveTypeMapping.getPureM3TypeFromJavaPrimitivesAndDates(obj);
         if (primitiveJavaToPureType != null)
         {

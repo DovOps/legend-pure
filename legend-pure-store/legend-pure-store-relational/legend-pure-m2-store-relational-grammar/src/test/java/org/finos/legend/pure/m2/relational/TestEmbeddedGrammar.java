@@ -40,9 +40,9 @@ import org.finos.legend.pure.m3.tests.CompiledStateIntegrityTestTools;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
 import org.finos.legend.pure.m4.exception.PureCompilationException;
 import org.finos.legend.pure.m4.serialization.grammar.antlr.PureParserException;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
 
@@ -50,7 +50,7 @@ public class TestEmbeddedGrammar extends AbstractPureRelationalTestWithCoreCompi
 {
     private RelationalGraphWalker graphWalker;
 
-    @Before
+    @BeforeEach
     @Override
     public void _setUp()
     {
@@ -68,45 +68,47 @@ public class TestEmbeddedGrammar extends AbstractPureRelationalTestWithCoreCompi
     @Test
     public void duplicatePropertyMappingInEmbeddedMappingCausesError()
     {
-        LoaderException e = Assert.assertThrows(LoaderException.class, () -> Loader.parseM3(
-                "import other::*;\n" +
-                        "\n" +
-                        "Class other::Person\n" +
-                        "{\n" +
-                        "    name:String[1];\n" +
-                        "    firm:Firm[1];\n" +
-                        "}\n" +
-                        "Class other::Firm\n" +
-                        "{\n" +
-                        "    legalName:String[1];\n" +
-                        "    employees:Person[1];\n" +
-                        "}\n" +
-                        "###Relational\n" +
-                        "Database mapping::db(\n" +
-                        "   Table employeeFirmDenormTable\n" +
-                        "   (\n" +
-                        "    id INT PRIMARY KEY,\n" +
-                        "    name VARCHAR(200),\n" +
-                        "    firmId INT,\n" +
-                        "    legalName VARCHAR(200)\n" +
-                        "   )\n" +
-                        "   Join firmJoin(employeeFirmDenormTable.firmId = {target}.firmId)\n" +
-                        ")\n" +
-                        "###Mapping\n" +
-                        "import other::*;\n" +
-                        "import mapping::*;\n" +
-                        "Mapping mappingPackage::myMapping\n" +
-                        "(\n" +
-                        "    Person: Relational\n" +
-                        "    {\n" +
-                        "        name : [db]employeeFirmDenormTable.name,\n" +
-                        "        firm\n" +
-                        "        (\n" +
-                        "            legalName : [db]employeeFirmDenormTable.legalName,\n" +
-                        "            legalName : [db]employeeFirmDenormTable.legalName\n" +
-                        "        )\n" +
-                        "    }\n" +
-                        ")\n", repository, new ParserLibrary(Lists.immutable.with(new M3AntlrParser(), new MappingParser(), new RelationalParser())), ValidationType.DEEP, VoidM3M4StateListener.VOID_M3_M4_STATE_LISTENER, context));
+        LoaderException e = Assertions.assertThrows(LoaderException.class, () -> Loader.parseM3(
+                """
+                import other::*;
+                
+                Class other::Person
+                {
+                    name:String[1];
+                    firm:Firm[1];
+                }
+                Class other::Firm
+                {
+                    legalName:String[1];
+                    employees:Person[1];
+                }
+                ###Relational
+                Database mapping::db(
+                   Table employeeFirmDenormTable
+                   (
+                    id INT PRIMARY KEY,
+                    name VARCHAR(200),
+                    firmId INT,
+                    legalName VARCHAR(200)
+                   )
+                   Join firmJoin(employeeFirmDenormTable.firmId = {target}.firmId)
+                )
+                ###Mapping
+                import other::*;
+                import mapping::*;
+                Mapping mappingPackage::myMapping
+                (
+                    Person: Relational
+                    {
+                        name : [db]employeeFirmDenormTable.name,
+                        firm
+                        (
+                            legalName : [db]employeeFirmDenormTable.legalName,
+                            legalName : [db]employeeFirmDenormTable.legalName
+                        )
+                    }
+                )
+                """, repository, new ParserLibrary(Lists.immutable.with(new M3AntlrParser(), new MappingParser(), new RelationalParser())), ValidationType.DEEP, VoidM3M4StateListener.VOID_M3_M4_STATE_LISTENER, context));
         assertOriginatingPureException("Duplicate mappings found for the property 'legalName' (targetId: ?) in the embedded mapping for 'firm' in the mapping for class Person, the property should have one mapping.", 35, 13, e);
     }
 
@@ -114,46 +116,52 @@ public class TestEmbeddedGrammar extends AbstractPureRelationalTestWithCoreCompi
     public void duplicateSetImplementationIdWithInEmbeddedMappingCausesError()
     {
         compileTestSource("/test/testModel.pure",
-                "import test::other::*;\n" +
-                        "\n" +
-                        "Class test::other::Person\n" +
-                        "{\n" +
-                        "    name:String[1];\n" +
-                        "    firm:Firm[1];\n" +
-                        "}\n" +
-                        "Class test::other::Firm\n" +
-                        "{\n" +
-                        "    legalName:String[1];\n" +
-                        "    employees:Person[1];\n" +
-                        "}\n");
+                """
+                import test::other::*;
+                
+                Class test::other::Person
+                {
+                    name:String[1];
+                    firm:Firm[1];
+                }
+                Class test::other::Firm
+                {
+                    legalName:String[1];
+                    employees:Person[1];
+                }
+                """);
         compileTestSource("/test/testStore.pure",
-                "###Relational\n" +
-                        "Database test::mapping::db(\n" +
-                        "   Table employeeFirmDenormTable\n" +
-                        "   (\n" +
-                        "    id INT PRIMARY KEY,\n" +
-                        "    name VARCHAR(200),\n" +
-                        "    firmId INT,\n" +
-                        "    legalName VARCHAR(200)\n" +
-                        "   )\n" +
-                        "   Join firmJoin(employeeFirmDenormTable.firmId = {target}.firmId)\n" +
-                        ")\n");
-        PureCompilationException e = Assert.assertThrows(PureCompilationException.class, () -> compileTestSource(
+                """
+                ###Relational
+                Database test::mapping::db(
+                   Table employeeFirmDenormTable
+                   (
+                    id INT PRIMARY KEY,
+                    name VARCHAR(200),
+                    firmId INT,
+                    legalName VARCHAR(200)
+                   )
+                   Join firmJoin(employeeFirmDenormTable.firmId = {target}.firmId)
+                )
+                """);
+        PureCompilationException e = Assertions.assertThrows(PureCompilationException.class, () -> compileTestSource(
                 "/test/testMapping.pure",
-                "###Mapping\n" +
-                        "import test::other::*;\n" +
-                        "import test::mapping::*;\n" +
-                        "Mapping test::mappingPackage::myMapping\n" +
-                        "(\n" +
-                        "    Person[k]: Relational\n" +
-                        "    {\n" +
-                        "        name : [db]employeeFirmDenormTable.name,\n" +
-                        "        firm[k]\n" +
-                        "        (\n" +
-                        "            legalName : [db]employeeFirmDenormTable.legalName\n" +
-                        "        )\n" +
-                        "    }\n" +
-                        ")\n"));
+                """
+                ###Mapping
+                import test::other::*;
+                import test::mapping::*;
+                Mapping test::mappingPackage::myMapping
+                (
+                    Person[k]: Relational
+                    {
+                        name : [db]employeeFirmDenormTable.name,
+                        firm[k]
+                        (
+                            legalName : [db]employeeFirmDenormTable.legalName
+                        )
+                    }
+                )
+                """));
         assertPureException(PureCompilationException.class, "Duplicate mapping found with id: 'k' in mapping test::mappingPackage::myMapping", "/test/testMapping.pure", 6, 5, e);
     }
 
@@ -161,60 +169,66 @@ public class TestEmbeddedGrammar extends AbstractPureRelationalTestWithCoreCompi
     public void duplicateSetImplementationIdBetweenEmbeddedMappingsCausesError()
     {
         compileTestSource("/test/testModel.pure",
-                "import test::other::*;\n" +
-                        "\n" +
-                        "Class test::other::Person\n" +
-                        "{\n" +
-                        "    name:String[1];\n" +
-                        "    firm:Firm[1];\n" +
-                        "}\n" +
-                        "Class test::other::Firm\n" +
-                        "{\n" +
-                        "    legalName:String[1];\n" +
-                        "    employees:Person[1];\n" +
-                        "}\n");
+                """
+                import test::other::*;
+                
+                Class test::other::Person
+                {
+                    name:String[1];
+                    firm:Firm[1];
+                }
+                Class test::other::Firm
+                {
+                    legalName:String[1];
+                    employees:Person[1];
+                }
+                """);
         compileTestSource("/test/testStore.pure",
-                "###Relational\n" +
-                        "Database test::mapping::db(\n" +
-                        "   Table employeeFirmDenormTable\n" +
-                        "   (\n" +
-                        "    id INT PRIMARY KEY,\n" +
-                        "    name VARCHAR(200),\n" +
-                        "    firmId INT,\n" +
-                        "    legalName VARCHAR(200)\n" +
-                        "   )\n" +
-                        "   Table firmEmployeeDenormTable\n" +
-                        "   (\n" +
-                        "    id INT PRIMARY KEY,\n" +
-                        "    legalName VARCHAR(200),\n" +
-                        "    employeeId INT,\n" +
-                        "    name VARCHAR(200)\n" +
-                        "   )\n" +
-                        ")\n");
-        PureCompilationException e = Assert.assertThrows(PureCompilationException.class, () -> compileTestSource(
+                """
+                ###Relational
+                Database test::mapping::db(
+                   Table employeeFirmDenormTable
+                   (
+                    id INT PRIMARY KEY,
+                    name VARCHAR(200),
+                    firmId INT,
+                    legalName VARCHAR(200)
+                   )
+                   Table firmEmployeeDenormTable
+                   (
+                    id INT PRIMARY KEY,
+                    legalName VARCHAR(200),
+                    employeeId INT,
+                    name VARCHAR(200)
+                   )
+                )
+                """);
+        PureCompilationException e = Assertions.assertThrows(PureCompilationException.class, () -> compileTestSource(
                 "/test/testMapping.pure",
-                "###Mapping\n" +
-                        "import test::other::*;\n" +
-                        "import test::mapping::*;\n" +
-                        "Mapping test::mappingPackage::myMapping\n" +
-                        "(\n" +
-                        "    Person: Relational\n" +
-                        "    {\n" +
-                        "        name : [db]employeeFirmDenormTable.name,\n" +
-                        "        firm[k]\n" +
-                        "        (\n" +
-                        "            legalName : [db]employeeFirmDenormTable.legalName\n" +
-                        "        )\n" +
-                        "    }\n" +
-                        "    Firm: Relational\n" +
-                        "    {\n" +
-                        "        legalName : [db]firmEmployeeDenormTable.legalName,\n" +
-                        "        employees[k]\n" +
-                        "        (\n" +
-                        "            name : [db]firmEmployeeDenormTable.name\n" +
-                        "        )\n" +
-                        "    }\n" +
-                        ")\n"));
+                """
+                ###Mapping
+                import test::other::*;
+                import test::mapping::*;
+                Mapping test::mappingPackage::myMapping
+                (
+                    Person: Relational
+                    {
+                        name : [db]employeeFirmDenormTable.name,
+                        firm[k]
+                        (
+                            legalName : [db]employeeFirmDenormTable.legalName
+                        )
+                    }
+                    Firm: Relational
+                    {
+                        legalName : [db]firmEmployeeDenormTable.legalName,
+                        employees[k]
+                        (
+                            name : [db]firmEmployeeDenormTable.name
+                        )
+                    }
+                )
+                """));
         assertPureException(PureCompilationException.class, "Duplicate mapping found with id: 'k' in mapping test::mappingPackage::myMapping", "/test/testMapping.pure", 17, 9, e);
     }
 
@@ -222,52 +236,54 @@ public class TestEmbeddedGrammar extends AbstractPureRelationalTestWithCoreCompi
     public void duplicateSetImplementationIdWithInEmbeddedMappingMultiple()
     {
         Loader.parseM3(
-                "import other::*;\n" +
-                        "\n" +
-                        "Class other::Person\n" +
-                        "{\n" +
-                        "    name:String[1];\n" +
-                        "    firm:Firm[1];\n" +
-                        "}\n" +
-                        "Class other::Firm\n" +
-                        "{\n" +
-                        "    legalName:String[1];\n" +
-                        "    employees:Person[1];\n" +
-                        "}\n" +
-                        "###Relational\n" +
-                        "Database mapping::db(\n" +
-                        "   Table employeeFirmDenormTable\n" +
-                        "   (\n" +
-                        "    id INT PRIMARY KEY,\n" +
-                        "    name VARCHAR(200),\n" +
-                        "    firmId INT,\n" +
-                        "    legalName VARCHAR(200)\n" +
-                        "   )\n" +
-                        "   Join firmJoin(employeeFirmDenormTable.firmId = {target}.firmId)\n" +
-                        ")\n" +
-                        "###Mapping\n" +
-                        "import other::*;\n" +
-                        "import mapping::*;\n" +
-                        "Mapping mappingPackage::myMapping\n" +
-                        "(\n" +
-                        "    Person[k]: Relational\n" +
-                        "    {\n" +
-                        "        name : [db]employeeFirmDenormTable.name,\n" +
-                        "        firm\n" +
-                        "        (\n" +
-                        "            legalName : [db]employeeFirmDenormTable.legalName\n" +
-                        "        )\n" +
-                        "    }\n" +
-                        "    " +
-                        "* Person[kk]: Relational\n" +
-                        "    {\n" +
-                        "        name : [db]employeeFirmDenormTable.name,\n" +
-                        "        firm\n" +
-                        "        (\n" +
-                        "            legalName : [db]employeeFirmDenormTable.legalName\n" +
-                        "        )\n" +
-                        "    }\n" +
-                        ")\n", repository, new ParserLibrary(Lists.immutable.with(new M3AntlrParser(), new MappingParser(), new RelationalParser())), ValidationType.DEEP, VoidM3M4StateListener.VOID_M3_M4_STATE_LISTENER, context);
+                """
+                import other::*;
+                
+                Class other::Person
+                {
+                    name:String[1];
+                    firm:Firm[1];
+                }
+                Class other::Firm
+                {
+                    legalName:String[1];
+                    employees:Person[1];
+                }
+                ###Relational
+                Database mapping::db(
+                   Table employeeFirmDenormTable
+                   (
+                    id INT PRIMARY KEY,
+                    name VARCHAR(200),
+                    firmId INT,
+                    legalName VARCHAR(200)
+                   )
+                   Join firmJoin(employeeFirmDenormTable.firmId = {target}.firmId)
+                )
+                ###Mapping
+                import other::*;
+                import mapping::*;
+                Mapping mappingPackage::myMapping
+                (
+                    Person[k]: Relational
+                    {
+                        name : [db]employeeFirmDenormTable.name,
+                        firm
+                        (
+                            legalName : [db]employeeFirmDenormTable.legalName
+                        )
+                    }
+                    \
+                * Person[kk]: Relational
+                    {
+                        name : [db]employeeFirmDenormTable.name,
+                        firm
+                        (
+                            legalName : [db]employeeFirmDenormTable.legalName
+                        )
+                    }
+                )
+                """, repository, new ParserLibrary(Lists.immutable.with(new M3AntlrParser(), new MappingParser(), new RelationalParser())), ValidationType.DEEP, VoidM3M4StateListener.VOID_M3_M4_STATE_LISTENER, context);
         runtime.compile();
     }
 
@@ -275,108 +291,110 @@ public class TestEmbeddedGrammar extends AbstractPureRelationalTestWithCoreCompi
     public void testEmbeddedMapping()
     {
         Loader.parseM3(
-                "import other::*;\n" +
-                        "\n" +
-                        "Class other::Person\n" +
-                        "{\n" +
-                        "    name:String[1];\n" +
-                        "    firm:Firm[1];\n" +
-                        "    address:Address[0..1];\n" +
-                        "}\n" +
-                        "Class other::Firm\n" +
-                        "{\n" +
-                        "    legalName:String[1];\n" +
-                        "    employees:Person[1];\n" +
-                        "    address:Address[1];\n" +
-                        "}\n" +
-                        "Class other::Address\n" +
-                        "{\n" +
-                        "    line1:String[1];\n" +
-                        "}\n" +
-                        "###Relational\n" +
-                        "Database mapping::db(\n" +
-                        "   Table employeeFirmDenormTable\n" +
-                        "   (\n" +
-                        "    id INT PRIMARY KEY,\n" +
-                        "    name VARCHAR(200),\n" +
-                        "    firmId INT,\n" +
-                        "    legalName VARCHAR(200),\n" +
-                        "    address VARCHAR(200)\n" +
-                        "   )\n" +
-                        ")\n" +
-                        "###Mapping\n" +
-                        "import other::*;\n" +
-                        "import mapping::*;\n" +
-                        "Mapping mappingPackage::myMapping\n" +
-                        "(\n" +
-                        "    Person: Relational\n" +
-                        "    {\n" +
-                        "        name : [db]employeeFirmDenormTable.name,\n" +
-                        "        firm\n" +
-                        "        (\n" +
-                        "            ~primaryKey ([db]employeeFirmDenormTable.legalName)\n" +
-                        "            legalName : [db]employeeFirmDenormTable.legalName,\n" +
-                        "            address\n" +
-                        "            (\n" +
-                        "                line1: [db]employeeFirmDenormTable.address\n" +
-                        "            )\n" +
-                        "        ),\n" +
-                        "        address\n" +
-                        "        (\n" +
-                        "            line1: [db]employeeFirmDenormTable.address\n" +
-                        "        )\n" +
-                        "    }\n" +
-                        ")\n", repository, new ParserLibrary(Lists.immutable.with(new M3AntlrParser(), new MappingParser(), new RelationalParser())), ValidationType.DEEP, VoidM3M4StateListener.VOID_M3_M4_STATE_LISTENER, context);
+                """
+                import other::*;
+                
+                Class other::Person
+                {
+                    name:String[1];
+                    firm:Firm[1];
+                    address:Address[0..1];
+                }
+                Class other::Firm
+                {
+                    legalName:String[1];
+                    employees:Person[1];
+                    address:Address[1];
+                }
+                Class other::Address
+                {
+                    line1:String[1];
+                }
+                ###Relational
+                Database mapping::db(
+                   Table employeeFirmDenormTable
+                   (
+                    id INT PRIMARY KEY,
+                    name VARCHAR(200),
+                    firmId INT,
+                    legalName VARCHAR(200),
+                    address VARCHAR(200)
+                   )
+                )
+                ###Mapping
+                import other::*;
+                import mapping::*;
+                Mapping mappingPackage::myMapping
+                (
+                    Person: Relational
+                    {
+                        name : [db]employeeFirmDenormTable.name,
+                        firm
+                        (
+                            ~primaryKey ([db]employeeFirmDenormTable.legalName)
+                            legalName : [db]employeeFirmDenormTable.legalName,
+                            address
+                            (
+                                line1: [db]employeeFirmDenormTable.address
+                            )
+                        ),
+                        address
+                        (
+                            line1: [db]employeeFirmDenormTable.address
+                        )
+                    }
+                )
+                """, repository, new ParserLibrary(Lists.immutable.with(new M3AntlrParser(), new MappingParser(), new RelationalParser())), ValidationType.DEEP, VoidM3M4StateListener.VOID_M3_M4_STATE_LISTENER, context);
         runtime.compile();
 
         CoreInstance mapping = this.graphWalker.getMapping("mappingPackage::myMapping");
-        Assert.assertNotNull(mapping);
-        Assert.assertEquals(4, this.graphWalker.getClassMappings(mapping).size());
+        Assertions.assertNotNull(mapping);
+        Assertions.assertEquals(4, this.graphWalker.getClassMappings(mapping).size());
         CoreInstance personMapping = this.graphWalker.getClassMapping(mapping, "Person");
-        Assert.assertNotNull(personMapping);
+        Assertions.assertNotNull(personMapping);
 
-        Assert.assertEquals("employeeFirmDenormTable", this.graphWalker.getName(this.graphWalker.getClassMappingImplementationMainTable(personMapping)));
-        Assert.assertEquals(3, this.graphWalker.getClassMappingImplementationPropertyMappings(personMapping).size());
+        Assertions.assertEquals("employeeFirmDenormTable", this.graphWalker.getName(this.graphWalker.getClassMappingImplementationMainTable(personMapping)));
+        Assertions.assertEquals(3, this.graphWalker.getClassMappingImplementationPropertyMappings(personMapping).size());
 
         CoreInstance namePropMapping = this.graphWalker.getClassMappingImplementationPropertyMapping(personMapping, "name");
-        Assert.assertNotNull(namePropMapping);
+        Assertions.assertNotNull(namePropMapping);
         CoreInstance firmPropMapping = this.graphWalker.getClassMappingImplementationPropertyMapping(personMapping, "firm");
-        Assert.assertNotNull(firmPropMapping);
+        Assertions.assertNotNull(firmPropMapping);
 
         CoreInstance firmProp = firmPropMapping.getValueForMetaPropertyToOne(M3Properties.property);
         ListIterable<? extends CoreInstance> refUsages = firmProp.getValueForMetaPropertyToMany(M3Properties.referenceUsages);
-        Assert.assertEquals(1, refUsages.size());
-        Assert.assertEquals(firmPropMapping, refUsages.getFirst().getValueForMetaPropertyToOne(M3Properties.owner));
+        Assertions.assertEquals(1, refUsages.size());
+        Assertions.assertEquals(firmPropMapping, refUsages.getFirst().getValueForMetaPropertyToOne(M3Properties.owner));
 
         CoreInstance owner = firmPropMapping.getValueForMetaPropertyToOne(M2RelationalProperties.setMappingOwner);
-        Assert.assertEquals(personMapping, owner);
-        Assert.assertEquals(personMapping, firmPropMapping.getValueForMetaPropertyToOne(M3Properties.owner));
+        Assertions.assertEquals(personMapping, owner);
+        Assertions.assertEquals(personMapping, firmPropMapping.getValueForMetaPropertyToOne(M3Properties.owner));
 
         ListIterable<? extends CoreInstance> pks = firmPropMapping.getValueForMetaPropertyToMany(M2RelationalProperties.primaryKey);
         CoreInstance pk = pks.getFirst();
-        Assert.assertEquals(personMapping, pk.getValueForMetaPropertyToOne(M2RelationalProperties.setMappingOwner));
+        Assertions.assertEquals(personMapping, pk.getValueForMetaPropertyToOne(M2RelationalProperties.setMappingOwner));
 
         CoreInstance legalNamePropMapping = this.graphWalker.getClassMappingImplementationPropertyMapping(firmPropMapping, "legalName");
         CoreInstance nameColumnAlias = this.graphWalker.getClassMappingImplementationPropertyMappingRelationalOperationElement(legalNamePropMapping);
-        Assert.assertEquals("employeeFirmDenormTable", this.graphWalker.getTableAliasColumnAliasName(nameColumnAlias));
-        Assert.assertEquals("legalName", this.graphWalker.getTableAliasColumnColumnName(nameColumnAlias));
+        Assertions.assertEquals("employeeFirmDenormTable", this.graphWalker.getTableAliasColumnAliasName(nameColumnAlias));
+        Assertions.assertEquals("legalName", this.graphWalker.getTableAliasColumnColumnName(nameColumnAlias));
 
         CoreInstance firmAddressPropMapping = this.graphWalker.getClassMappingImplementationPropertyMapping(firmPropMapping, "address");
-        Assert.assertEquals("other_Person_firm_address", firmAddressPropMapping.getValueForMetaPropertyToOne(M3Properties.id).getName());
+        Assertions.assertEquals("other_Person_firm_address", firmAddressPropMapping.getValueForMetaPropertyToOne(M3Properties.id).getName());
         CoreInstance ownerFirmAddress = firmAddressPropMapping.getValueForMetaPropertyToOne(M2RelationalProperties.setMappingOwner);
-        Assert.assertEquals(personMapping, ownerFirmAddress);
-        Assert.assertEquals(firmPropMapping, firmAddressPropMapping.getValueForMetaPropertyToOne(M3Properties.owner));
+        Assertions.assertEquals(personMapping, ownerFirmAddress);
+        Assertions.assertEquals(firmPropMapping, firmAddressPropMapping.getValueForMetaPropertyToOne(M3Properties.owner));
 
         CoreInstance addressLine1PropMapping = this.graphWalker.getClassMappingImplementationPropertyMapping(firmAddressPropMapping, "line1");
         CoreInstance addressLine1ColumnAlias = this.graphWalker.getClassMappingImplementationPropertyMappingRelationalOperationElement(addressLine1PropMapping);
-        Assert.assertEquals("employeeFirmDenormTable", this.graphWalker.getTableAliasColumnAliasName(addressLine1ColumnAlias));
-        Assert.assertEquals("address", this.graphWalker.getTableAliasColumnColumnName(addressLine1ColumnAlias));
+        Assertions.assertEquals("employeeFirmDenormTable", this.graphWalker.getTableAliasColumnAliasName(addressLine1ColumnAlias));
+        Assertions.assertEquals("address", this.graphWalker.getTableAliasColumnColumnName(addressLine1ColumnAlias));
 
         CoreInstance addressPropMapping = this.graphWalker.getClassMappingImplementationPropertyMapping(personMapping, "address");
-        Assert.assertEquals("other_Person_address", addressPropMapping.getValueForMetaPropertyToOne(M3Properties.id).getName());
+        Assertions.assertEquals("other_Person_address", addressPropMapping.getValueForMetaPropertyToOne(M3Properties.id).getName());
         CoreInstance ownerAddress = addressPropMapping.getValueForMetaPropertyToOne(M2RelationalProperties.setMappingOwner);
-        Assert.assertEquals(personMapping, ownerAddress);
-        Assert.assertEquals(personMapping, addressPropMapping.getValueForMetaPropertyToOne(M3Properties.owner));
+        Assertions.assertEquals(personMapping, ownerAddress);
+        Assertions.assertEquals(personMapping, addressPropMapping.getValueForMetaPropertyToOne(M3Properties.owner));
     }
 
 
@@ -384,97 +402,99 @@ public class TestEmbeddedGrammar extends AbstractPureRelationalTestWithCoreCompi
     public void testEmbeddedMappingWithIds()
     {
         Loader.parseM3(
-                "import other::*;\n" +
-                        "import meta::pure::mapping::*;\n" +
-                        "\n" +
-                        "Class other::Person\n" +
-                        "{\n" +
-                        "    name:String[1];\n" +
-                        "    firm:Firm[1];\n" +
-                        "    address:Address[0..1];\n" +
-                        "}\n" +
-                        "Class other::Firm\n" +
-                        "{\n" +
-                        "    legalName:String[1];\n" +
-                        "    employees:Person[1];\n" +
-                        "    address:Address[1];\n" +
-                        "}\n" +
-                        "Class other::Address\n" +
-                        "{\n" +
-                        "    line1:String[1];\n" +
-                        "}\n" +
-                        "   function meta::pure::router::operations::union(o:OperationSetImplementation[1]):SetImplementation[*]\n" +
-                        "   {\n" +
-                        "       $o.parameters.setImplementation;\n" +
-                        "   }\n" +
-                        "###Relational\n" +
-                        "Database mapping::db(\n" +
-                        "   Table employeeFirmDenormTable\n" +
-                        "   (\n" +
-                        "    id INT PRIMARY KEY,\n" +
-                        "    name VARCHAR(200),\n" +
-                        "    firmId INT,\n" +
-                        "    legalName VARCHAR(200),\n" +
-                        "    address VARCHAR(200)\n" +
-                        "   )\n" +
-                        "   Table employeeFirmDenormTable2\n" +
-                        "   (\n" +
-                        "    id INT PRIMARY KEY,\n" +
-                        "    name VARCHAR(200),\n" +
-                        "    firmId INT,\n" +
-                        "    legalName VARCHAR(200),\n" +
-                        "    address VARCHAR(200)\n" +
-                        "   )\n" +
-                        ")\n" +
-                        "###Mapping\n" +
-                        "import other::*;\n" +
-                        "import mapping::*;\n" +
-                        "Mapping mappingPackage::myMapping\n" +
-                        "(\n" +
-                        "    Person[per1]: Relational\n" +
-                        "    {\n" +
-                        "        name : [db]employeeFirmDenormTable.name,\n" +
-                        "        firm\n" +
-                        "        (\n" +
-                        "            ~primaryKey ([db]employeeFirmDenormTable.legalName)\n" +
-                        "            legalName : [db]employeeFirmDenormTable.legalName,\n" +
-                        "            address\n" +
-                        "            (\n" +
-                        "                line1: [db]employeeFirmDenormTable.address\n" +
-                        "            )\n" +
-                        "        ),\n" +
-                        "        address\n" +
-                        "        (\n" +
-                        "            line1: [db]employeeFirmDenormTable.address\n" +
-                        "        )\n" +
-                        "    }\n" +
-                        "    Person[per2]: Relational\n" +
-                        "    {\n" +
-                        "        name : [db]employeeFirmDenormTable2.name,\n" +
-                        "        firm\n" +
-                        "        (\n" +
-                        "            ~primaryKey ([db]employeeFirmDenormTable2.legalName)\n" +
-                        "            legalName : [db]employeeFirmDenormTable2.legalName,\n" +
-                        "            address\n" +
-                        "            (\n" +
-                        "                line1: [db]employeeFirmDenormTable2.address\n" +
-                        "            )\n" +
-                        "        ),\n" +
-                        "        address\n" +
-                        "        (\n" +
-                        "            line1: [db]employeeFirmDenormTable2.address\n" +
-                        "        )\n" +
-                        "    }\n" +
-                        "    *Person : Operation\n" +
-                        "    {\n" +
-                        "               meta::pure::router::operations::union_OperationSetImplementation_1__SetImplementation_MANY_( per1, per2 )   \n" +
-                        "    }\n" +
-                        ")\n", repository, new ParserLibrary(Lists.immutable.with(new M3AntlrParser(), new MappingParser(), new RelationalParser(), new OperationParser())), ValidationType.DEEP, VoidM3M4StateListener.VOID_M3_M4_STATE_LISTENER, context);
+                """
+                import other::*;
+                import meta::pure::mapping::*;
+                
+                Class other::Person
+                {
+                    name:String[1];
+                    firm:Firm[1];
+                    address:Address[0..1];
+                }
+                Class other::Firm
+                {
+                    legalName:String[1];
+                    employees:Person[1];
+                    address:Address[1];
+                }
+                Class other::Address
+                {
+                    line1:String[1];
+                }
+                   function meta::pure::router::operations::union(o:OperationSetImplementation[1]):SetImplementation[*]
+                   {
+                       $o.parameters.setImplementation;
+                   }
+                ###Relational
+                Database mapping::db(
+                   Table employeeFirmDenormTable
+                   (
+                    id INT PRIMARY KEY,
+                    name VARCHAR(200),
+                    firmId INT,
+                    legalName VARCHAR(200),
+                    address VARCHAR(200)
+                   )
+                   Table employeeFirmDenormTable2
+                   (
+                    id INT PRIMARY KEY,
+                    name VARCHAR(200),
+                    firmId INT,
+                    legalName VARCHAR(200),
+                    address VARCHAR(200)
+                   )
+                )
+                ###Mapping
+                import other::*;
+                import mapping::*;
+                Mapping mappingPackage::myMapping
+                (
+                    Person[per1]: Relational
+                    {
+                        name : [db]employeeFirmDenormTable.name,
+                        firm
+                        (
+                            ~primaryKey ([db]employeeFirmDenormTable.legalName)
+                            legalName : [db]employeeFirmDenormTable.legalName,
+                            address
+                            (
+                                line1: [db]employeeFirmDenormTable.address
+                            )
+                        ),
+                        address
+                        (
+                            line1: [db]employeeFirmDenormTable.address
+                        )
+                    }
+                    Person[per2]: Relational
+                    {
+                        name : [db]employeeFirmDenormTable2.name,
+                        firm
+                        (
+                            ~primaryKey ([db]employeeFirmDenormTable2.legalName)
+                            legalName : [db]employeeFirmDenormTable2.legalName,
+                            address
+                            (
+                                line1: [db]employeeFirmDenormTable2.address
+                            )
+                        ),
+                        address
+                        (
+                            line1: [db]employeeFirmDenormTable2.address
+                        )
+                    }
+                    *Person : Operation
+                    {
+                               meta::pure::router::operations::union_OperationSetImplementation_1__SetImplementation_MANY_( per1, per2 )  \s
+                    }
+                )
+                """, repository, new ParserLibrary(Lists.immutable.with(new M3AntlrParser(), new MappingParser(), new RelationalParser(), new OperationParser())), ValidationType.DEEP, VoidM3M4StateListener.VOID_M3_M4_STATE_LISTENER, context);
         runtime.compile();
 
         CoreInstance mapping = this.graphWalker.getMapping("mappingPackage::myMapping");
-        Assert.assertNotNull(mapping);
-        Assert.assertEquals(9, this.graphWalker.getClassMappings(mapping).size());
+        Assertions.assertNotNull(mapping);
+        Assertions.assertEquals(9, this.graphWalker.getClassMappings(mapping).size());
         CoreInstance personMapping = this.graphWalker.getClassMappingById(mapping, "per1");
         validatePersonMapping(personMapping, "employeeFirmDenormTable");
 
@@ -484,320 +504,325 @@ public class TestEmbeddedGrammar extends AbstractPureRelationalTestWithCoreCompi
 
     private void validatePersonMapping(CoreInstance personMapping, String tableName)
     {
-        Assert.assertNotNull(personMapping);
+        Assertions.assertNotNull(personMapping);
 
-        Assert.assertEquals(tableName, this.graphWalker.getName(this.graphWalker.getClassMappingImplementationMainTable(personMapping)));
-        Assert.assertEquals(3, this.graphWalker.getClassMappingImplementationPropertyMappings(personMapping).size());
+        Assertions.assertEquals(tableName, this.graphWalker.getName(this.graphWalker.getClassMappingImplementationMainTable(personMapping)));
+        Assertions.assertEquals(3, this.graphWalker.getClassMappingImplementationPropertyMappings(personMapping).size());
 
         CoreInstance namePropMapping = this.graphWalker.getClassMappingImplementationPropertyMapping(personMapping, "name");
-        Assert.assertNotNull(namePropMapping);
+        Assertions.assertNotNull(namePropMapping);
         CoreInstance firmPropMapping = this.graphWalker.getClassMappingImplementationPropertyMapping(personMapping, "firm");
-        Assert.assertNotNull(firmPropMapping);
+        Assertions.assertNotNull(firmPropMapping);
 
         CoreInstance firmProp = firmPropMapping.getValueForMetaPropertyToOne(M3Properties.property);
         ListIterable<? extends CoreInstance> refUsages = firmProp.getValueForMetaPropertyToMany(M3Properties.referenceUsages);
-        Assert.assertEquals(2, refUsages.size());
+        Assertions.assertEquals(2, refUsages.size());
         Verify.assertContains(firmPropMapping, (Collection<?>) refUsages.collect(object -> object.getValueForMetaPropertyToOne(M3Properties.owner)));
 
         CoreInstance owner = firmPropMapping.getValueForMetaPropertyToOne(M2RelationalProperties.setMappingOwner);
-        Assert.assertEquals(personMapping, owner);
-        Assert.assertEquals(personMapping, firmPropMapping.getValueForMetaPropertyToOne(M3Properties.owner));
+        Assertions.assertEquals(personMapping, owner);
+        Assertions.assertEquals(personMapping, firmPropMapping.getValueForMetaPropertyToOne(M3Properties.owner));
 
         ListIterable<? extends CoreInstance> pks = firmPropMapping.getValueForMetaPropertyToMany(M2RelationalProperties.primaryKey);
         CoreInstance pk = pks.getFirst();
-        Assert.assertEquals(personMapping, pk.getValueForMetaPropertyToOne(M2RelationalProperties.setMappingOwner));
+        Assertions.assertEquals(personMapping, pk.getValueForMetaPropertyToOne(M2RelationalProperties.setMappingOwner));
 
         CoreInstance legalNamePropMapping = this.graphWalker.getClassMappingImplementationPropertyMapping(firmPropMapping, "legalName");
         CoreInstance nameColumnAlias = this.graphWalker.getClassMappingImplementationPropertyMappingRelationalOperationElement(legalNamePropMapping);
-        Assert.assertEquals(tableName, this.graphWalker.getTableAliasColumnAliasName(nameColumnAlias));
-        Assert.assertEquals("legalName", this.graphWalker.getTableAliasColumnColumnName(nameColumnAlias));
+        Assertions.assertEquals(tableName, this.graphWalker.getTableAliasColumnAliasName(nameColumnAlias));
+        Assertions.assertEquals("legalName", this.graphWalker.getTableAliasColumnColumnName(nameColumnAlias));
 
         CoreInstance firmAddressPropMapping = this.graphWalker.getClassMappingImplementationPropertyMapping(firmPropMapping, "address");
         CoreInstance ownerFirmAddress = firmAddressPropMapping.getValueForMetaPropertyToOne(M2RelationalProperties.setMappingOwner);
-        Assert.assertEquals(personMapping, ownerFirmAddress);
-        Assert.assertEquals(firmPropMapping, firmAddressPropMapping.getValueForMetaPropertyToOne(M3Properties.owner));
+        Assertions.assertEquals(personMapping, ownerFirmAddress);
+        Assertions.assertEquals(firmPropMapping, firmAddressPropMapping.getValueForMetaPropertyToOne(M3Properties.owner));
 
         CoreInstance addressLine1PropMapping = this.graphWalker.getClassMappingImplementationPropertyMapping(firmAddressPropMapping, "line1");
         CoreInstance addressLine1ColumnAlias = this.graphWalker.getClassMappingImplementationPropertyMappingRelationalOperationElement(addressLine1PropMapping);
-        Assert.assertEquals(tableName, this.graphWalker.getTableAliasColumnAliasName(addressLine1ColumnAlias));
-        Assert.assertEquals("address", this.graphWalker.getTableAliasColumnColumnName(addressLine1ColumnAlias));
+        Assertions.assertEquals(tableName, this.graphWalker.getTableAliasColumnAliasName(addressLine1ColumnAlias));
+        Assertions.assertEquals("address", this.graphWalker.getTableAliasColumnColumnName(addressLine1ColumnAlias));
 
         CoreInstance addressPropMapping = this.graphWalker.getClassMappingImplementationPropertyMapping(personMapping, "address");
         CoreInstance ownerAddress = addressPropMapping.getValueForMetaPropertyToOne(M2RelationalProperties.setMappingOwner);
-        Assert.assertEquals(personMapping, ownerAddress);
-        Assert.assertEquals(personMapping, addressPropMapping.getValueForMetaPropertyToOne(M3Properties.owner));
+        Assertions.assertEquals(personMapping, ownerAddress);
+        Assertions.assertEquals(personMapping, addressPropMapping.getValueForMetaPropertyToOne(M3Properties.owner));
     }
 
     @Test
     public void embeddedMappingsCanBeReferenced()
     {
         Loader.parseM3(
-                "import other::*;\n" +
-                        "\n" +
-                        "Class other::Person\n" +
-                        "{\n" +
-                        "    name:String[1];\n" +
-                        "    address:Address[1];\n" +
-                        "    firm:Firm[1];\n" +
-                        "}\n" +
-                        "Class other::Firm\n" +
-                        "{\n" +
-                        "    legalName:String[1];\n" +
-                        "}\n" +
-                        "Class other::Address\n" +
-                        "{\n" +
-                        "    line1:String[1];\n" +
-                        "    postcode:String[1];\n" +
-                        "}\n" +
-                        "###Relational\n" +
-                        "Database mapping::db(\n" +
-                        "   Table employeeFirmDenormTable\n" +
-                        "   (\n" +
-                        "    id INT PRIMARY KEY,\n" +
-                        "    name VARCHAR(200),\n" +
-                        "    firmId INT,\n" +
-                        "    legalName VARCHAR(200),\n" +
-                        "    address1 VARCHAR(200),\n" +
-                        "    postcode VARCHAR(10)\n" +
-                        "   )\n" +
-                        ")\n" +
-                        "###Mapping\n" +
-                        "import other::*;\n" +
-                        "import mapping::*;\n" +
-                        "Mapping mappingPackage::myMapping\n" +
-                        "(\n" +
-                        "    Address[alias2]: Relational\n" +
-                        "    {\n" +
-                        "       line1: [db]employeeFirmDenormTable.address1,\n" +
-                        "       postcode: [db]employeeFirmDenormTable.postcode\n" +
+                """
+import other::*;
 
-                        "    }\n" +
-                        "    Person[alias1]: Relational\n" +
-                        "    {\n" +
-                        "        name : [db]employeeFirmDenormTable.name,\n" +
-                        "        firm\n" +
-                        "        (\n" +
-                        "            ~primaryKey ([db]employeeFirmDenormTable.legalName)\n" +
-                        "            legalName : [db]employeeFirmDenormTable.legalName\n" +
-                        "        ),\n" +
-                        "        address () Inline [alias2]\n" +
-                        "    }\n" +
-                        ")\n", repository, new ParserLibrary(Lists.immutable.with(new M3AntlrParser(), new MappingParser(), new RelationalParser())), ValidationType.DEEP, VoidM3M4StateListener.VOID_M3_M4_STATE_LISTENER, context);
+Class other::Person
+{
+    name:String[1];
+    address:Address[1];
+    firm:Firm[1];
+}
+Class other::Firm
+{
+    legalName:String[1];
+}
+Class other::Address
+{
+    line1:String[1];
+    postcode:String[1];
+}
+###Relational
+Database mapping::db(
+   Table employeeFirmDenormTable
+   (
+    id INT PRIMARY KEY,
+    name VARCHAR(200),
+    firmId INT,
+    legalName VARCHAR(200),
+    address1 VARCHAR(200),
+    postcode VARCHAR(10)
+   )
+)
+###Mapping
+import other::*;
+import mapping::*;
+Mapping mappingPackage::myMapping
+(
+    Address[alias2]: Relational
+    {
+       line1: [db]employeeFirmDenormTable.address1,
+       postcode: [db]employeeFirmDenormTable.postcode
+    }
+    Person[alias1]: Relational
+    {
+        name : [db]employeeFirmDenormTable.name,
+        firm
+        (
+            ~primaryKey ([db]employeeFirmDenormTable.legalName)
+            legalName : [db]employeeFirmDenormTable.legalName
+        ),
+        address () Inline [alias2]
+    }
+)
+""", repository, new ParserLibrary(Lists.immutable.with(new M3AntlrParser(), new MappingParser(), new RelationalParser())), ValidationType.DEEP, VoidM3M4StateListener.VOID_M3_M4_STATE_LISTENER, context);
         runtime.compile();
 
 
         CoreInstance mapping = this.graphWalker.getMapping("mappingPackage::myMapping");
-        Assert.assertNotNull(mapping);
-        Assert.assertEquals(4, this.graphWalker.getClassMappings(mapping).size());
+        Assertions.assertNotNull(mapping);
+        Assertions.assertEquals(4, this.graphWalker.getClassMappings(mapping).size());
 
         CoreInstance personMapping = this.graphWalker.getClassMapping(mapping, "Person");
-        Assert.assertNotNull(personMapping);
+        Assertions.assertNotNull(personMapping);
 
         CoreInstance addressMapping = this.graphWalker.getClassMapping(mapping, "Address");
-        Assert.assertNotNull(addressMapping);
+        Assertions.assertNotNull(addressMapping);
 
-        Assert.assertEquals("employeeFirmDenormTable", this.graphWalker.getName(this.graphWalker.getClassMappingImplementationMainTable(addressMapping)));
-        Assert.assertEquals(2, this.graphWalker.getClassMappingImplementationPropertyMappings(addressMapping).size());
+        Assertions.assertEquals("employeeFirmDenormTable", this.graphWalker.getName(this.graphWalker.getClassMappingImplementationMainTable(addressMapping)));
+        Assertions.assertEquals(2, this.graphWalker.getClassMappingImplementationPropertyMappings(addressMapping).size());
 
         CoreInstance addressLine1PropMapping = this.graphWalker.getClassMappingImplementationPropertyMapping(addressMapping, "line1");
         CoreInstance addressLine1ColumnAlias = this.graphWalker.getClassMappingImplementationPropertyMappingRelationalOperationElement(addressLine1PropMapping);
-        Assert.assertEquals("employeeFirmDenormTable", this.graphWalker.getTableAliasColumnAliasName(addressLine1ColumnAlias));
-        Assert.assertEquals("address1", this.graphWalker.getTableAliasColumnColumnName(addressLine1ColumnAlias));
+        Assertions.assertEquals("employeeFirmDenormTable", this.graphWalker.getTableAliasColumnAliasName(addressLine1ColumnAlias));
+        Assertions.assertEquals("address1", this.graphWalker.getTableAliasColumnColumnName(addressLine1ColumnAlias));
 
 
-        Assert.assertEquals("employeeFirmDenormTable", this.graphWalker.getName(this.graphWalker.getClassMappingImplementationMainTable(personMapping)));
-        Assert.assertEquals(3, this.graphWalker.getClassMappingImplementationPropertyMappings(personMapping).size());
+        Assertions.assertEquals("employeeFirmDenormTable", this.graphWalker.getName(this.graphWalker.getClassMappingImplementationMainTable(personMapping)));
+        Assertions.assertEquals(3, this.graphWalker.getClassMappingImplementationPropertyMappings(personMapping).size());
 
         CoreInstance firmPropMapping = this.graphWalker.getClassMappingImplementationPropertyMapping(personMapping, "firm");
-        Assert.assertNotNull(firmPropMapping);
+        Assertions.assertNotNull(firmPropMapping);
 
         CoreInstance firmProp = firmPropMapping.getValueForMetaPropertyToOne(M3Properties.property);
         ListIterable<? extends CoreInstance> refUsages = firmProp.getValueForMetaPropertyToMany(M3Properties.referenceUsages);
-        Assert.assertEquals(1, refUsages.size());
-        Assert.assertEquals(firmPropMapping, refUsages.getFirst().getValueForMetaPropertyToOne(M3Properties.owner));
-        Assert.assertNotNull(firmPropMapping.getValueForMetaPropertyToOne(M2RelationalProperties.propertyMappings));
+        Assertions.assertEquals(1, refUsages.size());
+        Assertions.assertEquals(firmPropMapping, refUsages.getFirst().getValueForMetaPropertyToOne(M3Properties.owner));
+        Assertions.assertNotNull(firmPropMapping.getValueForMetaPropertyToOne(M2RelationalProperties.propertyMappings));
 
         CoreInstance owner = firmPropMapping.getValueForMetaPropertyToOne(M2RelationalProperties.setMappingOwner);
-        Assert.assertEquals(personMapping, owner);
+        Assertions.assertEquals(personMapping, owner);
 
         ListIterable<? extends CoreInstance> pks = firmPropMapping.getValueForMetaPropertyToMany(M2RelationalProperties.primaryKey);
         CoreInstance pk = pks.getFirst();
-        Assert.assertEquals(personMapping, pk.getValueForMetaPropertyToOne(M2RelationalProperties.setMappingOwner));
+        Assertions.assertEquals(personMapping, pk.getValueForMetaPropertyToOne(M2RelationalProperties.setMappingOwner));
 
         CoreInstance addressPropMapping = this.graphWalker.getClassMappingImplementationPropertyMapping(personMapping, "address");
         CoreInstance ownerAddress = addressPropMapping.getValueForMetaPropertyToOne(M2RelationalProperties.setMappingOwner);
-        Assert.assertEquals(personMapping, ownerAddress);
+        Assertions.assertEquals(personMapping, ownerAddress);
 
-        Assert.assertNull(addressPropMapping.getValueForMetaPropertyToOne(M2RelationalProperties.propertyMappings));
+        Assertions.assertNull(addressPropMapping.getValueForMetaPropertyToOne(M2RelationalProperties.propertyMappings));
     }
 
     @Test
     public void embeddedMappingsWithOtherwise()
     {
         Loader.parseM3(
-                "import other::*;\n" +
-                        "\n" +
-                        "Class other::Person\n" +
-                        "{\n" +
-                        "    name:String[1];\n" +
-                        "    firm:Firm[1];\n" +
-                        "}\n" +
-                        "Class other::Firm\n" +
-                        "{\n" +
-                        "    legalName:String[1];\n" +
-                        "    otherInformation:String[1];\n" +
-                        "}\n" +
-                        "###Relational\n" +
-                        "Database mapping::db(\n" +
-                        "   Table employeeFirmDenormTable\n" +
-                        "   (\n" +
-                        "    id INT PRIMARY KEY,\n" +
-                        "    name VARCHAR(200),\n" +
-                        "    firmId INT,\n" +
-                        "    legalName VARCHAR(200),\n" +
-                        "    address1 VARCHAR(200),\n" +
-                        "    postcode VARCHAR(10)\n" +
-                        "   )\n" +
-                        "   Table FirmInfoTable\n" +
-                        "   (\n" +
-                        "    id INT PRIMARY KEY,\n" +
-                        "    name VARCHAR(200),\n" +
-                        "    other VARCHAR(200)\n" +
-                        "   )\n" +
-                        "   Join PersonFirmJoin(employeeFirmDenormTable.firmId = FirmInfoTable.id)\n" +
-                        ")\n" +
-                        "###Mapping\n" +
-                        "import other::*;\n" +
-                        "import mapping::*;\n" +
-                        "Mapping mappingPackage::myMapping\n" +
-                        "(\n" +
-                        "    Firm[firm1]: Relational\n" +
-                        "    {\n" +
-                        "       legalName : [db]FirmInfoTable.name ,\n" +
-                        "       otherInformation: [db]FirmInfoTable.other\n" +
-                        "    }\n" +
-                        "    Person[alias1]: Relational\n" +
-                        "    {\n" +
-                        "        name : [db]employeeFirmDenormTable.name,\n" +
-                        "        firm\n" +
-                        "        (\n" +
-                        "            ~primaryKey ([db]employeeFirmDenormTable.legalName)\n" +
-                        "            legalName : [db]employeeFirmDenormTable.legalName\n" +
-                        "        ) Otherwise ( [firm1]:[db]@PersonFirmJoin) \n" +
-                        "    }\n" +
-                        ")\n", repository, new ParserLibrary(Lists.immutable.with(new M3AntlrParser(), new MappingParser(), new RelationalParser())), ValidationType.DEEP, VoidM3M4StateListener.VOID_M3_M4_STATE_LISTENER, context);
+                """
+                import other::*;
+                
+                Class other::Person
+                {
+                    name:String[1];
+                    firm:Firm[1];
+                }
+                Class other::Firm
+                {
+                    legalName:String[1];
+                    otherInformation:String[1];
+                }
+                ###Relational
+                Database mapping::db(
+                   Table employeeFirmDenormTable
+                   (
+                    id INT PRIMARY KEY,
+                    name VARCHAR(200),
+                    firmId INT,
+                    legalName VARCHAR(200),
+                    address1 VARCHAR(200),
+                    postcode VARCHAR(10)
+                   )
+                   Table FirmInfoTable
+                   (
+                    id INT PRIMARY KEY,
+                    name VARCHAR(200),
+                    other VARCHAR(200)
+                   )
+                   Join PersonFirmJoin(employeeFirmDenormTable.firmId = FirmInfoTable.id)
+                )
+                ###Mapping
+                import other::*;
+                import mapping::*;
+                Mapping mappingPackage::myMapping
+                (
+                    Firm[firm1]: Relational
+                    {
+                       legalName : [db]FirmInfoTable.name ,
+                       otherInformation: [db]FirmInfoTable.other
+                    }
+                    Person[alias1]: Relational
+                    {
+                        name : [db]employeeFirmDenormTable.name,
+                        firm
+                        (
+                            ~primaryKey ([db]employeeFirmDenormTable.legalName)
+                            legalName : [db]employeeFirmDenormTable.legalName
+                        ) Otherwise ( [firm1]:[db]@PersonFirmJoin)\s
+                    }
+                )
+                """, repository, new ParserLibrary(Lists.immutable.with(new M3AntlrParser(), new MappingParser(), new RelationalParser())), ValidationType.DEEP, VoidM3M4StateListener.VOID_M3_M4_STATE_LISTENER, context);
         runtime.compile();
 
 
         CoreInstance mapping = this.graphWalker.getMapping("mappingPackage::myMapping");
-        Assert.assertNotNull(mapping);
-        Assert.assertEquals(3, this.graphWalker.getClassMappings(mapping).size());
+        Assertions.assertNotNull(mapping);
+        Assertions.assertEquals(3, this.graphWalker.getClassMappings(mapping).size());
 
 
         CoreInstance firmMapping = this.graphWalker.getClassMapping(mapping, "Firm");
-        Assert.assertNotNull(firmMapping);
-        Assert.assertTrue(PrimitiveUtilities.getBooleanValue(firmMapping.getValueForMetaPropertyToOne(M3Properties.root)));
-        Assert.assertEquals("FirmInfoTable", this.graphWalker.getName(this.graphWalker.getClassMappingImplementationMainTable(firmMapping)));
-        Assert.assertEquals(2, this.graphWalker.getClassMappingImplementationPropertyMappings(firmMapping).size());
+        Assertions.assertNotNull(firmMapping);
+        Assertions.assertTrue(PrimitiveUtilities.getBooleanValue(firmMapping.getValueForMetaPropertyToOne(M3Properties.root)));
+        Assertions.assertEquals("FirmInfoTable", this.graphWalker.getName(this.graphWalker.getClassMappingImplementationMainTable(firmMapping)));
+        Assertions.assertEquals(2, this.graphWalker.getClassMappingImplementationPropertyMappings(firmMapping).size());
 
         CoreInstance personMapping = this.graphWalker.getClassMapping(mapping, "Person");
-        Assert.assertNotNull(personMapping);
-        Assert.assertTrue(PrimitiveUtilities.getBooleanValue(personMapping.getValueForMetaPropertyToOne(M3Properties.root)));
-        Assert.assertEquals("employeeFirmDenormTable", this.graphWalker.getName(this.graphWalker.getClassMappingImplementationMainTable(personMapping)));
-        Assert.assertEquals(2, this.graphWalker.getClassMappingImplementationPropertyMappings(personMapping).size());
+        Assertions.assertNotNull(personMapping);
+        Assertions.assertTrue(PrimitiveUtilities.getBooleanValue(personMapping.getValueForMetaPropertyToOne(M3Properties.root)));
+        Assertions.assertEquals("employeeFirmDenormTable", this.graphWalker.getName(this.graphWalker.getClassMappingImplementationMainTable(personMapping)));
+        Assertions.assertEquals(2, this.graphWalker.getClassMappingImplementationPropertyMappings(personMapping).size());
 
         CoreInstance firmPropMapping = this.graphWalker.getClassMappingImplementationPropertyMapping(personMapping, "firm");
-        Assert.assertNotNull(firmPropMapping);
-        Assert.assertFalse(PrimitiveUtilities.getBooleanValue(firmPropMapping.getValueForMetaPropertyToOne(M3Properties.root)));
+        Assertions.assertNotNull(firmPropMapping);
+        Assertions.assertFalse(PrimitiveUtilities.getBooleanValue(firmPropMapping.getValueForMetaPropertyToOne(M3Properties.root)));
 
         CoreInstance owner = firmPropMapping.getValueForMetaPropertyToOne(M2RelationalProperties.setMappingOwner);
-        Assert.assertEquals(personMapping, owner);
+        Assertions.assertEquals(personMapping, owner);
 
         CoreInstance firmProp = firmPropMapping.getValueForMetaPropertyToOne(M3Properties.property);
         ListIterable<? extends CoreInstance> refUsages = firmProp.getValueForMetaPropertyToMany(M3Properties.referenceUsages);
-        Assert.assertEquals(1, refUsages.size());
-        Assert.assertEquals(firmPropMapping, refUsages.getFirst().getValueForMetaPropertyToOne(M3Properties.owner));
-        Assert.assertNotNull(firmPropMapping.getValueForMetaPropertyToOne(M2MappingProperties.propertyMappings));
+        Assertions.assertEquals(1, refUsages.size());
+        Assertions.assertEquals(firmPropMapping, refUsages.getFirst().getValueForMetaPropertyToOne(M3Properties.owner));
+        Assertions.assertNotNull(firmPropMapping.getValueForMetaPropertyToOne(M2MappingProperties.propertyMappings));
 
 
         CoreInstance otherwiseMapping = firmPropMapping.getValueForMetaPropertyToOne(M2MappingProperties.otherwisePropertyMapping);
-        Assert.assertNotNull(otherwiseMapping);
+        Assertions.assertNotNull(otherwiseMapping);
         CompiledStateIntegrityTestTools.testPropertyIntegrity(otherwiseMapping, processorSupport);
-        Assert.assertEquals("alias1", PrimitiveUtilities.getStringValue(otherwiseMapping.getValueForMetaPropertyToOne(M2MappingProperties.sourceSetImplementationId), null));
-        Assert.assertEquals(1, this.graphWalker.getClassMappingImplementationPropertyMappings(firmPropMapping).size());
-        Assert.assertEquals(1, this.graphWalker.getClassMappingImplementationOtherwisePropertyMapping(firmPropMapping).size());
+        Assertions.assertEquals("alias1", PrimitiveUtilities.getStringValue(otherwiseMapping.getValueForMetaPropertyToOne(M2MappingProperties.sourceSetImplementationId), null));
+        Assertions.assertEquals(1, this.graphWalker.getClassMappingImplementationPropertyMappings(firmPropMapping).size());
+        Assertions.assertEquals(1, this.graphWalker.getClassMappingImplementationOtherwisePropertyMapping(firmPropMapping).size());
 
         CoreInstance alias = otherwiseMapping.getValueForMetaPropertyToOne(M2RelationalProperties.relationalOperationElement)
                 .getValueForMetaPropertyToOne(M2RelationalProperties.joinTreeNode)
                 .getValueForMetaPropertyToOne(M2RelationalProperties.alias);
-        Assert.assertNotNull(alias);
+        Assertions.assertNotNull(alias);
     }
 
     @Test
     public void embeddedMappingsWithOtherwise2()
     {
         Loader.parseM3(
-                "import other::*;\n" +
-                        "\n" +
-                        "Class other::Person\n" +
-                        "{\n" +
-                        "    name:String[1];\n" +
-                        "    firm:Firm[1];\n" +
-                        "}\n" +
-                        "Class other::Firm\n" +
-                        "{\n" +
-                        "    legalName:String[1];\n" +
-                        "    otherInformation:String[1];\n" +
-                        "}\n" +
-                        "###Relational\n" +
-                        "Database mapping::db(\n" +
-                        "   Table employeeFirmDenormTable\n" +
-                        "   (\n" +
-                        "    id INT PRIMARY KEY,\n" +
-                        "    name VARCHAR(200),\n" +
-                        "    firmId INT,\n" +
-                        "    legalName VARCHAR(200),\n" +
-                        "    address1 VARCHAR(200),\n" +
-                        "    postcode VARCHAR(10)\n" +
-                        "   )\n" +
-                        "   Table FirmInfoTable\n" +
-                        "   (\n" +
-                        "    id INT PRIMARY KEY,\n" +
-                        "    name VARCHAR(200),\n" +
-                        "    other VARCHAR(200)\n" +
-                        "   )\n" +
-                        "   Join PersonFirmJoin(employeeFirmDenormTable.firmId = FirmInfoTable.id)\n" +
-                        ")\n" +
-                        "###Mapping\n" +
-                        "import other::*;\n" +
-                        "import mapping::*;\n" +
-                        "Mapping mappingPackage::myMapping\n" +
-                        "(\n" +
-                        "    Firm[f1]: Relational\n" +
-                        "    {\n" +
-                        "       legalName : [db]FirmInfoTable.name ,\n" +
-                        "       otherInformation: [db]FirmInfoTable.other\n" +
-                        "    }\n" +
-                        "    Person[alias1]: Relational\n" +
-                        "    {\n" +
-                        "        name : [db]employeeFirmDenormTable.name,\n" +
-                        "       firm[f1]:[db]@PersonFirmJoin \n" +
-                        "    }\n" +
-                        ")\n", repository, new ParserLibrary(Lists.immutable.with(new M3AntlrParser(), new MappingParser(), new RelationalParser())), ValidationType.DEEP, VoidM3M4StateListener.VOID_M3_M4_STATE_LISTENER, context);
+                """
+                import other::*;
+                
+                Class other::Person
+                {
+                    name:String[1];
+                    firm:Firm[1];
+                }
+                Class other::Firm
+                {
+                    legalName:String[1];
+                    otherInformation:String[1];
+                }
+                ###Relational
+                Database mapping::db(
+                   Table employeeFirmDenormTable
+                   (
+                    id INT PRIMARY KEY,
+                    name VARCHAR(200),
+                    firmId INT,
+                    legalName VARCHAR(200),
+                    address1 VARCHAR(200),
+                    postcode VARCHAR(10)
+                   )
+                   Table FirmInfoTable
+                   (
+                    id INT PRIMARY KEY,
+                    name VARCHAR(200),
+                    other VARCHAR(200)
+                   )
+                   Join PersonFirmJoin(employeeFirmDenormTable.firmId = FirmInfoTable.id)
+                )
+                ###Mapping
+                import other::*;
+                import mapping::*;
+                Mapping mappingPackage::myMapping
+                (
+                    Firm[f1]: Relational
+                    {
+                       legalName : [db]FirmInfoTable.name ,
+                       otherInformation: [db]FirmInfoTable.other
+                    }
+                    Person[alias1]: Relational
+                    {
+                        name : [db]employeeFirmDenormTable.name,
+                       firm[f1]:[db]@PersonFirmJoin\s
+                    }
+                )
+                """, repository, new ParserLibrary(Lists.immutable.with(new M3AntlrParser(), new MappingParser(), new RelationalParser())), ValidationType.DEEP, VoidM3M4StateListener.VOID_M3_M4_STATE_LISTENER, context);
         runtime.compile();
 
 
         CoreInstance mapping = this.graphWalker.getMapping("mappingPackage::myMapping");
-        Assert.assertNotNull(mapping);
+        Assertions.assertNotNull(mapping);
 
         CoreInstance personMapping = this.graphWalker.getClassMapping(mapping, "Person");
-        Assert.assertNotNull(personMapping);
+        Assertions.assertNotNull(personMapping);
         CoreInstance firmPropMapping = this.graphWalker.getClassMappingImplementationPropertyMapping(personMapping, "firm");
-        Assert.assertNotNull(firmPropMapping);
+        Assertions.assertNotNull(firmPropMapping);
         CoreInstance opElement = firmPropMapping.getValueForMetaPropertyToOne(M2RelationalProperties.relationalOperationElement)
                 .getValueForMetaPropertyToOne(M2RelationalProperties.joinTreeNode).getValueForMetaPropertyToOne(M2RelationalProperties.alias);
 
-        Assert.assertNotNull(opElement);
+        Assertions.assertNotNull(opElement);
     }
 
 
@@ -805,216 +830,222 @@ public class TestEmbeddedGrammar extends AbstractPureRelationalTestWithCoreCompi
     public void embeddedMappingsWithOtherwiseInClassMappingWithoutId()
     {
         Loader.parseM3(
-                "import other::*;\n" +
-                        "\n" +
-                        "Class other::Person\n" +
-                        "{\n" +
-                        "    name:String[1];\n" +
-                        "    firm:Firm[1];\n" +
-                        "}\n" +
-                        "Class other::Firm\n" +
-                        "{\n" +
-                        "    legalName:String[1];\n" +
-                        "    otherInformation:String[1];\n" +
-                        "}\n" +
-                        "###Relational\n" +
-                        "Database mapping::db(\n" +
-                        "   Table employeeFirmDenormTable\n" +
-                        "   (\n" +
-                        "    id INT PRIMARY KEY,\n" +
-                        "    name VARCHAR(200),\n" +
-                        "    firmId INT,\n" +
-                        "    legalName VARCHAR(200),\n" +
-                        "    address1 VARCHAR(200),\n" +
-                        "    postcode VARCHAR(10)\n" +
-                        "   )\n" +
-                        "   Table FirmInfoTable\n" +
-                        "   (\n" +
-                        "    id INT PRIMARY KEY,\n" +
-                        "    name VARCHAR(200),\n" +
-                        "    other VARCHAR(200)\n" +
-                        "   )\n" +
-                        "   Join PersonFirmJoin(employeeFirmDenormTable.firmId = FirmInfoTable.id)\n" +
-                        ")\n" +
-                        "###Mapping\n" +
-                        "import other::*;\n" +
-                        "import mapping::*;\n" +
-                        "Mapping mappingPackage::myMapping\n" +
-                        "(\n" +
-                        "    Firm[firm1]: Relational\n" +
-                        "    {\n" +
-                        "       legalName : [db]FirmInfoTable.name ,\n" +
-                        "       otherInformation: [db]FirmInfoTable.other\n" +
-                        "    }\n" +
-                        "    Person: Relational\n" +
-                        "    {\n" +
-                        "        name : [db]employeeFirmDenormTable.name,\n" +
-                        "        firm\n" +
-                        "        (\n" +
-                        "            ~primaryKey ([db]employeeFirmDenormTable.legalName)\n" +
-                        "            legalName : [db]employeeFirmDenormTable.legalName\n" +
-                        "        ) Otherwise ( [firm1]:[db]@PersonFirmJoin) \n" +
-                        "    }\n" +
-                        ")\n", repository, new ParserLibrary(Lists.immutable.with(new M3AntlrParser(), new MappingParser(), new RelationalParser())), ValidationType.DEEP, VoidM3M4StateListener.VOID_M3_M4_STATE_LISTENER, context);
+                """
+                import other::*;
+                
+                Class other::Person
+                {
+                    name:String[1];
+                    firm:Firm[1];
+                }
+                Class other::Firm
+                {
+                    legalName:String[1];
+                    otherInformation:String[1];
+                }
+                ###Relational
+                Database mapping::db(
+                   Table employeeFirmDenormTable
+                   (
+                    id INT PRIMARY KEY,
+                    name VARCHAR(200),
+                    firmId INT,
+                    legalName VARCHAR(200),
+                    address1 VARCHAR(200),
+                    postcode VARCHAR(10)
+                   )
+                   Table FirmInfoTable
+                   (
+                    id INT PRIMARY KEY,
+                    name VARCHAR(200),
+                    other VARCHAR(200)
+                   )
+                   Join PersonFirmJoin(employeeFirmDenormTable.firmId = FirmInfoTable.id)
+                )
+                ###Mapping
+                import other::*;
+                import mapping::*;
+                Mapping mappingPackage::myMapping
+                (
+                    Firm[firm1]: Relational
+                    {
+                       legalName : [db]FirmInfoTable.name ,
+                       otherInformation: [db]FirmInfoTable.other
+                    }
+                    Person: Relational
+                    {
+                        name : [db]employeeFirmDenormTable.name,
+                        firm
+                        (
+                            ~primaryKey ([db]employeeFirmDenormTable.legalName)
+                            legalName : [db]employeeFirmDenormTable.legalName
+                        ) Otherwise ( [firm1]:[db]@PersonFirmJoin)\s
+                    }
+                )
+                """, repository, new ParserLibrary(Lists.immutable.with(new M3AntlrParser(), new MappingParser(), new RelationalParser())), ValidationType.DEEP, VoidM3M4StateListener.VOID_M3_M4_STATE_LISTENER, context);
         runtime.compile();
 
 
         CoreInstance mapping = this.graphWalker.getMapping("mappingPackage::myMapping");
-        Assert.assertNotNull(mapping);
-        Assert.assertEquals(3, this.graphWalker.getClassMappings(mapping).size());
+        Assertions.assertNotNull(mapping);
+        Assertions.assertEquals(3, this.graphWalker.getClassMappings(mapping).size());
 
 
         CoreInstance firmMapping = this.graphWalker.getClassMapping(mapping, "Firm");
-        Assert.assertNotNull(firmMapping);
-        Assert.assertTrue(PrimitiveUtilities.getBooleanValue(firmMapping.getValueForMetaPropertyToOne(M3Properties.root)));
-        Assert.assertEquals("FirmInfoTable", this.graphWalker.getName(this.graphWalker.getClassMappingImplementationMainTable(firmMapping)));
-        Assert.assertEquals(2, this.graphWalker.getClassMappingImplementationPropertyMappings(firmMapping).size());
+        Assertions.assertNotNull(firmMapping);
+        Assertions.assertTrue(PrimitiveUtilities.getBooleanValue(firmMapping.getValueForMetaPropertyToOne(M3Properties.root)));
+        Assertions.assertEquals("FirmInfoTable", this.graphWalker.getName(this.graphWalker.getClassMappingImplementationMainTable(firmMapping)));
+        Assertions.assertEquals(2, this.graphWalker.getClassMappingImplementationPropertyMappings(firmMapping).size());
 
         CoreInstance personMapping = this.graphWalker.getClassMapping(mapping, "Person");
-        Assert.assertNotNull(personMapping);
-        Assert.assertTrue(PrimitiveUtilities.getBooleanValue(personMapping.getValueForMetaPropertyToOne(M3Properties.root)));
-        Assert.assertEquals("employeeFirmDenormTable", this.graphWalker.getName(this.graphWalker.getClassMappingImplementationMainTable(personMapping)));
-        Assert.assertEquals(2, this.graphWalker.getClassMappingImplementationPropertyMappings(personMapping).size());
+        Assertions.assertNotNull(personMapping);
+        Assertions.assertTrue(PrimitiveUtilities.getBooleanValue(personMapping.getValueForMetaPropertyToOne(M3Properties.root)));
+        Assertions.assertEquals("employeeFirmDenormTable", this.graphWalker.getName(this.graphWalker.getClassMappingImplementationMainTable(personMapping)));
+        Assertions.assertEquals(2, this.graphWalker.getClassMappingImplementationPropertyMappings(personMapping).size());
 
         CoreInstance firmPropMapping = this.graphWalker.getClassMappingImplementationPropertyMapping(personMapping, "firm");
-        Assert.assertNotNull(firmPropMapping);
-        Assert.assertFalse(PrimitiveUtilities.getBooleanValue(firmPropMapping.getValueForMetaPropertyToOne(M3Properties.root)));
+        Assertions.assertNotNull(firmPropMapping);
+        Assertions.assertFalse(PrimitiveUtilities.getBooleanValue(firmPropMapping.getValueForMetaPropertyToOne(M3Properties.root)));
 
         CoreInstance owner = firmPropMapping.getValueForMetaPropertyToOne(M2RelationalProperties.setMappingOwner);
-        Assert.assertEquals(personMapping, owner);
+        Assertions.assertEquals(personMapping, owner);
 
         CoreInstance firmProp = firmPropMapping.getValueForMetaPropertyToOne(M3Properties.property);
         ListIterable<? extends CoreInstance> refUsages = firmProp.getValueForMetaPropertyToMany(M3Properties.referenceUsages);
-        Assert.assertEquals(1, refUsages.size());
-        Assert.assertEquals(firmPropMapping, refUsages.getFirst().getValueForMetaPropertyToOne(M3Properties.owner));
-        Assert.assertNotNull(firmPropMapping.getValueForMetaPropertyToOne(M2MappingProperties.propertyMappings));
+        Assertions.assertEquals(1, refUsages.size());
+        Assertions.assertEquals(firmPropMapping, refUsages.getFirst().getValueForMetaPropertyToOne(M3Properties.owner));
+        Assertions.assertNotNull(firmPropMapping.getValueForMetaPropertyToOne(M2MappingProperties.propertyMappings));
 
 
         CoreInstance otherwiseMapping = firmPropMapping.getValueForMetaPropertyToOne(M2MappingProperties.otherwisePropertyMapping);
-        Assert.assertNotNull(otherwiseMapping);
-        Assert.assertEquals("other_Person", PrimitiveUtilities.getStringValue(otherwiseMapping.getValueForMetaPropertyToOne(M2MappingProperties.sourceSetImplementationId), null));
+        Assertions.assertNotNull(otherwiseMapping);
+        Assertions.assertEquals("other_Person", PrimitiveUtilities.getStringValue(otherwiseMapping.getValueForMetaPropertyToOne(M2MappingProperties.sourceSetImplementationId), null));
         CompiledStateIntegrityTestTools.testPropertyIntegrity(otherwiseMapping, processorSupport);
-        Assert.assertEquals(1, this.graphWalker.getClassMappingImplementationPropertyMappings(firmPropMapping).size());
-        Assert.assertEquals(1, this.graphWalker.getClassMappingImplementationOtherwisePropertyMapping(firmPropMapping).size());
+        Assertions.assertEquals(1, this.graphWalker.getClassMappingImplementationPropertyMappings(firmPropMapping).size());
+        Assertions.assertEquals(1, this.graphWalker.getClassMappingImplementationOtherwisePropertyMapping(firmPropMapping).size());
 
         CoreInstance alias = otherwiseMapping.getValueForMetaPropertyToOne(M2RelationalProperties.relationalOperationElement)
                 .getValueForMetaPropertyToOne(M2RelationalProperties.joinTreeNode)
                 .getValueForMetaPropertyToOne(M2RelationalProperties.alias);
-        Assert.assertNotNull(alias);
+        Assertions.assertNotNull(alias);
     }
 
 
     @Test
     public void otherwiseMappingsWithInvalidTargetId()
     {
-        LoaderException e = Assert.assertThrows(LoaderException.class, () -> Loader.parseM3(
-                "import other::*;\n" +
-                        "\n" +
-                        "Class other::Person\n" +
-                        "{\n" +
-                        "    name:String[1];\n" +
-                        "    firm:Firm[1];\n" +
-                        "}\n" +
-                        "Class other::Firm\n" +
-                        "{\n" +
-                        "    legalName:String[1];\n" +
-                        "    otherInformation:String[1];\n" +
-                        "}\n" +
-                        "###Relational\n" +
-                        "Database mapping::db(\n" +
-                        "   Table employeeFirmDenormTable\n" +
-                        "   (\n" +
-                        "    id INT PRIMARY KEY,\n" +
-                        "    name VARCHAR(200),\n" +
-                        "    firmId INT,\n" +
-                        "    legalName VARCHAR(200),\n" +
-                        "    address1 VARCHAR(200),\n" +
-                        "    postcode VARCHAR(10)\n" +
-                        "   )\n" +
-                        "   Table FirmInfoTable\n" +
-                        "   (\n" +
-                        "    id INT PRIMARY KEY,\n" +
-                        "    name VARCHAR(200),\n" +
-                        "    other VARCHAR(200)\n" +
-                        "   )\n" +
-                        "   Join PersonFirmJoin(employeeFirmDenormTable.firmId = FirmInfoTable.id)\n" +
-                        ")\n" +
-                        "###Mapping\n" +
-                        "import other::*;\n" +
-                        "import mapping::*;\n" +
-                        "Mapping mappingPackage::myMapping\n" +
-                        "(\n" +
-                        "    Firm: Relational\n" +
-                        "    {\n" +
-                        "       legalName : [db]FirmInfoTable.name ,\n" +
-                        "       otherInformation: [db]FirmInfoTable.other\n" +
-                        "    }\n" +
-                        "    Person[alias1]: Relational\n" +
-                        "    {\n" +
-                        "        name : [db]employeeFirmDenormTable.name,\n" +
-                        "        firm\n" +
-                        "        (\n" +
-                        "            ~primaryKey ([db]employeeFirmDenormTable.legalName)\n" +
-                        "            legalName : [db]employeeFirmDenormTable.legalName\n" +
-                        "        ) Otherwise ([firm1]:[db]@PersonFirmJoin) \n" +
-                        "    }\n" +
-                        ")\n", repository, new ParserLibrary(Lists.immutable.with(new M3AntlrParser(), new MappingParser(), new RelationalParser())), ValidationType.DEEP, VoidM3M4StateListener.VOID_M3_M4_STATE_LISTENER, context));
+        LoaderException e = Assertions.assertThrows(LoaderException.class, () -> Loader.parseM3(
+                """
+                import other::*;
+                
+                Class other::Person
+                {
+                    name:String[1];
+                    firm:Firm[1];
+                }
+                Class other::Firm
+                {
+                    legalName:String[1];
+                    otherInformation:String[1];
+                }
+                ###Relational
+                Database mapping::db(
+                   Table employeeFirmDenormTable
+                   (
+                    id INT PRIMARY KEY,
+                    name VARCHAR(200),
+                    firmId INT,
+                    legalName VARCHAR(200),
+                    address1 VARCHAR(200),
+                    postcode VARCHAR(10)
+                   )
+                   Table FirmInfoTable
+                   (
+                    id INT PRIMARY KEY,
+                    name VARCHAR(200),
+                    other VARCHAR(200)
+                   )
+                   Join PersonFirmJoin(employeeFirmDenormTable.firmId = FirmInfoTable.id)
+                )
+                ###Mapping
+                import other::*;
+                import mapping::*;
+                Mapping mappingPackage::myMapping
+                (
+                    Firm: Relational
+                    {
+                       legalName : [db]FirmInfoTable.name ,
+                       otherInformation: [db]FirmInfoTable.other
+                    }
+                    Person[alias1]: Relational
+                    {
+                        name : [db]employeeFirmDenormTable.name,
+                        firm
+                        (
+                            ~primaryKey ([db]employeeFirmDenormTable.legalName)
+                            legalName : [db]employeeFirmDenormTable.legalName
+                        ) Otherwise ([firm1]:[db]@PersonFirmJoin)\s
+                    }
+                )
+                """, repository, new ParserLibrary(Lists.immutable.with(new M3AntlrParser(), new MappingParser(), new RelationalParser())), ValidationType.DEEP, VoidM3M4StateListener.VOID_M3_M4_STATE_LISTENER, context));
         assertPureException(PureCompilationException.class, "Invalid Otherwise mapping found for 'firm' property, targetId firm1 does not exists.", "fromString.pure", 45, 9, e.getCause());
     }
 
     @Test
     public void redundantOtherwiseMappingsWithTargetId()
     {
-        LoaderException e = Assert.assertThrows(LoaderException.class, () -> Loader.parseM3(
-                "import other::*;\n" +
-                        "\n" +
-                        "Class other::Person\n" +
-                        "{\n" +
-                        "    name:String[1];\n" +
-                        "    firm:Firm[1];\n" +
-                        "}\n" +
-                        "Class other::Firm\n" +
-                        "{\n" +
-                        "    legalName:String[1];\n" +
-                        "    otherInformation:String[1];\n" +
-                        "}\n" +
-                        "###Relational\n" +
-                        "Database mapping::db(\n" +
-                        "   Table employeeFirmDenormTable\n" +
-                        "   (\n" +
-                        "    id INT PRIMARY KEY,\n" +
-                        "    name VARCHAR(200),\n" +
-                        "    firmId INT,\n" +
-                        "    legalName VARCHAR(200),\n" +
-                        "    address1 VARCHAR(200),\n" +
-                        "    postcode VARCHAR(10)\n" +
-                        "   )\n" +
-                        "   Table FirmInfoTable\n" +
-                        "   (\n" +
-                        "    id INT PRIMARY KEY,\n" +
-                        "    name VARCHAR(200),\n" +
-                        "    other VARCHAR(200)\n" +
-                        "   )\n" +
-                        "   Join PersonFirmJoin(employeeFirmDenormTable.firmId = FirmInfoTable.id)\n" +
-                        ")\n" +
-                        "###Mapping\n" +
-                        "import other::*;\n" +
-                        "import mapping::*;\n" +
-                        "Mapping mappingPackage::myMapping\n" +
-                        "(\n" +
-                        "    Firm: Relational\n" +
-                        "    {\n" +
-                        "       legalName : [db]FirmInfoTable.name ,\n" +
-                        "       otherInformation: [db]FirmInfoTable.other\n" +
-                        "    }\n" +
-                        "    Person[alias1]: Relational\n" +
-                        "    {\n" +
-                        "        name : [db]employeeFirmDenormTable.name,\n" +
-                        "        firm\n" +
-                        "        (\n" +
-                        "        ) Otherwise ([firm1]:[db]@PersonFirmJoin) \n" +
-                        "    }\n" +
-                        ")\n", repository, new ParserLibrary(Lists.immutable.with(new M3AntlrParser(), new MappingParser(), new RelationalParser())), ValidationType.DEEP, VoidM3M4StateListener.VOID_M3_M4_STATE_LISTENER, context));
+        LoaderException e = Assertions.assertThrows(LoaderException.class, () -> Loader.parseM3(
+                """
+                import other::*;
+                
+                Class other::Person
+                {
+                    name:String[1];
+                    firm:Firm[1];
+                }
+                Class other::Firm
+                {
+                    legalName:String[1];
+                    otherInformation:String[1];
+                }
+                ###Relational
+                Database mapping::db(
+                   Table employeeFirmDenormTable
+                   (
+                    id INT PRIMARY KEY,
+                    name VARCHAR(200),
+                    firmId INT,
+                    legalName VARCHAR(200),
+                    address1 VARCHAR(200),
+                    postcode VARCHAR(10)
+                   )
+                   Table FirmInfoTable
+                   (
+                    id INT PRIMARY KEY,
+                    name VARCHAR(200),
+                    other VARCHAR(200)
+                   )
+                   Join PersonFirmJoin(employeeFirmDenormTable.firmId = FirmInfoTable.id)
+                )
+                ###Mapping
+                import other::*;
+                import mapping::*;
+                Mapping mappingPackage::myMapping
+                (
+                    Firm: Relational
+                    {
+                       legalName : [db]FirmInfoTable.name ,
+                       otherInformation: [db]FirmInfoTable.other
+                    }
+                    Person[alias1]: Relational
+                    {
+                        name : [db]employeeFirmDenormTable.name,
+                        firm
+                        (
+                        ) Otherwise ([firm1]:[db]@PersonFirmJoin)\s
+                    }
+                )
+                """, repository, new ParserLibrary(Lists.immutable.with(new M3AntlrParser(), new MappingParser(), new RelationalParser())), ValidationType.DEEP, VoidM3M4StateListener.VOID_M3_M4_STATE_LISTENER, context));
         assertPureException(PureCompilationException.class, "Invalid Otherwise mapping found: 'firm' property has no embedded mappings defined, please use a property mapping with Join instead.", "fromString.pure", 45, 9, e.getCause());
     }
 
@@ -1022,68 +1053,70 @@ public class TestEmbeddedGrammar extends AbstractPureRelationalTestWithCoreCompi
     public void embeddedMappingsCanBeReferencedInAssociationMappingAsSource()
     {
         Loader.parseM3(
-                "import other::*;\n" +
-                        "\n" +
-                        "Class other::Person\n" +
-                        "{\n" +
-                        "    name:String[1];\n" +
-                        "    address:Address[1];\n" +
-                        "    firm:Firm[1];\n" +
-                        "}\n" +
-                        "Class other::Firm\n" +
-                        "{\n" +
-                        "    legalName:String[1];\n" +
-                        "}\n" +
-                        "Class other::Address\n" +
-                        "{\n" +
-                        "    line1:String[1];\n" +
-                        "    postcode:String[1];\n" +
-                        "}\n" +
-                        "Association other::Firm_Address\n" +
-                        "{\n" +
-                        "    address:Address[0..1];\n" +
-                        "    firm:Firm[1];\n" +
-                        "}\n" +
-                        "###Relational\n" +
-                        "Database mapping::db(\n" +
-                        "   Table employeeFirmDenormTable\n" +
-                        "   (\n" +
-                        "    id INT PRIMARY KEY,\n" +
-                        "    name VARCHAR(200),\n" +
-                        "    firmId INT,\n" +
-                        "    legalName VARCHAR(200),\n" +
-                        "    address1 VARCHAR(200),\n" +
-                        "    postcode VARCHAR(10)\n" +
-                        "   )\n" +
-                        "   Join firmAddress(employeeFirmDenormTable.address1 = {target}.address1)\n" +
-                        ")\n" +
-                        "###Mapping\n" +
-                        "import other::*;\n" +
-                        "import mapping::*;\n" +
-                        "Mapping mappingPackage::myMapping\n" +
-                        "(\n" +
-                        "    Address[a1]: Relational\n" +
-                        "    {\n" +
-                        "       line1: [db]employeeFirmDenormTable.address1,\n" +
-                        "       postcode: [db]employeeFirmDenormTable.postcode\n" +
-                        "    }\n" +
-                        "    Person[p1]: Relational\n" +
-                        "    {\n" +
-                        "        name : [db]employeeFirmDenormTable.name,\n" +
-                        "        firm\n" +
-                        "        (\n" +
-                        "            ~primaryKey ([db]employeeFirmDenormTable.legalName)\n" +
-                        "            legalName : [db]employeeFirmDenormTable.legalName\n" +
-                        "        )\n" +
-                        "    }\n" +
-                        "    Firm_Address: Relational\n" +
-                        "    {\n" +
-                        "        AssociationMapping\n" +
-                        "        (\n" +
-                        "           address[p1_firm,a1] : [db]@firmAddress\n" +
-                        "        )\n" +
-                        "    }\n" +
-                        ")\n", repository, new ParserLibrary(Lists.immutable.with(new M3AntlrParser(), new MappingParser(), new RelationalParser())), ValidationType.DEEP, VoidM3M4StateListener.VOID_M3_M4_STATE_LISTENER, context);
+                """
+                import other::*;
+                
+                Class other::Person
+                {
+                    name:String[1];
+                    address:Address[1];
+                    firm:Firm[1];
+                }
+                Class other::Firm
+                {
+                    legalName:String[1];
+                }
+                Class other::Address
+                {
+                    line1:String[1];
+                    postcode:String[1];
+                }
+                Association other::Firm_Address
+                {
+                    address:Address[0..1];
+                    firm:Firm[1];
+                }
+                ###Relational
+                Database mapping::db(
+                   Table employeeFirmDenormTable
+                   (
+                    id INT PRIMARY KEY,
+                    name VARCHAR(200),
+                    firmId INT,
+                    legalName VARCHAR(200),
+                    address1 VARCHAR(200),
+                    postcode VARCHAR(10)
+                   )
+                   Join firmAddress(employeeFirmDenormTable.address1 = {target}.address1)
+                )
+                ###Mapping
+                import other::*;
+                import mapping::*;
+                Mapping mappingPackage::myMapping
+                (
+                    Address[a1]: Relational
+                    {
+                       line1: [db]employeeFirmDenormTable.address1,
+                       postcode: [db]employeeFirmDenormTable.postcode
+                    }
+                    Person[p1]: Relational
+                    {
+                        name : [db]employeeFirmDenormTable.name,
+                        firm
+                        (
+                            ~primaryKey ([db]employeeFirmDenormTable.legalName)
+                            legalName : [db]employeeFirmDenormTable.legalName
+                        )
+                    }
+                    Firm_Address: Relational
+                    {
+                        AssociationMapping
+                        (
+                           address[p1_firm,a1] : [db]@firmAddress
+                        )
+                    }
+                )
+                """, repository, new ParserLibrary(Lists.immutable.with(new M3AntlrParser(), new MappingParser(), new RelationalParser())), ValidationType.DEEP, VoidM3M4StateListener.VOID_M3_M4_STATE_LISTENER, context);
         runtime.compile();
 
     }
@@ -1092,698 +1125,721 @@ public class TestEmbeddedGrammar extends AbstractPureRelationalTestWithCoreCompi
     public void inlinedEmbeddedMappingsCanBeReferencedInAssociationMappingAsSource()
     {
         Loader.parseM3(
-                "import other::*;\n" +
-                        "\n" +
-                        "Class other::Person\n" +
-                        "{\n" +
-                        "    name:String[1];\n" +
-                        "    address:Address[1];\n" +
-                        "    firm:Firm[1];\n" +
-                        "}\n" +
-                        "Class other::Firm\n" +
-                        "{\n" +
-                        "    legalName:String[1];\n" +
-                        "}\n" +
-                        "Class other::Address\n" +
-                        "{\n" +
-                        "    line1:String[1];\n" +
-                        "    postcode:String[1];\n" +
-                        "}\n" +
-                        "Association other::Firm_Address\n" +
-                        "{\n" +
-                        "    address:Address[0..1];\n" +
-                        "    firm:Firm[1];\n" +
-                        "}\n" +
-                        "###Relational\n" +
-                        "Database mapping::db(\n" +
-                        "   Table employeeFirmDenormTable\n" +
-                        "   (\n" +
-                        "    id INT PRIMARY KEY,\n" +
-                        "    name VARCHAR(200),\n" +
-                        "    firmId INT,\n" +
-                        "    legalName VARCHAR(200),\n" +
-                        "    address1 VARCHAR(200),\n" +
-                        "    postcode VARCHAR(10)\n" +
-                        "   )\n" +
-                        "   Join firmAddress(employeeFirmDenormTable.address1 = {target}.address1)\n" +
-                        ")\n" +
-                        "###Mapping\n" +
-                        "import other::*;\n" +
-                        "import mapping::*;\n" +
-                        "Mapping mappingPackage::myMapping\n" +
-                        "(\n" +
-                        "    Address[a1]: Relational\n" +
-                        "    {\n" +
-                        "       line1: [db]employeeFirmDenormTable.address1,\n" +
-                        "       postcode: [db]employeeFirmDenormTable.postcode\n" +
-                        "    }\n" +
-                        "    Person[p1]: Relational\n" +
-                        "    {\n" +
-                        "        name : [db]employeeFirmDenormTable.name,\n" +
-                        "        firm\n" +
-                        "        (\n" +
-                        "            ~primaryKey ([db]employeeFirmDenormTable.legalName)\n" +
-                        "            legalName : [db]employeeFirmDenormTable.legalName\n" +
-                        "        )\n" +
-                        "    }\n" +
-                        "    Firm[f1]: Relational\n" +
-                        "    {\n" +
-                        "         legalName : [db]employeeFirmDenormTable.legalName\n" +
-                        "    }\n" +
-                        "    Firm_Address: Relational\n" +
-                        "    {\n" +
-                        "        AssociationMapping\n" +
-                        "        (\n" +
-                        "           address[p1_firm,a1] : [db]@firmAddress\n" +
-                        "        )\n" +
-                        "    }\n" +
-                        ")\n", repository, new ParserLibrary(Lists.immutable.with(new M3AntlrParser(), new MappingParser(), new RelationalParser())), ValidationType.DEEP, VoidM3M4StateListener.VOID_M3_M4_STATE_LISTENER, context);
+                """
+                import other::*;
+                
+                Class other::Person
+                {
+                    name:String[1];
+                    address:Address[1];
+                    firm:Firm[1];
+                }
+                Class other::Firm
+                {
+                    legalName:String[1];
+                }
+                Class other::Address
+                {
+                    line1:String[1];
+                    postcode:String[1];
+                }
+                Association other::Firm_Address
+                {
+                    address:Address[0..1];
+                    firm:Firm[1];
+                }
+                ###Relational
+                Database mapping::db(
+                   Table employeeFirmDenormTable
+                   (
+                    id INT PRIMARY KEY,
+                    name VARCHAR(200),
+                    firmId INT,
+                    legalName VARCHAR(200),
+                    address1 VARCHAR(200),
+                    postcode VARCHAR(10)
+                   )
+                   Join firmAddress(employeeFirmDenormTable.address1 = {target}.address1)
+                )
+                ###Mapping
+                import other::*;
+                import mapping::*;
+                Mapping mappingPackage::myMapping
+                (
+                    Address[a1]: Relational
+                    {
+                       line1: [db]employeeFirmDenormTable.address1,
+                       postcode: [db]employeeFirmDenormTable.postcode
+                    }
+                    Person[p1]: Relational
+                    {
+                        name : [db]employeeFirmDenormTable.name,
+                        firm
+                        (
+                            ~primaryKey ([db]employeeFirmDenormTable.legalName)
+                            legalName : [db]employeeFirmDenormTable.legalName
+                        )
+                    }
+                    Firm[f1]: Relational
+                    {
+                         legalName : [db]employeeFirmDenormTable.legalName
+                    }
+                    Firm_Address: Relational
+                    {
+                        AssociationMapping
+                        (
+                           address[p1_firm,a1] : [db]@firmAddress
+                        )
+                    }
+                )
+                """, repository, new ParserLibrary(Lists.immutable.with(new M3AntlrParser(), new MappingParser(), new RelationalParser())), ValidationType.DEEP, VoidM3M4StateListener.VOID_M3_M4_STATE_LISTENER, context);
         runtime.compile();
     }
 
     @Test
     public void inlinedEmbeddedMappingsCanBeReferencedInAssociationMappingAsSourceInvalidId()
     {
-        LoaderException e = Assert.assertThrows(LoaderException.class, () -> Loader.parseM3(
-                "import other::*;\n" +
-                        "\n" +
-                        "Class other::Person\n" +
-                        "{\n" +
-                        "    name:String[1];\n" +
-                        "    address:Address[1];\n" +
-                        "    firm:Firm[1];\n" +
-                        "}\n" +
-                        "Class other::Firm\n" +
-                        "{\n" +
-                        "    legalName:String[1];\n" +
-                        "}\n" +
-                        "Class other::Address\n" +
-                        "{\n" +
-                        "    line1:String[1];\n" +
-                        "    postcode:String[1];\n" +
-                        "}\n" +
-                        "Association other::Firm_Address\n" +
-                        "{\n" +
-                        "    address:Address[0..1];\n" +
-                        "    firm:Firm[1];\n" +
-                        "}\n" +
-                        "###Relational\n" +
-                        "Database mapping::db(\n" +
-                        "   Table employeeFirmDenormTable\n" +
-                        "   (\n" +
-                        "    id INT PRIMARY KEY,\n" +
-                        "    name VARCHAR(200),\n" +
-                        "    firmId INT,\n" +
-                        "    legalName VARCHAR(200),\n" +
-                        "    address1 VARCHAR(200),\n" +
-                        "    postcode VARCHAR(10)\n" +
-                        "   )\n" +
-                        "   Join firmAddress(employeeFirmDenormTable.address1 = {target}.address1)\n" +
-                        ")\n" +
-                        "###Mapping\n" +
-                        "import other::*;\n" +
-                        "import mapping::*;\n" +
-                        "Mapping mappingPackage::myMapping\n" +
-                        "(\n" +
-                        "    Address[a1]: Relational\n" +
-                        "    {\n" +
-                        "       line1: [db]employeeFirmDenormTable.address1,\n" +
-                        "       postcode: [db]employeeFirmDenormTable.postcode\n" +
-                        "    }\n" +
-                        "    Person[p1]: Relational\n" +
-                        "    {\n" +
-                        "        name : [db]employeeFirmDenormTable.name,\n" +
-                        "        firm\n" +
-                        "        (\n" +
-                        "            ~primaryKey ([db]employeeFirmDenormTable.legalName)\n" +
-                        "            legalName : [db]employeeFirmDenormTable.legalName\n" +
-                        "        )\n" +
-                        "    }\n" +
-                        "    Firm[f1]: Relational\n" +
-                        "    {\n" +
-                        "         legalName : [db]employeeFirmDenormTable.legalName\n" +
-                        "    }\n" +
-                        "    Firm_Address: Relational\n" +
-                        "    {\n" +
-                        "        AssociationMapping\n" +
-                        "        (\n" +
-                        "           address[p1_f1,a1] : [db]@firmAddress\n" +
-                        "        )\n" +
-                        "    }\n" +
-                        ")\n", repository, new ParserLibrary(Lists.immutable.with(new M3AntlrParser(), new MappingParser(), new RelationalParser())), ValidationType.DEEP, VoidM3M4StateListener.VOID_M3_M4_STATE_LISTENER, context));
+        LoaderException e = Assertions.assertThrows(LoaderException.class, () -> Loader.parseM3(
+                """
+                import other::*;
+                
+                Class other::Person
+                {
+                    name:String[1];
+                    address:Address[1];
+                    firm:Firm[1];
+                }
+                Class other::Firm
+                {
+                    legalName:String[1];
+                }
+                Class other::Address
+                {
+                    line1:String[1];
+                    postcode:String[1];
+                }
+                Association other::Firm_Address
+                {
+                    address:Address[0..1];
+                    firm:Firm[1];
+                }
+                ###Relational
+                Database mapping::db(
+                   Table employeeFirmDenormTable
+                   (
+                    id INT PRIMARY KEY,
+                    name VARCHAR(200),
+                    firmId INT,
+                    legalName VARCHAR(200),
+                    address1 VARCHAR(200),
+                    postcode VARCHAR(10)
+                   )
+                   Join firmAddress(employeeFirmDenormTable.address1 = {target}.address1)
+                )
+                ###Mapping
+                import other::*;
+                import mapping::*;
+                Mapping mappingPackage::myMapping
+                (
+                    Address[a1]: Relational
+                    {
+                       line1: [db]employeeFirmDenormTable.address1,
+                       postcode: [db]employeeFirmDenormTable.postcode
+                    }
+                    Person[p1]: Relational
+                    {
+                        name : [db]employeeFirmDenormTable.name,
+                        firm
+                        (
+                            ~primaryKey ([db]employeeFirmDenormTable.legalName)
+                            legalName : [db]employeeFirmDenormTable.legalName
+                        )
+                    }
+                    Firm[f1]: Relational
+                    {
+                         legalName : [db]employeeFirmDenormTable.legalName
+                    }
+                    Firm_Address: Relational
+                    {
+                        AssociationMapping
+                        (
+                           address[p1_f1,a1] : [db]@firmAddress
+                        )
+                    }
+                )
+                """, repository, new ParserLibrary(Lists.immutable.with(new M3AntlrParser(), new MappingParser(), new RelationalParser())), ValidationType.DEEP, VoidM3M4StateListener.VOID_M3_M4_STATE_LISTENER, context));
         assertPureException(PureCompilationException.class, "Unable to find source class mapping (id:p1_f1) for property 'address' in Association mapping 'Firm_Address'. Make sure that you have specified a valid Class mapping id as the source id and target id, using the syntax 'property[sourceId, targetId]: ...'.", "fromString.pure", 63, 12, e.getCause());
     }
 
     @Test
     public void inlinedEmbeddedMappingsCanNotBeReferencedInAssociationMappingAsTarget()
     {
-        LoaderException e = Assert.assertThrows(LoaderException.class, () -> Loader.parseM3(
-                "import other::*;\n" +
-                        "\n" +
-                        "Class other::Person\n" +
-                        "{\n" +
-                        "    name:String[1];\n" +
-                        "    address:Address[1];\n" +
-                        "    firm:Firm[1];\n" +
-                        "}\n" +
-                        "Class other::Firm\n" +
-                        "{\n" +
-                        "    legalName:String[1];\n" +
-                        "}\n" +
-                        "Class other::Address\n" +
-                        "{\n" +
-                        "    line1:String[1];\n" +
-                        "    postcode:String[1];\n" +
-                        "}\n" +
-                        "Association other::Firm_Address\n" +
-                        "{\n" +
-                        "    address:Address[0..1];\n" +
-                        "    firm:Firm[1];\n" +
-                        "}\n" +
-                        "###Relational\n" +
-                        "Database mapping::db(\n" +
-                        "   Table employeeFirmDenormTable\n" +
-                        "   (\n" +
-                        "    id INT PRIMARY KEY,\n" +
-                        "    name VARCHAR(200),\n" +
-                        "    firmId INT,\n" +
-                        "    legalName VARCHAR(200),\n" +
-                        "    address1 VARCHAR(200),\n" +
-                        "    postcode VARCHAR(10)\n" +
-                        "   )\n" +
-                        "   Join firmAddress(employeeFirmDenormTable.address1 = {target}.address1)\n" +
-                        ")\n" +
-                        "###Mapping\n" +
-                        "import other::*;\n" +
-                        "import mapping::*;\n" +
-                        "Mapping mappingPackage::myMapping\n" +
-                        "(\n" +
-                        "    Address[a1]: Relational\n" +
-                        "    {\n" +
-                        "       line1: [db]employeeFirmDenormTable.address1,\n" +
-                        "       postcode: [db]employeeFirmDenormTable.postcode\n" +
-                        "    }\n" +
-                        "    Person[p1]: Relational\n" +
-                        "    {\n" +
-                        "        name : [db]employeeFirmDenormTable.name,\n" +
-                        "        firm\n" +
-                        "        (\n" +
-                        "            ~primaryKey ([db]employeeFirmDenormTable.legalName)\n" +
-                        "            legalName : [db]employeeFirmDenormTable.legalName\n" +
-                        "        )\n" +
-                        "    }\n" +
-                        "    Firm[f1]: Relational\n" +
-                        "    {\n" +
-                        "         legalName : [db]employeeFirmDenormTable.legalName\n" +
-                        "    }\n" +
-                        "    Firm_Address: Relational\n" +
-                        "    {\n" +
-                        "        AssociationMapping\n" +
-                        "        (\n" +
-                        "           address[p1_firm,a1] : [db]@firmAddress,\n" +
-                        "           firm[a1,p1_firm] : [db]@firmAddress\n" +
-                        "        )\n" +
-                        "    }\n" +
-                        ")\n", repository, new ParserLibrary(Lists.immutable.with(new M3AntlrParser(), new MappingParser(), new RelationalParser())), ValidationType.DEEP, VoidM3M4StateListener.VOID_M3_M4_STATE_LISTENER, context));
+        LoaderException e = Assertions.assertThrows(LoaderException.class, () -> Loader.parseM3(
+                """
+                import other::*;
+                
+                Class other::Person
+                {
+                    name:String[1];
+                    address:Address[1];
+                    firm:Firm[1];
+                }
+                Class other::Firm
+                {
+                    legalName:String[1];
+                }
+                Class other::Address
+                {
+                    line1:String[1];
+                    postcode:String[1];
+                }
+                Association other::Firm_Address
+                {
+                    address:Address[0..1];
+                    firm:Firm[1];
+                }
+                ###Relational
+                Database mapping::db(
+                   Table employeeFirmDenormTable
+                   (
+                    id INT PRIMARY KEY,
+                    name VARCHAR(200),
+                    firmId INT,
+                    legalName VARCHAR(200),
+                    address1 VARCHAR(200),
+                    postcode VARCHAR(10)
+                   )
+                   Join firmAddress(employeeFirmDenormTable.address1 = {target}.address1)
+                )
+                ###Mapping
+                import other::*;
+                import mapping::*;
+                Mapping mappingPackage::myMapping
+                (
+                    Address[a1]: Relational
+                    {
+                       line1: [db]employeeFirmDenormTable.address1,
+                       postcode: [db]employeeFirmDenormTable.postcode
+                    }
+                    Person[p1]: Relational
+                    {
+                        name : [db]employeeFirmDenormTable.name,
+                        firm
+                        (
+                            ~primaryKey ([db]employeeFirmDenormTable.legalName)
+                            legalName : [db]employeeFirmDenormTable.legalName
+                        )
+                    }
+                    Firm[f1]: Relational
+                    {
+                         legalName : [db]employeeFirmDenormTable.legalName
+                    }
+                    Firm_Address: Relational
+                    {
+                        AssociationMapping
+                        (
+                           address[p1_firm,a1] : [db]@firmAddress,
+                           firm[a1,p1_firm] : [db]@firmAddress
+                        )
+                    }
+                )
+                """, repository, new ParserLibrary(Lists.immutable.with(new M3AntlrParser(), new MappingParser(), new RelationalParser())), ValidationType.DEEP, VoidM3M4StateListener.VOID_M3_M4_STATE_LISTENER, context));
         assertPureException(PureCompilationException.class, "Invalid target class mapping for property 'firm' in Association mapping 'Firm_Address'. Target 'p1_firm' is an embedded class mapping, embedded mappings are only allowed to be the source in an Association Mapping.", "fromString.pure", 64, 12, e.getCause());
     }
 
     @Test
     public void embeddedMappingsCannotBeReferencedInAssociationMappingAsTarget()
     {
-        LoaderException e = Assert.assertThrows(LoaderException.class, () -> Loader.parseM3(
-                "import other::*;\n" +
-                        "\n" +
-                        "Class other::Person\n" +
-                        "{\n" +
-                        "    name:String[1];\n" +
-                        "    address:Address[1];\n" +
-                        "    firm:Firm[1];\n" +
-                        "}\n" +
-                        "Class other::Firm\n" +
-                        "{\n" +
-                        "    legalName:String[1];\n" +
-                        "}\n" +
-                        "Class other::Address\n" +
-                        "{\n" +
-                        "    line1:String[1];\n" +
-                        "    postcode:String[1];\n" +
-                        "}\n" +
-                        "Association other::Firm_Address\n" +
-                        "{\n" +
-                        "    address:Address[0..1];\n" +
-                        "    firm:Firm[1];\n" +
-                        "}\n" +
-                        "###Relational\n" +
-                        "Database mapping::db(\n" +
-                        "   Table employeeFirmDenormTable\n" +
-                        "   (\n" +
-                        "    id INT PRIMARY KEY,\n" +
-                        "    name VARCHAR(200),\n" +
-                        "    firmId INT,\n" +
-                        "    legalName VARCHAR(200),\n" +
-                        "    address1 VARCHAR(200),\n" +
-                        "    postcode VARCHAR(10)\n" +
-                        "   )\n" +
-                        "   Join firmAddress(employeeFirmDenormTable.address1 = {target}.address1)\n" +
-                        ")\n" +
-                        "###Mapping\n" +
-                        "import other::*;\n" +
-                        "import mapping::*;\n" +
-                        "Mapping mappingPackage::myMapping\n" +
-                        "(\n" +
-                        "    Address[a1]: Relational\n" +
-                        "    {\n" +
-                        "       line1: [db]employeeFirmDenormTable.address1,\n" +
-                        "       postcode: [db]employeeFirmDenormTable.postcode\n" +
-                        "    }\n" +
-                        "    Person[p1]: Relational\n" +
-                        "    {\n" +
-                        "        name : [db]employeeFirmDenormTable.name,\n" +
-                        "        firm\n" +
-                        "        (\n" +
-                        "            ~primaryKey ([db]employeeFirmDenormTable.legalName)\n" +
-                        "            legalName : [db]employeeFirmDenormTable.legalName\n" +
-                        "        )\n" +
-                        "    }\n" +
-                        "    Firm_Address: Relational\n" +
-                        "    {\n" +
-                        "        AssociationMapping\n" +
-                        "        (\n" +
-                        "           firm[a1,p1_firm] : [db]@firmAddress\n" +
-                        "        )\n" +
-                        "    }\n" +
-                        ")\n", repository, new ParserLibrary(Lists.immutable.with(new M3AntlrParser(), new MappingParser(), new RelationalParser())), ValidationType.DEEP, VoidM3M4StateListener.VOID_M3_M4_STATE_LISTENER, context));
+        LoaderException e = Assertions.assertThrows(LoaderException.class, () -> Loader.parseM3(
+                """
+                import other::*;
+                
+                Class other::Person
+                {
+                    name:String[1];
+                    address:Address[1];
+                    firm:Firm[1];
+                }
+                Class other::Firm
+                {
+                    legalName:String[1];
+                }
+                Class other::Address
+                {
+                    line1:String[1];
+                    postcode:String[1];
+                }
+                Association other::Firm_Address
+                {
+                    address:Address[0..1];
+                    firm:Firm[1];
+                }
+                ###Relational
+                Database mapping::db(
+                   Table employeeFirmDenormTable
+                   (
+                    id INT PRIMARY KEY,
+                    name VARCHAR(200),
+                    firmId INT,
+                    legalName VARCHAR(200),
+                    address1 VARCHAR(200),
+                    postcode VARCHAR(10)
+                   )
+                   Join firmAddress(employeeFirmDenormTable.address1 = {target}.address1)
+                )
+                ###Mapping
+                import other::*;
+                import mapping::*;
+                Mapping mappingPackage::myMapping
+                (
+                    Address[a1]: Relational
+                    {
+                       line1: [db]employeeFirmDenormTable.address1,
+                       postcode: [db]employeeFirmDenormTable.postcode
+                    }
+                    Person[p1]: Relational
+                    {
+                        name : [db]employeeFirmDenormTable.name,
+                        firm
+                        (
+                            ~primaryKey ([db]employeeFirmDenormTable.legalName)
+                            legalName : [db]employeeFirmDenormTable.legalName
+                        )
+                    }
+                    Firm_Address: Relational
+                    {
+                        AssociationMapping
+                        (
+                           firm[a1,p1_firm] : [db]@firmAddress
+                        )
+                    }
+                )
+                """, repository, new ParserLibrary(Lists.immutable.with(new M3AntlrParser(), new MappingParser(), new RelationalParser())), ValidationType.DEEP, VoidM3M4StateListener.VOID_M3_M4_STATE_LISTENER, context));
         assertPureException(PureCompilationException.class, "Invalid target class mapping for property 'firm' in Association mapping 'Firm_Address'. Target 'p1_firm' is an embedded class mapping, embedded mappings are only allowed to be the source in an Association Mapping.", "fromString.pure", 59, 12, e.getCause());
     }
 
     @Test
     public void testOtherwiseEmbeddedWithNoJoin()
     {
-        LoaderException e = Assert.assertThrows(LoaderException.class, () -> Loader.parseM3(
-                "import other::*;\n" +
-                        "\n" +
-                        "Class other::Person\n" +
-                        "{\n" +
-                        "    name:String[1];\n" +
-                        "    firm:Firm[1];\n" +
-                        "}\n" +
-                        "Class other::Firm\n" +
-                        "{\n" +
-                        "    legalName:String[1];\n" +
-                        "    otherInformation:String[1];\n" +
-                        "}\n" +
-                        "###Relational\n" +
-                        "Database mapping::db(\n" +
-                        "   Table employeeFirmDenormTable\n" +
-                        "   (\n" +
-                        "    id INT PRIMARY KEY,\n" +
-                        "    name VARCHAR(200),\n" +
-                        "    firmId INT,\n" +
-                        "    legalName VARCHAR(200),\n" +
-                        "    address1 VARCHAR(200),\n" +
-                        "    postcode VARCHAR(10)\n" +
-                        "   )\n" +
-                        "   Table FirmInfoTable\n" +
-                        "   (\n" +
-                        "    id INT PRIMARY KEY,\n" +
-                        "    name VARCHAR(200),\n" +
-                        "    other VARCHAR(200)\n" +
-                        "   )\n" +
-                        "   Join PersonFirmJoin(employeeFirmDenormTable.firmId = FirmInfoTable.id)\n" +
-                        ")\n" +
-                        "###Mapping\n" +
-                        "import other::*;\n" +
-                        "import mapping::*;\n" +
-                        "Mapping mappingPackage::myMapping\n" +
-                        "(\n" +
-                        "    Firm: Relational\n" +
-                        "    {\n" +
-                        "       legalName : [db]FirmInfoTable.name ,\n" +
-                        "       otherInformation: [db]FirmInfoTable.other\n" +
-                        "    }\n" +
-                        "    Person[alias1]: Relational\n" +
-                        "    {\n" +
-                        "        name : [db]employeeFirmDenormTable.name,\n" +
-                        "        firm\n" +
-                        "        (\n" +
-                        "            ~primaryKey ([db]employeeFirmDenormTable.legalName)\n" +
-                        "            legalName : [db]employeeFirmDenormTable.legalName\n" +
-                        "        ) Otherwise () \n" + //
-                        "    }\n" +
-                        ")\n", repository, new ParserLibrary(Lists.immutable.with(new M3AntlrParser(), new MappingParser(), new RelationalParser())), ValidationType.DEEP, VoidM3M4StateListener.VOID_M3_M4_STATE_LISTENER, context));
+        LoaderException e = Assertions.assertThrows(LoaderException.class, () -> Loader.parseM3(
+                """
+                import other::*;
+                
+                Class other::Person
+                {
+                    name:String[1];
+                    firm:Firm[1];
+                }
+                Class other::Firm
+                {
+                    legalName:String[1];
+                    otherInformation:String[1];
+                }
+                ###Relational
+                Database mapping::db(
+                   Table employeeFirmDenormTable
+                   (
+                    id INT PRIMARY KEY,
+                    name VARCHAR(200),
+                    firmId INT,
+                    legalName VARCHAR(200),
+                    address1 VARCHAR(200),
+                    postcode VARCHAR(10)
+                   )
+                   Table FirmInfoTable
+                   (
+                    id INT PRIMARY KEY,
+                    name VARCHAR(200),
+                    other VARCHAR(200)
+                   )
+                   Join PersonFirmJoin(employeeFirmDenormTable.firmId = FirmInfoTable.id)
+                )
+                ###Mapping
+                import other::*;
+                import mapping::*;
+                Mapping mappingPackage::myMapping
+                (
+                    Firm: Relational
+                    {
+                       legalName : [db]FirmInfoTable.name ,
+                       otherInformation: [db]FirmInfoTable.other
+                    }
+                    Person[alias1]: Relational
+                    {
+                        name : [db]employeeFirmDenormTable.name,
+                        firm
+                        (
+                            ~primaryKey ([db]employeeFirmDenormTable.legalName)
+                            legalName : [db]employeeFirmDenormTable.legalName
+                        ) Otherwise ()\s
+                    }
+                )
+                """, repository, new ParserLibrary(Lists.immutable.with(new M3AntlrParser(), new MappingParser(), new RelationalParser())), ValidationType.DEEP, VoidM3M4StateListener.VOID_M3_M4_STATE_LISTENER, context));
         assertPureException(PureParserException.class, "expected: '[' found: ')'", "fromString.pure", 49, 22, e.getCause());
     }
 
     @Test
     public void testOtherwiseEmbeddedWithNoJoinOrPropertyMappings()
     {
-        LoaderException e = Assert.assertThrows(LoaderException.class, () -> Loader.parseM3(
-                "import other::*;\n" +
-                        "\n" +
-                        "Class other::Person\n" +
-                        "{\n" +
-                        "    name:String[1];\n" +
-                        "    firm:Firm[1];\n" +
-                        "}\n" +
-                        "Class other::Firm\n" +
-                        "{\n" +
-                        "    legalName:String[1];\n" +
-                        "    otherInformation:String[1];\n" +
-                        "}\n" +
-                        "###Relational\n" +
-                        "Database mapping::db(\n" +
-                        "   Table employeeFirmDenormTable\n" +
-                        "   (\n" +
-                        "    id INT PRIMARY KEY,\n" +
-                        "    name VARCHAR(200),\n" +
-                        "    firmId INT,\n" +
-                        "    legalName VARCHAR(200),\n" +
-                        "    address1 VARCHAR(200),\n" +
-                        "    postcode VARCHAR(10)\n" +
-                        "   )\n" +
-                        "   Join PersonFirmJoin(employeeFirmDenormTable.firmId = FirmInfoTable.id)\n" +
-                        ")\n" +
-                        "###Mapping\n" +
-                        "import other::*;\n" +
-                        "import mapping::*;\n" +
-                        "Mapping mappingPackage::myMapping\n" +
-                        "(\n" +
-                        "    Person[alias1]: Relational\n" +
-                        "    {\n" +
-                        "        name : [db]employeeFirmDenormTable.name,\n" +
-                        "        firm\n" +
-                        "        (\n" +
-                        "        ) Otherwise () \n" +
-                        "    }\n" +
-                        ")\n", repository, new ParserLibrary(Lists.immutable.with(new M3AntlrParser(), new MappingParser(), new RelationalParser())), ValidationType.DEEP, VoidM3M4StateListener.VOID_M3_M4_STATE_LISTENER, context));
+        LoaderException e = Assertions.assertThrows(LoaderException.class, () -> Loader.parseM3(
+                """
+                import other::*;
+                
+                Class other::Person
+                {
+                    name:String[1];
+                    firm:Firm[1];
+                }
+                Class other::Firm
+                {
+                    legalName:String[1];
+                    otherInformation:String[1];
+                }
+                ###Relational
+                Database mapping::db(
+                   Table employeeFirmDenormTable
+                   (
+                    id INT PRIMARY KEY,
+                    name VARCHAR(200),
+                    firmId INT,
+                    legalName VARCHAR(200),
+                    address1 VARCHAR(200),
+                    postcode VARCHAR(10)
+                   )
+                   Join PersonFirmJoin(employeeFirmDenormTable.firmId = FirmInfoTable.id)
+                )
+                ###Mapping
+                import other::*;
+                import mapping::*;
+                Mapping mappingPackage::myMapping
+                (
+                    Person[alias1]: Relational
+                    {
+                        name : [db]employeeFirmDenormTable.name,
+                        firm
+                        (
+                        ) Otherwise ()\s
+                    }
+                )
+                """, repository, new ParserLibrary(Lists.immutable.with(new M3AntlrParser(), new MappingParser(), new RelationalParser())), ValidationType.DEEP, VoidM3M4StateListener.VOID_M3_M4_STATE_LISTENER, context));
         assertPureException(PureParserException.class, "expected: '[' found: ')'", "fromString.pure", 36, 22, e.getCause());
     }
 
     @Test
     public void testIncorrectInlineMapping()
     {
-        LoaderException e = Assert.assertThrows(LoaderException.class, () -> Loader.parseM3(
-                "import other::*;\n" +
-                        "\n" +
-                        "Class other::Person\n" +
-                        "{\n" +
-                        "    name:String[1];\n" +
-                        "    firm:Firm[1];\n" +
-                        "}\n" +
-                        "Class other::Firm\n" +
-                        "{\n" +
-                        "    legalName:String[1];\n" +
-                        "    otherInformation:String[1];\n" +
-                        "}\n" +
-                        "###Relational\n" +
-                        "Database mapping::db(\n" +
-                        "   Table employeeFirmDenormTable\n" +
-                        "   (\n" +
-                        "    id INT PRIMARY KEY,\n" +
-                        "    name VARCHAR(200),\n" +
-                        "    firmId INT,\n" +
-                        "    legalName VARCHAR(200),\n" +
-                        "    address1 VARCHAR(200),\n" +
-                        "    postcode VARCHAR(10)\n" +
-                        "   )\n" +
+        LoaderException e = Assertions.assertThrows(LoaderException.class, () -> Loader.parseM3(
+                """
+import other::*;
 
-                        ")\n" +
-                        "###Mapping\n" +
-                        "import other::*;\n" +
-                        "import mapping::*;\n" +
-                        "Mapping mappingPackage::myMapping\n" +
-                        "(\n" +
-                        "    Person[alias1]: Relational\n" +
-                        "    {\n" +
-                        "        name : [db]employeeFirmDenormTable.name,\n" +
-                        "        firm()\n" +
-                        "    }\n" +
-                        ")\n", repository, new ParserLibrary(Lists.immutable.with(new M3AntlrParser(), new MappingParser(), new RelationalParser())), ValidationType.DEEP, VoidM3M4StateListener.VOID_M3_M4_STATE_LISTENER, context));
+Class other::Person
+{
+    name:String[1];
+    firm:Firm[1];
+}
+Class other::Firm
+{
+    legalName:String[1];
+    otherInformation:String[1];
+}
+###Relational
+Database mapping::db(
+   Table employeeFirmDenormTable
+   (
+    id INT PRIMARY KEY,
+    name VARCHAR(200),
+    firmId INT,
+    legalName VARCHAR(200),
+    address1 VARCHAR(200),
+    postcode VARCHAR(10)
+   )
+)
+###Mapping
+import other::*;
+import mapping::*;
+Mapping mappingPackage::myMapping
+(
+    Person[alias1]: Relational
+    {
+        name : [db]employeeFirmDenormTable.name,
+        firm()
+    }
+)
+""", repository, new ParserLibrary(Lists.immutable.with(new M3AntlrParser(), new MappingParser(), new RelationalParser())), ValidationType.DEEP, VoidM3M4StateListener.VOID_M3_M4_STATE_LISTENER, context));
         assertPureException(PureCompilationException.class, "Invalid Inline mapping found: 'firm' mapping has not inline set defined, please use: firm() Inline[setid].", "fromString.pure", 33, 9, e.getCause());
     }
 
     @Test
     public void testIncorrectSetIdInlineMapping()
     {
-        LoaderException e = Assert.assertThrows(LoaderException.class, () -> Loader.parseM3(
-                "import other::*;\n" +
-                        "\n" +
-                        "Class other::Person\n" +
-                        "{\n" +
-                        "    name:String[1];\n" +
-                        "    firm:Firm[1];\n" +
-                        "}\n" +
-                        "Class other::Firm\n" +
-                        "{\n" +
-                        "    legalName:String[1];\n" +
-                        "    otherInformation:String[1];\n" +
-                        "}\n" +
-                        "###Relational\n" +
-                        "Database mapping::db(\n" +
-                        "   Table employeeFirmDenormTable\n" +
-                        "   (\n" +
-                        "    id INT PRIMARY KEY,\n" +
-                        "    name VARCHAR(200),\n" +
-                        "    firmId INT,\n" +
-                        "    legalName VARCHAR(200),\n" +
-                        "    address1 VARCHAR(200),\n" +
-                        "    postcode VARCHAR(10)\n" +
-                        "   )\n" +
-                        "   Join PersonFirmJoin(employeeFirmDenormTable.firmId = FirmInfoTable.id)\n" +
-                        ")\n" +
-                        "###Mapping\n" +
-                        "import other::*;\n" +
-                        "import mapping::*;\n" +
-                        "Mapping mappingPackage::myMapping\n" +
-                        "(\n" +
-                        "    Person[alias1]: Relational\n" +
-                        "    {\n" +
-                        "        name : [db]employeeFirmDenormTable.name,\n" +
-                        "        firm\n" +
-                        "        (\n" +
-                        "        ) Inline[] \n" +
-                        "    }\n" +
-                        ")\n", repository, new ParserLibrary(Lists.immutable.with(new M3AntlrParser(), new MappingParser(), new RelationalParser())), ValidationType.DEEP, VoidM3M4StateListener.VOID_M3_M4_STATE_LISTENER, context));
+        LoaderException e = Assertions.assertThrows(LoaderException.class, () -> Loader.parseM3(
+                """
+                import other::*;
+                
+                Class other::Person
+                {
+                    name:String[1];
+                    firm:Firm[1];
+                }
+                Class other::Firm
+                {
+                    legalName:String[1];
+                    otherInformation:String[1];
+                }
+                ###Relational
+                Database mapping::db(
+                   Table employeeFirmDenormTable
+                   (
+                    id INT PRIMARY KEY,
+                    name VARCHAR(200),
+                    firmId INT,
+                    legalName VARCHAR(200),
+                    address1 VARCHAR(200),
+                    postcode VARCHAR(10)
+                   )
+                   Join PersonFirmJoin(employeeFirmDenormTable.firmId = FirmInfoTable.id)
+                )
+                ###Mapping
+                import other::*;
+                import mapping::*;
+                Mapping mappingPackage::myMapping
+                (
+                    Person[alias1]: Relational
+                    {
+                        name : [db]employeeFirmDenormTable.name,
+                        firm
+                        (
+                        ) Inline[]\s
+                    }
+                )
+                """, repository, new ParserLibrary(Lists.immutable.with(new M3AntlrParser(), new MappingParser(), new RelationalParser())), ValidationType.DEEP, VoidM3M4StateListener.VOID_M3_M4_STATE_LISTENER, context));
         assertPureException(PureParserException.class, "expected: a valid identifier text; found: ']'", "fromString.pure", 36, 18, e.getCause());
     }
 
     @Test
     public void testOtherwiseEmbeddedWithIncorrectJoin()
     {
-        LoaderException e = Assert.assertThrows(LoaderException.class, () -> Loader.parseM3(
-                "import other::*;\n" +
-                        "\n" +
-                        "Class other::Person\n" +
-                        "{\n" +
-                        "    name:String[1];\n" +
-                        "    firm:Firm[1];\n" +
-                        "}\n" +
-                        "Class other::Firm\n" +
-                        "{\n" +
-                        "    legalName:String[1];\n" +
-                        "    otherInformation:String[1];\n" +
-                        "}\n" +
-                        "###Relational\n" +
-                        "Database mapping::db(\n" +
-                        "   Table employeeFirmDenormTable\n" +
-                        "   (\n" +
-                        "    id INT PRIMARY KEY,\n" +
-                        "    name VARCHAR(200),\n" +
-                        "    firmId INT,\n" +
-                        "    legalName VARCHAR(200),\n" +
-                        "    address1 VARCHAR(200),\n" +
-                        "    postcode VARCHAR(10)\n" +
-                        "   )\n" +
-                        "   Table FirmInfoTable\n" +
-                        "   (\n" +
-                        "    id INT PRIMARY KEY,\n" +
-                        "    name VARCHAR(200),\n" +
-                        "    other VARCHAR(200)\n" +
-                        "   )\n" +
-                        "   Join PersonFirmJoin(employeeFirmDenormTable.firmId = FirmInfoTable.id)\n" +
-                        ")\n" +
-                        "###Mapping\n" +
-                        "import other::*;\n" +
-                        "import mapping::*;\n" +
-                        "Mapping mappingPackage::myMapping\n" +
-                        "(\n" +
-                        "    Firm: Relational\n" +
-                        "    {\n" +
-                        "       legalName : [db]FirmInfoTable.name ,\n" +
-                        "       otherInformation: [db]FirmInfoTable.other\n" +
-                        "    }\n" +
-                        "    Person[alias1]: Relational\n" +
-                        "    {\n" +
-                        "        name : [db]employeeFirmDenormTable.name,\n" +
-                        "        firm\n" +
-                        "        (\n" +
-                        "        ) Otherwise ([firm1]:[db]@InvalidPersonFirmJoin) \n" +
-                        "    }\n" +
-                        ")\n", repository, new ParserLibrary(Lists.immutable.with(new M3AntlrParser(), new MappingParser(), new RelationalParser())), ValidationType.DEEP, VoidM3M4StateListener.VOID_M3_M4_STATE_LISTENER, context));
+        LoaderException e = Assertions.assertThrows(LoaderException.class, () -> Loader.parseM3(
+                """
+                import other::*;
+                
+                Class other::Person
+                {
+                    name:String[1];
+                    firm:Firm[1];
+                }
+                Class other::Firm
+                {
+                    legalName:String[1];
+                    otherInformation:String[1];
+                }
+                ###Relational
+                Database mapping::db(
+                   Table employeeFirmDenormTable
+                   (
+                    id INT PRIMARY KEY,
+                    name VARCHAR(200),
+                    firmId INT,
+                    legalName VARCHAR(200),
+                    address1 VARCHAR(200),
+                    postcode VARCHAR(10)
+                   )
+                   Table FirmInfoTable
+                   (
+                    id INT PRIMARY KEY,
+                    name VARCHAR(200),
+                    other VARCHAR(200)
+                   )
+                   Join PersonFirmJoin(employeeFirmDenormTable.firmId = FirmInfoTable.id)
+                )
+                ###Mapping
+                import other::*;
+                import mapping::*;
+                Mapping mappingPackage::myMapping
+                (
+                    Firm: Relational
+                    {
+                       legalName : [db]FirmInfoTable.name ,
+                       otherInformation: [db]FirmInfoTable.other
+                    }
+                    Person[alias1]: Relational
+                    {
+                        name : [db]employeeFirmDenormTable.name,
+                        firm
+                        (
+                        ) Otherwise ([firm1]:[db]@InvalidPersonFirmJoin)\s
+                    }
+                )
+                """, repository, new ParserLibrary(Lists.immutable.with(new M3AntlrParser(), new MappingParser(), new RelationalParser())), ValidationType.DEEP, VoidM3M4StateListener.VOID_M3_M4_STATE_LISTENER, context));
         assertPureException(PureCompilationException.class, "The join 'InvalidPersonFirmJoin' has not been found in the database 'db'", "fromString.pure", 47, 35, e.getCause());
     }
 
     @Test
     public void testOtherwiseEmbeddedWithIncorrectOtherwisePropertyMapping()
     {
-        LoaderException e = Assert.assertThrows(LoaderException.class, () -> Loader.parseM3(
-                "import other::*;\n" +
-                        "\n" +
-                        "Class other::Person\n" +
-                        "{\n" +
-                        "    name:String[1];\n" +
-                        "    firm:Firm[1];\n" +
-                        "}\n" +
-                        "Class other::Firm\n" +
-                        "{\n" +
-                        "    legalName:String[1];\n" +
-                        "    otherInformation:String[1];\n" +
-                        "}\n" +
-                        "###Relational\n" +
-                        "Database mapping::db(\n" +
-                        "   Table employeeFirmDenormTable\n" +
-                        "   (\n" +
-                        "    id INT PRIMARY KEY,\n" +
-                        "    name VARCHAR(200),\n" +
-                        "    firmId INT,\n" +
-                        "    legalName VARCHAR(200),\n" +
-                        "    address1 VARCHAR(200),\n" +
-                        "    postcode VARCHAR(10)\n" +
-                        "   )\n" +
-                        "   Table FirmInfoTable\n" +
-                        "   (\n" +
-                        "    id INT PRIMARY KEY,\n" +
-                        "    name VARCHAR(200),\n" +
-                        "    other VARCHAR(200)\n" +
-                        "   )\n" +
-                        "   Join PersonFirmJoin(employeeFirmDenormTable.firmId = FirmInfoTable.id)\n" +
-                        ")\n" +
-                        "###Mapping\n" +
-                        "import other::*;\n" +
-                        "import mapping::*;\n" +
-                        "Mapping mappingPackage::myMapping\n" +
-                        "(\n" +
-                        "    Firm[firm1]: Relational\n" +
-                        "    {\n" +
-                        "       legalName : [db]FirmInfoTable.name ,\n" +
-                        "       otherInformation: [db]FirmInfoTable.other\n" +
-                        "    }\n" +
-                        "    Person[alias1]: Relational\n" +
-                        "    {\n" +
-                        "        name : [db]employeeFirmDenormTable.name,\n" +
-                        "        firm\n" +
-                        "        (\n" +
-                        "          legalName : [db]employeeFirmDenormTable.name \n" +
-                        "        ) Otherwise ([firm1]:[db]employeeFirmDenormTable.name) \n" +
-                        "    }\n" +
-                        ")\n", repository, new ParserLibrary(Lists.immutable.with(new M3AntlrParser(), new MappingParser(), new RelationalParser())), ValidationType.DEEP, VoidM3M4StateListener.VOID_M3_M4_STATE_LISTENER, context));
+        LoaderException e = Assertions.assertThrows(LoaderException.class, () -> Loader.parseM3(
+                """
+                import other::*;
+                
+                Class other::Person
+                {
+                    name:String[1];
+                    firm:Firm[1];
+                }
+                Class other::Firm
+                {
+                    legalName:String[1];
+                    otherInformation:String[1];
+                }
+                ###Relational
+                Database mapping::db(
+                   Table employeeFirmDenormTable
+                   (
+                    id INT PRIMARY KEY,
+                    name VARCHAR(200),
+                    firmId INT,
+                    legalName VARCHAR(200),
+                    address1 VARCHAR(200),
+                    postcode VARCHAR(10)
+                   )
+                   Table FirmInfoTable
+                   (
+                    id INT PRIMARY KEY,
+                    name VARCHAR(200),
+                    other VARCHAR(200)
+                   )
+                   Join PersonFirmJoin(employeeFirmDenormTable.firmId = FirmInfoTable.id)
+                )
+                ###Mapping
+                import other::*;
+                import mapping::*;
+                Mapping mappingPackage::myMapping
+                (
+                    Firm[firm1]: Relational
+                    {
+                       legalName : [db]FirmInfoTable.name ,
+                       otherInformation: [db]FirmInfoTable.other
+                    }
+                    Person[alias1]: Relational
+                    {
+                        name : [db]employeeFirmDenormTable.name,
+                        firm
+                        (
+                          legalName : [db]employeeFirmDenormTable.name\s
+                        ) Otherwise ([firm1]:[db]employeeFirmDenormTable.name)\s
+                    }
+                )
+                """, repository, new ParserLibrary(Lists.immutable.with(new M3AntlrParser(), new MappingParser(), new RelationalParser())), ValidationType.DEEP, VoidM3M4StateListener.VOID_M3_M4_STATE_LISTENER, context));
         assertPureException(PureParserException.class, "expected: '@' found: 'employeeFirmDenormTable'", "fromString.pure", 48, 34, e.getCause());
     }
 
     @Test
     public void testInlineEmbeddeedInvalidTarget()
     {
-        LoaderException e = Assert.assertThrows(LoaderException.class, () -> Loader.parseM3(
-                "import other::*;\n" +
-                        "\n" +
-                        "Class other::Person\n" +
-                        "{\n" +
-                        "    name:String[1];\n" +
-                        "    firm:Firm[1];\n" +
-                        "}\n" +
-                        "Class other::Firm\n" +
-                        "{\n" +
-                        "    legalName:String[1];\n" +
-                        "    otherInformation:String[1];\n" +
-                        "}\n" +
-                        "###Relational\n" +
-                        "Database mapping::db(\n" +
-                        "   Table employeeFirmDenormTable\n" +
-                        "   (\n" +
-                        "    id INT PRIMARY KEY,\n" +
-                        "    name VARCHAR(200),\n" +
-                        "    firmId INT,\n" +
-                        "    legalName VARCHAR(200),\n" +
-                        "    address1 VARCHAR(200),\n" +
-                        "    postcode VARCHAR(10)\n" +
-                        "   )\n" +
-                        "   Table FirmInfoTable\n" +
-                        "   (\n" +
-                        "    id INT PRIMARY KEY,\n" +
-                        "    name VARCHAR(200),\n" +
-                        "    other VARCHAR(200)\n" +
-                        "   )\n" +
-                        "   Join PersonFirmJoin(employeeFirmDenormTable.firmId = FirmInfoTable.id)\n" +
-                        ")\n" +
-                        "###Mapping\n" +
-                        "import other::*;\n" +
-                        "import mapping::*;\n" +
-                        "Mapping mappingPackage::myMapping\n" +
-                        "(\n" +
-                        "    Firm: Relational\n" +
-                        "    {\n" +
-                        "       legalName : [db]FirmInfoTable.name ,\n" +
-                        "       otherInformation: [db]FirmInfoTable.other\n" +
-                        "    }\n" +
-                        "    Person[alias1]: Relational\n" +
-                        "    {\n" +
-                        "        name : [db]employeeFirmDenormTable.name,\n" +
-                        "        firm\n" +
-                        "        (\n" +
-                        "        ) Inline [firm1] \n" +
-                        "    }\n" +
-                        ")\n", repository, new ParserLibrary(Lists.immutable.with(new M3AntlrParser(), new MappingParser(), new RelationalParser())), ValidationType.DEEP, VoidM3M4StateListener.VOID_M3_M4_STATE_LISTENER, context));
+        LoaderException e = Assertions.assertThrows(LoaderException.class, () -> Loader.parseM3(
+                """
+                import other::*;
+                
+                Class other::Person
+                {
+                    name:String[1];
+                    firm:Firm[1];
+                }
+                Class other::Firm
+                {
+                    legalName:String[1];
+                    otherInformation:String[1];
+                }
+                ###Relational
+                Database mapping::db(
+                   Table employeeFirmDenormTable
+                   (
+                    id INT PRIMARY KEY,
+                    name VARCHAR(200),
+                    firmId INT,
+                    legalName VARCHAR(200),
+                    address1 VARCHAR(200),
+                    postcode VARCHAR(10)
+                   )
+                   Table FirmInfoTable
+                   (
+                    id INT PRIMARY KEY,
+                    name VARCHAR(200),
+                    other VARCHAR(200)
+                   )
+                   Join PersonFirmJoin(employeeFirmDenormTable.firmId = FirmInfoTable.id)
+                )
+                ###Mapping
+                import other::*;
+                import mapping::*;
+                Mapping mappingPackage::myMapping
+                (
+                    Firm: Relational
+                    {
+                       legalName : [db]FirmInfoTable.name ,
+                       otherInformation: [db]FirmInfoTable.other
+                    }
+                    Person[alias1]: Relational
+                    {
+                        name : [db]employeeFirmDenormTable.name,
+                        firm
+                        (
+                        ) Inline [firm1]\s
+                    }
+                )
+                """, repository, new ParserLibrary(Lists.immutable.with(new M3AntlrParser(), new MappingParser(), new RelationalParser())), ValidationType.DEEP, VoidM3M4StateListener.VOID_M3_M4_STATE_LISTENER, context));
         assertPureException(PureCompilationException.class, "Invalid Inline mapping found: 'firm' property, inline set id firm1 does not exists.", "fromString.pure", 45, 9, e.getCause());
     }
 
     @Test
     public void testIncorrectTypeSetIdInlineMapping()
     {
-        LoaderException e = Assert.assertThrows(LoaderException.class, () -> Loader.parseM3(
-                "import other::*;\n" +
-                        "\n" +
-                        "Class other::Person\n" +
-                        "{\n" +
-                        "    name:String[1];\n" +
-                        "    firm:Firm[1];\n" +
-                        "    address:Address[1];\n" +
-                        "}\n" +
-                        "Class other::Address\n" +
-                        "{\n" +
-                        "    name:String[1];\n" +
-                        "}\n" +
-                        "Class other::Firm\n" +
-                        "{\n" +
-                        "    legalName:String[1];\n" +
-                        "}\n" +
-                        "###Relational\n" +
-                        "Database mapping::db(\n" +
-                        "   Table employeeFirmDenormTable\n" +
-                        "   (\n" +
-                        "    id INT PRIMARY KEY,\n" +
-                        "    name VARCHAR(200),\n" +
-                        "    firmId INT,\n" +
-                        "    legalName VARCHAR(200),\n" +
-                        "    address1 VARCHAR(200),\n" +
-                        "    postcode VARCHAR(10)\n" +
-                        "   )\n" +
-                        ")\n" +
-                        "###Mapping\n" +
-                        "import other::*;\n" +
-                        "import mapping::*;\n" +
-                        "Mapping mappingPackage::myMapping\n" +
-                        "(\n" +
-                        "    Firm[firm1]: Relational\n" +
-                        "    {\n" +
-                        "       legalName : [db]employeeFirmDenormTable.legalName \n" +
-                        "    }\n" +
-                        "    Person[alias1]: Relational\n" +
-                        "    {\n" +
-                        "        name : [db]employeeFirmDenormTable.name,\n" +
-                        "        address()Inline[firm1] \n" +
-                        "    }\n" +
-                        ")\n", repository, new ParserLibrary(Lists.immutable.with(new M3AntlrParser(), new MappingParser(), new RelationalParser())), ValidationType.DEEP, VoidM3M4StateListener.VOID_M3_M4_STATE_LISTENER, context));
+        LoaderException e = Assertions.assertThrows(LoaderException.class, () -> Loader.parseM3(
+                """
+                import other::*;
+                
+                Class other::Person
+                {
+                    name:String[1];
+                    firm:Firm[1];
+                    address:Address[1];
+                }
+                Class other::Address
+                {
+                    name:String[1];
+                }
+                Class other::Firm
+                {
+                    legalName:String[1];
+                }
+                ###Relational
+                Database mapping::db(
+                   Table employeeFirmDenormTable
+                   (
+                    id INT PRIMARY KEY,
+                    name VARCHAR(200),
+                    firmId INT,
+                    legalName VARCHAR(200),
+                    address1 VARCHAR(200),
+                    postcode VARCHAR(10)
+                   )
+                )
+                ###Mapping
+                import other::*;
+                import mapping::*;
+                Mapping mappingPackage::myMapping
+                (
+                    Firm[firm1]: Relational
+                    {
+                       legalName : [db]employeeFirmDenormTable.legalName\s
+                    }
+                    Person[alias1]: Relational
+                    {
+                        name : [db]employeeFirmDenormTable.name,
+                        address()Inline[firm1]\s
+                    }
+                )
+                """, repository, new ParserLibrary(Lists.immutable.with(new M3AntlrParser(), new MappingParser(), new RelationalParser())), ValidationType.DEEP, VoidM3M4StateListener.VOID_M3_M4_STATE_LISTENER, context));
         assertPureException(PureCompilationException.class, "Mapping Error! The inlineSetImplementationId 'firm1' is implementing the class 'Firm' which is not a subType of 'Address' (return type of the mapped property 'address')", "fromString.pure", 41, 9, e.getCause());
     }
 }

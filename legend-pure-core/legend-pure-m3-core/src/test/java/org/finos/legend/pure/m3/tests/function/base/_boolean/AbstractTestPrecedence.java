@@ -15,7 +15,7 @@
 package org.finos.legend.pure.m3.tests.function.base._boolean;
 
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public abstract class AbstractTestPrecedence extends AbstractPureTestWithCoreCompiled
 {
@@ -23,10 +23,12 @@ public abstract class AbstractTestPrecedence extends AbstractPureTestWithCoreCom
     public void testBasicPrecedence()
     {
         compileTestSource(
-                "function test():Boolean[1]\n" +
-                        "{\n" +
-                        "   assert(true == true || false && false || false, |'');\n" +
-                        "}\n");
+                """
+                function test():Boolean[1]
+                {
+                   assert(true == true || false && false || false, |'');
+                }
+                """);
         this.execute("test():Boolean[1]");
     }
 }

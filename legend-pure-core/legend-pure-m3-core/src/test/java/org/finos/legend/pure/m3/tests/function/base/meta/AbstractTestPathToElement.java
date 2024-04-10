@@ -24,79 +24,81 @@ import org.finos.legend.pure.m3.serialization.filesystem.usercodestorage.Mutable
 import org.finos.legend.pure.m3.serialization.filesystem.usercodestorage.classpath.ClassLoaderCodeStorage;
 import org.finos.legend.pure.m3.serialization.filesystem.usercodestorage.composite.CompositeCodeStorage;
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public abstract class AbstractTestPathToElement extends AbstractPureTestWithCoreCompiled
 {
     protected static final String TEST_SOURCE_ID = "/test/testFile.pure";
-    protected static final String TEST_SOURCE_CODE = "Class test::model::classes::MyClass\n" +
-            "{\n" +
-            "}\n" +
-            "\n" +
-            "Enum test::model::enums::MyEnumeration\n" +
-            "{\n" +
-            "    VAL\n" +
-            "}\n" +
-            "\n" +
-            "function test::functions::testWrongClassName():Any[*]\n" +
-            "{\n" +
-            "  assertIs(test::model::classes::MyClass, pathToElement('test::model::classes::MyClass', '::'));\n" +
-            "  pathToElement('test::model::classes::YourClass', '::');\n" +
-            "}\n" +
-            "\n" +
-            "function test::functions::testWrongEnumName():Any[*]\n" +
-            "{\n" +
-            "  assertIs(test::model::enums::MyEnumeration, pathToElement('test::model::enums::MyEnumeration', '::'));\n" +
-            "  pathToElement('test::model::enums::YourEnumeration', '::');\n" +
-            "}\n" +
-            "\n" +
-            "function test::functions::testWrongFunctionName():Any[*]\n" +
-            "{\n" +
-            "  assertIs(test::functions::testWrongFunctionName__Any_MANY_, pathToElement('test::functions::testWrongFunctionName__Any_MANY_', '::'));\n" +
-            "  pathToElement('test::functions::testRightFunctionName__Any_MANY_', '::');\n" +
-            "}\n" +
-            "\n" +
-            "function test::functions::testWrongPackage1():Any[*]\n" +
-            "{\n" +
-            "  assertIs(test::model::classes::MyClass, pathToElement('test::model::classes::MyClass', '::'));\n" +
-            "  pathToElement('test::model::class::MyClass', '::');\n" +
-            "}\n" +
-            "\n" +
-            "function test::functions::testWrongPackage2():Any[*]\n" +
-            "{\n" +
-            "  assertIs(test::model::classes::MyClass, pathToElement('test::model::classes::MyClass', '::'));\n" +
-            "  pathToElement('test::models::classes::MyClass', '::');\n" +
-            "}\n" +
-            "\n" +
-            "function test::functions::testWrongPackage3():Any[*]\n" +
-            "{\n" +
-            "  assertIs(test::model::classes::MyClass, pathToElement('test::model::classes::MyClass', '::'));\n" +
-            "  pathToElement('tests::model::classes::MyClass', '::');\n" +
-            "}\n" +
-            "\n" +
-            "function test::functions::testWrongClassName_NonStandardSeparator():Any[*]\n" +
-            "{\n" +
-            "  assertIs(test::model::classes::MyClass, pathToElement('test.model.classes.MyClass', '.'));\n" +
-            "  pathToElement('test.model.classes.YourClass', '.');\n" +
-            "}\n" +
-            "\n" +
-            "function test::functions::testWrongPackage_NonStandardSeparator():Any[*]\n" +
-            "{\n" +
-            "  assertIs(test::model::classes::MyClass, pathToElement('test.model.classes.MyClass', '.'));\n" +
-            "  pathToElement('test.model.class.MyClass', '.');\n" +
-            "}\n" +
-            "\n" +
-            "function test::functions::testInvalidTopLevel():Any[*]\n" +
-            "{\n" +
-            "  pathToElement('Stringy', '::');\n" +
-            "}\n" +
-            "\n" +
-            "function test::functions::testSeparatorTypo():Any[*]\n" +
-            "{\n" +
-            "  assertIs(test::model::classes::MyClass, pathToElement('test.model.classes.MyClass', '.'));\n" +
-            "  pathToElement('test.model.classes.MyClass', '_');\n" +
-            "}\n";
+    protected static final String TEST_SOURCE_CODE = """
+            Class test::model::classes::MyClass
+            {
+            }
+            
+            Enum test::model::enums::MyEnumeration
+            {
+                VAL
+            }
+            
+            function test::functions::testWrongClassName():Any[*]
+            {
+              assertIs(test::model::classes::MyClass, pathToElement('test::model::classes::MyClass', '::'));
+              pathToElement('test::model::classes::YourClass', '::');
+            }
+            
+            function test::functions::testWrongEnumName():Any[*]
+            {
+              assertIs(test::model::enums::MyEnumeration, pathToElement('test::model::enums::MyEnumeration', '::'));
+              pathToElement('test::model::enums::YourEnumeration', '::');
+            }
+            
+            function test::functions::testWrongFunctionName():Any[*]
+            {
+              assertIs(test::functions::testWrongFunctionName__Any_MANY_, pathToElement('test::functions::testWrongFunctionName__Any_MANY_', '::'));
+              pathToElement('test::functions::testRightFunctionName__Any_MANY_', '::');
+            }
+            
+            function test::functions::testWrongPackage1():Any[*]
+            {
+              assertIs(test::model::classes::MyClass, pathToElement('test::model::classes::MyClass', '::'));
+              pathToElement('test::model::class::MyClass', '::');
+            }
+            
+            function test::functions::testWrongPackage2():Any[*]
+            {
+              assertIs(test::model::classes::MyClass, pathToElement('test::model::classes::MyClass', '::'));
+              pathToElement('test::models::classes::MyClass', '::');
+            }
+            
+            function test::functions::testWrongPackage3():Any[*]
+            {
+              assertIs(test::model::classes::MyClass, pathToElement('test::model::classes::MyClass', '::'));
+              pathToElement('tests::model::classes::MyClass', '::');
+            }
+            
+            function test::functions::testWrongClassName_NonStandardSeparator():Any[*]
+            {
+              assertIs(test::model::classes::MyClass, pathToElement('test.model.classes.MyClass', '.'));
+              pathToElement('test.model.classes.YourClass', '.');
+            }
+            
+            function test::functions::testWrongPackage_NonStandardSeparator():Any[*]
+            {
+              assertIs(test::model::classes::MyClass, pathToElement('test.model.classes.MyClass', '.'));
+              pathToElement('test.model.class.MyClass', '.');
+            }
+            
+            function test::functions::testInvalidTopLevel():Any[*]
+            {
+              pathToElement('Stringy', '::');
+            }
+            
+            function test::functions::testSeparatorTypo():Any[*]
+            {
+              assertIs(test::model::classes::MyClass, pathToElement('test.model.classes.MyClass', '.'));
+              pathToElement('test.model.classes.MyClass', '_');
+            }
+            """;
 
     @Test
     public void testWrongClassName()
@@ -190,7 +192,7 @@ public abstract class AbstractTestPathToElement extends AbstractPureTestWithCore
 
     private void assertElementToPathException(String function, String expectedMessage, int line, int column)
     {
-        PureExecutionException e = Assert.assertThrows(PureExecutionException.class, () -> execute(function));
+        PureExecutionException e = Assertions.assertThrows(PureExecutionException.class, () -> execute(function));
         assertPureException(PureExecutionException.class, expectedMessage, TEST_SOURCE_ID, line, column, e);
     }
 

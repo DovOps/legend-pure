@@ -38,7 +38,7 @@ import org.finos.legend.pure.m4.serialization.binary.BinaryReaders;
 import org.finos.legend.pure.m4.serialization.binary.BinaryRepositorySerializer;
 import org.finos.legend.pure.m4.serialization.binary.BinaryWriters;
 import org.finos.legend.pure.m4.transaction.TransactionObserver;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 
 import java.io.ByteArrayOutputStream;
 
@@ -101,7 +101,7 @@ public class TrackingTransactionObserver implements TransactionObserver
                 //System.out.println("Comparing:" + key + " bytes:" + value.getBytes().length);
                 CoreInstance instance = getInstanceFromKey(repository, key);
                 String now = getPrint(instance);
-                Assert.assertEquals(value, now);
+                Assertions.assertEquals(value, now);
             }
 //            else
 //            {
@@ -172,8 +172,8 @@ public class TrackingTransactionObserver implements TransactionObserver
             {
                 ListIterable<CoreInstance> values2 = instancesOnlyPresentAfter.get(key);
 
-                Verify.assertNotNull("Extra element " + values1, values2);
-                Verify.assertSize("Different number of " + key, values1.size(), values2);
+                Assertions.assertNotNull(values2, "Extra element " + values1);
+                Verify.assertSize(values1.size(), values2, "Different number of " + key);
 
 /*                    String str = values1.collect(new Function<CoreInstance, String>()
                                             {
@@ -188,7 +188,7 @@ public class TrackingTransactionObserver implements TransactionObserver
                 {
                     String str1 = values1.collect(object -> object.printWithoutDebug("", 2)).makeString("\n");
                     String str2 = values2.collect(object -> object.printWithoutDebug("", 2)).makeString("\n");
-                    Verify.assertEquals(str1, str2);
+                    Assertions.assertEquals(str1, str2);
                 }
             });
         }
@@ -200,8 +200,8 @@ public class TrackingTransactionObserver implements TransactionObserver
             {
                 ListIterable<CoreInstance> values2 = instancesOnlyPresentAfter.get(key);
 
-                Verify.assertNotNull("Extra element " + values1, values2);
-                Verify.assertSize("Different number of " + key, values1.size(), values2);
+                Assertions.assertNotNull(values2, "Extra element " + values1);
+                Verify.assertSize(values1.size(), values2, "Different number of " + key);
             });
         }
 
@@ -211,12 +211,12 @@ public class TrackingTransactionObserver implements TransactionObserver
             {
                 ListIterable<CoreInstance> values2 = instancesOnlyPresentBefore.get(key);
 
-                Verify.assertNotNull("Extra element " + values1, values2);
-                Verify.assertSize("Different number of " + key, values1.size(), values2);
+                Assertions.assertNotNull(values2, "Extra element " + values1);
+                Verify.assertSize(values1.size(), values2, "Different number of " + key);
             });
         }
 
-        Verify.assertEquals(instancesOnlyPresentBefore.size(), instancesOnlyPresentAfter.size());
+        Assertions.assertEquals(instancesOnlyPresentBefore.size(), instancesOnlyPresentAfter.size());
     }
 
     private static String getPrint(CoreInstance instance)

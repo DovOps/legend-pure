@@ -16,11 +16,11 @@ package org.finos.legend.pure.runtime.java.extension.store.relational.interprete
 
 import org.finos.legend.pure.m2.relational.AbstractTestTempTableLifecycle;
 import org.finos.legend.pure.runtime.java.interpreted.FunctionExecutionInterpreted;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 
 public class TestTempTableLifecycle extends AbstractTestTempTableLifecycle
 {
-    @Before
+    @BeforeEach
     public void setUp()
     {
         setUpRuntime(new FunctionExecutionInterpreted());

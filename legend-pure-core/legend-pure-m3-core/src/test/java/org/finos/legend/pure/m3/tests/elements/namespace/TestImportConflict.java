@@ -16,20 +16,20 @@ package org.finos.legend.pure.m3.tests.elements.namespace;
 
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiledPlatform;
 import org.finos.legend.pure.m4.exception.PureCompilationException;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestImportConflict extends AbstractPureTestWithCoreCompiledPlatform
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getExtra());
     }
 
-    @After
+    @AfterEach
     public void clearRuntime()
     {
         runtime.delete("fromString.pure");
@@ -41,21 +41,23 @@ public class TestImportConflict extends AbstractPureTestWithCoreCompiledPlatform
         try
         {
             compileTestSource("fromString.pure",
-                    "import a::*;\n" +
-                            "import b::*;\n" +
-                            "Class a::Employee\n" +
-                            "{\n" +
-                            "   a:String[1];\n" +
-                            "}\n" +
-                            "Class b::Employee\n" +
-                            "{\n" +
-                            "    b: String[1];\n" +
-                            "}\n" +
-                            "function test():Nil[0]\n" +
-                            "{\n" +
-                            "    print(Employee);\n" +
-                            "}\n");
-            Assert.fail("Expected a compilation error");
+                    """
+                    import a::*;
+                    import b::*;
+                    Class a::Employee
+                    {
+                       a:String[1];
+                    }
+                    Class b::Employee
+                    {
+                        b: String[1];
+                    }
+                    function test():Nil[0]
+                    {
+                        print(Employee);
+                    }
+                    """);
+            Assertions.fail("Expected a compilation error");
         }
         catch (Exception e)
         {
@@ -67,16 +69,18 @@ public class TestImportConflict extends AbstractPureTestWithCoreCompiledPlatform
     public void testImportTypeNonConflict() throws Exception
     {
         runtime.createInMemorySource("fromString.pure",
-                "import a::*;\n" +
-                        "import a::*;\n" +
-                        "Class a::Employee\n" +
-                        "{\n" +
-                        "   a:String[1];\n" +
-                        "}\n" +
-                        "function test():Nil[0]\n" +
-                        "{\n" +
-                        "    print(Employee,1);\n" +
-                        "}\n");
+                """
+                import a::*;
+                import a::*;
+                Class a::Employee
+                {
+                   a:String[1];
+                }
+                function test():Nil[0]
+                {
+                    print(Employee,1);
+                }
+                """);
         runtime.compile();
     }
 }

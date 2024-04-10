@@ -16,20 +16,20 @@ package org.finos.legend.pure.m3.tests.validation;
 
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiledPlatform;
 import org.finos.legend.pure.m4.exception.PureCompilationException;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestFunctionReturnType extends AbstractPureTestWithCoreCompiledPlatform
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getExtra());
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("testSource.pure");
@@ -44,19 +44,21 @@ public class TestFunctionReturnType extends AbstractPureTestWithCoreCompiledPlat
         try
         {
             compileTestSource("testSource.pure",
-                    "Class A\n" +
-                            "{\n" +
-                            "   name : String[1];\n" +
-                            "}\n" +
-                            "Class B extends A\n" +
-                            "{\n" +
-                            "   moreName : String[1];\n" +
-                            "}\n" +
-                            "function funcWithReturn():B[1]\n" +
-                            "{\n" +
-                            "   ^A(name='aaa');\n" +
-                            "}\n");
-            Assert.fail("Expected compilation exception");
+                    """
+                    Class A
+                    {
+                       name : String[1];
+                    }
+                    Class B extends A
+                    {
+                       moreName : String[1];
+                    }
+                    function funcWithReturn():B[1]
+                    {
+                       ^A(name='aaa');
+                    }
+                    """);
+            Assertions.fail("Expected compilation exception");
         }
         catch (Exception e)
         {
@@ -70,19 +72,21 @@ public class TestFunctionReturnType extends AbstractPureTestWithCoreCompiledPlat
         try
         {
             compileTestSource("testSource.pure",
-                    "Class b::A\n" +
-                            "{\n" +
-                            "   name : String[1];\n" +
-                            "}\n" +
-                            "Class c::A\n" +
-                            "{\n" +
-                            "   moreName : String[1];\n" +
-                            "}\n" +
-                            "function funcWithReturn():c::A[1]\n" +
-                            "{\n" +
-                            "   ^b::A(name='aaa');\n" +
-                            "}\n");
-            Assert.fail("Expected compilation exception");
+                    """
+                    Class b::A
+                    {
+                       name : String[1];
+                    }
+                    Class c::A
+                    {
+                       moreName : String[1];
+                    }
+                    function funcWithReturn():c::A[1]
+                    {
+                       ^b::A(name='aaa');
+                    }
+                    """);
+            Assertions.fail("Expected compilation exception");
         }
         catch (Exception e)
         {
@@ -96,16 +100,18 @@ public class TestFunctionReturnType extends AbstractPureTestWithCoreCompiledPlat
         try
         {
             compileTestSource("testSource.pure",
-                    "import test::*;\n" +
-                            "Class test::TestClass<T>\n" +
-                            "{\n" +
-                            "   prop : T[1];\n" +
-                            "}\n" +
-                            "function funcWithReturn():TestClass<String>[1]\n" +
-                            "{\n" +
-                            "   ^TestClass<Integer>(prop=5);\n" +
-                            "}\n");
-            Assert.fail("Expected compilation exception");
+                    """
+                    import test::*;
+                    Class test::TestClass<T>
+                    {
+                       prop : T[1];
+                    }
+                    function funcWithReturn():TestClass<String>[1]
+                    {
+                       ^TestClass<Integer>(prop=5);
+                    }
+                    """);
+            Assertions.fail("Expected compilation exception");
         }
         catch (Exception e)
         {
@@ -118,27 +124,33 @@ public class TestFunctionReturnType extends AbstractPureTestWithCoreCompiledPlat
     {
         // This should compile
         compileTestSource("testSource1.pure",
-                "function func1WithReturn<T>(t:T[*]):T[*]\n" +
-                        "{\n" +
-                        "  $t\n" +
-                        "}\n");
+                """
+                function func1WithReturn<T>(t:T[*]):T[*]
+                {
+                  $t
+                }
+                """);
 
         // This should compile
         compileTestSource("testSource2.pure",
-                "function func2WithReturn<T>(t:T[*]):T[*]\n" +
-                        "{\n" +
-                        "  []\n" +
-                        "}\n");
+                """
+                function func2WithReturn<T>(t:T[*]):T[*]
+                {
+                  []
+                }
+                """);
 
         try
         {
             // This should not compile
             compileTestSource("testSource3.pure",
-                    "function func3WithReturn<T>(t:T[*]):T[*]\n" +
-                            "{\n" +
-                            "  5\n" +
-                            "}\n");
-            Assert.fail("Expected compilation exception");
+                    """
+                    function func3WithReturn<T>(t:T[*]):T[*]
+                    {
+                      5
+                    }
+                    """);
+            Assertions.fail("Expected compilation exception");
         }
         catch (Exception e)
         {
@@ -151,27 +163,33 @@ public class TestFunctionReturnType extends AbstractPureTestWithCoreCompiledPlat
     {
         // This should compile
         compileTestSource("testSource1.pure",
-                "function func1WithReturn<T>(t:T[*]):List<T>[1]\n" +
-                        "{\n" +
-                        "  ^List<T>(values=$t)\n" +
-                        "}\n");
+                """
+                function func1WithReturn<T>(t:T[*]):List<T>[1]
+                {
+                  ^List<T>(values=$t)
+                }
+                """);
 
         // This should compile
         compileTestSource("testSource2.pure",
-                "function func2WithReturn<T>(t:T[*]):List<T>[1]\n" +
-                        "{\n" +
-                        "  ^List<Nil>()\n" +
-                        "}\n");
+                """
+                function func2WithReturn<T>(t:T[*]):List<T>[1]
+                {
+                  ^List<Nil>()
+                }
+                """);
 
         try
         {
             // This should not compile
             compileTestSource("testSource3.pure",
-                    "function func3WithReturn<T>(t:T[*]):List<T>[1]\n" +
-                            "{\n" +
-                            "  ^List<Integer>(values=5)\n" +
-                            "}\n");
-            Assert.fail("Expected compilation exception");
+                    """
+                    function func3WithReturn<T>(t:T[*]):List<T>[1]
+                    {
+                      ^List<Integer>(values=5)
+                    }
+                    """);
+            Assertions.fail("Expected compilation exception");
         }
         catch (Exception e)
         {
@@ -186,16 +204,18 @@ public class TestFunctionReturnType extends AbstractPureTestWithCoreCompiledPlat
         try
         {
             compileTestSource("testSource.pure",
-                    "import test::*;\n" +
-                            "Class test::TestClass\n" +
-                            "{\n" +
-                            "  prop : String[1];\n" +
-                            "}\n" +
-                            "function funcWithReturn():FunctionDefinition<{TestClass[1]->Integer[1]}>[1]\n" +
-                            "{\n" +
-                            "   {tc:TestClass[1] | $tc.prop}\n" +
-                            "}\n");
-            Assert.fail("Expected compilation exception");
+                    """
+                    import test::*;
+                    Class test::TestClass
+                    {
+                      prop : String[1];
+                    }
+                    function funcWithReturn():FunctionDefinition<{TestClass[1]->Integer[1]}>[1]
+                    {
+                       {tc:TestClass[1] | $tc.prop}
+                    }
+                    """);
+            Assertions.fail("Expected compilation exception");
         }
         catch (Exception e)
         {
@@ -208,35 +228,39 @@ public class TestFunctionReturnType extends AbstractPureTestWithCoreCompiledPlat
     {
         // This should compile
         compileTestSourceM3("testSource1.pure",
-                "import test::*;\n" +
-                        "function test::func1(c:Class<Any>[0..1]):List<Any>[1]\n" +
-                        "{\n" +
-                        "    ^List<Any>()\n" +
-                        "}\n" +
-                        "function test::funcPairs1():Pair<String, Function<{Class<Any>[0..1]->List<Any>[1]}>>[*]\n" +
-                        "{\n" +
-                        "  [\n" +
-                        "   pair('Key1', func1_Class_$0_1$__List_1_),\n" +
-                        "   pair('Key2', func1_Class_$0_1$__List_1_)\n" +
-                        "  ]\n" +
-                        "}\n");
+                """
+                import test::*;
+                function test::func1(c:Class<Any>[0..1]):List<Any>[1]
+                {
+                    ^List<Any>()
+                }
+                function test::funcPairs1():Pair<String, Function<{Class<Any>[0..1]->List<Any>[1]}>>[*]
+                {
+                  [
+                   pair('Key1', func1_Class_$0_1$__List_1_),
+                   pair('Key2', func1_Class_$0_1$__List_1_)
+                  ]
+                }
+                """);
         try
         {
             // This should not compile
             compileTestSourceM3("testSource2.pure",
-                    "import test::*;\n" +
-                            "function test::func2(c:Class<Type>[0..1]):List<Type>[1]\n" +
-                            "{\n" +
-                            "    ^List<Type>()\n" +
-                            "}\n" +
-                            "function test::funcPairs2():Pair<String, Function<{Class<Any>[0..1]->List<Any>[1]}>>[*]\n" +
-                            "{\n" +
-                            "  [\n" +
-                            "   pair('Key1', func2_Class_$0_1$__List_1_),\n" +
-                            "   pair('Key2', func2_Class_$0_1$__List_1_)\n" +
-                            "  ]\n" +
-                            "}\n");
-            Assert.fail("Expected compilation exception");
+                    """
+                    import test::*;
+                    function test::func2(c:Class<Type>[0..1]):List<Type>[1]
+                    {
+                        ^List<Type>()
+                    }
+                    function test::funcPairs2():Pair<String, Function<{Class<Any>[0..1]->List<Any>[1]}>>[*]
+                    {
+                      [
+                       pair('Key1', func2_Class_$0_1$__List_1_),
+                       pair('Key2', func2_Class_$0_1$__List_1_)
+                      ]
+                    }
+                    """);
+            Assertions.fail("Expected compilation exception");
         }
         catch (Exception e)
         {

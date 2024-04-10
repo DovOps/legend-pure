@@ -30,14 +30,14 @@ import org.finos.legend.pure.m3.serialization.filesystem.usercodestorage.classpa
 import org.finos.legend.pure.m3.serialization.filesystem.usercodestorage.composite.CompositeCodeStorage;
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiledPlatform;
 import org.finos.legend.pure.m3.tools.ListHelper;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestProfile extends AbstractPureTestWithCoreCompiledPlatform
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getFunctionExecution(), new CompositeCodeStorage(new ClassLoaderCodeStorage(getCodeRepositories())), getFactoryRegistryOverride(), getOptions(), getExtra());
@@ -50,7 +50,7 @@ public class TestProfile extends AbstractPureTestWithCoreCompiledPlatform
                 GenericCodeRepository.build("test", "test(::.*)?", "platform", "system"));
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("/test/testSource.pure");
@@ -61,21 +61,23 @@ public class TestProfile extends AbstractPureTestWithCoreCompiledPlatform
     @Test
     public void testProfile()
     {
-        compileTestSource("fromString.pure", "Profile test::myProfile\n" +
-                "{\n" +
-                "  stereotypes: [st1, st2];\n" +
-                "  tags: [t1, t2, t3];\n" +
-                "}");
+        compileTestSource("fromString.pure", """
+                Profile test::myProfile
+                {
+                  stereotypes: [st1, st2];
+                  tags: [t1, t2, t3];
+                }\
+                """);
 
         Profile profile = (Profile) runtime.getCoreInstance("test::myProfile");
-        Assert.assertNotNull(profile);
+        Assertions.assertNotNull(profile);
 
         ListIterable<? extends Stereotype> stereotypes = ListHelper.wrapListIterable(profile._p_stereotypes());
         Verify.assertSize(2, stereotypes);
         MutableSet<String> stereotypeValues = Sets.mutable.empty();
         for (Stereotype stereotype : stereotypes)
         {
-            Assert.assertSame(profile, stereotype._profile());
+            Assertions.assertSame(profile, stereotype._profile());
             stereotypeValues.add(stereotype._value());
         }
         Verify.assertSetsEqual(Sets.mutable.with("st1", "st2"), stereotypeValues);
@@ -85,7 +87,7 @@ public class TestProfile extends AbstractPureTestWithCoreCompiledPlatform
         MutableSet<String> tagValues = Sets.mutable.empty();
         for (Tag tag : tags)
         {
-            Assert.assertSame(profile, tag._profile());
+            Assertions.assertSame(profile, tag._profile());
             tagValues.add(tag._value());
         }
         Verify.assertSetsEqual(Sets.mutable.with("t1", "t2", "t3"), tagValues);
@@ -95,33 +97,35 @@ public class TestProfile extends AbstractPureTestWithCoreCompiledPlatform
     public void testStereotypes()
     {
         compileTestSource("/test/testSource.pure",
-                "Profile test::myProfile\n" +
-                        "{\n" +
-                        "  stereotypes: [st1, st2, st3];\n" +
-                        "}");
+                """
+                Profile test::myProfile
+                {
+                  stereotypes: [st1, st2, st3];
+                }\
+                """);
 
         Profile profile = (Profile) runtime.getCoreInstance("test::myProfile");
-        Assert.assertNotNull(profile);
+        Assertions.assertNotNull(profile);
 
         ListIterable<? extends Stereotype> stereotypes = ListHelper.wrapListIterable(profile._p_stereotypes());
         Verify.assertSize(3, stereotypes);
 
         Stereotype st1 = (Stereotype) org.finos.legend.pure.m3.navigation.profile.Profile.findStereotype(profile, "st1");
-        Assert.assertNotNull(st1);
-        Assert.assertEquals("st1", st1._value());
-        Assert.assertSame(profile, st1._profile());
+        Assertions.assertNotNull(st1);
+        Assertions.assertEquals("st1", st1._value());
+        Assertions.assertSame(profile, st1._profile());
         assertSourceInformation("/test/testSource.pure", 3, 17, 3, 17, 3, 19, st1.getSourceInformation());
 
         Stereotype st2 = (Stereotype) org.finos.legend.pure.m3.navigation.profile.Profile.findStereotype(profile, "st2");
-        Assert.assertNotNull(st1);
-        Assert.assertEquals("st2", st2._value());
-        Assert.assertSame(profile, st2._profile());
+        Assertions.assertNotNull(st1);
+        Assertions.assertEquals("st2", st2._value());
+        Assertions.assertSame(profile, st2._profile());
         assertSourceInformation("/test/testSource.pure", 3, 22, 3, 22, 3, 24, st2.getSourceInformation());
 
         Stereotype st3 = (Stereotype) org.finos.legend.pure.m3.navigation.profile.Profile.findStereotype(profile, "st3");
-        Assert.assertNotNull(st1);
-        Assert.assertEquals("st3", st3._value());
-        Assert.assertSame(profile, st3._profile());
+        Assertions.assertNotNull(st1);
+        Assertions.assertEquals("st3", st3._value());
+        Assertions.assertSame(profile, st3._profile());
         assertSourceInformation("/test/testSource.pure", 3, 27, 3, 27, 3, 29, st3.getSourceInformation());
     }
 
@@ -129,34 +133,36 @@ public class TestProfile extends AbstractPureTestWithCoreCompiledPlatform
     public void testTags()
     {
         compileTestSource("/test/testSource.pure",
-                "Profile test::myProfile\n" +
-                        "{\n" +
-                        "  stereotypes: [st1, st2];\n" +
-                        "  tags: [t1, t2, t3];\n" +
-                        "}");
+                """
+                Profile test::myProfile
+                {
+                  stereotypes: [st1, st2];
+                  tags: [t1, t2, t3];
+                }\
+                """);
 
         Profile profile = (Profile) runtime.getCoreInstance("test::myProfile");
-        Assert.assertNotNull(profile);
+        Assertions.assertNotNull(profile);
 
         ListIterable<? extends Tag> tags = ListHelper.wrapListIterable(profile._p_tags());
         Verify.assertSize(3, tags);
 
         Tag t1 = (Tag) org.finos.legend.pure.m3.navigation.profile.Profile.findTag(profile, "t1");
-        Assert.assertNotNull(t1);
-        Assert.assertEquals("t1", t1._value());
-        Assert.assertSame(profile, t1._profile());
+        Assertions.assertNotNull(t1);
+        Assertions.assertEquals("t1", t1._value());
+        Assertions.assertSame(profile, t1._profile());
         assertSourceInformation("/test/testSource.pure", 4, 10, 4, 10, 4, 11, t1.getSourceInformation());
 
         Tag t2 = (Tag) org.finos.legend.pure.m3.navigation.profile.Profile.findTag(profile, "t2");
-        Assert.assertNotNull(t2);
-        Assert.assertEquals("t2", t2._value());
-        Assert.assertSame(profile, t2._profile());
+        Assertions.assertNotNull(t2);
+        Assertions.assertEquals("t2", t2._value());
+        Assertions.assertSame(profile, t2._profile());
         assertSourceInformation("/test/testSource.pure", 4, 14, 4, 14, 4, 15, t2.getSourceInformation());
 
         Tag t3 = (Tag) org.finos.legend.pure.m3.navigation.profile.Profile.findTag(profile, "t3");
-        Assert.assertNotNull(t3);
-        Assert.assertEquals("t3", t3._value());
-        Assert.assertSame(profile, t3._profile());
+        Assertions.assertNotNull(t3);
+        Assertions.assertEquals("t3", t3._value());
+        Assertions.assertSame(profile, t3._profile());
         assertSourceInformation("/test/testSource.pure", 4, 18, 4, 18, 4, 19, t3.getSourceInformation());
     }
 }

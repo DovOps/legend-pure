@@ -93,9 +93,9 @@ public class NumericUtilities
         {
             throw new IllegalArgumentException("Cannot create Pure number from null");
         }
-        if (javaNumber instanceof BigDecimal)
+        if (javaNumber instanceof BigDecimal decimal)
         {
-            return bigDecimalToPureDecimal ? newPureDecimal((BigDecimal) javaNumber, repository) : newPureFloat((BigDecimal) javaNumber, repository);
+            return bigDecimalToPureDecimal ? newPureDecimal(decimal, repository) : newPureFloat(decimal, repository);
         }
         if (javaNumber instanceof Double)
         {
@@ -105,9 +105,9 @@ public class NumericUtilities
         {
             return newPureFloat(javaNumber.floatValue(), repository);
         }
-        if (javaNumber instanceof BigInteger)
+        if (javaNumber instanceof BigInteger integer)
         {
-            return newPureInteger((BigInteger) javaNumber, repository);
+            return newPureInteger(integer, repository);
         }
         if (javaNumber instanceof Long)
         {
@@ -281,13 +281,13 @@ public class NumericUtilities
             {
                 return new BigDecimal(left.longValue()).compareTo(BigDecimal.valueOf(right.doubleValue()));
             }
-            else if (right instanceof BigInteger)
+            else if (right instanceof BigInteger integer)
             {
-                return new BigInteger(left.toString()).compareTo((BigInteger) right);
+                return new BigInteger(left.toString()).compareTo(integer);
             }
-            else if (right instanceof BigDecimal)
+            else if (right instanceof BigDecimal decimal)
             {
-                return new BigDecimal(left.longValue()).compareTo((BigDecimal) right);
+                return new BigDecimal(left.longValue()).compareTo(decimal);
             }
             else
             {
@@ -304,59 +304,59 @@ public class NumericUtilities
             {
                 return Double.compare(left.doubleValue(), right.doubleValue());
             }
-            else if (right instanceof BigInteger)
+            else if (right instanceof BigInteger integer)
             {
-                return new BigDecimal(left.doubleValue()).compareTo(new BigDecimal((BigInteger) right)); //NOSONAR
+                return new BigDecimal(left.doubleValue()).compareTo(new BigDecimal(integer)); //NOSONAR
             }
-            else if (right instanceof BigDecimal)
+            else if (right instanceof BigDecimal decimal)
             {
-                return BigDecimal.valueOf(left.doubleValue()).compareTo((BigDecimal) right);
-            }
-            else
-            {
-                throw new RuntimeException("Number of an unhandled type: " + right);
-            }
-        }
-        else if (left instanceof BigInteger)
-        {
-            if ((right instanceof Integer) || (right instanceof Long))
-            {
-                return ((BigInteger) left).compareTo(new BigInteger(right.toString()));
-            }
-            else if ((right instanceof Float) || (right instanceof Double))
-            {
-                return new BigDecimal((BigInteger) left).compareTo(BigDecimal.valueOf(right.doubleValue()));
-            }
-            else if (right instanceof BigInteger)
-            {
-                return ((BigInteger) left).compareTo((BigInteger) right);
-            }
-            else if (right instanceof BigDecimal)
-            {
-                return new BigDecimal((BigInteger) left).compareTo((BigDecimal) right);
+                return BigDecimal.valueOf(left.doubleValue()).compareTo(decimal);
             }
             else
             {
                 throw new RuntimeException("Number of an unhandled type: " + right);
             }
         }
-        else if (left instanceof BigDecimal)
+        else if (left instanceof BigInteger integer)
         {
             if ((right instanceof Integer) || (right instanceof Long))
             {
-                return ((BigDecimal) left).compareTo(new BigDecimal(right.longValue()));
+                return integer.compareTo(new BigInteger(right.toString()));
             }
             else if ((right instanceof Float) || (right instanceof Double))
             {
-                return ((BigDecimal) left).compareTo(BigDecimal.valueOf(right.doubleValue()));
+                return new BigDecimal(integer).compareTo(BigDecimal.valueOf(right.doubleValue()));
             }
-            else if (right instanceof BigInteger)
+            else if (right instanceof BigInteger integer)
             {
-                return ((BigDecimal) left).compareTo(new BigDecimal((BigInteger) right));
+                return ((BigInteger) left).compareTo(integer);
             }
-            else if (right instanceof BigDecimal)
+            else if (right instanceof BigDecimal decimal)
             {
-                return ((BigDecimal) left).compareTo((BigDecimal) right);
+                return new BigDecimal((BigInteger) left).compareTo(decimal);
+            }
+            else
+            {
+                throw new RuntimeException("Number of an unhandled type: " + right);
+            }
+        }
+        else if (left instanceof BigDecimal decimal)
+        {
+            if ((right instanceof Integer) || (right instanceof Long))
+            {
+                return decimal.compareTo(new BigDecimal(right.longValue()));
+            }
+            else if ((right instanceof Float) || (right instanceof Double))
+            {
+                return decimal.compareTo(BigDecimal.valueOf(right.doubleValue()));
+            }
+            else if (right instanceof BigInteger integer)
+            {
+                return ((BigDecimal) left).compareTo(new BigDecimal(integer));
+            }
+            else if (right instanceof BigDecimal decimal)
+            {
+                return ((BigDecimal) left).compareTo(decimal);
             }
             else
             {

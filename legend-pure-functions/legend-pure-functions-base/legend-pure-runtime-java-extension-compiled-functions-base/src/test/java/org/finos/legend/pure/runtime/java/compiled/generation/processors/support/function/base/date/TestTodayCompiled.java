@@ -20,20 +20,20 @@ import org.finos.legend.pure.m3.tests.function.base.date.AbstractTestToday;
 import org.finos.legend.pure.m3.tools.test.ToFix;
 import org.finos.legend.pure.runtime.java.compiled.execution.FunctionExecutionCompiledBuilder;
 import org.finos.legend.pure.runtime.java.compiled.factory.JavaModelFactoryRegistryLoader;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 public class TestTodayCompiled extends AbstractTestToday
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         AbstractPureTestWithCoreCompiled.setUpRuntime(getFunctionExecution(), JavaModelFactoryRegistryLoader.loader());
     }
 
     @ToFix
-    @Ignore
+    @Disabled
     @Test
     @Override
     public void testToday()

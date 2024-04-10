@@ -71,19 +71,21 @@ public class Let extends AbstractNative implements Native
     @Override
     public String buildBody()
     {
-        return "new DefendedPureFunction1<Object,Object>()\n" +
-                "        {\n" +
-                "            @Override\n" +
-                "            public Object execute(ListIterable<?> vars, ExecutionSupport es)\n" +
-                "            {\n" +
-                "                return value(vars.get(1), es);\n" +
-                "            }\n" +
-                "            @Override\n" +
-                "            public Object value(Object o, ExecutionSupport es)\n" +
-                "            {\n" +
-                "                return o;\n" +
-                "            }\n" +
-                "        }";
+        return """
+                new DefendedPureFunction1<Object,Object>()
+                        {
+                            @Override
+                            public Object execute(ListIterable<?> vars, ExecutionSupport es)
+                            {
+                                return value(vars.get(1), es);
+                            }
+                            @Override
+                            public Object value(Object o, ExecutionSupport es)
+                            {
+                                return o;
+                            }
+                        }\
+                """;
     }
 }
 

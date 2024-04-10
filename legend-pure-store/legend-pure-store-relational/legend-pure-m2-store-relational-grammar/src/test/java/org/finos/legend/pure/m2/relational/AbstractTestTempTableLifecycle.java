@@ -16,111 +16,118 @@ package org.finos.legend.pure.m2.relational;
 
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
 import org.finos.legend.pure.m3.exception.PureExecutionException;
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public abstract class AbstractTestTempTableLifecycle extends AbstractPureTestWithCoreCompiled
 {
-    @Rule
-    public final ExpectedException exception = ExpectedException.none();
 
     @Test
     public void testCreateTempTable()
     {
-        exception.expect(PureExecutionException.class);
-        exception.expectMessage("Table \"TT\" not found");
+        Throwable exception = assertThrows(PureExecutionException.class, () -> {
 
-        compileTestSource(
-                "import meta::external::store::relational::runtime::*;\n" +
-                        "import meta::relational::metamodel::*;\n" +
-                        "import meta::relational::metamodel::execute::*;" +
-                        "import meta::relational::functions::toDDL::*;" +
-                        "function test():Any[0..1]\n" +
-                        "{\n" +
-                        "   let dbConnection = ^TestDatabaseConnection(type = meta::relational::runtime::DatabaseType.H2);" +
-                        "   createTempTable('tt', ^Column(name='col', type=^meta::relational::metamodel::datatype::Integer()), " +
-                        "                   {ttName:String[1], cols: Column[*], dbType: meta::relational::runtime::DatabaseType[1]| 'Create LOCAL TEMPORARY TABLE tt (col INT)'}, " +
-                        "                   $dbConnection);" +
-                        "   let res = executeInDb('select * from tt', $dbConnection, 0, 1000);" +
-                        "   let columnNames = $res.columnNames;" +
-                        "   print($columnNames, 1);" +
-                        "   assert('COL' == $columnNames, |'');" +
-                        "   dropTempTable('tt', $dbConnection);" +
-                        "   executeInDb('select * from tt', $dbConnection, 0, 1000);" +
-                        "}\n" +
-                        "###Relational\n" +
-                        "Database mydb()\n"
-        );
-        try
-        {
-            compileAndExecute("test():Any[0..1]");
-        }
-        catch (PureExecutionException ex)
-        {
-            //expected
-            Assert.assertEquals("'COL'", this.functionExecution.getConsole().getLine(0));
-            throw ex;
-        }
+            compileTestSource(
+                    """
+                    import meta::external::store::relational::runtime::*;
+                    import meta::relational::metamodel::*;
+                    import meta::relational::metamodel::execute::*;\
+                    import meta::relational::functions::toDDL::*;\
+                    function test():Any[0..1]
+                    {
+                       let dbConnection = ^TestDatabaseConnection(type = meta::relational::runtime::DatabaseType.H2);\
+                       createTempTable('tt', ^Column(name='col', type=^meta::relational::metamodel::datatype::Integer()), \
+                                       {ttName:String[1], cols: Column[*], dbType: meta::relational::runtime::DatabaseType[1]| 'Create LOCAL TEMPORARY TABLE tt (col INT)'}, \
+                                       $dbConnection);\
+                       let res = executeInDb('select * from tt', $dbConnection, 0, 1000);\
+                       let columnNames = $res.columnNames;\
+                       print($columnNames, 1);\
+                       assert('COL' == $columnNames, |'');\
+                       dropTempTable('tt', $dbConnection);\
+                       executeInDb('select * from tt', $dbConnection, 0, 1000);\
+                    }
+                    ###Relational
+                    Database mydb()
+                    """
+            );
+            try
+            {
+                compileAndExecute("test():Any[0..1]");
+            }
+            catch (PureExecutionException ex)
+            {
+                //expected
+                Assertions.assertEquals("'COL'", this.functionExecution.getConsole().getLine(0));
+                throw ex;
+            }
+        });
+        assertTrue(exception.getMessage().contains("Table \"TT\" not found"));
     }
 
     @Test
     public void testTempTableDroppedInFinally()
     {
-        exception.expect(PureExecutionException.class);
-        exception.expectMessage("Temporary table: tt should be dropped explicitly");
+        Throwable exception = assertThrows(PureExecutionException.class, () -> {
 
-        compileTestSource(
-                "import meta::external::store::relational::runtime::*;\n" +
-                        "import meta::relational::metamodel::*;\n" +
-                        "import meta::relational::metamodel::execute::*;" +
-                        "function test():Any[0..1]\n" +
-                        "{\n" +
-                        "   let dbConnection = ^TestDatabaseConnection(type = meta::relational::runtime::DatabaseType.H2);" +
-                        "   createTempTable('tt', ^Column(name='col', type=^meta::relational::metamodel::datatype::Integer()), " +
-                        "   {ttName:String[1], cols: Column[*], dbType: meta::relational::runtime::DatabaseType[1]| 'Create LOCAL TEMPORARY TABLE tt (col INT)'}, " +
-                        "   $dbConnection);" +
-                        "   let res = executeInDb('select * from tt', $dbConnection, 0, 1000);" +
-                        "   let columnNames = $res.columnNames;" +
-                        "   print($columnNames, 1);" +
-                        "   assert('COL' == $columnNames, |'');" +
-                        "}\n" +
-                        "###Relational\n" +
-                        "Database mydb()\n"
-        );
-        try
-        {
-            compileAndExecute("test():Any[0..1]");
-        }
-        catch (PureExecutionException ex)
-        {
-            //expected
-            Assert.assertEquals("'COL'", this.functionExecution.getConsole().getLine(0));
-            throw ex;
-        }
+            compileTestSource(
+                    """
+                    import meta::external::store::relational::runtime::*;
+                    import meta::relational::metamodel::*;
+                    import meta::relational::metamodel::execute::*;\
+                    function test():Any[0..1]
+                    {
+                       let dbConnection = ^TestDatabaseConnection(type = meta::relational::runtime::DatabaseType.H2);\
+                       createTempTable('tt', ^Column(name='col', type=^meta::relational::metamodel::datatype::Integer()), \
+                       {ttName:String[1], cols: Column[*], dbType: meta::relational::runtime::DatabaseType[1]| 'Create LOCAL TEMPORARY TABLE tt (col INT)'}, \
+                       $dbConnection);\
+                       let res = executeInDb('select * from tt', $dbConnection, 0, 1000);\
+                       let columnNames = $res.columnNames;\
+                       print($columnNames, 1);\
+                       assert('COL' == $columnNames, |'');\
+                    }
+                    ###Relational
+                    Database mydb()
+                    """
+            );
+            try
+            {
+                compileAndExecute("test():Any[0..1]");
+            }
+            catch (PureExecutionException ex)
+            {
+                //expected
+                Assertions.assertEquals("'COL'", this.functionExecution.getConsole().getLine(0));
+                throw ex;
+            }
+        });
+        assertTrue(exception.getMessage().contains("Temporary table: tt should be dropped explicitly"));
     }
 
     @Test
     public void testRelyOnFinallyTempTableFlow()
     {
         compileTestSource(
-                "import meta::external::store::relational::runtime::*;\n" +
-                        "import meta::relational::metamodel::*;\n" +
-                        "import meta::relational::metamodel::execute::*;" +
-                        "function test():Any[0..1]\n" +
-                        "{\n" +
-                        "   let dbConnection = ^TestDatabaseConnection(type = meta::relational::runtime::DatabaseType.H2);" +
-                        "   createTempTable('tt', ^Column(name='col', type=^meta::relational::metamodel::datatype::Integer()), " +
-                        "   {ttName:String[1], cols: Column[*], dbType: meta::relational::runtime::DatabaseType[1]| 'Create LOCAL TEMPORARY TABLE tt (col INT)'}, true," +
-                        "   $dbConnection);" +
-                        "   let res = executeInDb('select * from tt', $dbConnection, 0, 1000);" +
-                        "   let columnNames = $res.columnNames;" +
-                        "   print($columnNames, 1);" +
-                        "   assert('COL' == $columnNames, |'');" +
-                        "}\n" +
-                        "###Relational\n" +
-                        "Database mydb()\n"
+                """
+                import meta::external::store::relational::runtime::*;
+                import meta::relational::metamodel::*;
+                import meta::relational::metamodel::execute::*;\
+                function test():Any[0..1]
+                {
+                   let dbConnection = ^TestDatabaseConnection(type = meta::relational::runtime::DatabaseType.H2);\
+                   createTempTable('tt', ^Column(name='col', type=^meta::relational::metamodel::datatype::Integer()), \
+                   {ttName:String[1], cols: Column[*], dbType: meta::relational::runtime::DatabaseType[1]| 'Create LOCAL TEMPORARY TABLE tt (col INT)'}, true,\
+                   $dbConnection);\
+                   let res = executeInDb('select * from tt', $dbConnection, 0, 1000);\
+                   let columnNames = $res.columnNames;\
+                   print($columnNames, 1);\
+                   assert('COL' == $columnNames, |'');\
+                }
+                ###Relational
+                Database mydb()
+                """
         );
         try
         {
@@ -129,7 +136,7 @@ public abstract class AbstractTestTempTableLifecycle extends AbstractPureTestWit
         catch (PureExecutionException ex)
         {
             //expected
-            Assert.assertEquals("'COL'", this.functionExecution.getConsole().getLine(0));
+            Assertions.assertEquals("'COL'", this.functionExecution.getConsole().getLine(0));
             throw ex;
         }
     }

@@ -15,7 +15,7 @@
 package org.finos.legend.pure.m3.tests.function.base.math;
 
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public abstract class AbstractTestDivide extends AbstractPureTestWithCoreCompiled
 {
@@ -23,10 +23,12 @@ public abstract class AbstractTestDivide extends AbstractPureTestWithCoreCompile
     public void testBasic()
     {
         compileTestSource("fromString.pure",
-                "function test():Boolean[1]\n" +
-                        "{\n" +
-                        "   assert(6.0 == 12/2, |'');\n" +
-                        "}\n");
+                """
+                function test():Boolean[1]
+                {
+                   assert(6.0 == 12/2, |'');
+                }
+                """);
         this.execute("test():Boolean[1]");
     }
 
@@ -34,10 +36,12 @@ public abstract class AbstractTestDivide extends AbstractPureTestWithCoreCompile
     public void testComplex()
     {
         compileTestSource("fromString.pure",
-                "function test():Boolean[1]\n" +
-                        "{\n" +
-                        "   assert(3.0 == 12/2/2, |'');\n" +
-                        "}\n");
+                """
+                function test():Boolean[1]
+                {
+                   assert(3.0 == 12/2/2, |'');
+                }
+                """);
         this.execute("test():Boolean[1]");
     }
 }

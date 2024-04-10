@@ -15,7 +15,7 @@
 package org.finos.legend.pure.m3.tests.function.base.string;
 
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public abstract class AbstractTestParseDate extends AbstractPureTestWithCoreCompiled
 {
@@ -23,10 +23,12 @@ public abstract class AbstractTestParseDate extends AbstractPureTestWithCoreComp
     public void testBasicParse()
     {
             compileTestSource("fromString.pure",
-                    "function test():Boolean[1]\n" +
-                            "{\n" +
-                            "   assert(%2018-08-31 == '%2018-08-31'->parseDate(), |'');\n" +
-                            "}\n");
+                    """
+                    function test():Boolean[1]
+                    {
+                       assert(%2018-08-31 == '%2018-08-31'->parseDate(), |'');
+                    }
+                    """);
             this.execute("test():Boolean[1]");
     }
 
@@ -34,10 +36,12 @@ public abstract class AbstractTestParseDate extends AbstractPureTestWithCoreComp
     public void testEvalParse()
     {
         compileTestSource("fromString.pure",
-                "function test():Boolean[1]\n" +
-                        "{\n" +
-                        "   assert(%2018-08-31 == parseDate_String_1__Date_1_->eval('%2018-08-31'), |'');\n" +
-                        "}\n");
+                """
+                function test():Boolean[1]
+                {
+                   assert(%2018-08-31 == parseDate_String_1__Date_1_->eval('%2018-08-31'), |'');
+                }
+                """);
         this.execute("test():Boolean[1]");
     }
 }

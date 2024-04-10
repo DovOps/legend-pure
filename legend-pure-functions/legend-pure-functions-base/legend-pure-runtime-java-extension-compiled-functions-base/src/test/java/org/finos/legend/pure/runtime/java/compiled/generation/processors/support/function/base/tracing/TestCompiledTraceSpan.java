@@ -20,19 +20,19 @@ import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
 import org.finos.legend.pure.m3.tests.function.base.tracing.AbstractTestTraceSpan;
 import org.finos.legend.pure.runtime.java.compiled.execution.FunctionExecutionCompiledBuilder;
 import org.finos.legend.pure.runtime.java.compiled.factory.JavaModelFactoryRegistryLoader;
-import org.junit.After;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 
 public class TestCompiledTraceSpan extends AbstractTestTraceSpan
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         AbstractPureTestWithCoreCompiled.setUpRuntime(getFunctionExecution(), JavaModelFactoryRegistryLoader.loader());
         GlobalTracer.registerIfAbsent(AbstractTestTraceSpan.tracer);
     }
 
-    @After
+    @AfterEach
     public void clearRuntime()
     {
         AbstractPureTestWithCoreCompiled.runtime.delete("fromString.pure");

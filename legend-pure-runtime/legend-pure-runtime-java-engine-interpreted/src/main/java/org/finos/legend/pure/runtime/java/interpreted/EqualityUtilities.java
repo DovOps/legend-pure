@@ -61,10 +61,10 @@ public class EqualityUtilities
             return true;
         }
 
-        if ((left instanceof PrimitiveCoreInstance<?>) && (right instanceof PrimitiveCoreInstance<?>))
+        if ((left instanceof PrimitiveCoreInstance<?> instance) && (right instanceof PrimitiveCoreInstance<?> instance))
         {
             return processorSupport.getClassifier(left).getName().equals(processorSupport.getClassifier(right).getName()) &&
-                    ((PrimitiveCoreInstance<?>) left).getValue().equals(((PrimitiveCoreInstance<?>) right).getValue());
+                    instance.getValue().equals(instance.getValue());
         }
 
         CoreInstance type = processorSupport.getClassifier(left);
@@ -92,10 +92,10 @@ public class EqualityUtilities
             return true;
         }
 
-        if ((left instanceof PrimitiveCoreInstance<?>) && (right instanceof PrimitiveCoreInstance<?>))
+        if ((left instanceof PrimitiveCoreInstance<?> instance) && (right instanceof PrimitiveCoreInstance<?> instance))
         {
             return processorSupport.getClassifier(left).getName().equals(processorSupport.getClassifier(right).getName()) &&
-                    ((PrimitiveCoreInstance<?>) left).getValue().equals(((PrimitiveCoreInstance<?>) right).getValue());
+                    instance.getValue().equals(instance.getValue());
         }
 
         CoreInstance type = processorSupport.getClassifier(left);
@@ -235,8 +235,8 @@ public class EqualityUtilities
      */
     public static boolean containsCoreInstance(Iterable<? extends CoreInstance> iterable, CoreInstance instance, ProcessorSupport processorSupport)
     {
-        return (iterable instanceof CoreInstanceMutableSet) ?
-                ((CoreInstanceMutableSet<?>) iterable).contains(instance) :
+        return (iterable instanceof CoreInstanceMutableSet cims) ?
+                cims.contains(instance) :
                 Iterate.anySatisfy(iterable, i -> equal(instance, i, Lists.immutable.empty(), processorSupport));
     }
 

@@ -58,7 +58,7 @@ public class JsonUnitSerialization<T extends CoreInstance> extends UnitConversio
         else
         {
             CoreInstance numericInArray = processedPureObject.getValueForMetaPropertyToOne("values");
-            value = numericInArray instanceof PrimitiveCoreInstance ? ((PrimitiveCoreInstance) numericInArray).getValue() : ((PrimitiveCoreInstance) numericInArray.getValueForMetaPropertyToOne("values")).getValue();
+            value = numericInArray instanceof PrimitiveCoreInstance pci ? pci.getValue() : ((PrimitiveCoreInstance) numericInArray.getValueForMetaPropertyToOne("values")).getValue();
             typeString = PackageableElement.getUserPathForPackageableElement(Instance.getValueForMetaPropertyToOneResolved(processedPureObject, M3Properties.genericType, M3Properties.rawType, processorSupport));
         }
 

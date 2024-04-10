@@ -146,13 +146,13 @@ public abstract class IDIndex<K, V extends CoreInstance>
 
     private static int getInitialSizeForMap(Iterable<?> values)
     {
-        if (values instanceof Collection)
+        if (values instanceof Collection collection)
         {
-            return ((Collection<?>)values).size();
+            return collection.size();
         }
-        if (values instanceof RichIterable)
+        if (values instanceof RichIterable iterable)
         {
-            return ((RichIterable<?>)values).size();
+            return iterable.size();
         }
         return 16;
     }

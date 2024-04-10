@@ -18,19 +18,19 @@ import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
 import org.finos.legend.pure.m3.execution.FunctionExecution;
 import org.finos.legend.pure.runtime.java.compiled.execution.FunctionExecutionCompiledBuilder;
 import org.finos.legend.pure.runtime.java.compiled.factory.JavaModelFactoryRegistryLoader;
-import org.junit.After;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestEvaluateFunctions extends AbstractPureTestWithCoreCompiled
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         AbstractPureTestWithCoreCompiled.setUpRuntime(getFunctionExecution(), JavaModelFactoryRegistryLoader.loader());
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         AbstractPureTestWithCoreCompiled.runtime.delete("fromString.pure");
@@ -41,10 +41,12 @@ public class TestEvaluateFunctions extends AbstractPureTestWithCoreCompiled
     public void testFilterSimple()
     {
         AbstractPureTestWithCoreCompiled.compileTestSource("fromString.pure",
-                "function test():Boolean[1]\n" +
-                        "{\n" +
-                        "   assert('test' == ['a','b','test']->filter(x|$x == 'test'), |'')\n" +
-                        "}");
+                """
+                function test():Boolean[1]
+                {
+                   assert('test' == ['a','b','test']->filter(x|$x == 'test'), |'')
+                }\
+                """);
         this.compileAndExecute("test():Boolean[1]");
     }
 
@@ -52,10 +54,12 @@ public class TestEvaluateFunctions extends AbstractPureTestWithCoreCompiled
     public void testFilterReflectiveEval()
     {
         AbstractPureTestWithCoreCompiled.compileTestSource("fromString.pure",
-                "function test():Boolean[1]\n" +
-                        "{\n" +
-                        "   assert('test' == filter_T_MANY__Function_1__T_MANY_->eval(['a','b','test'], x:String[1]|$x == 'test'), |'')\n" +
-                        "}");
+                """
+                function test():Boolean[1]
+                {
+                   assert('test' == filter_T_MANY__Function_1__T_MANY_->eval(['a','b','test'], x:String[1]|$x == 'test'), |'')
+                }\
+                """);
         this.compileAndExecute("test():Boolean[1]");
     }
 
@@ -63,10 +67,12 @@ public class TestEvaluateFunctions extends AbstractPureTestWithCoreCompiled
     public void testFilterReflectiveEvaluate()
     {
         AbstractPureTestWithCoreCompiled.compileTestSource("fromString.pure",
-                "function test():Boolean[1]\n" +
-                        "{\n" +
-                        "   assert('test' == filter_T_MANY__Function_1__T_MANY_->evaluate([list(['a','b','test']), list(x:String[1]|$x == 'test')]), |'')\n" +
-                        "}");
+                """
+                function test():Boolean[1]
+                {
+                   assert('test' == filter_T_MANY__Function_1__T_MANY_->evaluate([list(['a','b','test']), list(x:String[1]|$x == 'test')]), |'')
+                }\
+                """);
         this.compileAndExecute("test():Boolean[1]");
 
     }

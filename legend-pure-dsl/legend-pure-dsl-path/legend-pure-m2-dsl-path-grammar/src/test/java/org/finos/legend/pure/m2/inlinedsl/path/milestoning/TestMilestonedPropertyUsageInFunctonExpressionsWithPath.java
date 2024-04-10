@@ -15,12 +15,12 @@
 package org.finos.legend.pure.m2.inlinedsl.path.milestoning;
 
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestMilestonedPropertyUsageInFunctonExpressionsWithPath extends AbstractPureTestWithCoreCompiled
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime();
@@ -30,35 +30,37 @@ public class TestMilestonedPropertyUsageInFunctonExpressionsWithPath extends Abs
     public void testLatestDateCompilationValidationAndPropagationDate() throws Exception
     {
         runtime.createInMemorySource("sourceId.pure",
-                "import meta::test::milestoning::domain::*;\n" +
-                        "Class <<temporal.processingtemporal>> meta::test::milestoning::domain::Classification{\n" +
-                        "   name:String[1];\n" +
-                        "}\n" +
-                        "Class <<temporal.processingtemporal>> meta::test::milestoning::domain::Trader{\n" +
-                        "   name:String[1];\n" +
-                        "   coveredProducts:Product[*];\n" +
-                        "}\n" +
-                        "Class <<temporal.businesstemporal>> meta::test::milestoning::domain::Product{\n" +
-                        "   name:String[1];\n" +
-                        "   classification : Classification[0..1];\n" +
-                        "}\n" +
-                        "Class <<temporal.bitemporal>> meta::test::milestoning::domain::BiTemporalProduct{\n" +
-                        "   name:String[1];\n" +
-                        "   classification : Classification[0..1];\n" +
-                        "}\n" +
-                        "Class  <<temporal.processingtemporal>> meta::test::milestoning::domain::Order{\n" +
-                        "   product : Product[0..1];\n" +
-                        "   biTemporalProduct : BiTemporalProduct[0..1];\n" +
-                        "   trader : Trader[0..1];\n" +
-                        "}\n" +
-                        "function go():Any[*]\n" +
-                        "{\n" +
-                        "   {|Order.all(%latest).product(%latest).classification(%latest).name};" +
-                        "   {|Order.all(%latest).biTemporalProduct(%latest, %latest).name};" +
-                        "   {|Order.all(%latest).trader.coveredProducts(%latest).name};" +
-                        "   {|BiTemporalProduct.all(%latest, %latest).name};" +
-                        "   {|#/Order/biTemporalProduct(%latest, %latest)/name#};" +
-                        "}\n"
+                """
+                import meta::test::milestoning::domain::*;
+                Class <<temporal.processingtemporal>> meta::test::milestoning::domain::Classification{
+                   name:String[1];
+                }
+                Class <<temporal.processingtemporal>> meta::test::milestoning::domain::Trader{
+                   name:String[1];
+                   coveredProducts:Product[*];
+                }
+                Class <<temporal.businesstemporal>> meta::test::milestoning::domain::Product{
+                   name:String[1];
+                   classification : Classification[0..1];
+                }
+                Class <<temporal.bitemporal>> meta::test::milestoning::domain::BiTemporalProduct{
+                   name:String[1];
+                   classification : Classification[0..1];
+                }
+                Class  <<temporal.processingtemporal>> meta::test::milestoning::domain::Order{
+                   product : Product[0..1];
+                   biTemporalProduct : BiTemporalProduct[0..1];
+                   trader : Trader[0..1];
+                }
+                function go():Any[*]
+                {
+                   {|Order.all(%latest).product(%latest).classification(%latest).name};\
+                   {|Order.all(%latest).biTemporalProduct(%latest, %latest).name};\
+                   {|Order.all(%latest).trader.coveredProducts(%latest).name};\
+                   {|BiTemporalProduct.all(%latest, %latest).name};\
+                   {|#/Order/biTemporalProduct(%latest, %latest)/name#};\
+                }
+                """
         );
 
         runtime.compile();

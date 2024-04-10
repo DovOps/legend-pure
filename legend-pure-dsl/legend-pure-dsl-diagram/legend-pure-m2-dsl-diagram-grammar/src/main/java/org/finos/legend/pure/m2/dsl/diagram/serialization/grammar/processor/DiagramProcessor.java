@@ -120,17 +120,17 @@ public class DiagramProcessor extends Processor<Diagram>
     {
         try
         {
-            if (view instanceof TypeView)
+            if (view instanceof TypeView typeView)
             {
-                ImportStub.withImportStubByPass(((TypeView)view)._typeCoreInstance(), processorSupport);
+                ImportStub.withImportStubByPass(typeView._typeCoreInstance(), processorSupport);
             }
-            else if (view instanceof AssociationView)
+            else if (view instanceof AssociationView associationView)
             {
-                ImportStub.withImportStubByPass(((AssociationView)view)._associationCoreInstance(), processorSupport);
+                ImportStub.withImportStubByPass(associationView._associationCoreInstance(), processorSupport);
             }
-            else if (view instanceof PropertyView)
+            else if (view instanceof PropertyView propertyView)
             {
-                ImportStub.withImportStubByPass(((PropertyView)view)._propertyCoreInstance(), processorSupport);
+                ImportStub.withImportStubByPass(propertyView._propertyCoreInstance(), processorSupport);
             }
         }
         catch (PureCompilationException e)

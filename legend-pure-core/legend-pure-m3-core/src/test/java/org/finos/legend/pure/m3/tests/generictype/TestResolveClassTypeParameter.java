@@ -20,20 +20,20 @@ import org.finos.legend.pure.m3.navigation.generictype.GenericType;
 import org.finos.legend.pure.m3.navigation.type.Type;
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiledPlatform;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestResolveClassTypeParameter extends AbstractPureTestWithCoreCompiledPlatform
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getExtra());
     }
 
-    @After
+    @AfterEach
     public void clearRuntime()
     {
         runtime.delete("fromString.pure");
@@ -42,20 +42,24 @@ public class TestResolveClassTypeParameter extends AbstractPureTestWithCoreCompi
     @Test
     public void testResolveClassTypeParameter()
     {
-        compileTestSource("fromString.pure", "Class A<T>{}" +
-                "Class D<T> extends A<T>{}" +
-                "Class B extends D<C>{}" +
-                "Class C{}");
+        compileTestSource("fromString.pure", """
+                Class A<T>{}\
+                Class D<T> extends A<T>{}\
+                Class B extends D<C>{}\
+                Class C{}\
+                """);
         CoreInstance genericType = GenericType.resolveClassTypeParameterUsingInheritance(Type.wrapGenericType(runtime.getCoreInstance("B"), processorSupport), Type.wrapGenericType(runtime.getCoreInstance("A"), processorSupport), processorSupport).getArgumentsByParameterName().get("T");
-        Assert.assertEquals("Anonymous_StripedId instance GenericType\n" +
-                "    rawType(Property):\n" +
-                "        Anonymous_StripedId instance ImportStub\n" +
-                "            idOrPath(Property):\n" +
-                "                C instance String\n" +
-                "            importGroup(Property):\n" +
-                "                import_fromString_pure_1 instance ImportGroup\n" +
-                "            resolvedNode(Property):\n" +
-                "                C instance Class", genericType.printWithoutDebug(""));
+        Assertions.assertEquals("""
+                Anonymous_StripedId instance GenericType
+                    rawType(Property):
+                        Anonymous_StripedId instance ImportStub
+                            idOrPath(Property):
+                                C instance String
+                            importGroup(Property):
+                                import_fromString_pure_1 instance ImportGroup
+                            resolvedNode(Property):
+                                C instance Class\
+                """, genericType.printWithoutDebug(""));
     }
 
     @Test
@@ -63,81 +67,87 @@ public class TestResolveClassTypeParameter extends AbstractPureTestWithCoreCompi
     {
         try
         {
-            compileTestSource("fromString.pure", "Class A<T>{}" +
-                    "Class D<T> extends A<T>{}" +
-                    "Class B<Z> extends D<C>{}" +
-                    "Class C{}");
+            compileTestSource("fromString.pure", """
+                    Class A<T>{}\
+                    Class D<T> extends A<T>{}\
+                    Class B<Z> extends D<C>{}\
+                    Class C{}\
+                    """);
             GenericType.resolveClassTypeParameterUsingInheritance(Type.wrapGenericType(runtime.getCoreInstance("B"), processorSupport), Type.wrapGenericType(runtime.getCoreInstance("A"), processorSupport), processorSupport).getArgumentsByParameterName().get("T");
-            Assert.fail();
+            Assertions.fail();
         }
         catch (Exception e)
         {
-            Assert.assertEquals("Type argument mismatch for B<Z>; got: B", e.getMessage());
+            Assertions.assertEquals("Type argument mismatch for B<Z>; got: B", e.getMessage());
         }
     }
 
     @Test
     public void testResolveClassTypeWithFunctionTypes()
     {
-        compileTestSource("fromString.pure", "Class A<T>{}" +
-                "Class D<T,X> extends A<{T[1]->{X[1]->C[1]}[1]}>{}" +
-                "Class B<X> extends D<X,C>{}" +
-                "Class C{}" +
-                "Class E{}" +
-                "^B<E> k()");
+        compileTestSource("fromString.pure", """
+                Class A<T>{}\
+                Class D<T,X> extends A<{T[1]->{X[1]->C[1]}[1]}>{}\
+                Class B<X> extends D<X,C>{}\
+                Class C{}\
+                Class E{}\
+                ^B<E> k()\
+                """);
         CoreInstance genericType = GenericType.resolveClassTypeParameterUsingInheritance(Instance.getValueForMetaPropertyToOneResolved(runtime.getCoreInstance("k"), M3Properties.classifierGenericType, processorSupport), Type.wrapGenericType(runtime.getCoreInstance("A"), processorSupport), processorSupport).getArgumentsByParameterName().get("T");
-        Assert.assertEquals("Anonymous_StripedId instance GenericType\n" +
-                "    rawType(Property):\n" +
-                "        Anonymous_StripedId instance FunctionType\n" +
-                "            parameters(Property):\n" +
-                "                Anonymous_StripedId instance VariableExpression\n" +
-                "                    genericType(Property):\n" +
-                "                        Anonymous_StripedId instance GenericType\n" +
-                "                            rawType(Property):\n" +
-                "                                Anonymous_StripedId instance ImportStub\n" +
-                "                                    idOrPath(Property):\n" +
-                "                                        E instance String\n" +
-                "                                    importGroup(Property):\n" +
-                "                                        import_fromString_pure_1 instance ImportGroup\n" +
-                "                                    resolvedNode(Property):\n" +
-                "                                        E instance Class\n" +
-                "                    multiplicity(Property):\n" +
-                "                        PureOne instance PackageableMultiplicity\n" +
-                "                    name(Property):\n" +
-                "                         instance String\n" +
-                "            returnMultiplicity(Property):\n" +
-                "                PureOne instance PackageableMultiplicity\n" +
-                "            returnType(Property):\n" +
-                "                Anonymous_StripedId instance GenericType\n" +
-                "                    rawType(Property):\n" +
-                "                        Anonymous_StripedId instance FunctionType\n" +
-                "                            parameters(Property):\n" +
-                "                                Anonymous_StripedId instance VariableExpression\n" +
-                "                                    genericType(Property):\n" +
-                "                                        Anonymous_StripedId instance GenericType\n" +
-                "                                            rawType(Property):\n" +
-                "                                                Anonymous_StripedId instance ImportStub\n" +
-                "                                                    idOrPath(Property):\n" +
-                "                                                        C instance String\n" +
-                "                                                    importGroup(Property):\n" +
-                "                                                        import_fromString_pure_1 instance ImportGroup\n" +
-                "                                                    resolvedNode(Property):\n" +
-                "                                                        C instance Class\n" +
-                "                                    multiplicity(Property):\n" +
-                "                                        PureOne instance PackageableMultiplicity\n" +
-                "                                    name(Property):\n" +
-                "                                         instance String\n" +
-                "                            returnMultiplicity(Property):\n" +
-                "                                PureOne instance PackageableMultiplicity\n" +
-                "                            returnType(Property):\n" +
-                "                                Anonymous_StripedId instance GenericType\n" +
-                "                                    rawType(Property):\n" +
-                "                                        Anonymous_StripedId instance ImportStub\n" +
-                "                                            idOrPath(Property):\n" +
-                "                                                C instance String\n" +
-                "                                            importGroup(Property):\n" +
-                "                                                import_fromString_pure_1 instance ImportGroup\n" +
-                "                                            resolvedNode(Property):\n" +
-                "                                                C instance Class", genericType.printWithoutDebug("", 10));
+        Assertions.assertEquals("""
+                Anonymous_StripedId instance GenericType
+                    rawType(Property):
+                        Anonymous_StripedId instance FunctionType
+                            parameters(Property):
+                                Anonymous_StripedId instance VariableExpression
+                                    genericType(Property):
+                                        Anonymous_StripedId instance GenericType
+                                            rawType(Property):
+                                                Anonymous_StripedId instance ImportStub
+                                                    idOrPath(Property):
+                                                        E instance String
+                                                    importGroup(Property):
+                                                        import_fromString_pure_1 instance ImportGroup
+                                                    resolvedNode(Property):
+                                                        E instance Class
+                                    multiplicity(Property):
+                                        PureOne instance PackageableMultiplicity
+                                    name(Property):
+                                         instance String
+                            returnMultiplicity(Property):
+                                PureOne instance PackageableMultiplicity
+                            returnType(Property):
+                                Anonymous_StripedId instance GenericType
+                                    rawType(Property):
+                                        Anonymous_StripedId instance FunctionType
+                                            parameters(Property):
+                                                Anonymous_StripedId instance VariableExpression
+                                                    genericType(Property):
+                                                        Anonymous_StripedId instance GenericType
+                                                            rawType(Property):
+                                                                Anonymous_StripedId instance ImportStub
+                                                                    idOrPath(Property):
+                                                                        C instance String
+                                                                    importGroup(Property):
+                                                                        import_fromString_pure_1 instance ImportGroup
+                                                                    resolvedNode(Property):
+                                                                        C instance Class
+                                                    multiplicity(Property):
+                                                        PureOne instance PackageableMultiplicity
+                                                    name(Property):
+                                                         instance String
+                                            returnMultiplicity(Property):
+                                                PureOne instance PackageableMultiplicity
+                                            returnType(Property):
+                                                Anonymous_StripedId instance GenericType
+                                                    rawType(Property):
+                                                        Anonymous_StripedId instance ImportStub
+                                                            idOrPath(Property):
+                                                                C instance String
+                                                            importGroup(Property):
+                                                                import_fromString_pure_1 instance ImportGroup
+                                                            resolvedNode(Property):
+                                                                C instance Class\
+                """, genericType.printWithoutDebug("", 10));
     }
 }

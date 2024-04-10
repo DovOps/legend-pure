@@ -15,7 +15,7 @@
 package org.finos.legend.pure.m3.tests.function.base.asserts;
 
 import org.finos.legend.pure.m3.tests.function.base.PureExpressionTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public abstract class AbstractTestAssert extends PureExpressionTest
 {

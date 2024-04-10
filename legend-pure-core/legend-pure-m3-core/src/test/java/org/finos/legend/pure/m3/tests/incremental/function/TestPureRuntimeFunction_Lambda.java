@@ -19,22 +19,22 @@ import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiledPlatform;
 import org.finos.legend.pure.m3.tests.RuntimeTestScriptBuilder;
 import org.finos.legend.pure.m3.tests.RuntimeVerifier;
 import org.finos.legend.pure.m4.exception.PureCompilationException;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.util.regex.Pattern;
 
 public class TestPureRuntimeFunction_Lambda extends AbstractPureTestWithCoreCompiledPlatform
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getExtra());
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("other.pure");
@@ -92,7 +92,7 @@ public class TestPureRuntimeFunction_Lambda extends AbstractPureTestWithCoreComp
             {
                 runtime.createInMemorySource("sourceId.pure", "function sourceFunction():Integer[1]{1}");
                 runtime.compile();
-                Assert.fail();
+                Assertions.fail();
             }
             catch (Exception e)
             {
@@ -114,6 +114,6 @@ public class TestPureRuntimeFunction_Lambda extends AbstractPureTestWithCoreComp
         }
         runtime.modify("sourceId.pure", "Class Test{} Class B{a:A[1];} Class A{}");
         runtime.compile();
-        Assert.assertEquals("Graph size mismatch", size, repository.serialize().length);
+        Assertions.assertEquals(size, repository.serialize().length, "Graph size mismatch");
     }
 }

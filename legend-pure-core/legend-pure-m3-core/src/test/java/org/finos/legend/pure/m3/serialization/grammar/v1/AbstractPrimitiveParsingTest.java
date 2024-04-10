@@ -21,14 +21,14 @@ import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiledPlatform;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
 import org.finos.legend.pure.m4.coreinstance.SourceInformation;
 import org.finos.legend.pure.m4.serialization.grammar.antlr.PureParserException;
-import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 
 import java.util.UUID;
 
 public abstract class AbstractPrimitiveParsingTest extends AbstractPureTestWithCoreCompiledPlatform
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime();
@@ -39,10 +39,10 @@ public abstract class AbstractPrimitiveParsingTest extends AbstractPureTestWithC
     protected void assertParsesTo(String expectedName, String string)
     {
         CoreInstance value = parsePrimitiveValue(string);
-        Assert.assertNotNull(value);
-        Assert.assertNotNull(value.getClassifier());
-        Assert.assertEquals(getPrimitiveTypeName(), value.getClassifier().getName());
-        Assert.assertEquals(expectedName, value.getName());
+        Assertions.assertNotNull(value);
+        Assertions.assertNotNull(value.getClassifier());
+        Assertions.assertEquals(getPrimitiveTypeName(), value.getClassifier().getName());
+        Assertions.assertEquals(expectedName, value.getName());
     }
 
     protected void assertFailsToParse(String string)
@@ -52,18 +52,18 @@ public abstract class AbstractPrimitiveParsingTest extends AbstractPureTestWithC
 
     protected void assertFailsToParse(String expectedInfo, String string)
     {
-        PureParserException e = Assert.assertThrows(PureParserException.class, () -> parsePrimitiveValue(string));
+        PureParserException e = Assertions.assertThrows(PureParserException.class, () -> parsePrimitiveValue(string));
 
         assertPureException(PureParserException.class, expectedInfo, null, 3, null, 3, null, 3, null, e);
         SourceInformation sourceInfo = e.getSourceInformation();
         int start = 5;
         if (sourceInfo.getStartColumn() < start)
         {
-            Assert.fail("Expected start column to be at least " + start + ", got: " + sourceInfo.getStartColumn() + ", string: \"" + string + "\"");
+            Assertions.fail("Expected start column to be at least " + start + ", got: " + sourceInfo.getStartColumn() + ", string: \"" + string + "\"");
         }
         if (sourceInfo.getColumn() < start)
         {
-            Assert.fail("Expected column to be at least " + start + ", got: " + sourceInfo.getStartColumn() + ", string: \"" + string + "\"");
+            Assertions.fail("Expected column to be at least " + start + ", got: " + sourceInfo.getStartColumn() + ", string: \"" + string + "\"");
         }
         // TODO re-enable
 //        int end = string.length() + 5;
@@ -84,9 +84,9 @@ public abstract class AbstractPrimitiveParsingTest extends AbstractPureTestWithC
                 "}\n";
         compileTestSource(testFunctionString);
         CoreInstance function = runtime.getFunction(functionSignature);
-        Assert.assertNotNull(function);
+        Assertions.assertNotNull(function);
         ListIterable<? extends CoreInstance> expressions = Instance.getValueForMetaPropertyToManyResolved(function, M3Properties.expressionSequence, processorSupport);
-        Assert.assertEquals(1, expressions.size());
+        Assertions.assertEquals(1, expressions.size());
         return Instance.getValueForMetaPropertyToOneResolved(expressions.getFirst(), M3Properties.values, processorSupport);
     }
 }

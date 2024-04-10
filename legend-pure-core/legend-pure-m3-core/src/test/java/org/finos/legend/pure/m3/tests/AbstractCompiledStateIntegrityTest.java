@@ -61,10 +61,10 @@ import org.finos.legend.pure.m4.coreinstance.SourceInformation;
 import org.finos.legend.pure.m4.serialization.binary.BinaryReaders;
 import org.finos.legend.pure.m4.serialization.binary.BinaryWriters;
 import org.finos.legend.pure.m4.tools.GraphNodeIterable;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Collection;
@@ -102,7 +102,7 @@ public abstract class AbstractCompiledStateIntegrityTest
         enumStubClass = runtime.getCoreInstance(M3Paths.EnumStub);
     }
 
-    @AfterClass
+    @AfterAll
     public static void cleanUp()
     {
         if (runtime != null)
@@ -133,15 +133,15 @@ public abstract class AbstractCompiledStateIntegrityTest
         MutableSet<String> topLevelNames = repository.getTopLevels().collect(CoreInstance::getName, Sets.mutable.empty());
         MutableSet<String> expectedTopLevelNames = _Package.SPECIAL_TYPES.toSet().with(M3Paths.Root);
 
-        Assert.assertEquals(repository.getTopLevels().size(), topLevelNames.size());
+        Assertions.assertEquals(repository.getTopLevels().size(), topLevelNames.size());
         Verify.assertSetsEqual(expectedTopLevelNames, topLevelNames);
 
         repository.getTopLevels().forEach(topLevel ->
         {
             SourceInformation sourceInfo = topLevel.getSourceInformation();
-            Assert.assertNotNull("Null source information for " + topLevel.getName(), sourceInfo);
+            Assertions.assertNotNull(sourceInfo, "Null source information for " + topLevel.getName());
 
-            Assert.assertEquals("Source information for " + topLevel.getName() + " not in m3.pure", "/platform/pure/grammar/m3.pure", sourceInfo.getSourceId());
+            Assertions.assertEquals("/platform/pure/grammar/m3.pure", sourceInfo.getSourceId(), "Source information for " + topLevel.getName() + " not in m3.pure");
         });
     }
 
@@ -161,7 +161,7 @@ public abstract class AbstractCompiledStateIntegrityTest
                     sourceInfo.appendMessage(message.append(": "));
                 }
             });
-            Assert.fail(message.toString());
+            Assertions.fail(message.toString());
         }
     }
 
@@ -177,9 +177,9 @@ public abstract class AbstractCompiledStateIntegrityTest
         CoreInstance importGroupClass = runtime.getCoreInstance(M3Paths.ImportGroup);
         CoreInstance packageClass = runtime.getCoreInstance(M3Paths.Package);
         CoreInstance packageableElementClass = runtime.getCoreInstance(M3Paths.PackageableElement);
-        Assert.assertNotNull(importGroupClass);
-        Assert.assertNotNull(packageClass);
-        Assert.assertNotNull(packageableElementClass);
+        Assertions.assertNotNull(importGroupClass);
+        Assertions.assertNotNull(packageClass);
+        Assertions.assertNotNull(packageableElementClass);
 
         ImmutableSet<CoreInstance> exceptionClasses = Sets.immutable.with(importGroupClass, packageClass);
 
@@ -194,7 +194,7 @@ public abstract class AbstractCompiledStateIntegrityTest
                 PackageableElement.writeUserPathForPackageableElement(message.append("\n\t"), instance);
                 PackageableElement.writeUserPathForPackageableElement(message.append(" ("), instance.getClassifier()).append(')');
             });
-            Assert.fail(message.toString());
+            Assertions.fail(message.toString());
         }
     }
 
@@ -213,7 +213,7 @@ public abstract class AbstractCompiledStateIntegrityTest
         {
             StringBuilder message = new StringBuilder();
             nonPackageableElementsBySource.forEachKeyValue((source, instances) -> instances.appendString(message.append(source.getId()), ":\n", "\n\t", "\n"));
-            Assert.fail(message.toString());
+            Assertions.fail(message.toString());
         }
     }
 
@@ -223,7 +223,7 @@ public abstract class AbstractCompiledStateIntegrityTest
         MutableList<Package> badPackages = PackageTreeIterable.newRootPackageTreeIterable(repository).select(pkg -> pkg._children().contains(null), Lists.mutable.empty());
         if (badPackages.notEmpty())
         {
-            Assert.fail(badPackages.collect(PackageableElement::getUserPathForPackageableElement).sortThis().makeString("The following packages have null children: ", ", ", ""));
+            Assertions.fail(badPackages.collect(PackageableElement::getUserPathForPackageableElement).sortThis().makeString("The following packages have null children: ", ", ", ""));
         }
     }
 
@@ -231,7 +231,7 @@ public abstract class AbstractCompiledStateIntegrityTest
     public void testAllPackageChildrenArePackageable()
     {
         CoreInstance packageableElementClass = runtime.getCoreInstance(M3Paths.PackageableElement);
-        Assert.assertNotNull(packageableElementClass);
+        Assertions.assertNotNull(packageableElementClass);
 
         MutableMap<CoreInstance, MutableList<CoreInstance>> nonPackageableElements = Maps.mutable.empty();
         PackageTreeIterable.newRootPackageTreeIterable(repository).forEach(pkg -> pkg._children().forEach(child ->
@@ -253,7 +253,7 @@ public abstract class AbstractCompiledStateIntegrityTest
                     children.forEach(child -> builder.append("\n\t\t").append(child));
                 }
             });
-            Assert.fail(builder.toString());
+            Assertions.fail(builder.toString());
         }
     }
 
@@ -261,7 +261,7 @@ public abstract class AbstractCompiledStateIntegrityTest
     public void testAllPackageChildrenHaveMatchingPackage()
     {
         CoreInstance packageableElementClass = runtime.getCoreInstance(M3Paths.PackageableElement);
-        Assert.assertNotNull(packageableElementClass);
+        Assertions.assertNotNull(packageableElementClass);
 
         MutableMap<CoreInstance, MutableList<CoreInstance>> badElements = Maps.mutable.empty();
         PackageTreeIterable.newRootPackageTreeIterable(repository).forEach(pkg -> pkg._children().forEach(child ->
@@ -294,7 +294,7 @@ public abstract class AbstractCompiledStateIntegrityTest
                     });
                 }
             });
-            Assert.fail(builder.toString());
+            Assertions.fail(builder.toString());
         }
     }
 
@@ -315,7 +315,7 @@ public abstract class AbstractCompiledStateIntegrityTest
         });
         if (badElements.notEmpty())
         {
-            Assert.fail(badElements.collect(PackageableElement::getUserPathForPackageableElement).sortThis().makeString("The following elements are not children of their packages:\n\t", "\n\t", ""));
+            Assertions.fail(badElements.collect(PackageableElement::getUserPathForPackageableElement).sortThis().makeString("The following elements are not children of their packages:\n\t", "\n\t", ""));
         }
     }
 
@@ -341,7 +341,7 @@ public abstract class AbstractCompiledStateIntegrityTest
                     children.appendString(builder, "\n\t\t", "\n\t\t", "");
                 }
             });
-            Assert.fail(builder.toString());
+            Assertions.fail(builder.toString());
         }
     }
 
@@ -368,7 +368,7 @@ public abstract class AbstractCompiledStateIntegrityTest
                     children.forEach(nameName -> builder.append("\n\t\t'").append(nameName.getOne()).append("' / '").append(nameName.getTwo()).append('\''));
                 }
             });
-            Assert.fail(builder.toString());
+            Assertions.fail(builder.toString());
         }
     }
 
@@ -394,7 +394,7 @@ public abstract class AbstractCompiledStateIntegrityTest
                     children.appendString(builder, "\n\t\t", "\n\t\t", "");
                 }
             });
-            Assert.fail(builder.toString());
+            Assertions.fail(builder.toString());
         }
     }
 
@@ -426,7 +426,7 @@ public abstract class AbstractCompiledStateIntegrityTest
                     children.toSortedList().forEach(nameCount -> builder.append("\n\t\t'").append(nameCount.getOne()).append("': ").append(nameCount.getTwo()));
                 }
             });
-            Assert.fail(builder.toString());
+            Assertions.fail(builder.toString());
         }
     }
 
@@ -434,11 +434,11 @@ public abstract class AbstractCompiledStateIntegrityTest
     public void testAllImportGroupsHaveSourceInfo()
     {
         CoreInstance imports = processorSupport.package_getByUserPath("system::imports");
-        Assert.assertNotNull("Could not find system::imports", imports);
+        Assertions.assertNotNull(imports, "Could not find system::imports");
         ListIterable<? extends CoreInstance> importGroupsWithoutSourceInfo = imports.getValueForMetaPropertyToMany(M3Properties.children).select(child -> child.getSourceInformation() == null);
         if (importGroupsWithoutSourceInfo.notEmpty())
         {
-            Assert.fail(importGroupsWithoutSourceInfo.collect(PackageableElement::getUserPathForPackageableElement, Lists.mutable.withInitialCapacity(importGroupsWithoutSourceInfo.size()))
+            Assertions.fail(importGroupsWithoutSourceInfo.collect(PackageableElement::getUserPathForPackageableElement, Lists.mutable.withInitialCapacity(importGroupsWithoutSourceInfo.size()))
                     .sortThis()
                     .makeString("The following ImportGroups have no source information:\n\t", "\n\t", ""));
         }
@@ -557,7 +557,7 @@ public abstract class AbstractCompiledStateIntegrityTest
                     });
                 });
             }
-            Assert.fail(message.toString());
+            Assertions.fail(message.toString());
         }
     }
 
@@ -709,7 +709,7 @@ public abstract class AbstractCompiledStateIntegrityTest
             StringBuilder message = new StringBuilder(errorCount * 128);
             message.append("There are ").append(errorCount).append(" property classifierGenericType errors:\n\t");
             errorMessages.appendString(message, "\n\t");
-            Assert.fail(message.toString());
+            Assertions.fail(message.toString());
         }
 
     }
@@ -751,7 +751,7 @@ public abstract class AbstractCompiledStateIntegrityTest
             StringBuilder message = new StringBuilder(errorCount * 128);
             message.append("There are ").append(errorCount).append(" qualified property name errors:\n\t");
             errorMessages.appendString(message, "\n\t");
-            Assert.fail(message.toString());
+            Assertions.fail(message.toString());
         }
     }
 
@@ -850,7 +850,7 @@ public abstract class AbstractCompiledStateIntegrityTest
             StringBuilder message = new StringBuilder(errorCount * 128);
             message.append("There are ").append(errorCount).append(" function type computation errors:\n\t");
             errorMessages.appendString(message, "\n\t");
-            Assert.fail(message.toString());
+            Assertions.fail(message.toString());
         }
     }
 
@@ -888,12 +888,12 @@ public abstract class AbstractCompiledStateIntegrityTest
                 }
                 message.append(')');
             });
-            Assert.fail(message.toString());
+            Assertions.fail(message.toString());
         }
     }
 
     @Test
-    @Ignore
+    @Disabled
     public void testFunctionTypesHaveSourceInformation()
     {
         testFunctionTypesHaveSourceInformation(true);
@@ -962,7 +962,7 @@ public abstract class AbstractCompiledStateIntegrityTest
             StringBuilder message = new StringBuilder(errorCount * 128);
             message.append("There are ").append(errorCount).append(" function type function conflicts:\n\t");
             errorMessages.appendString(message, "\n\t");
-            Assert.fail(message.toString());
+            Assertions.fail(message.toString());
         }
     }
 
@@ -1081,7 +1081,7 @@ public abstract class AbstractCompiledStateIntegrityTest
             StringBuilder message = new StringBuilder(errorCount * 128);
             message.append("There are ").append(errorCount).append(" ReferenceUsage issues:\n\t");
             errorMessages.appendString(message, "\n\t");
-            Assert.fail(message.toString());
+            Assertions.fail(message.toString());
         }
     }
 

@@ -17,10 +17,14 @@ package org.finos.legend.pure.m3.tests.function.base.tracing;
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
 import org.finos.legend.pure.m3.exception.PureAssertFailException;
 import io.opentracing.util.GlobalTracer;
-import org.junit.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
 import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public abstract class AbstractTestTraceSpan extends AbstractPureTestWithCoreCompiled
 {
@@ -30,57 +34,65 @@ public abstract class AbstractTestTraceSpan extends AbstractPureTestWithCoreComp
     @Test
     public void testTraceSpan()
     {
-        compileTestSource("fromString.pure", "function testTraceSpan():Nil[0]\n" +
-                "{\n" +
-                "    meta::pure::functions::tracing::traceSpan(|print('Hello World',1), 'Test Execute');\n" +
-                "}\n");
+        compileTestSource("fromString.pure", """
+                function testTraceSpan():Nil[0]
+                {
+                    meta::pure::functions::tracing::traceSpan(|print('Hello World',1), 'Test Execute');
+                }
+                """);
         this.execute("testTraceSpan():Nil[0]");
-        Assert.assertEquals("'Hello World'", this.functionExecution.getConsole().getLine(0));
-        Assert.assertTrue(tracer.spanExists("Test Execute"));
+        Assertions.assertEquals("'Hello World'", this.functionExecution.getConsole().getLine(0));
+        Assertions.assertTrue(tracer.spanExists("Test Execute"));
     }
 
     @Test
     public void testTraceSpanWithReturnValue()
     {
-        compileTestSource("fromString.pure", "function testTraceSpan():Nil[0]\n" +
-                "{\n" +
-                "    let text = meta::pure::functions::tracing::traceSpan(|' World', 'Test Execute');\n" +
-                "    print('Hello' + $text, 1);\n" +
-                "}\n");
+        compileTestSource("fromString.pure", """
+                function testTraceSpan():Nil[0]
+                {
+                    let text = meta::pure::functions::tracing::traceSpan(|' World', 'Test Execute');
+                    print('Hello' + $text, 1);
+                }
+                """);
         this.execute("testTraceSpan():Nil[0]");
-        Assert.assertEquals("'Hello World'", this.functionExecution.getConsole().getLine(0));
+        Assertions.assertEquals("'Hello World'", this.functionExecution.getConsole().getLine(0));
     }
 
     @Test
     public void testTraceSpanWithAnnotations()
     {
-        compileTestSource("fromString.pure", "function testTraceSpan():Nil[0]\n" +
-                "{\n" +
-                "   let annotations = newMap([\n" +
-                "      pair('key1', 'value1'), \n" +
-                "      pair('key2', 'value2')\n" +
-                "     ]);  \n" +
-                "    meta::pure::functions::tracing::traceSpan(|print('Hello World',1), 'Test Execute', |$annotations);\n" +
-                "}\n");
+        compileTestSource("fromString.pure", """
+                function testTraceSpan():Nil[0]
+                {
+                   let annotations = newMap([
+                      pair('key1', 'value1'),\s
+                      pair('key2', 'value2')
+                     ]); \s
+                    meta::pure::functions::tracing::traceSpan(|print('Hello World',1), 'Test Execute', |$annotations);
+                }
+                """);
         this.execute("testTraceSpan():Nil[0]");
-        Assert.assertEquals("'Hello World'", this.functionExecution.getConsole().getLine(0));
-        Assert.assertTrue(tracer.spanExists("Test Execute"));
+        Assertions.assertEquals("'Hello World'", this.functionExecution.getConsole().getLine(0));
+        Assertions.assertTrue(tracer.spanExists("Test Execute"));
         Map<Object, Object> tags = this.tracer.getTags("Test Execute");
-        Assert.assertEquals(tags.get("key1"), "value1");
-        Assert.assertEquals(tags.get("key2"), "value2");
+        Assertions.assertEquals(tags.get("key1"), "value1");
+        Assertions.assertEquals(tags.get("key2"), "value2");
     }
 
     @Test
     public void testTraceSpanUsingEval()
     {
-        compileTestSource("fromString.pure", "function testTraceSpan():Nil[0]\n" +
-                "{\n" +
-                "    let res = meta::pure::functions::tracing::traceSpan_Function_1__String_1__V_m_->eval(|'Hello World', 'Test Execute');\n" +
-                "    print($res,1);" +
-                "}\n");
+        compileTestSource("fromString.pure", """
+                function testTraceSpan():Nil[0]
+                {
+                    let res = meta::pure::functions::tracing::traceSpan_Function_1__String_1__V_m_->eval(|'Hello World', 'Test Execute');
+                    print($res,1);\
+                }
+                """);
         this.execute("testTraceSpan():Nil[0]");
-        Assert.assertEquals("'Hello World'", this.functionExecution.getConsole().getLine(0));
-        Assert.assertTrue(tracer.spanExists("Test Execute"));
+        Assertions.assertEquals("'Hello World'", this.functionExecution.getConsole().getLine(0));
+        Assertions.assertTrue(tracer.spanExists("Test Execute"));
     }
 
     @Test
@@ -88,70 +100,80 @@ public abstract class AbstractTestTraceSpan extends AbstractPureTestWithCoreComp
     {
         tracer.reset();
         unregisterTracer();
-        compileTestSource("fromString.pure", "function testTraceSpan():Nil[0]\n" +
-                "{\n" +
-                "    meta::pure::functions::tracing::traceSpan(|print('Hello World',1), 'Test Execute');\n" +
-                "}\n");
+        compileTestSource("fromString.pure", """
+                function testTraceSpan():Nil[0]
+                {
+                    meta::pure::functions::tracing::traceSpan(|print('Hello World',1), 'Test Execute');
+                }
+                """);
         this.execute("testTraceSpan():Nil[0]");
-        Assert.assertEquals("'Hello World'", this.functionExecution.getConsole().getLine(0));
-        Assert.assertFalse(tracer.spanExists("Test Execute"));
+        Assertions.assertEquals("'Hello World'", this.functionExecution.getConsole().getLine(0));
+        Assertions.assertFalse(tracer.spanExists("Test Execute"));
         GlobalTracer.registerIfAbsent(tracer);
     }
 
     @Test
     public void testTraceSpanShouldHandleErrorWhileEvaluatingTagsLamda()
     {
-        compileTestSource("fromString.pure", "function getTags(): Map<String, String>[1] {" +
-                "   assert('a' == 'b', |'');    " +
-                "   newMap([        \n" +
-                "      pair('key1', '') \n" +
-                "     ]);  \n" +
-                "}" +
-                "function testTraceSpan():Nil[0]\n" +
-                "{\n" +
-                "    meta::pure::functions::tracing::traceSpan(|print('Hello World',1), 'Test Execute', |getTags(), false);\n" +
-                "}\n");
+        compileTestSource("fromString.pure", """
+                function getTags(): Map<String, String>[1] {\
+                   assert('a' == 'b', |'');    \
+                   newMap([       \s
+                      pair('key1', '')\s
+                     ]); \s
+                }\
+                function testTraceSpan():Nil[0]
+                {
+                    meta::pure::functions::tracing::traceSpan(|print('Hello World',1), 'Test Execute', |getTags(), false);
+                }
+                """);
         this.execute("testTraceSpan():Nil[0]");
-        Assert.assertEquals("'Hello World'", this.functionExecution.getConsole().getLine(0));
-        Assert.assertTrue(tracer.spanExists("Test Execute"));
+        Assertions.assertEquals("'Hello World'", this.functionExecution.getConsole().getLine(0));
+        Assertions.assertTrue(tracer.spanExists("Test Execute"));
         Map<Object, Object> tags = this.tracer.getTags("Test Execute");
-        Assert.assertTrue(tags.get("Exception").toString().startsWith("Unable to resolve tags - "));
+        Assertions.assertTrue(tags.get("Exception").toString().startsWith("Unable to resolve tags - "));
     }
 
     @Test
     public void testTraceSpanShouldHandleStackOverflowErrorWhileEvaluatingTagsLamda()
     {
-        compileTestSource("fromString.pure", "function getTags(): Map<String, String>[1] {" +
-                "   getTags();  \n" +
-                "}" +
-                "function testTraceSpan():Nil[0]\n" +
-                "{\n" +
-                "    meta::pure::functions::tracing::traceSpan(|print('Hello World', 1), 'Test Execute', |getTags(), false);\n" +
-                "}\n");
+        compileTestSource("fromString.pure", """
+                function getTags(): Map<String, String>[1] {\
+                   getTags(); \s
+                }\
+                function testTraceSpan():Nil[0]
+                {
+                    meta::pure::functions::tracing::traceSpan(|print('Hello World', 1), 'Test Execute', |getTags(), false);
+                }
+                """);
         this.execute("testTraceSpan():Nil[0]");
-        Assert.assertEquals("'Hello World'", this.functionExecution.getConsole().getLine(0));
-        Assert.assertTrue(tracer.spanExists("Test Execute"));
+        Assertions.assertEquals("'Hello World'", this.functionExecution.getConsole().getLine(0));
+        Assertions.assertTrue(tracer.spanExists("Test Execute"));
         Map<Object, Object> tags = this.tracer.getTags("Test Execute");
-        Assert.assertTrue(tags.get("Exception").toString().startsWith("Unable to resolve tags - "));
+        Assertions.assertTrue(tags.get("Exception").toString().startsWith("Unable to resolve tags - "));
     }
 
-    @Test(expected = PureAssertFailException.class)
+    @Test
     public void testTraceSpanShouldNotHandleErrorWhileEvaluatingTagsLamda()
     {
-        compileTestSource("fromString.pure", "function getTags(): Map<String, String>[1] {" +
-                "   assert('a' == 'b', |'');    " +
-                "   newMap([        \n" +
-                "      pair('key1', '') \n" +
-                "     ]);  \n" +
-                "}" +
-                "function testTraceSpan():Nil[0]\n" +
-                "{\n" +
-                "    meta::pure::functions::tracing::traceSpan(|print('Hello World',1), 'Test Execute', |getTags());\n" +
-                "}\n");
-        this.execute("testTraceSpan():Nil[0]");
+        assertThrows(PureAssertFailException.class, () -> {
+            compileTestSource("fromString.pure", """
+                    function getTags(): Map<String, String>[1] {\
+                       assert('a' == 'b', |'');    \
+                       newMap([       \s
+                          pair('key1', '')\s
+                         ]); \s
+                    }\
+                    function testTraceSpan():Nil[0]
+                    {
+                        meta::pure::functions::tracing::traceSpan(|print('Hello World',1), 'Test Execute', |getTags());
+                    }
+                    """);
+            this.execute("testTraceSpan():Nil[0]");
+        });
     }
 
-    @AfterClass
+    @AfterAll
     public static void tearDown()
     {
         tracer.reset();
@@ -166,7 +188,7 @@ public abstract class AbstractTestTraceSpan extends AbstractPureTestWithCoreComp
             Field tracerField = GlobalTracer.get().getClass().getDeclaredField("isRegistered");
             tracerField.setAccessible(true);
             tracerField.set(GlobalTracer.get(), false);
-            Assert.assertFalse(GlobalTracer.isRegistered());
+            Assertions.assertFalse(GlobalTracer.isRegistered());
         }
         catch (Exception ignored)
         {

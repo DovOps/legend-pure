@@ -28,38 +28,40 @@ import org.finos.legend.pure.runtime.java.compiled.execution.FunctionExecutionCo
 import org.finos.legend.pure.runtime.java.compiled.execution.FunctionExecutionCompiledBuilder;
 import org.finos.legend.pure.runtime.java.compiled.extension.CompiledExtensionLoader;
 import org.finos.legend.pure.runtime.java.compiled.generation.processors.support.Pure;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestMappingExtensionCompiled extends AbstractPureTestWithCoreCompiled
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(
                 new FunctionExecutionCompiledBuilder().build(),
                 Tuples.pair(
                         "test.pure",
-                        "Class Firm\n" +
-                                "{\n" +
-                                "  legalName : String[1];\n" +
-                                "}\n" +
-                                "Class FirmSource\n" +
-                                "{\n" +
-                                "   val : String[1];\n" +
-                                "}\n" +
-                                "\n" +
-                                "###Mapping\n" +
-                                "Mapping test::TestMapping\n" +
-                                "(\n" +
-                                "  Firm[firm] : Pure\n" +
-                                "  {\n" +
-                                "    ~src FirmSource\n" +
-                                "    ~filter $src.val == 'ok'\n" +
-                                "    legalName : $src.val\n" +
-                                "  }\n" +
-                                ")\n"));
+                        """
+                        Class Firm
+                        {
+                          legalName : String[1];
+                        }
+                        Class FirmSource
+                        {
+                           val : String[1];
+                        }
+                        
+                        ###Mapping
+                        Mapping test::TestMapping
+                        (
+                          Firm[firm] : Pure
+                          {
+                            ~src FirmSource
+                            ~filter $src.val == 'ok'
+                            legalName : $src.val
+                          }
+                        )
+                        """));
     }
 
     @Test
@@ -68,7 +70,7 @@ public class TestMappingExtensionCompiled extends AbstractPureTestWithCoreCompil
         MutableSet<Class<?>> extensionClasses = CompiledExtensionLoader.extensions().collect(Object::getClass, Sets.mutable.empty());
         if (!extensionClasses.contains(MappingExtensionCompiled.class))
         {
-            Assert.fail("Could not find " + MappingExtensionCompiled.class.getName() + " in extensions: " + extensionClasses.collect(Class::getName, Lists.mutable.empty()).sortThis());
+            Assertions.fail("Could not find " + MappingExtensionCompiled.class.getName() + " in extensions: " + extensionClasses.collect(Class::getName, Lists.mutable.empty()).sortThis());
         }
     }
 
@@ -80,9 +82,8 @@ public class TestMappingExtensionCompiled extends AbstractPureTestWithCoreCompil
         MutableList<String> missingImpls = Lists.mutable.empty();
         mapping._classMappings().forEach(cm ->
         {
-            if (cm instanceof PureInstanceSetImplementation)
+            if (cm instanceof PureInstanceSetImplementation classMapping)
             {
-                PureInstanceSetImplementation classMapping = (PureInstanceSetImplementation) cm;
                 String id = classMapping._id();
                 if (!Pure.canFindNativeOrLambdaFunction(executionSupport, classMapping._filter()))
                 {
@@ -99,7 +100,7 @@ public class TestMappingExtensionCompiled extends AbstractPureTestWithCoreCompil
         });
         if (missingImpls.notEmpty())
         {
-            Assert.fail(missingImpls.makeString("Missing implementations for: ", ", ", ""));
+            Assertions.fail(missingImpls.makeString("Missing implementations for: ", ", ", ""));
         }
     }
 }

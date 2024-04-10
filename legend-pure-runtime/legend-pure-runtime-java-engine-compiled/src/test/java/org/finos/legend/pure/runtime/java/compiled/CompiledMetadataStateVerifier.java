@@ -19,7 +19,7 @@ import org.finos.legend.pure.m3.execution.FunctionExecution;
 import org.finos.legend.pure.runtime.java.compiled.execution.CompiledProcessorSupport;
 import org.finos.legend.pure.runtime.java.compiled.execution.FunctionExecutionCompiled;
 import org.finos.legend.pure.runtime.java.compiled.metadata.MetadataEager;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 
 public class CompiledMetadataStateVerifier implements RuntimeVerifier.FunctionExecutionStateVerifier
 {
@@ -41,8 +41,8 @@ public class CompiledMetadataStateVerifier implements RuntimeVerifier.FunctionEx
     {
         FunctionExecutionCompiled functionExecutionCompiled = (FunctionExecutionCompiled)functionExecution;
         MetadataEager metamodel = this.getMetamodel(functionExecutionCompiled);
-        Assert.assertEquals(this.classCacheSizeBefore, functionExecutionCompiled.getClassCacheSize());
-        Assert.assertEquals(this.metadataCount, metamodel.getSize());
+        Assertions.assertEquals(this.classCacheSizeBefore, functionExecutionCompiled.getClassCacheSize());
+        Assertions.assertEquals(this.metadataCount, metamodel.getSize());
     }
 
     private MetadataEager getMetamodel(FunctionExecutionCompiled functionExecutionCompiled)

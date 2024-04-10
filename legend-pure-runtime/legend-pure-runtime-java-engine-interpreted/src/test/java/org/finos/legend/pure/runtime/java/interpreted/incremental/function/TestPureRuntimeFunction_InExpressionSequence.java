@@ -18,20 +18,20 @@ import org.finos.legend.pure.m3.execution.FunctionExecution;
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
 import org.finos.legend.pure.m4.exception.PureCompilationException;
 import org.finos.legend.pure.runtime.java.interpreted.FunctionExecutionInterpreted;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestPureRuntimeFunction_InExpressionSequence extends AbstractPureTestWithCoreCompiled
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getFunctionExecution());
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("sourceId.pure");
@@ -45,7 +45,7 @@ public class TestPureRuntimeFunction_InExpressionSequence extends AbstractPureTe
         runtime.createInMemorySource("userId.pure", "function go():Nil[0]{sourceFunction();}");
         this.compileAndExecute("go():Nil[0]");
         int size = runtime.getModelRepository().serialize().length;
-        Assert.assertEquals("'theFunc'", functionExecution.getConsole().getLine(0));
+        Assertions.assertEquals("'theFunc'", functionExecution.getConsole().getLine(0));
 
         for (int i = 0; i < 10; i++)
         {
@@ -53,7 +53,7 @@ public class TestPureRuntimeFunction_InExpressionSequence extends AbstractPureTe
             try
             {
                 runtime.compile();
-                Assert.fail();
+                Assertions.fail();
             }
             catch (Exception e)
             {
@@ -62,23 +62,25 @@ public class TestPureRuntimeFunction_InExpressionSequence extends AbstractPureTe
 
             runtime.createInMemorySource("sourceId.pure", "function sourceFunction():Nil[0]{print('theFuncYeah!', 1);}");
             this.compileAndExecute("go():Nil[0]");
-            Assert.assertEquals("'theFuncYeah!'", functionExecution.getConsole().getLine(0));
+            Assertions.assertEquals("'theFuncYeah!'", functionExecution.getConsole().getLine(0));
         }
         runtime.delete("sourceId.pure");
         runtime.createInMemorySource("sourceId.pure", "function sourceFunction():Nil[0]{print('theFunc', 1);}");
         runtime.compile();
-        Assert.assertEquals("Graph size mismatch", size, repository.serialize().length);
+        Assertions.assertEquals(size, repository.serialize().length, "Graph size mismatch");
     }
 
     @Test
     public void testPureRuntimeFunctionBodyDependenciesError() throws Exception
     {
         runtime.createInMemorySource("sourceId.pure", "function sourceFunction():String[1]{'theFunc';}");
-        runtime.createInMemorySource("userId.pure", "function test():String[1]{sourceFunction()}" +
-                "function go():Nil[0]{print(test(),1);}");
+        runtime.createInMemorySource("userId.pure", """
+                function test():String[1]{sourceFunction()}\
+                function go():Nil[0]{print(test(),1);}\
+                """);
         this.compileAndExecute("go():Nil[0]");
         int size = runtime.getModelRepository().serialize().length;
-        Assert.assertEquals("'theFunc'", functionExecution.getConsole().getLine(0));
+        Assertions.assertEquals("'theFunc'", functionExecution.getConsole().getLine(0));
 
         for (int i = 0; i < 10; i++)
         {
@@ -86,7 +88,7 @@ public class TestPureRuntimeFunction_InExpressionSequence extends AbstractPureTe
             try
             {
                 runtime.compile();
-                Assert.fail();
+                Assertions.fail();
             }
             catch (Exception e)
             {
@@ -97,7 +99,7 @@ public class TestPureRuntimeFunction_InExpressionSequence extends AbstractPureTe
             {
                 runtime.createInMemorySource("sourceId.pure", "function sourceFunction():Integer[1]{1}");
                 runtime.compile();
-                Assert.fail();
+                Assertions.fail();
             }
             catch (Exception e)
             {
@@ -107,7 +109,7 @@ public class TestPureRuntimeFunction_InExpressionSequence extends AbstractPureTe
         runtime.delete("sourceId.pure");
         runtime.createInMemorySource("sourceId.pure", "function sourceFunction():String[1]{'theFunc';}");
         runtime.compile();
-        Assert.assertEquals("Graph size mismatch", size, repository.serialize().length);
+        Assertions.assertEquals(size, repository.serialize().length, "Graph size mismatch");
     }
 
     protected static FunctionExecution getFunctionExecution()

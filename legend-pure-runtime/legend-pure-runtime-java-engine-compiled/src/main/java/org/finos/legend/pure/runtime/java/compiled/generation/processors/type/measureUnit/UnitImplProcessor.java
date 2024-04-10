@@ -34,34 +34,37 @@ import org.finos.legend.pure.runtime.java.compiled.generation.processors.valuesp
 public class UnitImplProcessor
 {
     //DO NOT ADD WIDE * IMPORTS TO THIS LIST IT IMPACTS COMPILE TIMES
-    static final String IMPORTS = "import org.eclipse.collections.api.list.ListIterable;\n" +
-            "import org.eclipse.collections.api.list.MutableList;\n" +
-            "import org.eclipse.collections.api.RichIterable;\n" +
-            "import org.eclipse.collections.api.map.MutableMap;\n" +
-            "import org.eclipse.collections.impl.factory.Lists;\n" +
-            "import org.eclipse.collections.impl.factory.Maps;\n" +
-            "import org.eclipse.collections.impl.map.mutable.UnifiedMap;\n" +
-            "import org.finos.legend.pure.m4.coreinstance.CoreInstance;\n" +
-            "import org.finos.legend.pure.m4.coreinstance.factory.CoreInstanceFactory;\n" +
-            "import org.finos.legend.pure.m4.ModelRepository;\n" +
-            "import org.finos.legend.pure.m4.coreinstance.SourceInformation;\n" +
-            "import org.finos.legend.pure.runtime.java.compiled.generation.processors.support.*;\n" +
-            "import org.finos.legend.pure.runtime.java.compiled.generation.processors.support.function.defended.*;\n" +
-            "import org.finos.legend.pure.runtime.java.compiled.generation.processors.support.function.*;\n" +
-            "import org.finos.legend.pure.runtime.java.compiled.execution.*;\n" +
-            "import org.finos.legend.pure.runtime.java.compiled.execution.sourceInformation.*;\n" +
-            "import org.finos.legend.pure.runtime.java.compiled.generation.processors.support.coreinstance.ReflectiveCoreInstance;\n" +
-            "import org.finos.legend.pure.runtime.java.compiled.generation.processors.support.coreinstance.ValCoreInstance;\n" +
-            "import org.finos.legend.pure.m3.execution.ExecutionSupport;\n" +
-            "import org.finos.legend.pure.runtime.java.compiled.generation.processors.support.coreinstance.GetterOverrideExecutor;\n" +
-
-            "import org.finos.legend.pure.m4.coreinstance.CoreInstance;\n";
+    static final String IMPORTS = """
+import org.eclipse.collections.api.list.ListIterable;
+import org.eclipse.collections.api.list.MutableList;
+import org.eclipse.collections.api.RichIterable;
+import org.eclipse.collections.api.map.MutableMap;
+import org.eclipse.collections.impl.factory.Lists;
+import org.eclipse.collections.impl.factory.Maps;
+import org.eclipse.collections.impl.map.mutable.UnifiedMap;
+import org.finos.legend.pure.m4.coreinstance.CoreInstance;
+import org.finos.legend.pure.m4.coreinstance.factory.CoreInstanceFactory;
+import org.finos.legend.pure.m4.ModelRepository;
+import org.finos.legend.pure.m4.coreinstance.SourceInformation;
+import org.finos.legend.pure.runtime.java.compiled.generation.processors.support.*;
+import org.finos.legend.pure.runtime.java.compiled.generation.processors.support.function.defended.*;
+import org.finos.legend.pure.runtime.java.compiled.generation.processors.support.function.*;
+import org.finos.legend.pure.runtime.java.compiled.execution.*;
+import org.finos.legend.pure.runtime.java.compiled.execution.sourceInformation.*;
+import org.finos.legend.pure.runtime.java.compiled.generation.processors.support.coreinstance.ReflectiveCoreInstance;
+import org.finos.legend.pure.runtime.java.compiled.generation.processors.support.coreinstance.ValCoreInstance;
+import org.finos.legend.pure.m3.execution.ExecutionSupport;
+import org.finos.legend.pure.runtime.java.compiled.generation.processors.support.coreinstance.GetterOverrideExecutor;
+import org.finos.legend.pure.m4.coreinstance.CoreInstance;
+""";
 
     static final String FUNCTION_IMPORTS =
-            "import org.eclipse.collections.api.block.function.Function0;\n" +
-                    "import org.eclipse.collections.api.block.function.Function;\n" +
-                    "import org.eclipse.collections.api.block.function.Function2;\n" +
-                    "import org.finos.legend.pure.runtime.java.compiled.generation.processors.support.map.PureMap;\n";
+            """
+            import org.eclipse.collections.api.block.function.Function0;
+            import org.eclipse.collections.api.block.function.Function;
+            import org.eclipse.collections.api.block.function.Function2;
+            import org.finos.legend.pure.runtime.java.compiled.generation.processors.support.map.PureMap;
+            """;
 
     public static final String CLASS_IMPL_SUFFIX = "_Impl";
 
@@ -158,11 +161,13 @@ public class UnitImplProcessor
 
     private static String buildGetClassifier()
     {
-        return "    @Override\n" +
-                "    public CoreInstance getClassifier()\n" +
-                "     {\n" +
-                "        return this.classifier;\n" +
-                "     }\n";
+        return """
+                    @Override
+                    public CoreInstance getClassifier()
+                     {
+                        return this.classifier;
+                     }
+                """;
     }
 
     public static String buildGetValueForMetaPropertyToOne(final CoreInstance classGenericType, final ProcessorSupport processorSupport)
@@ -201,9 +206,11 @@ public class UnitImplProcessor
 
     public static String buildGetFullSystemPath()
     {
-        return "    public String getFullSystemPath()\n" +
-                "    {\n" +
-                "         return tempFullTypeId;\n" +
-                "    }\n";
+        return """
+                    public String getFullSystemPath()
+                    {
+                         return tempFullTypeId;
+                    }
+                """;
     }
 }

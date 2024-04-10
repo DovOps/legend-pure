@@ -47,7 +47,7 @@ public abstract class ConversionCache
 
     private Conversion<?, ?> newConversion(Type type, ConversionContext context)
     {
-        if (type instanceof Class)
+        if (type instanceof Class class1)
         {
             if (type.getName().equals("Map")) // Maps do not contain properties, need to handle separately for entries' conversions
             {
@@ -63,15 +63,15 @@ public abstract class ConversionCache
             }
             else
             {
-                ClassConversion<?, ?> classConversion = this.newClassConversion((Class)type, context);
+                ClassConversion<?, ?> classConversion = this.newClassConversion(class1, context);
                 this.cache.put(type, classConversion);
                 classConversion.completeInitialisation(context); // reasoning for this is explained at completeInitialisation's definition
                 return classConversion;
             }
         }
-        if (type instanceof Enumeration)
+        if (type instanceof Enumeration enumeration)
         {
-            EnumerationConversion<?,?> enumerationConversion = this.newEnumerationConversion((Enumeration)type, context);
+            EnumerationConversion<?,?> enumerationConversion = this.newEnumerationConversion(enumeration, context);
             this.cache.put(type, enumerationConversion);
             return enumerationConversion;
         }
@@ -81,9 +81,9 @@ public abstract class ConversionCache
             this.cache.put(type, unitConversion);
             return unitConversion;
         }
-        if (type instanceof PrimitiveType)
+        if (type instanceof PrimitiveType primitiveType)
         {
-            return this.newPrimitiveConversion((PrimitiveType)type, context);
+            return this.newPrimitiveConversion(primitiveType, context);
         }
         if (type == null)
         {

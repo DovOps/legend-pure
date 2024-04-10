@@ -76,32 +76,31 @@ public class Reactivator
 
     private static boolean canReactivateWithoutJavaCompilationImpl(ValueSpecification valueSpecification, ExecutionSupport es, boolean atRoot, PureMap lambdaOpenVariablesMap, Bridge bridge)
     {
-        if (valueSpecification instanceof RoutedValueSpecification)
+        if (valueSpecification instanceof RoutedValueSpecification specification)
         {
-            return canReactivateWithoutJavaCompilationImpl(((RoutedValueSpecification) valueSpecification)._value(), es, atRoot, lambdaOpenVariablesMap, bridge);
+            return canReactivateWithoutJavaCompilationImpl(specification._value(), es, atRoot, lambdaOpenVariablesMap, bridge);
         }
-        if (valueSpecification instanceof InstanceValue)
+        if (valueSpecification instanceof InstanceValue value)
         {
-            return atRoot || ((InstanceValue) valueSpecification)._values().allSatisfy(o ->
+            return atRoot || value._values().allSatisfy(o ->
             {
-                if (o instanceof ValueSpecification)
+                if (o instanceof ValueSpecification specification)
                 {
-                    return canReactivateWithoutJavaCompilationImpl((ValueSpecification) o, es, false, lambdaOpenVariablesMap, bridge);
+                    return canReactivateWithoutJavaCompilationImpl(specification, es, false, lambdaOpenVariablesMap, bridge);
                 }
-                if (o instanceof Function)
+                if (o instanceof Function function)
                 {
-                    return canReactivateWithoutJavaCompilationImpl((Function<?>) o, es, false, lambdaOpenVariablesMap, bridge);
+                    return canReactivateWithoutJavaCompilationImpl(function, es, false, lambdaOpenVariablesMap, bridge);
                 }
                 return true;
             });
         }
-        if (valueSpecification instanceof VariableExpression)
+        if (valueSpecification instanceof VariableExpression expression)
         {
-            return lambdaOpenVariablesMap.getMap().containsKey(((VariableExpression) valueSpecification)._name());
+            return lambdaOpenVariablesMap.getMap().containsKey(expression._name());
         }
-        if (valueSpecification instanceof SimpleFunctionExpression)
+        if (valueSpecification instanceof SimpleFunctionExpression sfe)
         {
-            SimpleFunctionExpression sfe = (SimpleFunctionExpression) valueSpecification;
             return canReactivateWithoutJavaCompilationImpl(sfe._func(), es, atRoot, lambdaOpenVariablesMap, bridge) &&
                     sfe._parametersValues().allSatisfy(vs -> canReactivateWithoutJavaCompilationImpl(vs, es, false, lambdaOpenVariablesMap, bridge));
         }
@@ -123,9 +122,8 @@ public class Reactivator
         {
             return Pure.canFindNativeOrLambdaFunction(es, func);
         }
-        if (func instanceof LambdaFunction)
+        if (func instanceof LambdaFunction lambdaFunction)
         {
-            LambdaFunction<?> lambdaFunction = (LambdaFunction<?>) func;
             MutableSet<String> openVars = Sets.mutable.withAll(lambdaFunction._openVariables());
             openVars.removeAll(lambdaOpenVariablesMap.getMap().keySet());
             if (openVars.notEmpty() && !atRoot)
@@ -177,22 +175,22 @@ public class Reactivator
 
     private static Object reactivateWithoutJavaCompilationImpl(ValueSpecification valueSpecification, PureMap lambdaOpenVariablesMap, ExecutionSupport es, boolean atRoot, Bridge bridge)
     {
-        if (valueSpecification instanceof RoutedValueSpecification)
+        if (valueSpecification instanceof RoutedValueSpecification specification)
         {
-            return reactivateWithoutJavaCompilationImpl(((RoutedValueSpecification) valueSpecification)._value(), lambdaOpenVariablesMap, es, atRoot, bridge);
+            return reactivateWithoutJavaCompilationImpl(specification._value(), lambdaOpenVariablesMap, es, atRoot, bridge);
         }
-        if (valueSpecification instanceof InstanceValue)
+        if (valueSpecification instanceof InstanceValue value)
         {
-            MutableList<Object> result = reactivateWithoutJavaCompilationImpl((InstanceValue) valueSpecification, lambdaOpenVariablesMap, es, bridge);
+            MutableList<Object> result = reactivateWithoutJavaCompilationImpl(value, lambdaOpenVariablesMap, es, bridge);
             return (result.size() == 1) ? result.get(0) : result;
         }
-        if (valueSpecification instanceof SimpleFunctionExpression)
+        if (valueSpecification instanceof SimpleFunctionExpression expression)
         {
-            return reactivateWithoutJavaCompilationImpl((SimpleFunctionExpression) valueSpecification, lambdaOpenVariablesMap, es, atRoot, bridge);
+            return reactivateWithoutJavaCompilationImpl(expression, lambdaOpenVariablesMap, es, atRoot, bridge);
         }
-        if (valueSpecification instanceof VariableExpression)
+        if (valueSpecification instanceof VariableExpression expression)
         {
-            return reactivateWithoutJavaCompilationImpl((VariableExpression) valueSpecification, lambdaOpenVariablesMap);
+            return reactivateWithoutJavaCompilationImpl(expression, lambdaOpenVariablesMap);
         }
         throw new PureDynamicReactivateException(valueSpecification.getSourceInformation(), "Unexpected type to dynamically reactivate: " + valueSpecification.getClass().getName());
     }
@@ -203,21 +201,20 @@ public class Reactivator
         MutableList<Object> results = Lists.mutable.empty();
         instanceValue._values().each(value ->
         {
-            if (value instanceof ValueSpecification)
+            if (value instanceof ValueSpecification specification)
             {
-                Object res = reactivateWithoutJavaCompilationImpl((ValueSpecification) value, lambdaOpenVariablesMap, es, false, bridge);
-                if (res instanceof Iterable)
+                Object res = reactivateWithoutJavaCompilationImpl(specification, lambdaOpenVariablesMap, es, false, bridge);
+                if (res instanceof Iterable iterable)
                 {
-                    results.addAllIterable((Iterable<?>) res);
+                    results.addAllIterable(iterable);
                 }
                 else if (res != null)
                 {
                     results.add(res);
                 }
             }
-            else if (lambdaOpenVariablesMap.getMap().notEmpty() && (value instanceof KeyExpression))
+            else if (lambdaOpenVariablesMap.getMap().notEmpty() && (value instanceof KeyExpression ke))
             {
-                KeyExpression ke = (KeyExpression) value;
 
                 MutableList<Object> key = reactivateWithoutJavaCompilationImpl(ke._key(), lambdaOpenVariablesMap, es, bridge);
                 InstanceValue rKey = (InstanceValue) ((CompiledExecutionSupport) es).getProcessorSupport().newCoreInstance("key", M3Paths.InstanceValue, null);
@@ -225,22 +222,21 @@ public class Reactivator
 
                 Object expression = reactivateWithoutJavaCompilationImpl(ke._expression(), lambdaOpenVariablesMap, es, false, bridge);
                 InstanceValue rExpression = (InstanceValue) ((CompiledExecutionSupport) es).getProcessorSupport().newCoreInstance("key", M3Paths.InstanceValue, null);
-                rExpression._values(expression instanceof RichIterable ? (RichIterable<?>) expression : Lists.immutable.with(expression));
+                rExpression._values(expression instanceof RichIterable ri ? ri : Lists.immutable.with(expression));
 
                 results.add(ke.copy()._key(rKey)._expression(rExpression));
             }
-            else if (value instanceof LambdaFunction)
+            else if (value instanceof LambdaFunction lambdaFunction)
             {
-                LambdaFunction lambdaFunction = (LambdaFunction) value;
 
                 MutableMap<String, Object> openVariables = Maps.mutable.empty();
                 lambdaOpenVariablesMap.getMap().forEachKeyValue((key, values) -> openVariables.put((String) key, ((List<?>) values)._values()));
                 Pure.getOpenVariables(lambdaFunction, bridge).getMap().forEachKeyValue((key, values) -> openVariables.put((String) key, ((List<?>) values)._values()));
                 results.add(bridge.buildLambda(lambdaFunction, DynamicPureFunctionImpl.createPureFunction(lambdaFunction, openVariables, bridge)));
             }
-            else if (value instanceof Iterable)
+            else if (value instanceof Iterable iterable)
             {
-                results.addAllIterable((Iterable<?>) value);
+                results.addAllIterable(iterable);
             }
             else if (value != null)
             {
@@ -280,13 +276,13 @@ public class Reactivator
             {
                 return Lists.fixedSize.empty();
             }
-            if (newValue instanceof RichIterable)
+            if (newValue instanceof RichIterable iterable)
             {
-                return (RichIterable<?>) newValue;
+                return iterable;
             }
-            if (newValue instanceof Iterable)
+            if (newValue instanceof Iterable iterable)
             {
-                return Lists.mutable.withAll((Iterable<?>) newValue);
+                return Lists.mutable.withAll(iterable);
             }
             return Lists.fixedSize.of(newValue);
         }, Lists.mutable.empty());

@@ -536,10 +536,10 @@ public class FunctionsHelper
             int index = string.indexOf('.');
             subsecond = (index == -1) ? "0" : string.substring(index + 1);
         }
-        else if (second instanceof BigDecimal)
+        else if (second instanceof BigDecimal decimal)
         {
             secondInt = second.intValue();
-            String string = ((BigDecimal) second).toPlainString();
+            String string = decimal.toPlainString();
             int index = string.indexOf('.');
             if (index != -1)
             {
@@ -600,27 +600,27 @@ public class FunctionsHelper
 
     public static Long floor(Number number)
     {
-        if (number instanceof Long)
+        if (number instanceof Long long1)
         {
-            return (Long) number;
+            return long1;
         }
         return (long) Math.floor(number.doubleValue());
     }
 
     public static Long ceiling(Number number)
     {
-        if (number instanceof Long)
+        if (number instanceof Long long1)
         {
-            return (Long) number;
+            return long1;
         }
         return (long) Math.ceil(number.doubleValue());
     }
 
     public static Long round(Number number)
     {
-        if (number instanceof Long)
+        if (number instanceof Long long1)
         {
-            return (Long) number;
+            return long1;
         }
 
         double toRound = number.doubleValue();
@@ -640,13 +640,13 @@ public class FunctionsHelper
 
     public static Number round(Number number, long scale)
     {
-        if (number instanceof Double)
+        if (number instanceof Double double1)
         {
-            return round((Double) number, scale);
+            return round(double1, scale);
         }
-        if (number instanceof BigDecimal)
+        if (number instanceof BigDecimal decimal)
         {
-            return round((BigDecimal) number, scale);
+            return round(decimal, scale);
         }
 
         throw new IllegalArgumentException("incorrect number type");
@@ -704,29 +704,29 @@ public class FunctionsHelper
             return dividend.longValue() % divisor.longValue();
         }
 
-        if (dividend instanceof BigDecimal && divisor instanceof BigDecimal)
+        if (dividend instanceof BigDecimal decimal && divisor instanceof BigDecimal decimal)
         {
-            return ((BigDecimal) dividend).remainder((BigDecimal) divisor);
+            return decimal.remainder(decimal);
         }
 
-        if (dividend instanceof BigDecimal && divisor instanceof Long)
+        if (dividend instanceof BigDecimal decimal && divisor instanceof Long long1)
         {
-            return ((BigDecimal) dividend).remainder(BigDecimal.valueOf((Long) divisor));
+            return decimal.remainder(BigDecimal.valueOf(long1));
         }
 
-        if (dividend instanceof BigDecimal && divisor instanceof Double)
+        if (dividend instanceof BigDecimal decimal && divisor instanceof Double double1)
         {
-            return ((BigDecimal) dividend).remainder(BigDecimal.valueOf((Double) divisor));
+            return decimal.remainder(BigDecimal.valueOf(double1));
         }
 
-        if (dividend instanceof Long && divisor instanceof BigDecimal)
+        if (dividend instanceof Long long1 && divisor instanceof BigDecimal decimal)
         {
-            return BigDecimal.valueOf((Long) dividend).remainder((BigDecimal) divisor);
+            return BigDecimal.valueOf(long1).remainder(decimal);
         }
 
-        if (dividend instanceof Double && divisor instanceof BigDecimal)
+        if (dividend instanceof Double double1 && divisor instanceof BigDecimal decimal)
         {
-            return BigDecimal.valueOf((Double) dividend).remainder((BigDecimal) divisor);
+            return BigDecimal.valueOf(double1).remainder(decimal);
         }
 
         return dividend.doubleValue() % divisor.doubleValue();
@@ -747,9 +747,9 @@ public class FunctionsHelper
 
     public static BigDecimal toDecimal(Number number)
     {
-        if (number instanceof BigDecimal)
+        if (number instanceof BigDecimal decimal)
         {
-            return (BigDecimal) number;
+            return decimal;
         }
         return new BigDecimal(number.toString());
     }
@@ -851,9 +851,9 @@ public class FunctionsHelper
             return false;
         }
 
-        if (object instanceof Iterable)
+        if (object instanceof Iterable iterable)
         {
-            return Iterate.anySatisfy((Iterable) object, predicate);
+            return Iterate.anySatisfy(iterable, predicate);
         }
 
         return predicate.accept(object);
@@ -866,9 +866,9 @@ public class FunctionsHelper
             return true;
         }
 
-        if (object instanceof Iterable)
+        if (object instanceof Iterable iterable)
         {
-            return Iterate.allSatisfy((Iterable) object, predicate);
+            return Iterate.allSatisfy(iterable, predicate);
         }
 
         return predicate.accept(object);
@@ -1008,7 +1008,7 @@ public class FunctionsHelper
     public static PureMap putAllPairs(PureMap pureMap, RichIterable<? extends org.finos.legend.pure.m3.coreinstance.meta.pure.functions.collection.Pair<?, ?>> pairs)
     {
         Map map = pureMap.getMap();
-        MutableMap<Object, Object> newOne = (map instanceof UnifiedMapWithHashingStrategy) ? new UnifiedMapWithHashingStrategy<>(((UnifiedMapWithHashingStrategy) map).hashingStrategy(), map) : Maps.mutable.withMap(map);
+        MutableMap<Object, Object> newOne = (map instanceof UnifiedMapWithHashingStrategy umwhs) ? new UnifiedMapWithHashingStrategy<>(umwhs.hashingStrategy(), map) : Maps.mutable.withMap(map);
         pairs.forEach(p -> newOne.put(p._first(), p._second()));
         return new PureMap(newOne);
     }
@@ -1017,7 +1017,7 @@ public class FunctionsHelper
     public static PureMap putAllPairs(PureMap pureMap, org.finos.legend.pure.m3.coreinstance.meta.pure.functions.collection.Pair<?, ?> pair)
     {
         Map map = pureMap.getMap();
-        MutableMap<Object, Object> newOne = (map instanceof UnifiedMapWithHashingStrategy) ? new UnifiedMapWithHashingStrategy<>(((UnifiedMapWithHashingStrategy) map).hashingStrategy(), map) : Maps.mutable.withMap(map);
+        MutableMap<Object, Object> newOne = (map instanceof UnifiedMapWithHashingStrategy umwhs) ? new UnifiedMapWithHashingStrategy<>(umwhs.hashingStrategy(), map) : Maps.mutable.withMap(map);
         newOne.put(pair._first(), pair._second());
         return new PureMap(newOne);
     }
@@ -1026,7 +1026,7 @@ public class FunctionsHelper
     public static PureMap putAllMaps(PureMap pureMap, PureMap other)
     {
         Map map = pureMap.getMap();
-        MutableMap<Object, Object> newOne = (map instanceof UnifiedMapWithHashingStrategy) ? new UnifiedMapWithHashingStrategy<>(((UnifiedMapWithHashingStrategy) map).hashingStrategy(), map) : Maps.mutable.withMap(map);
+        MutableMap<Object, Object> newOne = (map instanceof UnifiedMapWithHashingStrategy umwhs) ? new UnifiedMapWithHashingStrategy<>(umwhs.hashingStrategy(), map) : Maps.mutable.withMap(map);
         newOne.putAll(other.getMap());
         return new PureMap(newOne);
     }
@@ -1035,7 +1035,7 @@ public class FunctionsHelper
     public static PureMap replaceAll(PureMap pureMap, RichIterable<? extends org.finos.legend.pure.m3.coreinstance.meta.pure.functions.collection.Pair<?, ?>> pairs)
     {
         Map map = pureMap.getMap();
-        MutableMap<Object, Object> newOne = map instanceof UnifiedMapWithHashingStrategy ? new UnifiedMapWithHashingStrategy<>(((UnifiedMapWithHashingStrategy) map).hashingStrategy()) : Maps.mutable.empty();
+        MutableMap<Object, Object> newOne = map instanceof UnifiedMapWithHashingStrategy umwhs ? new UnifiedMapWithHashingStrategy<>(umwhs.hashingStrategy()) : Maps.mutable.empty();
         pairs.forEach(p -> newOne.put(p._first(), p._second()));
         return new PureMap(newOne);
     }
@@ -1044,7 +1044,7 @@ public class FunctionsHelper
     public static PureMap replaceAll(PureMap pureMap, org.finos.legend.pure.m3.coreinstance.meta.pure.functions.collection.Pair<?, ?> pair)
     {
         Map map = pureMap.getMap();
-        MutableMap<Object, Object> newOne = map instanceof UnifiedMapWithHashingStrategy ? new UnifiedMapWithHashingStrategy<>(((UnifiedMapWithHashingStrategy) map).hashingStrategy()) : Maps.mutable.empty();
+        MutableMap<Object, Object> newOne = map instanceof UnifiedMapWithHashingStrategy umwhs ? new UnifiedMapWithHashingStrategy<>(umwhs.hashingStrategy()) : Maps.mutable.empty();
         newOne.put(pair._first(), pair._second());
         return new PureMap(newOne);
     }
@@ -1194,9 +1194,8 @@ public class FunctionsHelper
     public static Object buildSourceInformation(Object obj, ClassLoader globalClassLoader)
     {
         Object result = null;
-        if (obj instanceof CoreInstance)
+        if (obj instanceof CoreInstance coreInstance)
         {
-            CoreInstance coreInstance = (CoreInstance)obj;
             SourceInformation sourceInfo = coreInstance.getSourceInformation();
             if (sourceInfo != null)
             {
@@ -1482,7 +1481,7 @@ public class FunctionsHelper
     public static PureMap put(PureMap pureMap, Object key, Object val)
     {
         Map map = pureMap.getMap();
-        MutableMap<Object, Object> newOne = map instanceof UnifiedMapWithHashingStrategy ? new UnifiedMapWithHashingStrategy<>(((UnifiedMapWithHashingStrategy<?, ?>) map).hashingStrategy(), map) : Maps.mutable.withMap(map);
+        MutableMap<Object, Object> newOne = map instanceof UnifiedMapWithHashingStrategy umwhs ? new UnifiedMapWithHashingStrategy<>(umwhs.hashingStrategy(), map) : Maps.mutable.withMap(map);
         newOne.put(key, val);
         return new PureMap(newOne);
     }
@@ -1632,7 +1631,7 @@ public class FunctionsHelper
                 {
                     if (tagsCritical)
                     {
-                        throw (e instanceof RuntimeException) ? (RuntimeException) e : new RuntimeException(e);
+                        throw (e instanceof RuntimeException re) ? re : new RuntimeException(e);
                     }
                     span.setTag("Exception", "Unable to resolve tags - [" + e.getMessage() + "]");
                 }

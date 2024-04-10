@@ -62,7 +62,7 @@ public class HttpRawHelper
         }
         catch (URISyntaxException e)
         {
-            String errMsg = String.format("Cannot build URI from url (%s, %d, %s)", host, port, path);
+            String errMsg = "Cannot build URI from url (%s, %d, %s)".formatted(host, port, path);
             throw new RuntimeException(errMsg, e);
         }
         return executeRequest(httpMethod, uri, mimeType, body);

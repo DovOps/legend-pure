@@ -125,7 +125,7 @@ public class GraphLoader
         MapIterable<String, byte[]> fileBytes = this.loadedFiles.isEmpty() ? this.jarLibrary.readAllFiles() : this.jarLibrary.readFiles(this.jarLibrary.getAllFiles().reject(this::fileIsLoaded));
         if (message != null)
         {
-            message.setMessage(String.format("    Reading all (%,d) files ...", fileBytes.size()));
+            message.setMessage("    Reading all (%,d) files ...".formatted(fileBytes.size()));
         }
         loadFileBytes(fileBytes, message);
     }
@@ -235,7 +235,7 @@ public class GraphLoader
     {
         if (message != null)
         {
-            message.setMessage(String.format("    Reading %,d files ...", +files.size()));
+            message.setMessage("    Reading %,d files ...".formatted(+files.size()));
         }
         MapIterable<String, byte[]> fileBytes = this.jarLibrary.readFiles(LazyIterate.reject(files, this::fileIsLoaded));
         loadFileBytes(fileBytes, message);
@@ -256,7 +256,7 @@ public class GraphLoader
         int fileCount = fileBytes.size();
         if (message != null)
         {
-            message.setMessage(String.format("    Deserializing %,d files ...", fileCount));
+            message.setMessage("    Deserializing %,d files ...".formatted(fileCount));
         }
         ExternalReferenceSerializerLibrary serializerLibrary = ExternalReferenceSerializerLibrary.newLibrary(this.parserLibrary);
         ReferenceFactory referenceFactory = CachedReferenceFactory.wrap(new SimpleReferenceFactory());
@@ -290,7 +290,7 @@ public class GraphLoader
     {
         if (message != null)
         {
-            message.setMessage(String.format("    Initializing %,d nodes ...", nodes.size()));
+            message.setMessage("    Initializing %,d nodes ...".formatted(nodes.size()));
         }
         nodes.forEach(this::initializeTopLevelNode);
         if (shouldParallelize(nodes.size(), INITIALIZE_NODES_THRESHOLD))

@@ -83,9 +83,9 @@ public class RootGraphFetchTreeValidator implements MatchRunner<RootGraphFetchTr
         {
             ValueSpecification parameter = parameters.get(i);
 
-            if (parameter instanceof InstanceValue)
+            if (parameter instanceof InstanceValue value)
             {
-                ListIterable<? extends CoreInstance> values = ImportStub.withImportStubByPasses(((InstanceValue) parameter)._valuesCoreInstance().toList(), processorSupport);
+                ListIterable<? extends CoreInstance> values = ImportStub.withImportStubByPasses(value._valuesCoreInstance().toList(), processorSupport);
                 GenericType genericTypeSpecified = valueSpecification._genericType();
 
                 CoreInstance type = values.size() == 1 ?

@@ -179,13 +179,13 @@ public class ViewProcessing extends RelationalMappingSpecificationProcessing
         for (RelationalOperationElement table : allTables)
         {
             Database database = null;
-            if (table instanceof Table)
+            if (table instanceof Table table1)
             {
-                database = ((Table)table)._schema() == null ? null : (Database)ImportStub.withImportStubByPass(((Table)table)._schema()._databaseCoreInstance(), processorSupport);
+                database = table1._schema() == null ? null : (Database)ImportStub.withImportStubByPass(table1._schema()._databaseCoreInstance(), processorSupport);
             }
-            else if (table instanceof View)
+            else if (table instanceof View view1)
             {
-                database = ((View)table)._schema() == null ? null : (Database)ImportStub.withImportStubByPass(((View)table)._schema()._databaseCoreInstance(), processorSupport);
+                database = view1._schema() == null ? null : (Database)ImportStub.withImportStubByPass(view1._schema()._databaseCoreInstance(), processorSupport);
             }
             if (!dbsInHierarchy.contains(database))
             {
@@ -242,13 +242,13 @@ public class ViewProcessing extends RelationalMappingSpecificationProcessing
 
     private static DataType getColumnType(RelationalOperationElement relationalOperationElement, ProcessorSupport processorSupport, ModelRepository repository)
     {
-        if (relationalOperationElement instanceof TableAliasColumn)
+        if (relationalOperationElement instanceof TableAliasColumn column)
         {
-            return ((TableAliasColumn)relationalOperationElement)._column() == null ? null : ((TableAliasColumn)relationalOperationElement)._column()._type();
+            return column._column() == null ? null : column._column()._type();
         }
-        if (relationalOperationElement  instanceof RelationalOperationElementWithJoin)
+        if (relationalOperationElement  instanceof RelationalOperationElementWithJoin join)
         {
-            return getColumnType(((RelationalOperationElementWithJoin)relationalOperationElement)._relationalOperationElement(), processorSupport, repository);
+            return getColumnType(join._relationalOperationElement(), processorSupport, repository);
         }
         if (relationalOperationElement instanceof  DynaFunction)
         {
@@ -261,20 +261,20 @@ public class ViewProcessing extends RelationalMappingSpecificationProcessing
     private static ImmutableList<RelationalOperationElement> findAllTablesRootFirst(RelationalOperationElement relationalOperationElement)
     {
         MutableList<RelationalOperationElement> allTables = Lists.mutable.empty();
-        if (relationalOperationElement instanceof TableAliasColumn)
+        if (relationalOperationElement instanceof TableAliasColumn column)
         {
-            allTables.add(((TableAliasColumn)relationalOperationElement)._alias() == null ? null : ((TableAliasColumn)relationalOperationElement)._alias()._relationalElement());
+            allTables.add(column._alias() == null ? null : column._alias()._relationalElement());
         }
-        else if (relationalOperationElement instanceof RelationalOperationElementWithJoin)
+        else if (relationalOperationElement instanceof RelationalOperationElementWithJoin join)
         {
-            RelationalOperationElement joinRelationalOperationElement = ((RelationalOperationElementWithJoin)relationalOperationElement)._relationalOperationElement();
+            RelationalOperationElement joinRelationalOperationElement = join._relationalOperationElement();
             RelationalOperationElement targetTable = findAllTablesRootFirst(joinRelationalOperationElement).toList().getFirst();
-            JoinTreeNode joinTreeNode = ((RelationalOperationElementWithJoin)relationalOperationElement)._joinTreeNode();
+            JoinTreeNode joinTreeNode = join._joinTreeNode();
             allTables.addAllIterable(findAllJoinTreeNodeTablesRootFirst(joinTreeNode, targetTable));
         }
-        else if (relationalOperationElement instanceof DynaFunction)
+        else if (relationalOperationElement instanceof DynaFunction function)
         {
-            RichIterable<? extends RelationalOperationElement> params = ((DynaFunction)relationalOperationElement)._parameters();
+            RichIterable<? extends RelationalOperationElement> params = function._parameters();
             MutableList<RelationalOperationElement> tablesForParams = params.flatCollect(ViewProcessing::findAllTablesRootFirst, Lists.mutable.empty());
             if (tablesForParams.size() == 1)
             {

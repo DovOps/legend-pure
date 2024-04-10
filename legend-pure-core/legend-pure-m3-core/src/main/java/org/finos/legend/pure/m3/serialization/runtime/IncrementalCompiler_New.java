@@ -415,7 +415,7 @@ public class IncrementalCompiler_New extends IncrementalCompiler
 
     private void removeInstanceButNotPackage(CoreInstance instance)
     {
-        Package pkg = instance instanceof PackageableElement ? ((PackageableElement) instance)._package() : null;
+        Package pkg = instance instanceof PackageableElement pe ? pe._package() : null;
         if (pkg != null)
         {
             pkg._childrenRemove((PackageableElement) instance);
@@ -426,7 +426,7 @@ public class IncrementalCompiler_New extends IncrementalCompiler
 
     private void tryRemovePackage(CoreInstance instance)
     {
-        Package pkg = instance instanceof PackageableElement ? ((PackageableElement) instance)._package() : null;
+        Package pkg = instance instanceof PackageableElement pe ? pe._package() : null;
         if (pkg != null)
         {
             if (pkg._children().isEmpty() && pkg.getSourceInformation() == null)

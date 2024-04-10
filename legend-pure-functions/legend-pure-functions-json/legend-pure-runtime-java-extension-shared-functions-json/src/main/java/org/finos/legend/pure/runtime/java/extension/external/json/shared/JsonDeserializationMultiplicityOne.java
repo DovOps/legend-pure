@@ -42,9 +42,8 @@ public class JsonDeserializationMultiplicityOne<T> extends JsonPropertyDeseriali
             }
             return Lists.immutable.empty();
         }
-        if (jsonValue instanceof JSONArray)
+        if (jsonValue instanceof JSONArray jsonValues)
         {
-            JSONArray jsonValues = (JSONArray) jsonValue;
             if (jsonValues.size() > 1)
             {
                 throw new PureExecutionException(jsonDeserializationContext.getSourceInformation(), "Expected value(s) of multiplicity [1], found " + jsonValues.size() + " value(s).");
@@ -53,7 +52,7 @@ public class JsonDeserializationMultiplicityOne<T> extends JsonPropertyDeseriali
             {
                 throw new PureExecutionException(jsonDeserializationContext.getSourceInformation(), "Expected value(s) of multiplicity [1], found 0 value(s).");
             }
-            Object value = ((JSONArray) jsonValue).get(0);
+            Object value = jsonValues.get(0);
             return applyConversion(value, jsonDeserializationContext);
         }
         return applyConversion(jsonValue, jsonDeserializationContext);

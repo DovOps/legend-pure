@@ -15,20 +15,20 @@
 package org.finos.legend.pure.m2.inlinedsl.graph;
 
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestMilestonedPropertyUsageInGraph extends AbstractPureTestWithCoreCompiled
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime();
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("file.pure");
@@ -39,36 +39,40 @@ public class TestMilestonedPropertyUsageInGraph extends AbstractPureTestWithCore
     {
         try
         {
-            runtime.createInMemorySource("file.pure", "import meta::test::milestoning::domain::*;\n" +
-                    "Class meta::test::milestoning::domain::Product{\n" +
-                    "   classification : Classification[1];\n" +
-                    "}\n" +
-                    "Class  <<temporal.businesstemporal>> meta::test::milestoning::domain::Classification{\n" +
-                    "   classificationType : String[1];\n" +
-                    "}\n" +
-                    "function go():Any[*]\n" +
-                    "{\n" +
-                    "   print(#{Product{classification{classificationType}}}#)" +
-                    "}\n");
+            runtime.createInMemorySource("file.pure", """
+                    import meta::test::milestoning::domain::*;
+                    Class meta::test::milestoning::domain::Product{
+                       classification : Classification[1];
+                    }
+                    Class  <<temporal.businesstemporal>> meta::test::milestoning::domain::Classification{
+                       classificationType : String[1];
+                    }
+                    function go():Any[*]
+                    {
+                       print(#{Product{classification{classificationType}}}#)\
+                    }
+                    """);
             runtime.compile();
-            Assert.fail();
+            Assertions.fail();
         }
         catch (Exception e)
         {
-            Assert.assertEquals("Compilation error at (resource:file.pure line:10 column:20), \"The system can't find a match for the property / qualified property: classification(). No-Arg milestoned property: 'classification' is not supported yet in graph fetch flow! It needs to be supplied with [businessDate] parameters\"", e.getMessage());
+            Assertions.assertEquals("Compilation error at (resource:file.pure line:10 column:20), \"The system can't find a match for the property / qualified property: classification(). No-Arg milestoned property: 'classification' is not supported yet in graph fetch flow! It needs to be supplied with [businessDate] parameters\"", e.getMessage());
         }
 
-        runtime.modify("file.pure", "import meta::test::milestoning::domain::*;\n" +
-                "Class meta::test::milestoning::domain::Product{\n" +
-                "   classification : Classification[1];\n" +
-                "}\n" +
-                "Class  <<temporal.businesstemporal>> meta::test::milestoning::domain::Classification{\n" +
-                "   classificationType : String[1];\n" +
-                "}\n" +
-                "function go():Any[*]\n" +
-                "{\n" +
-                "   print(#{Product{classification(%latest){classificationType}}}#, 1)" +
-                "}\n");
+        runtime.modify("file.pure", """
+                import meta::test::milestoning::domain::*;
+                Class meta::test::milestoning::domain::Product{
+                   classification : Classification[1];
+                }
+                Class  <<temporal.businesstemporal>> meta::test::milestoning::domain::Classification{
+                   classificationType : String[1];
+                }
+                function go():Any[*]
+                {
+                   print(#{Product{classification(%latest){classificationType}}}#, 1)\
+                }
+                """);
         runtime.compile();
     }
 
@@ -77,36 +81,40 @@ public class TestMilestonedPropertyUsageInGraph extends AbstractPureTestWithCore
     {
         try
         {
-            runtime.createInMemorySource("file.pure", "import meta::test::milestoning::domain::*;\n" +
-                    "Class <<temporal.businesstemporal>> meta::test::milestoning::domain::Product{\n" +
-                    "   classification : Classification[1];\n" +
-                    "}\n" +
-                    "Class  <<temporal.businesstemporal>> meta::test::milestoning::domain::Classification{\n" +
-                    "   classificationType : String[1];\n" +
-                    "}\n" +
-                    "function go():Any[*]\n" +
-                    "{\n" +
-                    "   print(#{Product{classification{classificationType}}}#)" +
-                    "}\n");
+            runtime.createInMemorySource("file.pure", """
+                    import meta::test::milestoning::domain::*;
+                    Class <<temporal.businesstemporal>> meta::test::milestoning::domain::Product{
+                       classification : Classification[1];
+                    }
+                    Class  <<temporal.businesstemporal>> meta::test::milestoning::domain::Classification{
+                       classificationType : String[1];
+                    }
+                    function go():Any[*]
+                    {
+                       print(#{Product{classification{classificationType}}}#)\
+                    }
+                    """);
             runtime.compile();
-            Assert.fail();
+            Assertions.fail();
         }
         catch (Exception e)
         {
-            Assert.assertEquals("Compilation error at (resource:file.pure line:10 column:20), \"No-Arg milestoned property: 'classification' is not supported yet in graph fetch flow! It needs to be supplied with [businessDate] parameters\"", e.getMessage());
+            Assertions.assertEquals("Compilation error at (resource:file.pure line:10 column:20), \"No-Arg milestoned property: 'classification' is not supported yet in graph fetch flow! It needs to be supplied with [businessDate] parameters\"", e.getMessage());
         }
 
-        runtime.modify("file.pure", "import meta::test::milestoning::domain::*;\n" +
-                "Class <<temporal.businesstemporal>> meta::test::milestoning::domain::Product{\n" +
-                "   classification : Classification[1];\n" +
-                "}\n" +
-                "Class  <<temporal.businesstemporal>> meta::test::milestoning::domain::Classification{\n" +
-                "   classificationType : String[1];\n" +
-                "}\n" +
-                "function go():Any[*]\n" +
-                "{\n" +
-                "   print(#{Product{classification(%2015-01-01){classificationType}}}#, 1)" +
-                "}\n");
+        runtime.modify("file.pure", """
+                import meta::test::milestoning::domain::*;
+                Class <<temporal.businesstemporal>> meta::test::milestoning::domain::Product{
+                   classification : Classification[1];
+                }
+                Class  <<temporal.businesstemporal>> meta::test::milestoning::domain::Classification{
+                   classificationType : String[1];
+                }
+                function go():Any[*]
+                {
+                   print(#{Product{classification(%2015-01-01){classificationType}}}#, 1)\
+                }
+                """);
         runtime.compile();
     }
 }

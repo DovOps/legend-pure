@@ -25,7 +25,7 @@ public class ImportStubHelper
 
     public static CoreInstance fromImportStub(CoreInstance instance)
     {
-        return (instance instanceof ImportStub) ? fromImportStub((ImportStub) instance) : instance;
+        return (instance instanceof ImportStub is) ? fromImportStub(is) : instance;
     }
 
     public static CoreInstance fromImportStub(ImportStub importStub)

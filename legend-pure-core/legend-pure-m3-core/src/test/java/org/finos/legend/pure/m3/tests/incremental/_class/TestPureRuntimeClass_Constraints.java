@@ -18,20 +18,20 @@ import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiledPlatform;
 import org.finos.legend.pure.m3.tests.RuntimeTestScriptBuilder;
 import org.finos.legend.pure.m3.tests.RuntimeVerifier;
 import org.finos.legend.pure.m4.exception.PureCompilationException;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestPureRuntimeClass_Constraints extends AbstractPureTestWithCoreCompiledPlatform
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime();
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("sourceId.pure");
@@ -44,8 +44,8 @@ public class TestPureRuntimeClass_Constraints extends AbstractPureTestWithCoreCo
     public void testPureRuntimeClassConstraintError()
     {
         runtime.createInMemorySource("sourceId.pure", "Class test::A[$this.nam == 'ee']{name:String[1];}");
-        PureCompilationException e = Assert.assertThrows(PureCompilationException.class, runtime::compile);
-        Assert.assertEquals("Compilation error at (resource:sourceId.pure line:1 column:21), \"Can't find the property 'nam' in the class test::A\"", e.getMessage());
+        PureCompilationException e = Assertions.assertThrows(PureCompilationException.class, runtime::compile);
+        Assertions.assertEquals("Compilation error at (resource:sourceId.pure line:1 column:21), \"Can't find the property 'nam' in the class test::A\"", e.getMessage());
     }
 
     @Test
@@ -69,8 +69,8 @@ public class TestPureRuntimeClass_Constraints extends AbstractPureTestWithCoreCo
         runtime.createInMemorySource("userId.pure", "function a():String[1]{'ee'}");
         runtime.compile();
         runtime.delete("userId.pure");
-        PureCompilationException e = Assert.assertThrows(PureCompilationException.class, runtime::compile);
-        Assert.assertEquals("Compilation error at (resource:sourceId.pure line:1 column:29), \"The system can't find a match for the function: a()\"", e.getMessage());
+        PureCompilationException e = Assertions.assertThrows(PureCompilationException.class, runtime::compile);
+        Assertions.assertEquals("Compilation error at (resource:sourceId.pure line:1 column:29), \"The system can't find a match for the function: a()\"", e.getMessage());
     }
 
 
@@ -93,12 +93,14 @@ public class TestPureRuntimeClass_Constraints extends AbstractPureTestWithCoreCo
     public void testPureRuntimeClassConstraintTypeErrorType()
     {
         runtime.createInMemorySource("/test/testModel.pure",
-                "Class A\n" +
-                        "[22]\n" +
-                        "{\n" +
-                        "  name:String[1];\n" +
-                        "}");
-        PureCompilationException e = Assert.assertThrows(PureCompilationException.class, runtime::compile);
+                """
+                Class A
+                [22]
+                {
+                  name:String[1];
+                }\
+                """);
+        PureCompilationException e = Assertions.assertThrows(PureCompilationException.class, runtime::compile);
         assertPureException(PureCompilationException.class, "A constraint must be of type Boolean and multiplicity one", "/test/testModel.pure", 2, 2, 2, 2, 2, 3, e);
     }
 
@@ -106,12 +108,14 @@ public class TestPureRuntimeClass_Constraints extends AbstractPureTestWithCoreCo
     public void testPureRuntimeClassConstraintTypeErrorMultiplicity()
     {
         runtime.createInMemorySource("/test/testModel.pure",
-                "Class A\n" +
-                        "[ [true,true] ]\n" +
-                        "{\n" +
-                        "   name:String[1];\n" +
-                        "}");
-        PureCompilationException e = Assert.assertThrows(PureCompilationException.class, runtime::compile);
+                """
+                Class A
+                [ [true,true] ]
+                {
+                   name:String[1];
+                }\
+                """);
+        PureCompilationException e = Assertions.assertThrows(PureCompilationException.class, runtime::compile);
         assertPureException(PureCompilationException.class, "A constraint must be of type Boolean and multiplicity one", "/test/testModel.pure", 2, 3, 2, 3, 2, 13, e);
     }
 
@@ -120,12 +124,14 @@ public class TestPureRuntimeClass_Constraints extends AbstractPureTestWithCoreCo
     public void testPureRuntimeClassConstraintFunction()
     {
         runtime.createInMemorySource("/test/testModel.pure",
-                "Class A\n" +
-                        "[ $this.name ==  t() ]\n" +
-                        "{\n" +
-                        "   name:String[1];\n" +
-                        "}");
-        PureCompilationException e = Assert.assertThrows(PureCompilationException.class, runtime::compile);
+                """
+                Class A
+                [ $this.name ==  t() ]
+                {
+                   name:String[1];
+                }\
+                """);
+        PureCompilationException e = Assertions.assertThrows(PureCompilationException.class, runtime::compile);
         assertPureException(PureCompilationException.class, "The system can't find a match for the function: t()", "/test/testModel.pure", 2, 18, 2, 18, 2, 18, e);
     }
 
@@ -133,15 +139,17 @@ public class TestPureRuntimeClass_Constraints extends AbstractPureTestWithCoreCo
     public void testPureRuntimeClassConstraintFunctionUnbind()
     {
         runtime.createInMemorySource("sourceId.pure",
-                "Class A\n" +
-                        "[ $this.name ==  t() ]\n" +
-                        "{\n" +
-                        "   name:String[1];\n" +
-                        "}");
+                """
+                Class A
+                [ $this.name ==  t() ]
+                {
+                   name:String[1];
+                }\
+                """);
         runtime.createInMemorySource("userId.pure", "function t():String[1]{'test'}");
         runtime.compile();
         runtime.delete("userId.pure");
-        PureCompilationException e = Assert.assertThrows(PureCompilationException.class, runtime::compile);
+        PureCompilationException e = Assertions.assertThrows(PureCompilationException.class, runtime::compile);
         assertPureException(PureCompilationException.class, "The system can't find a match for the function: t()", "sourceId.pure", 2, 18, 2, 18, 2, 18, e);
     }
 

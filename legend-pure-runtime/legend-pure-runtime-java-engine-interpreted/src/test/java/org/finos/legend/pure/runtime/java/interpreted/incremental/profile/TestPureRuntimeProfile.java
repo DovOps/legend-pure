@@ -18,20 +18,20 @@ import org.finos.legend.pure.m3.execution.FunctionExecution;
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
 import org.finos.legend.pure.m4.exception.PureCompilationException;
 import org.finos.legend.pure.runtime.java.interpreted.FunctionExecutionInterpreted;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestPureRuntimeProfile extends AbstractPureTestWithCoreCompiled
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getFunctionExecution());
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("sourceId.pure");
@@ -42,8 +42,10 @@ public class TestPureRuntimeProfile extends AbstractPureTestWithCoreCompiled
     public void testPureRuntimeProfilePointer()
     {
         runtime.createInMemorySource("sourceId.pure", "Profile testProfile{stereotypes:[s1,s2];}");
-        runtime.createInMemorySource("userId.pure", "function a():Profile[1]{testProfile}" +
-                "function go():Nil[0]{a();[];}");
+        runtime.createInMemorySource("userId.pure", """
+                function a():Profile[1]{testProfile}\
+                function go():Nil[0]{a();[];}\
+                """);
         this.compileAndExecute("go():Nil[0]");
         int size = runtime.getModelRepository().serialize().length;
 
@@ -53,7 +55,7 @@ public class TestPureRuntimeProfile extends AbstractPureTestWithCoreCompiled
             try
             {
                 this.compileAndExecute("go():Nil[0]");
-                Assert.fail();
+                Assertions.fail();
             }
             catch (Exception e)
             {
@@ -62,7 +64,7 @@ public class TestPureRuntimeProfile extends AbstractPureTestWithCoreCompiled
 
             runtime.createInMemorySource("sourceId.pure", "Profile testProfile{stereotypes:[s1,s2];}");
             this.compileAndExecute("go():Nil[0]");
-            Assert.assertEquals("Graph size mismatch", size, repository.serialize().length);
+            Assertions.assertEquals(size, repository.serialize().length, "Graph size mismatch");
         }
     }
 
@@ -71,8 +73,10 @@ public class TestPureRuntimeProfile extends AbstractPureTestWithCoreCompiled
     public void testPureRuntimeProfilePointerError()
     {
         runtime.createInMemorySource("sourceId.pure", "Profile testProfile{stereotypes:[s1,s2];}");
-        runtime.createInMemorySource("userId.pure", "function a():Profile[1]{testProfile}" +
-                "function go():Nil[0]{a();[];}");
+        runtime.createInMemorySource("userId.pure", """
+                function a():Profile[1]{testProfile}\
+                function go():Nil[0]{a();[];}\
+                """);
         this.compileAndExecute("go():Nil[0]");
         int size = runtime.getModelRepository().serialize().length;
 
@@ -82,7 +86,7 @@ public class TestPureRuntimeProfile extends AbstractPureTestWithCoreCompiled
             try
             {
                 this.compileAndExecute("go():Nil[0]");
-                Assert.fail();
+                Assertions.fail();
             }
             catch (Exception e)
             {
@@ -101,7 +105,7 @@ public class TestPureRuntimeProfile extends AbstractPureTestWithCoreCompiled
         }
         runtime.modify("sourceId.pure", "Profile testProfile{stereotypes:[s1,s2];}");
         runtime.compile();
-        Assert.assertEquals("Graph size mismatch", size, repository.serialize().length);
+        Assertions.assertEquals(size, repository.serialize().length, "Graph size mismatch");
     }
 
     protected static FunctionExecution getFunctionExecution()

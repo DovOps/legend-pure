@@ -100,9 +100,9 @@ public class CombinedPostProcessorObserver implements PostProcessorObserver
         MutableList<PostProcessorObserver> list = Lists.mutable.empty();
         observers.forEach(o ->
         {
-            if (o instanceof CombinedPostProcessorObserver)
+            if (o instanceof CombinedPostProcessorObserver observer)
             {
-                list.addAllIterable(((CombinedPostProcessorObserver) o).observers);
+                list.addAllIterable(observer.observers);
             }
             else if ((o != null) && !(o instanceof VoidPostProcessorObserver))
             {

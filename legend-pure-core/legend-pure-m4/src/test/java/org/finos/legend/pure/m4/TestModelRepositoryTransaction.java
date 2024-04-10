@@ -18,8 +18,8 @@ import org.finos.legend.pure.m4.serialization.grammar.M4Parser;
 import org.finos.legend.pure.m4.statelistener.VoidM4StateListener;
 import org.finos.legend.pure.m4.transaction.ModelRepositoryTransaction;
 import org.finos.legend.pure.m4.transaction.framework.ThreadLocalTransactionContext;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class TestModelRepositoryTransaction
 {
@@ -27,95 +27,103 @@ public class TestModelRepositoryTransaction
     public void testTopLevelRollBack() throws Exception
     {
         ModelRepository repository = new ModelRepository();
-        new M4Parser().parse("^Class Class\n" +
-                "{\n" +
-                "    Class.properties[properties] :\n" +
-                "        [\n" +
-                "            ^Property properties\n" +
-                "                {\n" +
-                "                    Property.properties[type] : Property\n" +
-                "                }\n" +
-                "        ]\n" +
-                "}\n" +
-                "\n" +
-                "^Class Property\n" +
-                "{\n" +
-                "    Class.properties[properties] :\n" +
-                "        [\n" +
-                "            ^Property type\n" +
-                "                {\n" +
-                "                    Property.properties[type] : Class\n" +
-                "                }\n" +
-                "        ]\n" +
-                "}", repository, new VoidM4StateListener());
+        new M4Parser().parse("""
+                ^Class Class
+                {
+                    Class.properties[properties] :
+                        [
+                            ^Property properties
+                                {
+                                    Property.properties[type] : Property
+                                }
+                        ]
+                }
+                
+                ^Class Property
+                {
+                    Class.properties[properties] :
+                        [
+                            ^Property type
+                                {
+                                    Property.properties[type] : Class
+                                }
+                        ]
+                }\
+                """, repository, new VoidM4StateListener());
         repository.validate(new VoidM4StateListener());
 
-        Assert.assertEquals(2, repository.getTopLevels().size());
+        Assertions.assertEquals(2, repository.getTopLevels().size());
         ModelRepositoryTransaction transaction = repository.newTransaction(true);
         try (ThreadLocalTransactionContext ignore = transaction.openInCurrentThread())
         {
-            new M4Parser().parse("^Class Other\n" +
-                    "{\n" +
-                    "    Class.properties[properties] :\n" +
-                    "        [\n" +
-                    "            ^Property type\n" +
-                    "                {\n" +
-                    "                    Property.properties[type] : Class\n" +
-                    "                }\n" +
-                    "        ]\n" +
-                    "}", repository, new VoidM4StateListener());
-            Assert.assertEquals(3, repository.getTopLevels().size());
+            new M4Parser().parse("""
+                    ^Class Other
+                    {
+                        Class.properties[properties] :
+                            [
+                                ^Property type
+                                    {
+                                        Property.properties[type] : Class
+                                    }
+                            ]
+                    }\
+                    """, repository, new VoidM4StateListener());
+            Assertions.assertEquals(3, repository.getTopLevels().size());
         }
-        Assert.assertEquals(2, repository.getTopLevels().size());
+        Assertions.assertEquals(2, repository.getTopLevels().size());
         transaction.rollback();
-        Assert.assertEquals(2, repository.getTopLevels().size());
+        Assertions.assertEquals(2, repository.getTopLevels().size());
     }
 
     @Test
     public void testTopLevelCommit() throws Exception
     {
         ModelRepository repository = new ModelRepository();
-        new M4Parser().parse("^Class Class\n" +
-                "{\n" +
-                "    Class.properties[properties] :\n" +
-                "        [\n" +
-                "            ^Property properties\n" +
-                "                {\n" +
-                "                    Property.properties[type] : Property\n" +
-                "                }\n" +
-                "        ]\n" +
-                "}\n" +
-                "\n" +
-                "^Class Property\n" +
-                "{\n" +
-                "    Class.properties[properties] :\n" +
-                "        [\n" +
-                "            ^Property type\n" +
-                "                {\n" +
-                "                    Property.properties[type] : Class\n" +
-                "                }\n" +
-                "        ]\n" +
-                "}", repository, new VoidM4StateListener());
+        new M4Parser().parse("""
+                ^Class Class
+                {
+                    Class.properties[properties] :
+                        [
+                            ^Property properties
+                                {
+                                    Property.properties[type] : Property
+                                }
+                        ]
+                }
+                
+                ^Class Property
+                {
+                    Class.properties[properties] :
+                        [
+                            ^Property type
+                                {
+                                    Property.properties[type] : Class
+                                }
+                        ]
+                }\
+                """, repository, new VoidM4StateListener());
         repository.validate(new VoidM4StateListener());
 
-        Assert.assertEquals(2, repository.getTopLevels().size());
+        Assertions.assertEquals(2, repository.getTopLevels().size());
         ModelRepositoryTransaction transaction = repository.newTransaction(true);
         try (ThreadLocalTransactionContext ignore = transaction.openInCurrentThread())
         {
-            new M4Parser().parse("^Class Other\n" +
-                    "{\n" +
-                    "    Class.properties[properties] :\n" +
-                    "        [\n" +
-                    "            ^Property type\n" +
-                    "                {\n" +
-                    "                    Property.properties[type] : Class\n" +
-                    "                }\n" +
-                    "        ]\n" +
-                    "}", repository, new VoidM4StateListener());
-            Assert.assertEquals(3, repository.getTopLevels().size());
+            new M4Parser().parse("""
+                    ^Class Other
+                    {
+                        Class.properties[properties] :
+                            [
+                                ^Property type
+                                    {
+                                        Property.properties[type] : Class
+                                    }
+                            ]
+                    }\
+                    """, repository, new VoidM4StateListener());
+            Assertions.assertEquals(3, repository.getTopLevels().size());
         }
-        Assert.assertEquals(2, repository.getTopLevels().size());
+        Assertions.assertEquals(2, repository.getTopLevels().size());
         transaction.commit();
-        Assert.assertEquals(3, repository.getTopLevels().size());
+        Assertions.assertEquals(3, repository.getTopLevels().size());
     }
 }

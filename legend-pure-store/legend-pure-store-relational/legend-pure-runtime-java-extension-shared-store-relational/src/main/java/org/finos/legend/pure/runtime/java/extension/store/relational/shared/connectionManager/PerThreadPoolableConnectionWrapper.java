@@ -55,4 +55,43 @@ public class PerThreadPoolableConnectionWrapper extends ConnectionWrapper
             this.provider.removePerThreadConnections(user);
         }
     }
+
+    public boolean isWrapperFor(Class<?> iface) throws java.sql.SQLException {
+        // TODO Auto-generated method stub
+        return iface != null && iface.isAssignableFrom(this.getClass());
+    }
+
+    public <T> T unwrap(Class<T> iface) throws java.sql.SQLException {
+        // TODO Auto-generated method stub
+        try {
+            if (iface != null && iface.isAssignableFrom(this.getClass())) {
+                return (T) this;
+            }
+            throw new java.sql.SQLException("Auto-generated unwrap failed; Revisit implementation");
+        } catch (Exception e) {
+            throw new java.sql.SQLException(e);
+        }
+    }
+
+    public void abort(java.util.concurrent.Executor executor) {
+        // TODO Auto-generated method stub
+    }
+
+    public int getNetworkTimeout() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    public java.lang.String getSchema() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public void setNetworkTimeout(java.util.concurrent.Executor executor, int milliseconds) {
+        // TODO Auto-generated method stub
+    }
+
+    public void setSchema(java.lang.String schema) throws java.sql.SQLException {
+        // TODO Auto-generated method stub
+    }
 }

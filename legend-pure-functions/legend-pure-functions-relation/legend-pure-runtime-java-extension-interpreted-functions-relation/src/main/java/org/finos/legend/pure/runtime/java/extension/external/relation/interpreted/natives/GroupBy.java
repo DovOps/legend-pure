@@ -65,13 +65,13 @@ public class GroupBy extends Shared
 
         Object cols = Instance.getValueForMetaPropertyToOneResolved(params.get(1), M3Properties.values, processorSupport);
         ListIterable<String> ids;
-        if (cols instanceof ColSpec)
+        if (cols instanceof ColSpec spec)
         {
-            ids = Lists.mutable.with(((ColSpec<?>) cols)._name());
+            ids = Lists.mutable.with(spec._name());
         }
-        else if (cols instanceof ColSpecArray)
+        else if (cols instanceof ColSpecArray array)
         {
-            ids = ((ColSpecArray<?>) cols)._names().collect(c -> (String) c).toList();
+            ids = array._names().collect(c -> (String) c).toList();
         }
         else
         {
@@ -84,9 +84,9 @@ public class GroupBy extends Shared
         {
             result = processOneAggColSpec(tds, null, ids, aggColSpec, resolvedTypeParameters, resolvedMultiplicityParameters, variableContext, functionExpressionToUseInStack, profiler, instantiationContext, executionSupport, processorSupport, relationType);
         }
-        else if (aggColSpec instanceof AggColSpecArray)
+        else if (aggColSpec instanceof AggColSpecArray array)
         {
-            result = ((AggColSpecArray<?, ?, ?>) aggColSpec)._aggSpecs().injectInto(null, (a, b) -> processOneAggColSpec(tds, a, ids, b, resolvedTypeParameters, resolvedMultiplicityParameters, variableContext, functionExpressionToUseInStack, profiler, instantiationContext, executionSupport, processorSupport, relationType));
+            result = array._aggSpecs().injectInto(null, (a, b) -> processOneAggColSpec(tds, a, ids, b, resolvedTypeParameters, resolvedMultiplicityParameters, variableContext, functionExpressionToUseInStack, profiler, instantiationContext, executionSupport, processorSupport, relationType));
         }
         else
         {

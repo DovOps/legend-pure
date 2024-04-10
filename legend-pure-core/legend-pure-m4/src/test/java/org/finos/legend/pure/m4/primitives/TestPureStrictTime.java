@@ -16,8 +16,8 @@ package org.finos.legend.pure.m4.primitives;
 
 import org.finos.legend.pure.m4.coreinstance.primitive.strictTime.PureStrictTime;
 import org.finos.legend.pure.m4.coreinstance.primitive.strictTime.StrictTimeFunctions;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class TestPureStrictTime
 {
@@ -25,31 +25,31 @@ public class TestPureStrictTime
     public void testStrictTimeFormat()
     {
         PureStrictTime strictTimeWithHourMin = StrictTimeFunctions.newPureStrictTime(16, 12);
-        Assert.assertEquals("16:12", strictTimeWithHourMin.format("HH:mm"));
-        Assert.assertEquals("04:12", strictTimeWithHourMin.format("hh:mm"));
+        Assertions.assertEquals("16:12", strictTimeWithHourMin.format("HH:mm"));
+        Assertions.assertEquals("04:12", strictTimeWithHourMin.format("hh:mm"));
 
         PureStrictTime strictTimeWithHourMinSec = StrictTimeFunctions.newPureStrictTime(16, 12, 35);
-        Assert.assertEquals("16:12:35", strictTimeWithHourMinSec.format("HH:mm:ss"));
+        Assertions.assertEquals("16:12:35", strictTimeWithHourMinSec.format("HH:mm:ss"));
 
         PureStrictTime strictTimeWithHourMinSecSubSec = StrictTimeFunctions.newPureStrictTime(16, 12, 35, "070004235");
-        Assert.assertEquals("16:12:35", strictTimeWithHourMinSecSubSec.format("H:mm:ss"));
-        Assert.assertEquals("16:12:35.070004235", strictTimeWithHourMinSecSubSec.format("HH:mm:ss.SSSS"));
-        Assert.assertEquals("16:12:35.070", strictTimeWithHourMinSecSubSec.format("HH:mm:ss.SSS"));
+        Assertions.assertEquals("16:12:35", strictTimeWithHourMinSecSubSec.format("H:mm:ss"));
+        Assertions.assertEquals("16:12:35.070004235", strictTimeWithHourMinSecSubSec.format("HH:mm:ss.SSSS"));
+        Assertions.assertEquals("16:12:35.070", strictTimeWithHourMinSecSubSec.format("HH:mm:ss.SSS"));
     }
 
     @Test
     public void testInvalidFormat()
     {
         PureStrictTime strictTimeWithHourMin = StrictTimeFunctions.newPureStrictTime(16, 12);
-        Assert.assertEquals("16:12", strictTimeWithHourMin.format("HH:mm"));
+        Assertions.assertEquals("16:12", strictTimeWithHourMin.format("HH:mm"));
         try
         {
             strictTimeWithHourMin.format("HH:mm:ss.SSSZ");
-            Assert.fail();
+            Assertions.fail();
         }
         catch (IllegalArgumentException e)
         {
-            Assert.assertEquals("StrictTime has no second: 16:12", e.getMessage());
+            Assertions.assertEquals("StrictTime has no second: 16:12", e.getMessage());
         }
     }
 
@@ -59,41 +59,41 @@ public class TestPureStrictTime
         try
         {
             StrictTimeFunctions.newPureStrictTime(10, 26, 33, null);
-            Assert.fail("Expected exception");
+            Assertions.fail("Expected exception");
         }
         catch (IllegalArgumentException e)
         {
-            Assert.assertEquals("Invalid subsecond value: null", e.getMessage());
+            Assertions.assertEquals("Invalid subsecond value: null", e.getMessage());
         }
 
         try
         {
             StrictTimeFunctions.newPureStrictTime(10, 26, 33, "");
-            Assert.fail("Expected exception");
+            Assertions.fail("Expected exception");
         }
         catch (IllegalArgumentException e)
         {
-            Assert.assertEquals("Invalid subsecond value: \"\"", e.getMessage());
+            Assertions.assertEquals("Invalid subsecond value: \"\"", e.getMessage());
         }
 
         try
         {
             StrictTimeFunctions.newPureStrictTime(10, 26, 33, "789as9898");
-            Assert.fail("Expected exception");
+            Assertions.fail("Expected exception");
         }
         catch (IllegalArgumentException e)
         {
-            Assert.assertEquals("Invalid subsecond value: \"789as9898\"", e.getMessage());
+            Assertions.assertEquals("Invalid subsecond value: \"789as9898\"", e.getMessage());
         }
 
         try
         {
             StrictTimeFunctions.newPureStrictTime(10, 26, 33, "-789");
-            Assert.fail("Expected exception");
+            Assertions.fail("Expected exception");
         }
         catch (IllegalArgumentException e)
         {
-            Assert.assertEquals("Invalid subsecond value: \"-789\"", e.getMessage());
+            Assertions.assertEquals("Invalid subsecond value: \"-789\"", e.getMessage());
         }
     }
 
@@ -101,11 +101,11 @@ public class TestPureStrictTime
     public void testAddHoursMinutesSecondsMilliseconds()
     {
         PureStrictTime time = StrictTimeFunctions.newPureStrictTime(10, 26, 33, "780013429");
-        Assert.assertEquals(StrictTimeFunctions.newPureStrictTime(11, 26, 33, "780013429"), time.addHours(1));
-        Assert.assertEquals(StrictTimeFunctions.newPureStrictTime(10, 46, 33, "780013429"), time.addMinutes(20));
-        Assert.assertEquals(StrictTimeFunctions.newPureStrictTime(10, 27, 3, "780013429"), time.addSeconds(30));
-        Assert.assertSame(time, time.addMilliseconds(0));
-        Assert.assertEquals(StrictTimeFunctions.newPureStrictTime(10, 26, 32, "781013429"), time.addMilliseconds(-999));
+        Assertions.assertEquals(StrictTimeFunctions.newPureStrictTime(11, 26, 33, "780013429"), time.addHours(1));
+        Assertions.assertEquals(StrictTimeFunctions.newPureStrictTime(10, 46, 33, "780013429"), time.addMinutes(20));
+        Assertions.assertEquals(StrictTimeFunctions.newPureStrictTime(10, 27, 3, "780013429"), time.addSeconds(30));
+        Assertions.assertSame(time, time.addMilliseconds(0));
+        Assertions.assertEquals(StrictTimeFunctions.newPureStrictTime(10, 26, 32, "781013429"), time.addMilliseconds(-999));
     }
 
 }

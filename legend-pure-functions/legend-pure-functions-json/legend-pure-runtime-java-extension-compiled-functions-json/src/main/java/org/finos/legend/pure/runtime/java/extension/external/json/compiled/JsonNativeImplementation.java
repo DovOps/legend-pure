@@ -86,7 +86,7 @@ public class JsonNativeImplementation
                         propertyGetter = pureObject.getClass().getMethod("_" + propertyName);
                         value = propertyGetter.invoke(pureObject);
                     }
-                    return value instanceof RichIterable ? (RichIterable<?>)value : Lists.immutable.of(value);
+                    return value instanceof RichIterable ri ? ri : Lists.immutable.of(value);
                 }
                 catch (NoSuchMethodException e)
                 {

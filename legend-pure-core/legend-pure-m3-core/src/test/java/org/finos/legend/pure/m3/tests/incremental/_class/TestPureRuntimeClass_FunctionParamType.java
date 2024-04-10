@@ -24,20 +24,20 @@ import org.finos.legend.pure.m3.navigation.Instance;
 import org.finos.legend.pure.m3.navigation._class._Class;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
 import org.finos.legend.pure.m4.exception.PureCompilationException;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestPureRuntimeClass_FunctionParamType extends AbstractPureTestWithCoreCompiledPlatform
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getExtra());
     }
 
-    @After
+    @AfterEach
     public void clearRuntime()
     {
         runtime.delete("sourceId.pure");
@@ -50,8 +50,10 @@ public class TestPureRuntimeClass_FunctionParamType extends AbstractPureTestWith
     public void testPureRuntimeClassAsFunctionParameterType() throws Exception
     {
         RuntimeVerifier.verifyOperationIsStable(new RuntimeTestScriptBuilder().createInMemorySource("sourceId.pure", "Class A{name:String[1];}")
-                        .createInMemorySource("userId.pure", "function f(c:A[0]):A[0]{$c}" +
-                                "function test():Boolean[1]{assert(f([])->isEmpty(),|'')}")
+                        .createInMemorySource("userId.pure", """
+                                function f(c:A[0]):A[0]{$c}\
+                                function test():Boolean[1]{assert(f([])->isEmpty(),|'')}\
+                                """)
                         .compile(),
                 new RuntimeTestScriptBuilder()
                         .deleteSource("sourceId.pure")
@@ -65,8 +67,10 @@ public class TestPureRuntimeClass_FunctionParamType extends AbstractPureTestWith
     public void testPureRuntimeClassAsFunctionParameterTypeError() throws Exception
     {
         RuntimeVerifier.verifyOperationIsStable(new RuntimeTestScriptBuilder().createInMemorySource("sourceId.pure", "Class A{}")
-                        .createInMemorySource("userId.pure", "function f(c:A[0]):A[0]{$c}" +
-                                "function test():Boolean[1]{assert(f([])->isEmpty(),|'')}")
+                        .createInMemorySource("userId.pure", """
+                                function f(c:A[0]):A[0]{$c}\
+                                function test():Boolean[1]{assert(f([])->isEmpty(),|'')}\
+                                """)
                         .compile(),
                 new RuntimeTestScriptBuilder()
                         .deleteSource("sourceId.pure")
@@ -196,18 +200,22 @@ public class TestPureRuntimeClass_FunctionParamType extends AbstractPureTestWith
     public void testPureRuntimeClassAsFunctionParameterTypeReverse() throws Exception
     {
         RuntimeVerifier.verifyOperationIsStable(new RuntimeTestScriptBuilder().createInMemorySource("otherId.pure", "Class TK{}")
-                        .createInMemorySource("sourceId.pure", "function isContract(p:TK[1]):Nil[0]\n" +
-                                "{\n" +
-                                "    [];\n" +
-                                "}")
+                        .createInMemorySource("sourceId.pure", """
+                                function isContract(p:TK[1]):Nil[0]
+                                {
+                                    [];
+                                }\
+                                """)
                         .compile(),
                 new RuntimeTestScriptBuilder()
                         .deleteSource("sourceId.pure")
                         .compile()
-                        .createInMemorySource("sourceId.pure", "function isContract(p:TK[1]):Nil[0]\n" +
-                                "{\n" +
-                                "    [];\n" +
-                                "}")
+                        .createInMemorySource("sourceId.pure", """
+                                function isContract(p:TK[1]):Nil[0]
+                                {
+                                    [];
+                                }\
+                                """)
                         .compile(),
                 runtime, functionExecution, this.getAdditionalVerifiers());
     }
@@ -227,7 +235,7 @@ public class TestPureRuntimeClass_FunctionParamType extends AbstractPureTestWith
         CoreInstance classA = processorSupport.package_getByUserPath("A");
         CoreInstance classB = processorSupport.package_getByUserPath("B");
         CoreInstance prop = _Class.getQualifiedPropertiesByName(classB, processorSupport).get("prop(A)");
-        Assert.assertSame(classA, Instance.getValueForMetaPropertyToOneResolved(Instance.getValueForMetaPropertyToManyResolved(processorSupport.function_getFunctionType(prop), M3Properties.parameters, processorSupport).get(1), M3Properties.genericType, M3Properties.rawType, processorSupport));
+        Assertions.assertSame(classA, Instance.getValueForMetaPropertyToOneResolved(Instance.getValueForMetaPropertyToManyResolved(processorSupport.function_getFunctionType(prop), M3Properties.parameters, processorSupport).get(1), M3Properties.genericType, M3Properties.rawType, processorSupport));
 
         for (int i = 0; i < 10; i++)
         {
@@ -235,7 +243,7 @@ public class TestPureRuntimeClass_FunctionParamType extends AbstractPureTestWith
             try
             {
                 runtime.compile();
-                Assert.fail("Expected a compile exception");
+                Assertions.fail("Expected a compile exception");
             }
             catch (Exception e)
             {
@@ -248,9 +256,9 @@ public class TestPureRuntimeClass_FunctionParamType extends AbstractPureTestWith
             classA = processorSupport.package_getByUserPath("A");
             classB = processorSupport.package_getByUserPath("B");
             prop = _Class.getQualifiedPropertiesByName(classB, processorSupport).get("prop(A)");
-            Assert.assertSame(classA, Instance.getValueForMetaPropertyToOneResolved(Instance.getValueForMetaPropertyToManyResolved(processorSupport.function_getFunctionType(prop), M3Properties.parameters, processorSupport).get(1), M3Properties.genericType, M3Properties.rawType, processorSupport));
+            Assertions.assertSame(classA, Instance.getValueForMetaPropertyToOneResolved(Instance.getValueForMetaPropertyToManyResolved(processorSupport.function_getFunctionType(prop), M3Properties.parameters, processorSupport).get(1), M3Properties.genericType, M3Properties.rawType, processorSupport));
 
-            Assert.assertEquals(size, repository.serialize().length);
+            Assertions.assertEquals(size, repository.serialize().length);
         }
     }
 }

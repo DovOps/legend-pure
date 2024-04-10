@@ -51,17 +51,17 @@ public class TypeValidator implements MatchRunner<Type>
         RichIterable<? extends Generalization> generalizations = type._generalizations();
         if (generalizations.notEmpty())
         {
-            if (type instanceof Class)
+            if (type instanceof Class class1)
             {
-                validateClassGeneralizations((Class)type, generalizations, processorSupport);
+                validateClassGeneralizations(class1, generalizations, processorSupport);
             }
-            else if (type instanceof PrimitiveType)
+            else if (type instanceof PrimitiveType primitiveType)
             {
-                validatePrimitiveTypeGeneralizations((PrimitiveType)type, generalizations, processorSupport);
+                validatePrimitiveTypeGeneralizations(primitiveType, generalizations, processorSupport);
             }
-            else if (type instanceof Enumeration)
+            else if (type instanceof Enumeration enumeration)
             {
-                validateEnumerationGeneralizations((Enumeration)type, generalizations, processorSupport);
+                validateEnumerationGeneralizations(enumeration, generalizations, processorSupport);
             }
         }
         try

@@ -16,8 +16,8 @@ package org.finos.legend.pure.m2.relational;
 
 import org.finos.legend.pure.m3.navigation.PrimitiveUtilities;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class TestDatabaseColumnTypes extends AbstractPureRelationalTestWithCoreCompiled
 {
@@ -26,24 +26,34 @@ public class TestDatabaseColumnTypes extends AbstractPureRelationalTestWithCoreC
     {
         String dataType = "BIGINT";
 
-        String dbDef = String.format("###Relational\n " +
-                "Database db\n " +
-                "(\n " +
-                "   Table myTable\n " +
-                "   (\n " +
-                "       name %s PRIMARY KEY \n " +
-                "   )\n " +
-                ")\n ", dataType);
+        String dbDef = ("""
+                ###Relational
+                 \
+                Database db
+                 \
+                (
+                 \
+                   Table myTable
+                 \
+                   (
+                 \
+                       name %s PRIMARY KEY\s
+                 \
+                   )
+                 \
+                )
+                 \
+                """).formatted(dataType);
         this.runtime.createInMemorySource("sourceId.pure", dbDef);
         this.runtime.createInMemorySource("userId.pure", "function test():Boolean[1]{assert(1 == db->meta::relational::metamodel::schema('default').tables->size(), |'');}");
 
         this.runtime.compile();
 
         CoreInstance db = processorSupport.package_getByUserPath("db");
-        Assert.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).size());
-        Assert.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).size());
-        Assert.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.columns).size());
-        Assert.assertEquals(dataType.toUpperCase(), db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.columns).getFirst().getValueForMetaPropertyToOne("type").getClassifier().getName().toUpperCase());
+        Assertions.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).size());
+        Assertions.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).size());
+        Assertions.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.columns).size());
+        Assertions.assertEquals(dataType.toUpperCase(), db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.columns).getFirst().getValueForMetaPropertyToOne("type").getClassifier().getName().toUpperCase());
     }
 
     @Test
@@ -51,24 +61,34 @@ public class TestDatabaseColumnTypes extends AbstractPureRelationalTestWithCoreC
     {
         String dataType = "TINYINT";
 
-        String dbDef = String.format("###Relational\n " +
-                "Database db\n " +
-                "(\n " +
-                "   Table myTable\n " +
-                "   (\n " +
-                "       name %s PRIMARY KEY \n " +
-                "   )\n " +
-                ")\n ", dataType);
+        String dbDef = ("""
+                ###Relational
+                 \
+                Database db
+                 \
+                (
+                 \
+                   Table myTable
+                 \
+                   (
+                 \
+                       name %s PRIMARY KEY\s
+                 \
+                   )
+                 \
+                )
+                 \
+                """).formatted(dataType);
         this.runtime.createInMemorySource("sourceId.pure", dbDef);
         this.runtime.createInMemorySource("userId.pure", "function test():Boolean[1]{assert(1 == db->meta::relational::metamodel::schema('default').tables->size(), |'');}");
 
         this.runtime.compile();
 
         CoreInstance db = processorSupport.package_getByUserPath("db");
-        Assert.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).size());
-        Assert.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).size());
-        Assert.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.columns).size());
-        Assert.assertEquals(dataType.toUpperCase(), db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.columns).getFirst().getValueForMetaPropertyToOne("type").getClassifier().getName().toUpperCase());
+        Assertions.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).size());
+        Assertions.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).size());
+        Assertions.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.columns).size());
+        Assertions.assertEquals(dataType.toUpperCase(), db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.columns).getFirst().getValueForMetaPropertyToOne("type").getClassifier().getName().toUpperCase());
     }
 
     @Test
@@ -76,24 +96,34 @@ public class TestDatabaseColumnTypes extends AbstractPureRelationalTestWithCoreC
     {
         String dataType = "SMALLINT";
 
-        String dbDef = String.format("###Relational\n " +
-                "Database db\n " +
-                "(\n " +
-                "   Table myTable\n " +
-                "   (\n " +
-                "       name %s PRIMARY KEY \n " +
-                "   )\n " +
-                ")\n ", dataType);
+        String dbDef = ("""
+                ###Relational
+                 \
+                Database db
+                 \
+                (
+                 \
+                   Table myTable
+                 \
+                   (
+                 \
+                       name %s PRIMARY KEY\s
+                 \
+                   )
+                 \
+                )
+                 \
+                """).formatted(dataType);
         this.runtime.createInMemorySource("sourceId.pure", dbDef);
         this.runtime.createInMemorySource("userId.pure", "function test():Boolean[1]{assert(1 == db->meta::relational::metamodel::schema('default').tables->size(), |'');}");
 
         this.runtime.compile();
 
         CoreInstance db = processorSupport.package_getByUserPath("db");
-        Assert.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).size());
-        Assert.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).size());
-        Assert.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.columns).size());
-        Assert.assertEquals(dataType.toUpperCase(), db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.columns).getFirst().getValueForMetaPropertyToOne("type").getClassifier().getName().toUpperCase());
+        Assertions.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).size());
+        Assertions.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).size());
+        Assertions.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.columns).size());
+        Assertions.assertEquals(dataType.toUpperCase(), db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.columns).getFirst().getValueForMetaPropertyToOne("type").getClassifier().getName().toUpperCase());
     }
 
     @Test
@@ -101,24 +131,34 @@ public class TestDatabaseColumnTypes extends AbstractPureRelationalTestWithCoreC
     {
         String dataType = "INTEGER";
 
-        String dbDef = String.format("###Relational\n " +
-                "Database db\n " +
-                "(\n " +
-                "   Table myTable\n " +
-                "   (\n " +
-                "       name %s PRIMARY KEY \n " +
-                "   )\n " +
-                ")\n ", dataType);
+        String dbDef = ("""
+                ###Relational
+                 \
+                Database db
+                 \
+                (
+                 \
+                   Table myTable
+                 \
+                   (
+                 \
+                       name %s PRIMARY KEY\s
+                 \
+                   )
+                 \
+                )
+                 \
+                """).formatted(dataType);
         this.runtime.createInMemorySource("sourceId.pure", dbDef);
         this.runtime.createInMemorySource("userId.pure", "function test():Boolean[1]{assert(1 == db->meta::relational::metamodel::schema('default').tables->size(), |'');}");
 
         this.runtime.compile();
 
         CoreInstance db = processorSupport.package_getByUserPath("db");
-        Assert.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).size());
-        Assert.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).size());
-        Assert.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.columns).size());
-        Assert.assertEquals(dataType.toUpperCase(), db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.columns).getFirst().getValueForMetaPropertyToOne("type").getClassifier().getName().toUpperCase());
+        Assertions.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).size());
+        Assertions.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).size());
+        Assertions.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.columns).size());
+        Assertions.assertEquals(dataType.toUpperCase(), db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.columns).getFirst().getValueForMetaPropertyToOne("type").getClassifier().getName().toUpperCase());
     }
 
     @Test
@@ -126,24 +166,34 @@ public class TestDatabaseColumnTypes extends AbstractPureRelationalTestWithCoreC
     {
         String dataType = "FLOAT";
 
-        String dbDef = String.format("###Relational\n " +
-                "Database db\n " +
-                "(\n " +
-                "   Table myTable\n " +
-                "   (\n " +
-                "       name %s PRIMARY KEY \n " +
-                "   )\n " +
-                ")\n ", dataType);
+        String dbDef = ("""
+                ###Relational
+                 \
+                Database db
+                 \
+                (
+                 \
+                   Table myTable
+                 \
+                   (
+                 \
+                       name %s PRIMARY KEY\s
+                 \
+                   )
+                 \
+                )
+                 \
+                """).formatted(dataType);
         this.runtime.createInMemorySource("sourceId.pure", dbDef);
         this.runtime.createInMemorySource("userId.pure", "function test():Boolean[1]{assert(1 == db->meta::relational::metamodel::schema('default').tables->size(), |'');}");
 
         this.runtime.compile();
 
         CoreInstance db = processorSupport.package_getByUserPath("db");
-        Assert.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).size());
-        Assert.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).size());
-        Assert.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.columns).size());
-        Assert.assertEquals(dataType.toUpperCase(), db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.columns).getFirst().getValueForMetaPropertyToOne("type").getClassifier().getName().toUpperCase());
+        Assertions.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).size());
+        Assertions.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).size());
+        Assertions.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.columns).size());
+        Assertions.assertEquals(dataType.toUpperCase(), db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.columns).getFirst().getValueForMetaPropertyToOne("type").getClassifier().getName().toUpperCase());
     }
 
     @Test
@@ -151,24 +201,34 @@ public class TestDatabaseColumnTypes extends AbstractPureRelationalTestWithCoreC
     {
         String dataType = "DOUBLE";
 
-        String dbDef = String.format("###Relational\n " +
-                "Database db\n " +
-                "(\n " +
-                "   Table myTable\n " +
-                "   (\n " +
-                "       name %s PRIMARY KEY \n " +
-                "   )\n " +
-                ")\n ", dataType);
+        String dbDef = ("""
+                ###Relational
+                 \
+                Database db
+                 \
+                (
+                 \
+                   Table myTable
+                 \
+                   (
+                 \
+                       name %s PRIMARY KEY\s
+                 \
+                   )
+                 \
+                )
+                 \
+                """).formatted(dataType);
         this.runtime.createInMemorySource("sourceId.pure", dbDef);
         this.runtime.createInMemorySource("userId.pure", "function test():Boolean[1]{assert(1 == db->meta::relational::metamodel::schema('default').tables->size(), |'');}");
 
         this.runtime.compile();
 
         CoreInstance db = processorSupport.package_getByUserPath("db");
-        Assert.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).size());
-        Assert.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).size());
-        Assert.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.columns).size());
-        Assert.assertEquals(dataType.toUpperCase(), db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.columns).getFirst().getValueForMetaPropertyToOne("type").getClassifier().getName().toUpperCase());
+        Assertions.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).size());
+        Assertions.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).size());
+        Assertions.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.columns).size());
+        Assertions.assertEquals(dataType.toUpperCase(), db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.columns).getFirst().getValueForMetaPropertyToOne("type").getClassifier().getName().toUpperCase());
     }
 
     @Test
@@ -176,25 +236,35 @@ public class TestDatabaseColumnTypes extends AbstractPureRelationalTestWithCoreC
     {
         String dataType = "VARCHAR";
         int size = 200;
-        String dbDef = String.format("###Relational\n " +
-                "Database db\n " +
-                "(\n " +
-                "   Table myTable\n " +
-                "   (\n " +
-                "       name %s(%d) PRIMARY KEY \n " +
-                "   )\n " +
-                ")\n ", dataType, size);
+        String dbDef = ("""
+                ###Relational
+                 \
+                Database db
+                 \
+                (
+                 \
+                   Table myTable
+                 \
+                   (
+                 \
+                       name %s(%d) PRIMARY KEY\s
+                 \
+                   )
+                 \
+                )
+                 \
+                """).formatted(dataType, size);
         this.runtime.createInMemorySource("sourceId.pure", dbDef);
         this.runtime.createInMemorySource("userId.pure", "function test():Boolean[1]{assert(1 == db->meta::relational::metamodel::schema('default').tables->size(), |'');}");
 
         this.runtime.compile();
 
         CoreInstance db = processorSupport.package_getByUserPath("db");
-        Assert.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).size());
-        Assert.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).size());
-        Assert.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.columns).size());
-        Assert.assertEquals(dataType.toUpperCase(), db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.columns).getFirst().getValueForMetaPropertyToOne("type").getClassifier().getName().toUpperCase());
-        Assert.assertEquals(size, PrimitiveUtilities.getIntegerValue(db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.columns).getFirst().getValueForMetaPropertyToOne("type").getValueForMetaPropertyToMany("size").getFirst()));
+        Assertions.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).size());
+        Assertions.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).size());
+        Assertions.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.columns).size());
+        Assertions.assertEquals(dataType.toUpperCase(), db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.columns).getFirst().getValueForMetaPropertyToOne("type").getClassifier().getName().toUpperCase());
+        Assertions.assertEquals(size, PrimitiveUtilities.getIntegerValue(db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.columns).getFirst().getValueForMetaPropertyToOne("type").getValueForMetaPropertyToMany("size").getFirst()));
     }
 
     @Test
@@ -202,25 +272,35 @@ public class TestDatabaseColumnTypes extends AbstractPureRelationalTestWithCoreC
     {
         String dataType = "CHAR";
         int size = 200;
-        String dbDef = String.format("###Relational\n " +
-                "Database db\n " +
-                "(\n " +
-                "   Table myTable\n " +
-                "   (\n " +
-                "       name %s(%d) PRIMARY KEY \n " +
-                "   )\n " +
-                ")\n ", dataType, size);
+        String dbDef = ("""
+                ###Relational
+                 \
+                Database db
+                 \
+                (
+                 \
+                   Table myTable
+                 \
+                   (
+                 \
+                       name %s(%d) PRIMARY KEY\s
+                 \
+                   )
+                 \
+                )
+                 \
+                """).formatted(dataType, size);
         this.runtime.createInMemorySource("sourceId.pure", dbDef);
         this.runtime.createInMemorySource("userId.pure", "function test():Boolean[1]{assert(1 == db->meta::relational::metamodel::schema('default').tables->size(), |'');}");
 
         this.runtime.compile();
 
         CoreInstance db = processorSupport.package_getByUserPath("db");
-        Assert.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).size());
-        Assert.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).size());
-        Assert.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.columns).size());
-        Assert.assertEquals(dataType.toUpperCase(), db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.columns).getFirst().getValueForMetaPropertyToOne("type").getClassifier().getName().toUpperCase());
-        Assert.assertEquals(size, PrimitiveUtilities.getIntegerValue(db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.columns).getFirst().getValueForMetaPropertyToOne("type").getValueForMetaPropertyToMany("size").getFirst()));
+        Assertions.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).size());
+        Assertions.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).size());
+        Assertions.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.columns).size());
+        Assertions.assertEquals(dataType.toUpperCase(), db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.columns).getFirst().getValueForMetaPropertyToOne("type").getClassifier().getName().toUpperCase());
+        Assertions.assertEquals(size, PrimitiveUtilities.getIntegerValue(db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.columns).getFirst().getValueForMetaPropertyToOne("type").getValueForMetaPropertyToMany("size").getFirst()));
     }
 
     @Test
@@ -228,25 +308,35 @@ public class TestDatabaseColumnTypes extends AbstractPureRelationalTestWithCoreC
     {
         String dataType = "VARBINARY";
         int size = 200;
-        String dbDef = String.format("###Relational\n " +
-                "Database db\n " +
-                "(\n " +
-                "   Table myTable\n " +
-                "   (\n " +
-                "       name %s(%d) PRIMARY KEY \n " +
-                "   )\n " +
-                ")\n ", dataType, size);
+        String dbDef = ("""
+                ###Relational
+                 \
+                Database db
+                 \
+                (
+                 \
+                   Table myTable
+                 \
+                   (
+                 \
+                       name %s(%d) PRIMARY KEY\s
+                 \
+                   )
+                 \
+                )
+                 \
+                """).formatted(dataType, size);
         this.runtime.createInMemorySource("sourceId.pure", dbDef);
         this.runtime.createInMemorySource("userId.pure", "function test():Boolean[1]{assert(1 == db->meta::relational::metamodel::schema('default').tables->size(), |'');}");
 
         this.runtime.compile();
 
         CoreInstance db = processorSupport.package_getByUserPath("db");
-        Assert.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).size());
-        Assert.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).size());
-        Assert.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.columns).size());
-        Assert.assertEquals(dataType.toUpperCase(), db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.columns).getFirst().getValueForMetaPropertyToOne("type").getClassifier().getName().toUpperCase());
-        Assert.assertEquals(size, PrimitiveUtilities.getIntegerValue(db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.columns).getFirst().getValueForMetaPropertyToOne("type").getValueForMetaPropertyToMany("size").getFirst()));
+        Assertions.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).size());
+        Assertions.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).size());
+        Assertions.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.columns).size());
+        Assertions.assertEquals(dataType.toUpperCase(), db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.columns).getFirst().getValueForMetaPropertyToOne("type").getClassifier().getName().toUpperCase());
+        Assertions.assertEquals(size, PrimitiveUtilities.getIntegerValue(db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.columns).getFirst().getValueForMetaPropertyToOne("type").getValueForMetaPropertyToMany("size").getFirst()));
     }
 
     @Test
@@ -254,25 +344,35 @@ public class TestDatabaseColumnTypes extends AbstractPureRelationalTestWithCoreC
     {
         String dataType = "BINARY";
         int size = 16;
-        String dbDef = String.format("###Relational\n " +
-                "Database db\n " +
-                "(\n " +
-                "   Table myTable\n " +
-                "   (\n " +
-                "       name %s(%d) PRIMARY KEY \n " +
-                "   )\n " +
-                ")\n ", dataType, size);
+        String dbDef = ("""
+                ###Relational
+                 \
+                Database db
+                 \
+                (
+                 \
+                   Table myTable
+                 \
+                   (
+                 \
+                       name %s(%d) PRIMARY KEY\s
+                 \
+                   )
+                 \
+                )
+                 \
+                """).formatted(dataType, size);
         this.runtime.createInMemorySource("sourceId.pure", dbDef);
         this.runtime.createInMemorySource("userId.pure", "function test():Boolean[1]{assert(1 == db->meta::relational::metamodel::schema('default').tables->size(), |'');}");
 
         this.runtime.compile();
 
         CoreInstance db = processorSupport.package_getByUserPath("db");
-        Assert.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).size());
-        Assert.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).size());
-        Assert.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.columns).size());
-        Assert.assertEquals(dataType.toUpperCase(), db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.columns).getFirst().getValueForMetaPropertyToOne("type").getClassifier().getName().toUpperCase());
-        Assert.assertEquals(size, PrimitiveUtilities.getIntegerValue(db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.columns).getFirst().getValueForMetaPropertyToOne("type").getValueForMetaPropertyToMany("size").getFirst()));
+        Assertions.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).size());
+        Assertions.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).size());
+        Assertions.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.columns).size());
+        Assertions.assertEquals(dataType.toUpperCase(), db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.columns).getFirst().getValueForMetaPropertyToOne("type").getClassifier().getName().toUpperCase());
+        Assertions.assertEquals(size, PrimitiveUtilities.getIntegerValue(db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.columns).getFirst().getValueForMetaPropertyToOne("type").getValueForMetaPropertyToMany("size").getFirst()));
     }
 
     @Test
@@ -281,26 +381,36 @@ public class TestDatabaseColumnTypes extends AbstractPureRelationalTestWithCoreC
         String dataType = "DECIMAL";
         int precision = 200;
         int scale = 5;
-        String dbDef = String.format("###Relational\n " +
-                "Database db\n " +
-                "(\n " +
-                "   Table myTable\n " +
-                "   (\n " +
-                "       name %s(%d, %d) PRIMARY KEY \n " +
-                "   )\n " +
-                ")\n ", dataType, precision, scale);
+        String dbDef = ("""
+                ###Relational
+                 \
+                Database db
+                 \
+                (
+                 \
+                   Table myTable
+                 \
+                   (
+                 \
+                       name %s(%d, %d) PRIMARY KEY\s
+                 \
+                   )
+                 \
+                )
+                 \
+                """).formatted(dataType, precision, scale);
         this.runtime.createInMemorySource("sourceId.pure", dbDef);
         this.runtime.createInMemorySource("userId.pure", "function test():Boolean[1]{assert(1 == db->meta::relational::metamodel::schema('default').tables->size(), |'');}");
 
         this.runtime.compile();
 
         CoreInstance db = processorSupport.package_getByUserPath("db");
-        Assert.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).size());
-        Assert.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).size());
-        Assert.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.columns).size());
-        Assert.assertEquals(dataType.toUpperCase(), db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.columns).getFirst().getValueForMetaPropertyToOne("type").getClassifier().getName().toUpperCase());
-        Assert.assertEquals(precision, PrimitiveUtilities.getIntegerValue(db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.columns).getFirst().getValueForMetaPropertyToOne("type").getValueForMetaPropertyToMany("precision").getFirst()));
-        Assert.assertEquals(scale, PrimitiveUtilities.getIntegerValue(db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.columns).getFirst().getValueForMetaPropertyToOne("type").getValueForMetaPropertyToMany("scale").getFirst()));
+        Assertions.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).size());
+        Assertions.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).size());
+        Assertions.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.columns).size());
+        Assertions.assertEquals(dataType.toUpperCase(), db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.columns).getFirst().getValueForMetaPropertyToOne("type").getClassifier().getName().toUpperCase());
+        Assertions.assertEquals(precision, PrimitiveUtilities.getIntegerValue(db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.columns).getFirst().getValueForMetaPropertyToOne("type").getValueForMetaPropertyToMany("precision").getFirst()));
+        Assertions.assertEquals(scale, PrimitiveUtilities.getIntegerValue(db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.columns).getFirst().getValueForMetaPropertyToOne("type").getValueForMetaPropertyToMany("scale").getFirst()));
     }
 
     @Test
@@ -309,26 +419,36 @@ public class TestDatabaseColumnTypes extends AbstractPureRelationalTestWithCoreC
         String dataType = "NUMERIC";
         int precision = 200;
         int scale = 5;
-        String dbDef = String.format("###Relational\n " +
-                "Database db\n " +
-                "(\n " +
-                "   Table myTable\n " +
-                "   (\n " +
-                "       name %s(%d, %d) PRIMARY KEY \n " +
-                "   )\n " +
-                ")\n ", dataType, precision, scale);
+        String dbDef = ("""
+                ###Relational
+                 \
+                Database db
+                 \
+                (
+                 \
+                   Table myTable
+                 \
+                   (
+                 \
+                       name %s(%d, %d) PRIMARY KEY\s
+                 \
+                   )
+                 \
+                )
+                 \
+                """).formatted(dataType, precision, scale);
         this.runtime.createInMemorySource("sourceId.pure", dbDef);
         this.runtime.createInMemorySource("userId.pure", "function test():Boolean[1]{assert(1 == db->meta::relational::metamodel::schema('default').tables->size(), |'');}");
 
         this.runtime.compile();
 
         CoreInstance db = processorSupport.package_getByUserPath("db");
-        Assert.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).size());
-        Assert.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).size());
-        Assert.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.columns).size());
-        Assert.assertEquals(dataType.toUpperCase(), db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.columns).getFirst().getValueForMetaPropertyToOne("type").getClassifier().getName().toUpperCase());
-        Assert.assertEquals(precision, PrimitiveUtilities.getIntegerValue(db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.columns).getFirst().getValueForMetaPropertyToOne("type").getValueForMetaPropertyToMany("precision").getFirst()));
-        Assert.assertEquals(scale, PrimitiveUtilities.getIntegerValue(db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.columns).getFirst().getValueForMetaPropertyToOne("type").getValueForMetaPropertyToMany("scale").getFirst()));
+        Assertions.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).size());
+        Assertions.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).size());
+        Assertions.assertEquals(1, db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.columns).size());
+        Assertions.assertEquals(dataType.toUpperCase(), db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.columns).getFirst().getValueForMetaPropertyToOne("type").getClassifier().getName().toUpperCase());
+        Assertions.assertEquals(precision, PrimitiveUtilities.getIntegerValue(db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.columns).getFirst().getValueForMetaPropertyToOne("type").getValueForMetaPropertyToMany("precision").getFirst()));
+        Assertions.assertEquals(scale, PrimitiveUtilities.getIntegerValue(db.getValueForMetaPropertyToMany(M2RelationalProperties.schemas).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.tables).getFirst().getValueForMetaPropertyToMany(M2RelationalProperties.columns).getFirst().getValueForMetaPropertyToOne("type").getValueForMetaPropertyToMany("scale").getFirst()));
     }
 
 }

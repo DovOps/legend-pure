@@ -14,8 +14,8 @@
 
 package org.finos.legend.pure.m4.serialization;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
@@ -34,7 +34,7 @@ public abstract class TestSerializers
             try (Reader reader = writerReader.getReader())
             {
                 byte actual = reader.readByte();
-                Assert.assertEquals(expected, actual);
+                Assertions.assertEquals(expected, actual);
             }
         }
     }
@@ -51,7 +51,7 @@ public abstract class TestSerializers
         try (Reader reader = writerReader.getReader())
         {
             byte[] actual = reader.readBytes(expected.length);
-            Assert.assertArrayEquals(expected, actual);
+            Assertions.assertArrayEquals(expected, actual);
         }
     }
 
@@ -67,7 +67,7 @@ public abstract class TestSerializers
         try (Reader reader = writerReader.getReader())
         {
             byte[] actual = reader.readBytes(3);
-            Assert.assertArrayEquals(new byte[]{Byte.MAX_VALUE, 0, -1}, actual);
+            Assertions.assertArrayEquals(new byte[]{Byte.MAX_VALUE, 0, -1}, actual);
         }
     }
 
@@ -86,7 +86,7 @@ public abstract class TestSerializers
         {
             reader.skipBytes(array1.length);
             byte[] actual = reader.readBytes(array2.length);
-            Assert.assertArrayEquals(array2, actual);
+            Assertions.assertArrayEquals(array2, actual);
         }
     }
 
@@ -102,7 +102,7 @@ public abstract class TestSerializers
         try (Reader reader = writerReader.getReader())
         {
             byte[] actual = reader.readByteArray();
-            Assert.assertArrayEquals(expected, actual);
+            Assertions.assertArrayEquals(expected, actual);
         }
     }
 
@@ -121,7 +121,7 @@ public abstract class TestSerializers
         {
             reader.skipByteArray();
             byte[] actual = reader.readByteArray();
-            Assert.assertArrayEquals(array2, actual);
+            Assertions.assertArrayEquals(array2, actual);
         }
     }
 
@@ -138,7 +138,7 @@ public abstract class TestSerializers
             try (Reader reader = writerReader.getReader())
             {
                 boolean actual = reader.readBoolean();
-                Assert.assertEquals(expected, actual);
+                Assertions.assertEquals(expected, actual);
             }
         }
     }
@@ -158,7 +158,7 @@ public abstract class TestSerializers
             {
                 reader.skipBoolean();
                 boolean actual = reader.readBoolean();
-                Assert.assertEquals(expected, actual);
+                Assertions.assertEquals(expected, actual);
             }
         }
     }
@@ -176,7 +176,7 @@ public abstract class TestSerializers
             try (Reader reader = writerReader.getReader())
             {
                 short actual = reader.readShort();
-                Assert.assertEquals(expected, actual);
+                Assertions.assertEquals(expected, actual);
             }
         }
     }
@@ -197,7 +197,7 @@ public abstract class TestSerializers
             {
                 reader.skipShort();
                 short actual = reader.readShort();
-                Assert.assertEquals(expected, actual);
+                Assertions.assertEquals(expected, actual);
             }
         }
     }
@@ -214,7 +214,7 @@ public abstract class TestSerializers
         try (Reader reader = writerReader.getReader())
         {
             short[] actual = reader.readShortArray();
-            Assert.assertArrayEquals(expected, actual);
+            Assertions.assertArrayEquals(expected, actual);
         }
     }
 
@@ -234,7 +234,7 @@ public abstract class TestSerializers
         {
             reader.skipShortArray();
             short[] actual = reader.readShortArray();
-            Assert.assertArrayEquals(array2, actual);
+            Assertions.assertArrayEquals(array2, actual);
         }
     }
 
@@ -251,7 +251,7 @@ public abstract class TestSerializers
             try (Reader reader = writerReader.getReader())
             {
                 int actual = reader.readInt();
-                Assert.assertEquals(expected, actual);
+                Assertions.assertEquals(expected, actual);
             }
         }
     }
@@ -272,7 +272,7 @@ public abstract class TestSerializers
             {
                 reader.skipInt();
                 int actual = reader.readInt();
-                Assert.assertEquals(expected, actual);
+                Assertions.assertEquals(expected, actual);
             }
         }
     }
@@ -289,7 +289,7 @@ public abstract class TestSerializers
         try (Reader reader = writerReader.getReader())
         {
             int[] actual = reader.readIntArray();
-            Assert.assertArrayEquals(expected, actual);
+            Assertions.assertArrayEquals(expected, actual);
         }
     }
 
@@ -308,7 +308,7 @@ public abstract class TestSerializers
         {
             reader.skipIntArray();
             int[] actual = reader.readIntArray();
-            Assert.assertArrayEquals(array2, actual);
+            Assertions.assertArrayEquals(array2, actual);
         }
     }
 
@@ -325,7 +325,7 @@ public abstract class TestSerializers
             try (Reader reader = writerReader.getReader())
             {
                 long actual = reader.readLong();
-                Assert.assertEquals(expected, actual);
+                Assertions.assertEquals(expected, actual);
             }
         }
     }
@@ -346,7 +346,7 @@ public abstract class TestSerializers
             {
                 reader.skipLong();
                 long actual = reader.readLong();
-                Assert.assertEquals(expected, actual);
+                Assertions.assertEquals(expected, actual);
             }
         }
     }
@@ -363,7 +363,7 @@ public abstract class TestSerializers
         try (Reader reader = writerReader.getReader())
         {
             long[] actual = reader.readLongArray();
-            Assert.assertArrayEquals(expected, actual);
+            Assertions.assertArrayEquals(expected, actual);
         }
     }
 
@@ -382,7 +382,7 @@ public abstract class TestSerializers
         {
             reader.skipLongArray();
             long[] actual = reader.readLongArray();
-            Assert.assertArrayEquals(array2, actual);
+            Assertions.assertArrayEquals(array2, actual);
         }
     }
 
@@ -399,7 +399,7 @@ public abstract class TestSerializers
             try (Reader reader = writerReader.getReader())
             {
                 float actual = reader.readFloat();
-                Assert.assertEquals(Float.floatToRawIntBits(expected), Float.floatToRawIntBits(actual));
+                Assertions.assertEquals(Float.floatToRawIntBits(expected), Float.floatToRawIntBits(actual));
             }
         }
     }
@@ -420,7 +420,7 @@ public abstract class TestSerializers
             {
                 reader.skipFloat();
                 float actual = reader.readFloat();
-                Assert.assertEquals(Float.floatToRawIntBits(expected), Float.floatToRawIntBits(actual));
+                Assertions.assertEquals(Float.floatToRawIntBits(expected), Float.floatToRawIntBits(actual));
             }
         }
     }
@@ -437,7 +437,7 @@ public abstract class TestSerializers
         try (Reader reader = writerReader.getReader())
         {
             float[] actual = reader.readFloatArray();
-            Assert.assertArrayEquals(convertFloatArrayToIntBits(expected), convertFloatArrayToIntBits(actual));
+            Assertions.assertArrayEquals(convertFloatArrayToIntBits(expected), convertFloatArrayToIntBits(actual));
         }
     }
 
@@ -456,7 +456,7 @@ public abstract class TestSerializers
         {
             reader.skipFloatArray();
             float[] actual = reader.readFloatArray();
-            Assert.assertArrayEquals(convertFloatArrayToIntBits(array2), convertFloatArrayToIntBits(actual));
+            Assertions.assertArrayEquals(convertFloatArrayToIntBits(array2), convertFloatArrayToIntBits(actual));
         }
     }
 
@@ -484,7 +484,7 @@ public abstract class TestSerializers
             try (Reader reader = writerReader.getReader())
             {
                 double actual = reader.readDouble();
-                Assert.assertEquals(Double.doubleToRawLongBits(expected), Double.doubleToRawLongBits(actual));
+                Assertions.assertEquals(Double.doubleToRawLongBits(expected), Double.doubleToRawLongBits(actual));
             }
         }
     }
@@ -505,7 +505,7 @@ public abstract class TestSerializers
             {
                 reader.skipDouble();
                 double actual = reader.readDouble();
-                Assert.assertEquals(Double.doubleToRawLongBits(expected), Double.doubleToRawLongBits(actual));
+                Assertions.assertEquals(Double.doubleToRawLongBits(expected), Double.doubleToRawLongBits(actual));
             }
         }
     }
@@ -522,7 +522,7 @@ public abstract class TestSerializers
         try (Reader reader = writerReader.getReader())
         {
             double[] actual = reader.readDoubleArray();
-            Assert.assertArrayEquals(convertDoubleArrayToLongBits(expected), convertDoubleArrayToLongBits(actual));
+            Assertions.assertArrayEquals(convertDoubleArrayToLongBits(expected), convertDoubleArrayToLongBits(actual));
         }
     }
 
@@ -541,7 +541,7 @@ public abstract class TestSerializers
         {
             reader.skipDoubleArray();
             double[] actual = reader.readDoubleArray();
-            Assert.assertArrayEquals(convertDoubleArrayToLongBits(array2), convertDoubleArrayToLongBits(actual));
+            Assertions.assertArrayEquals(convertDoubleArrayToLongBits(array2), convertDoubleArrayToLongBits(actual));
         }
     }
 
@@ -569,7 +569,7 @@ public abstract class TestSerializers
             try (Reader reader = writerReader.getReader())
             {
                 String actual = reader.readString();
-                Assert.assertEquals(expected, actual);
+                Assertions.assertEquals(expected, actual);
             }
         }
     }
@@ -589,7 +589,7 @@ public abstract class TestSerializers
         {
             reader.skipString();
             String actual = reader.readString();
-            Assert.assertEquals(string2, actual);
+            Assertions.assertEquals(string2, actual);
         }
     }
 
@@ -605,7 +605,7 @@ public abstract class TestSerializers
         try (Reader reader = writerReader.getReader())
         {
             String[] actual = reader.readStringArray();
-            Assert.assertArrayEquals(expected, actual);
+            Assertions.assertArrayEquals(expected, actual);
         }
     }
 
@@ -624,7 +624,7 @@ public abstract class TestSerializers
         {
             reader.skipStringArray();
             String[] actual = reader.readStringArray();
-            Assert.assertArrayEquals(array2, actual);
+            Assertions.assertArrayEquals(array2, actual);
         }
     }
 

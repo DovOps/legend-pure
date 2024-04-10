@@ -58,9 +58,8 @@ public class AbstractPropertyUnloaderWalk implements MatchRunner<AbstractPropert
             {
                 matcher.fullMatch(owner, state);
             }
-            else if (owner instanceof Class)
+            else if (owner instanceof Class cls)
             {
-                Class<?> cls = (Class<?>) owner;
                 MutableList<CoreInstance> allProperties = Lists.mutable.<CoreInstance>withAll(cls._properties())
                         .withAll(cls._propertiesFromAssociations())
                         .withAll(cls._qualifiedProperties())
@@ -78,9 +77,8 @@ public class AbstractPropertyUnloaderWalk implements MatchRunner<AbstractPropert
             {
                 matcher.fullMatch(owner, state);
             }
-            else if (owner instanceof Association)
+            else if (owner instanceof Association association)
             {
-                Association association = (Association) owner;
                 MutableList<CoreInstance> allProperties = Lists.mutable.<CoreInstance>withAll(association._properties())
                         .withAll(association._qualifiedProperties())
                         .withAll(association._originalMilestonedProperties());

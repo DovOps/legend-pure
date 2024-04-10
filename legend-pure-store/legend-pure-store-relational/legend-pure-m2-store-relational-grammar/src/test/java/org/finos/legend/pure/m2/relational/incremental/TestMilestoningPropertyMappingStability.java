@@ -18,7 +18,7 @@ import org.finos.legend.pure.m2.relational.AbstractPureRelationalTestWithCoreCom
 import org.finos.legend.pure.m2.relational.MilestoningPropertyMappingTestSourceCodes;
 import org.finos.legend.pure.m3.tests.RuntimeTestScriptBuilder;
 import org.finos.legend.pure.m3.tests.RuntimeVerifier;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class TestMilestoningPropertyMappingStability extends AbstractPureRelationalTestWithCoreCompiled
 {

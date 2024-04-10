@@ -191,14 +191,14 @@ public enum MilestoningStereotypeEnum implements MilestoningStereotype
     private static MilestonePropertyCodeBlock getDatePropertyCodeBlock(String temporalDatePropertyName, SourceInformation sourceInformation)
     {
         String propertyTemplate = MilestoningFunctions.GENERATED_MILESTONING_DATE_STEREOTYPE + " %s: Date[1];\n";
-        String codeBlock = String.format(propertyTemplate, temporalDatePropertyName);
+        String codeBlock = propertyTemplate.formatted(temporalDatePropertyName);
         return new MilestonePropertyCodeBlock(MilestonePropertyHolderType.REGULAR, codeBlock, sourceInformation);
     }
 
     private static MilestonePropertyCodeBlock getMilestoningDatePropertyCodeBlock(String propertyClassName, SourceInformation sourceInformation)
     {
         String propertyTemplate = MilestoningFunctions.GENERATED_MILESTONING_DATE_STEREOTYPE + " " + MilestoningFunctions.MILESTONING + " : %s[0..1];\n";
-        String codeBlock = String.format(propertyTemplate, propertyClassName);
+        String codeBlock = propertyTemplate.formatted(propertyClassName);
         return new MilestonePropertyCodeBlock(MilestonePropertyHolderType.REGULAR, codeBlock, sourceInformation);
     }
 
@@ -222,7 +222,7 @@ public enum MilestoningStereotypeEnum implements MilestoningStereotype
     {
         String functionTemplateWithArg = MilestoningFunctions.GENERATED_MILESTONING_STEREOTYPE + "%s(td:Date[1]){$this.%s->filter(%s| $%s.%s->eq($td))%s } : %s[%s];";
         String temporalDatePropertyName = milestoningStereotype.getTemporalDatePropertyNames().getFirst();
-        String function = String.format(functionTemplateWithArg, milestoningPropertyCodeBlockMetaData.propertyName, milestoningPropertyCodeBlockMetaData.edgepointPropertyName, milestoningPropertyCodeBlockMetaData.varName, milestoningPropertyCodeBlockMetaData.varName, temporalDatePropertyName, milestoningPropertyCodeBlockMetaData.multiplicityFunctionCall, milestoningPropertyCodeBlockMetaData.returnType, milestoningPropertyCodeBlockMetaData.possiblyOverridenMultiplicity);
+        String function = functionTemplateWithArg.formatted(milestoningPropertyCodeBlockMetaData.propertyName, milestoningPropertyCodeBlockMetaData.edgepointPropertyName, milestoningPropertyCodeBlockMetaData.varName, milestoningPropertyCodeBlockMetaData.varName, temporalDatePropertyName, milestoningPropertyCodeBlockMetaData.multiplicityFunctionCall, milestoningPropertyCodeBlockMetaData.returnType, milestoningPropertyCodeBlockMetaData.possiblyOverridenMultiplicity);
         return new MilestonePropertyCodeBlock(MilestonePropertyHolderType.QUALIFIED, function, milestoningPropertyCodeBlockMetaData.property, milestoningPropertyCodeBlockMetaData.propertySourceInformation, milestoningPropertyCodeBlockMetaData.propertyGenericTypeSourceInformation);
     }
 
@@ -230,7 +230,7 @@ public enum MilestoningStereotypeEnum implements MilestoningStereotype
     {
         String functionTemplateWithArg = MilestoningFunctions.GENERATED_MILESTONING_STEREOTYPE + "%s(){$this.%s->filter(%s| $%s.%s->eq($this.%s))%s } : %s[%s];";
         String temporalDatePropertyName = milestoningStereotype.getTemporalDatePropertyNames().getFirst();
-        String function = String.format(functionTemplateWithArg, milestoningPropertyCodeBlockMetaData.propertyName, milestoningPropertyCodeBlockMetaData.edgepointPropertyName, milestoningPropertyCodeBlockMetaData.varName, milestoningPropertyCodeBlockMetaData.varName, temporalDatePropertyName, temporalDatePropertyName, milestoningPropertyCodeBlockMetaData.multiplicityFunctionCall, milestoningPropertyCodeBlockMetaData.returnType, milestoningPropertyCodeBlockMetaData.possiblyOverridenMultiplicity);
+        String function = functionTemplateWithArg.formatted(milestoningPropertyCodeBlockMetaData.propertyName, milestoningPropertyCodeBlockMetaData.edgepointPropertyName, milestoningPropertyCodeBlockMetaData.varName, milestoningPropertyCodeBlockMetaData.varName, temporalDatePropertyName, temporalDatePropertyName, milestoningPropertyCodeBlockMetaData.multiplicityFunctionCall, milestoningPropertyCodeBlockMetaData.returnType, milestoningPropertyCodeBlockMetaData.possiblyOverridenMultiplicity);
         return new MilestonePropertyCodeBlock(MilestonePropertyHolderType.QUALIFIED, function, milestoningPropertyCodeBlockMetaData.property, milestoningPropertyCodeBlockMetaData.propertySourceInformation, milestoningPropertyCodeBlockMetaData.propertyGenericTypeSourceInformation);
     }
 
@@ -238,14 +238,14 @@ public enum MilestoningStereotypeEnum implements MilestoningStereotype
     {
         String functionTemplate = MilestoningFunctions.GENERATED_MILESTONING_STEREOTYPE + "%s(start:Date[1], end:Date[1]){$this.%s->filter(%s| $%s.%s->eq($start))%s } : %s[%s];";
         String temporalDatePropertyName = milestoningStereotype.getTemporalDatePropertyNames().getFirst();
-        String function = String.format(functionTemplate, milestoningPropertyCodeBlockMetaData.rangePropertyName, milestoningPropertyCodeBlockMetaData.edgepointPropertyName, milestoningPropertyCodeBlockMetaData.varName, milestoningPropertyCodeBlockMetaData.varName, temporalDatePropertyName, milestoningPropertyCodeBlockMetaData.multiplicityFunctionCall, milestoningPropertyCodeBlockMetaData.returnType, milestoningPropertyCodeBlockMetaData.possiblyOverridenMultiplicity);
+        String function = functionTemplate.formatted(milestoningPropertyCodeBlockMetaData.rangePropertyName, milestoningPropertyCodeBlockMetaData.edgepointPropertyName, milestoningPropertyCodeBlockMetaData.varName, milestoningPropertyCodeBlockMetaData.varName, temporalDatePropertyName, milestoningPropertyCodeBlockMetaData.multiplicityFunctionCall, milestoningPropertyCodeBlockMetaData.returnType, milestoningPropertyCodeBlockMetaData.possiblyOverridenMultiplicity);
         return new MilestonePropertyCodeBlock(MilestonePropertyHolderType.QUALIFIED, function, milestoningPropertyCodeBlockMetaData.property, milestoningPropertyCodeBlockMetaData.propertySourceInformation, milestoningPropertyCodeBlockMetaData.propertyGenericTypeSourceInformation);
     }
 
     private static MilestonePropertyCodeBlock getBiTemporalMilestoningPropertyCodeBlockNoParams(MilestoningPropertyCodeBlockMetaData milestoningPropertyCodeBlockMetaData)
     {
         String functionTemplateWithArg = MilestoningFunctions.GENERATED_MILESTONING_STEREOTYPE + "%s(){$this.%s->filter(%s| $%s.processingDate->eq($this.processingDate) && $%s.businessDate->eq($this.businessDate) )%s } : %s[%s];";
-        String function = String.format(functionTemplateWithArg, milestoningPropertyCodeBlockMetaData.propertyName, milestoningPropertyCodeBlockMetaData.edgepointPropertyName, milestoningPropertyCodeBlockMetaData.varName, milestoningPropertyCodeBlockMetaData.varName, milestoningPropertyCodeBlockMetaData.varName, milestoningPropertyCodeBlockMetaData.multiplicityFunctionCall, milestoningPropertyCodeBlockMetaData.returnType, milestoningPropertyCodeBlockMetaData.possiblyOverridenMultiplicity);
+        String function = functionTemplateWithArg.formatted(milestoningPropertyCodeBlockMetaData.propertyName, milestoningPropertyCodeBlockMetaData.edgepointPropertyName, milestoningPropertyCodeBlockMetaData.varName, milestoningPropertyCodeBlockMetaData.varName, milestoningPropertyCodeBlockMetaData.varName, milestoningPropertyCodeBlockMetaData.multiplicityFunctionCall, milestoningPropertyCodeBlockMetaData.returnType, milestoningPropertyCodeBlockMetaData.possiblyOverridenMultiplicity);
         return new MilestonePropertyCodeBlock(MilestonePropertyHolderType.QUALIFIED, function, milestoningPropertyCodeBlockMetaData.property, milestoningPropertyCodeBlockMetaData.propertySourceInformation, milestoningPropertyCodeBlockMetaData.propertyGenericTypeSourceInformation);
     }
 
@@ -254,14 +254,14 @@ public enum MilestoningStereotypeEnum implements MilestoningStereotype
         String sourceProcessingDate = availableTemporalDate == processingtemporal ? "$this.processingDate" : "$td";
         String sourceBusinessDate = availableTemporalDate == businesstemporal ? "$this.businessDate" : "$td";
         String functionTemplateWithArg = MilestoningFunctions.GENERATED_MILESTONING_STEREOTYPE + "%s(td:Date[1]){$this.%s->filter(%s| $%s.processingDate->eq(%s) && $%s.businessDate->eq(%s) )%s } : %s[%s];";
-        String function = String.format(functionTemplateWithArg, milestoningPropertyCodeBlockMetaData.propertyName, milestoningPropertyCodeBlockMetaData.edgepointPropertyName, milestoningPropertyCodeBlockMetaData.varName, milestoningPropertyCodeBlockMetaData.varName, sourceProcessingDate, milestoningPropertyCodeBlockMetaData.varName, sourceBusinessDate, milestoningPropertyCodeBlockMetaData.multiplicityFunctionCall, milestoningPropertyCodeBlockMetaData.returnType, milestoningPropertyCodeBlockMetaData.possiblyOverridenMultiplicity);
+        String function = functionTemplateWithArg.formatted(milestoningPropertyCodeBlockMetaData.propertyName, milestoningPropertyCodeBlockMetaData.edgepointPropertyName, milestoningPropertyCodeBlockMetaData.varName, milestoningPropertyCodeBlockMetaData.varName, sourceProcessingDate, milestoningPropertyCodeBlockMetaData.varName, sourceBusinessDate, milestoningPropertyCodeBlockMetaData.multiplicityFunctionCall, milestoningPropertyCodeBlockMetaData.returnType, milestoningPropertyCodeBlockMetaData.possiblyOverridenMultiplicity);
         return new MilestonePropertyCodeBlock(MilestonePropertyHolderType.QUALIFIED, function, milestoningPropertyCodeBlockMetaData.property, milestoningPropertyCodeBlockMetaData.propertySourceInformation, milestoningPropertyCodeBlockMetaData.propertyGenericTypeSourceInformation);
     }
 
     private static MilestonePropertyCodeBlock getBiTemporalMilestoningPropertyCodeBlockWithParams(MilestoningPropertyCodeBlockMetaData milestoningPropertyCodeBlockMetaData)
     {
         String functionTemplateWithArg = MilestoningFunctions.GENERATED_MILESTONING_STEREOTYPE + "%s(pd:Date[1], bd:Date[1]){$this.%s->filter(%s| $%s.processingDate->eq($pd) && $%s.businessDate->eq($bd) )%s } : %s[%s];";
-        String function = String.format(functionTemplateWithArg, milestoningPropertyCodeBlockMetaData.propertyName, milestoningPropertyCodeBlockMetaData.edgepointPropertyName, milestoningPropertyCodeBlockMetaData.varName, milestoningPropertyCodeBlockMetaData.varName, milestoningPropertyCodeBlockMetaData.varName, milestoningPropertyCodeBlockMetaData.multiplicityFunctionCall, milestoningPropertyCodeBlockMetaData.returnType, milestoningPropertyCodeBlockMetaData.possiblyOverridenMultiplicity);
+        String function = functionTemplateWithArg.formatted(milestoningPropertyCodeBlockMetaData.propertyName, milestoningPropertyCodeBlockMetaData.edgepointPropertyName, milestoningPropertyCodeBlockMetaData.varName, milestoningPropertyCodeBlockMetaData.varName, milestoningPropertyCodeBlockMetaData.varName, milestoningPropertyCodeBlockMetaData.multiplicityFunctionCall, milestoningPropertyCodeBlockMetaData.returnType, milestoningPropertyCodeBlockMetaData.possiblyOverridenMultiplicity);
         return new MilestonePropertyCodeBlock(MilestonePropertyHolderType.QUALIFIED, function, milestoningPropertyCodeBlockMetaData.property, milestoningPropertyCodeBlockMetaData.propertySourceInformation, milestoningPropertyCodeBlockMetaData.propertyGenericTypeSourceInformation);
     }
 }

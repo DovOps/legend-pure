@@ -47,7 +47,7 @@ public class CodeRepositorySet
             return true;
         }
 
-        return (other instanceof CodeRepositorySet) && this.repositoriesByName.equals(((CodeRepositorySet) other).repositoriesByName);
+        return (other instanceof CodeRepositorySet crs) && this.repositoriesByName.equals(crs.repositoriesByName);
     }
 
     @Override
@@ -136,9 +136,9 @@ public class CodeRepositorySet
             CodeRepository repository = deque.removeLast();
             if (resolved.put(repository.getName(), repository) == null)
             {
-                if (repository instanceof GenericCodeRepository)
+                if (repository instanceof GenericCodeRepository codeRepository)
                 {
-                    ((GenericCodeRepository) repository).getDependencies().collect(this.repositoriesByName::get, deque);
+                    codeRepository.getDependencies().collect(this.repositoriesByName::get, deque);
                 }
                 else
                 {
@@ -253,9 +253,9 @@ public class CodeRepositorySet
             // validate that all dependencies are present
             this.repositories.forEachValue(r ->
             {
-                if (r instanceof GenericCodeRepository)
+                if (r instanceof GenericCodeRepository repository)
                 {
-                    MutableList<String> missingDependencies = ((GenericCodeRepository) r).getDependencies().reject(this.repositories::containsKey, Lists.mutable.empty());
+                    MutableList<String> missingDependencies = repository.getDependencies().reject(this.repositories::containsKey, Lists.mutable.empty());
                     if (missingDependencies.notEmpty())
                     {
                         StringBuilder builder = new StringBuilder("The ").append((missingDependencies.size() == 1) ? "dependency" : "dependencies");

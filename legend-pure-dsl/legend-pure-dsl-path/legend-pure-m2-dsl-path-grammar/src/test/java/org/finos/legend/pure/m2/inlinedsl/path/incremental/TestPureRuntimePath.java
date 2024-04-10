@@ -18,19 +18,19 @@ import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.tuple.Tuples;
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
 import org.finos.legend.pure.m3.tests.RuntimeVerifier;
-import org.junit.After;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestPureRuntimePath extends AbstractPureTestWithCoreCompiled
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime();
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("sourceId.pure");
@@ -72,23 +72,25 @@ public class TestPureRuntimePath extends AbstractPureTestWithCoreCompiled
     @Test
     public void testPureRuntimeWithQualifiedPropertyWithEnum()
     {
-        String source = "Class EntityWithLocations\n" +
-                "{\n" +
-                "    locations : Location[*];\n" +
-                "    locationsByType(types:GeographicEntityType[*])\n" +
-                "    {\n" +
-                "        $this.locations->filter(l | $types->filter(type | is($l.type, $type))->isNotEmpty())\n" +
-                "    }:Location[*];\n" +
-                "}\n" +
-                "Class Location\n" +
-                "{\n" +
-                "    type : GeographicEntityType[1];\n" +
-                "}\n" +
-                "Enum GeographicEntityType\n" +
-                "{\n" +
-                "    CITY,\n" +
-                "    COUNTRY\n" +
-                "}";
+        String source = """
+                Class EntityWithLocations
+                {
+                    locations : Location[*];
+                    locationsByType(types:GeographicEntityType[*])
+                    {
+                        $this.locations->filter(l | $types->filter(type | is($l.type, $type))->isNotEmpty())
+                    }:Location[*];
+                }
+                Class Location
+                {
+                    type : GeographicEntityType[1];
+                }
+                Enum GeographicEntityType
+                {
+                    CITY,
+                    COUNTRY
+                }\
+                """;
         String sourceId = "sourceId.pure";
         this.runtime.createInMemorySource(sourceId, source);
         this.runtime.createInMemorySource("userId.pure", "function test():Boolean[1]{print(#/EntityWithLocations/locationsByType(GeographicEntityType.CITY)#,0);true;}");
@@ -101,24 +103,28 @@ public class TestPureRuntimePath extends AbstractPureTestWithCoreCompiled
     @Test
     public void testPureRuntimeWithQualifiedPropertyWithEnumCompileError()
     {
-        String source = "Class EntityWithLocations\n" +
-                "{\n" +
-                "    locations : Location[*];\n" +
-                "    locationsByType(types:GeographicEntityType[*])\n" +
-                "    {\n" +
-                "        $this.locations->filter(l | $types->filter(type | is($l.type, $type))->isNotEmpty())\n" +
-                "    }:Location[*];\n" +
-                "}\n" +
-                "Class Location\n" +
-                "{\n" +
-                "    type : GeographicEntityType[1];\n" +
-                "}\n";
+        String source = """
+                Class EntityWithLocations
+                {
+                    locations : Location[*];
+                    locationsByType(types:GeographicEntityType[*])
+                    {
+                        $this.locations->filter(l | $types->filter(type | is($l.type, $type))->isNotEmpty())
+                    }:Location[*];
+                }
+                Class Location
+                {
+                    type : GeographicEntityType[1];
+                }
+                """;
 
-        String enumSource = "Enum GeographicEntityType\n" +
-                "{\n" +
-                "    CITY,\n" +
-                "    COUNTRY\n" +
-                "}";
+        String enumSource = """
+                Enum GeographicEntityType
+                {
+                    CITY,
+                    COUNTRY
+                }\
+                """;
         String sourceId = "sourceId.pure";
         String enumSourceId = "enumSourceId.pure";
         this.runtime.createInMemorySource(sourceId, source);
@@ -126,11 +132,13 @@ public class TestPureRuntimePath extends AbstractPureTestWithCoreCompiled
         this.runtime.createInMemorySource("userId.pure", "function test():Boolean[1]{print(#/EntityWithLocations/locationsByType(GeographicEntityType.CITY)#,0);true;}");
         this.runtime.compile();
 
-        String enumSourceChange = "Enum GeographicEntityType\n" +
-                "{\n" +
-                "    CTIY,\n" +
-                "    COUNTRY\n" +
-                "}";
+        String enumSourceChange = """
+                Enum GeographicEntityType
+                {
+                    CTIY,
+                    COUNTRY
+                }\
+                """;
 
         RuntimeVerifier.replaceWithCompileErrorCompileAndReloadMultipleTimesIsStable(this.runtime,
                 Lists.fixedSize.of(Tuples.pair(enumSourceId, enumSourceChange)), "The enum value 'CITY' can't be found in the enumeration GeographicEntityType", "userId.pure", 1, 72);
@@ -140,15 +148,19 @@ public class TestPureRuntimePath extends AbstractPureTestWithCoreCompiled
     public void testPathUnbindStabilityForMilestonedQualifiedProperties()
     {
         String sourceA = "Class <<temporal.businesstemporal>> A{}";
-        String sourceB = "Class <<temporal.businesstemporal>> B{bAttr:String[0..1];}\n" +
-                "Association AB{a:A[0..1]; b:B[0..1];}";
+        String sourceB = """
+                Class <<temporal.businesstemporal>> B{bAttr:String[0..1];}
+                Association AB{a:A[0..1]; b:B[0..1];}\
+                """;
 
-        String function = "function go():Any[*]\n" +
-                "{" +
-                "  {|A.all(%2015)->filter(a|!$a->isEmpty())->project([#/A/b/bAttr#])}" +
-                "}" +
-                "function project<K>(set:K[*], functions:Function<{K[1]->Any[*]}>[*]):Any[0..1]\n" +
-                "{[]}\n";
+        String function = """
+                function go():Any[*]
+                {\
+                  {|A.all(%2015)->filter(a|!$a->isEmpty())->project([#/A/b/bAttr#])}\
+                }\
+                function project<K>(set:K[*], functions:Function<{K[1]->Any[*]}>[*]):Any[0..1]
+                {[]}
+                """;
 
         String sourceIdB = "sourceIdB.pure";
         this.runtime.createInMemorySource("sourceIdA.pure", sourceA);

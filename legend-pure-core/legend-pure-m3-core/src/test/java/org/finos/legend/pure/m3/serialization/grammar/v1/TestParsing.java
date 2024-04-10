@@ -23,21 +23,21 @@ import org.finos.legend.pure.m3.navigation.multiplicity.Multiplicity;
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiledPlatform;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
 import org.finos.legend.pure.m4.serialization.grammar.antlr.PureParserException;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestParsing extends AbstractPureTestWithCoreCompiledPlatform
 {
 
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getExtra());
     }
 
-    @After
+    @AfterEach
     public void clearRuntime()
     {
         runtime.delete("fromString.pure");
@@ -46,55 +46,61 @@ public class TestParsing extends AbstractPureTestWithCoreCompiledPlatform
     @Test
     public void parsingEOFError()
     {
-        PureParserException e = Assert.assertThrows(PureParserException.class, () -> compileTestSource(
+        PureParserException e = Assertions.assertThrows(PureParserException.class, () -> compileTestSource(
                 "fromString.pure",
-                "function myAdd(a:String[1], b:String[1]):String[1]\n" +
-                        "{\n" +
-                        "   'aa';\n" +
-                        "} helloeoe"));
+                """
+                function myAdd(a:String[1], b:String[1]):String[1]
+                {
+                   'aa';
+                } helloeoe\
+                """));
         assertPureException(PureParserException.class, "expected: one of {<EOF>, '^', 'native', 'function', 'Class', 'Association', 'Profile', 'Enum', 'Measure'} found: 'helloeoe'", "fromString.pure", 4, 3, e);
     }
 
     @Test
     public void testParseEmptyList()
     {
-        compileTestSource("fromString.pure", "function go():Any[*]\n" +
-                "{\n" +
-                "   []\n" +
-                "}\n");
+        compileTestSource("fromString.pure", """
+                function go():Any[*]
+                {
+                   []
+                }
+                """);
         CoreInstance function = runtime.getFunction("go():Any[*]");
-        Assert.assertNotNull(function);
+        Assertions.assertNotNull(function);
         ListIterable<? extends CoreInstance> expressions = Instance.getValueForMetaPropertyToManyResolved(function, M3Properties.expressionSequence, processorSupport);
         Verify.assertSize(1, expressions);
         CoreInstance expression = expressions.get(0);
-        Assert.assertTrue(Instance.instanceOf(expression, M3Paths.InstanceValue, processorSupport));
+        Assertions.assertTrue(Instance.instanceOf(expression, M3Paths.InstanceValue, processorSupport));
 
         Verify.assertEmpty(Instance.getValueForMetaPropertyToManyResolved(expression, M3Properties.values, processorSupport));
 
         CoreInstance genericType = Instance.getValueForMetaPropertyToOneResolved(expression, M3Properties.genericType, processorSupport);
-        Assert.assertSame(processorSupport.type_BottomType(), Instance.getValueForMetaPropertyToOneResolved(genericType, M3Properties.rawType, processorSupport));
+        Assertions.assertSame(processorSupport.type_BottomType(), Instance.getValueForMetaPropertyToOneResolved(genericType, M3Properties.rawType, processorSupport));
         Verify.assertEmpty(Instance.getValueForMetaPropertyToManyResolved(genericType, M3Properties.typeArguments, processorSupport));
 
         CoreInstance multiplicity = Instance.getValueForMetaPropertyToOneResolved(expression, M3Properties.multiplicity, processorSupport);
-        Assert.assertTrue(Multiplicity.isMultiplicityConcrete(multiplicity));
-        Assert.assertEquals(0, Multiplicity.multiplicityLowerBoundToInt(multiplicity));
-        Assert.assertEquals(0, Multiplicity.multiplicityUpperBoundToInt(multiplicity));
+        Assertions.assertTrue(Multiplicity.isMultiplicityConcrete(multiplicity));
+        Assertions.assertEquals(0, Multiplicity.multiplicityLowerBoundToInt(multiplicity));
+        Assertions.assertEquals(0, Multiplicity.multiplicityUpperBoundToInt(multiplicity));
     }
 
     @Test
     public void testPackageIntegrity()
     {
-        PureParserException e = Assert.assertThrows(PureParserException.class, () -> compileTestSource(
+        PureParserException e = Assertions.assertThrows(PureParserException.class, () -> compileTestSource(
                 "fromString.pure",
-                "Class test::TestClass\n" +
-                        "{\n" +
-                        "   prop:String[1];\n" +
-                        "}\n" +
-                        "\n" +
-                        "function test::TestClass::func(a:String[1], b:String[1]):String[1]\n" +
-                        "{\n" +
-                        "   $a + $b\n" +
-                        "}"));
+                """
+                Class test::TestClass
+                {
+                   prop:String[1];
+                }
+                
+                function test::TestClass::func(a:String[1], b:String[1]):String[1]
+                {
+                   $a + $b
+                }\
+                """));
         assertPureException(PureParserException.class, "('test::TestClass' is a Class, should be a Package) in\n'test::TestClass'", 6, 14, e);
     }
 }

@@ -15,12 +15,12 @@
 package org.finos.legend.pure.m3.tests.function.base.meta;
 
 import org.finos.legend.pure.m3.tests.function.base.PureExpressionTest;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 public abstract class AbstractTestId extends PureExpressionTest
 {
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("fromString.pure");
@@ -31,10 +31,12 @@ public abstract class AbstractTestId extends PureExpressionTest
     public void testBasic()
     {
         compileTestSource("fromString.pure",
-                "function test():Boolean[1]\n" +
-                        "{\n" +
-                        "   assert(!(1->id()->isEmpty()), |'');\n" +
-                        "}\n");
+                """
+                function test():Boolean[1]
+                {
+                   assert(!(1->id()->isEmpty()), |'');
+                }
+                """);
         this.execute("test():Boolean[1]");
     }
 
@@ -42,10 +44,12 @@ public abstract class AbstractTestId extends PureExpressionTest
     public void testEval()
     {
         compileTestSource("fromString.pure",
-                "function test():Boolean[1]\n" +
-                        "{\n" +
-                        "   assert(!id_Any_1__String_1_->eval(1)->isEmpty(),|'');\n" +
-                        "}\n");
+                """
+                function test():Boolean[1]
+                {
+                   assert(!id_Any_1__String_1_->eval(1)->isEmpty(),|'');
+                }
+                """);
         this.execute("test():Boolean[1]");
     }
 }

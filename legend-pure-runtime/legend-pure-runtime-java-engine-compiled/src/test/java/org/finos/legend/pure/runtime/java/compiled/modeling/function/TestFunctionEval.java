@@ -28,21 +28,17 @@ import org.finos.legend.pure.m3.tools.test.ToFix;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
 import org.finos.legend.pure.runtime.java.compiled.execution.FunctionExecutionCompiledBuilder;
 import org.finos.legend.pure.runtime.java.compiled.factory.JavaModelFactoryRegistryLoader;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.*;
 
 public class TestFunctionEval extends AbstractPureTestWithCoreCompiled
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getFunctionExecution(), new CompositeCodeStorage(new ClassLoaderCodeStorage(getCodeRepositories())), JavaModelFactoryRegistryLoader.loader());
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("/test/testSource1.pure");
@@ -50,30 +46,32 @@ public class TestFunctionEval extends AbstractPureTestWithCoreCompiled
     }
 
     @Test
-    @Ignore
+    @Disabled
     @ToFix
     public void testFunctionEvalWithUnusedResult()
     {
         compileTestSource(
                 "/test/testSource1.pure",
-                "import test::*;\n" +
-                        "\n" +
-                        "function test::inspect<T|m>(values:T[m], fn:Function<{T[m]->Any[*]}>[1]):T[m]\n" +
-                        "{\n" +
-                        "    $fn->eval($values);\n" +
-                        "    $values;\n" +
-                        "}\n" +
-                        "\n" +
-                        "function test::test():Any[*]\n" +
-                        "{\n" +
-                        "  inspect([1, 2, 3, 4], v | $v->map(i | $i->toString())->joinStrings('[', ', ', ']\\n'))\n" +
-                        "}\n");
+                """
+                import test::*;
+                
+                function test::inspect<T|m>(values:T[m], fn:Function<{T[m]->Any[*]}>[1]):T[m]
+                {
+                    $fn->eval($values);
+                    $values;
+                }
+                
+                function test::test():Any[*]
+                {
+                  inspect([1, 2, 3, 4], v | $v->map(i | $i->toString())->joinStrings('[', ', ', ']\\n'))
+                }
+                """);
         CoreInstance test = runtime.getFunction("test::test():Any[*]");
-        Assert.assertNotNull(test);
+        Assertions.assertNotNull(test);
         CoreInstance result = functionExecution.start(test, Lists.immutable.empty());
-        Assert.assertNotNull(result);
-        Assert.assertTrue(result instanceof InstanceValue);
-        Assert.assertEquals(Lists.fixedSize.with(1L, 2L, 3L, 4L), ((InstanceValue) result)._values());
+        Assertions.assertNotNull(result);
+        Assertions.assertTrue(result instanceof InstanceValue);
+        Assertions.assertEquals(Lists.fixedSize.with(1L, 2L, 3L, 4L), ((InstanceValue) result)._values());
     }
 
     protected static FunctionExecution getFunctionExecution()

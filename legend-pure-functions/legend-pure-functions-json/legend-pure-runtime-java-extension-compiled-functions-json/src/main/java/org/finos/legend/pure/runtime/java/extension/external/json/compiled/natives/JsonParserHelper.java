@@ -235,9 +235,9 @@ public class JsonParserHelper
         catch (InvocationTargetException e)
         {
             Throwable targetException = e.getTargetException();
-            if (targetException instanceof RuntimeException)
+            if (targetException instanceof RuntimeException exception)
             {
-                throw (RuntimeException) targetException;
+                throw exception;
             }
             throw new RuntimeException("Error calling fromJSON() method", e);
         }
@@ -269,9 +269,9 @@ public class JsonParserHelper
         {
             return null;
         }
-        if (value instanceof String)
+        if (value instanceof String string)
         {
-            return (String) value;
+            return string;
         }
         return value.toString();
     }
@@ -282,9 +282,9 @@ public class JsonParserHelper
         {
             return null;
         }
-        if (value instanceof Integer)
+        if (value instanceof Integer integer)
         {
-            return (Integer) value;
+            return integer;
         }
         return Integer.parseInt(value.toString());
     }
@@ -296,9 +296,9 @@ public class JsonParserHelper
             return null;
         }
 
-        if (value instanceof Long)
+        if (value instanceof Long long1)
         {
-            return (Long) value;
+            return long1;
         }
         return Long.parseLong(value.toString());
     }
@@ -310,9 +310,9 @@ public class JsonParserHelper
         {
             return null;
         }
-        if (value instanceof Number)
+        if (value instanceof Number number)
         {
-            return ((Number) value).doubleValue();
+            return number.doubleValue();
         }
         return Double.parseDouble(value.toString());
     }
@@ -323,9 +323,9 @@ public class JsonParserHelper
         {
             return null;
         }
-        if (value instanceof Boolean)
+        if (value instanceof Boolean boolean1)
         {
-            return (Boolean) value;
+            return boolean1;
         }
         return Boolean.valueOf(value.toString());
     }

@@ -41,17 +41,17 @@ public class PropertyOwnerProcessor implements MatchRunner<PropertyOwner>
     {
         MutableList<AbstractProperty> propertiesProperties = FastList.newList();
 
-        if (propertyOwner instanceof Class)
+        if (propertyOwner instanceof Class class1)
         {
-            propertiesProperties.addAllIterable(((Class)propertyOwner)._properties());
-            propertiesProperties.addAllIterable(((Class)propertyOwner)._qualifiedProperties());
-            propertiesProperties.addAllIterable(((Class)propertyOwner)._originalMilestonedProperties());
+            propertiesProperties.addAllIterable(class1._properties());
+            propertiesProperties.addAllIterable(class1._qualifiedProperties());
+            propertiesProperties.addAllIterable(class1._originalMilestonedProperties());
         }
-        else if (propertyOwner instanceof Association)
+        else if (propertyOwner instanceof Association association)
         {
-            propertiesProperties.addAllIterable(((Association)propertyOwner)._properties());
-            propertiesProperties.addAllIterable(((Association)propertyOwner)._qualifiedProperties());
-            propertiesProperties.addAllIterable(((Association)propertyOwner)._originalMilestonedProperties());
+            propertiesProperties.addAllIterable(association._properties());
+            propertiesProperties.addAllIterable(association._qualifiedProperties());
+            propertiesProperties.addAllIterable(association._originalMilestonedProperties());
         }
 
         for (AbstractProperty property : propertiesProperties)

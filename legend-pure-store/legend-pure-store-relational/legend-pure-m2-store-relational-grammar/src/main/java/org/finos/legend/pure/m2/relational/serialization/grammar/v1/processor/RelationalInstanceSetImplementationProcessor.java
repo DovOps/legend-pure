@@ -75,13 +75,13 @@ public class RelationalInstanceSetImplementationProcessor extends Processor<Root
         @Override
         public RichIterable<RelationalOperationElement> valueOf(PropertyMapping propertyMapping)
         {
-            if (propertyMapping instanceof RelationalPropertyMapping)
+            if (propertyMapping instanceof RelationalPropertyMapping mapping)
             {
-                return FastList.newListWith(((RelationalPropertyMapping)propertyMapping)._relationalOperationElement());
+                return FastList.newListWith(mapping._relationalOperationElement());
             }
-            else if (propertyMapping instanceof EmbeddedRelationalInstanceSetImplementation)
+            else if (propertyMapping instanceof EmbeddedRelationalInstanceSetImplementation implementation)
             {
-                return ((EmbeddedRelationalInstanceSetImplementation)propertyMapping)._propertyMappings().flatCollect(PROPERTY_MAPPING_TO_RELATIONAL_OPERATION_ELEMENT_FN);
+                return implementation._propertyMappings().flatCollect(PROPERTY_MAPPING_TO_RELATIONAL_OPERATION_ELEMENT_FN);
             }
             else
             {
@@ -96,9 +96,9 @@ public class RelationalInstanceSetImplementationProcessor extends Processor<Root
         @Override
         public RelationalOperationElement valueOf(RelationalOperationElement roe)
         {
-            if (roe instanceof TableAliasColumn)
+            if (roe instanceof TableAliasColumn column)
             {
-                return ((TableAliasColumn)roe)._column();
+                return column._column();
             }
             return roe;
         }
@@ -240,13 +240,13 @@ public class RelationalInstanceSetImplementationProcessor extends Processor<Root
             final TableAlias finalMainTable = mainTableAlias;
             DatabaseProcessor.processTable(relation, matcher, state, processorSupport);
             RichIterable<? extends Column> columns = FastList.newList();
-            if (relation instanceof Table)
+            if (relation instanceof Table table)
             {
-                columns = ((Table)relation)._primaryKey();
+                columns = table._primaryKey();
             }
-            else if (relation instanceof View)
+            else if (relation instanceof View view)
             {
-                columns = ((View)relation)._primaryKey();
+                columns = view._primaryKey();
             }
             RichIterable<TableAliasColumn> primaryKey = columns.collect(new Function<Column, TableAliasColumn>()
             {
@@ -308,9 +308,9 @@ public class RelationalInstanceSetImplementationProcessor extends Processor<Root
 
     public static void populateReferenceUsagesForUserDefinedPrimaryKey(CoreInstance implementation, ModelRepository repository, ProcessorSupport processorSupport)
     {
-        if (implementation instanceof RelationalInstanceSetImplementation)
+        if (implementation instanceof RelationalInstanceSetImplementation setImplementation)
         {
-            for (RelationalOperationElement primaryKey : ((RelationalInstanceSetImplementation)implementation)._primaryKey())
+            for (RelationalOperationElement primaryKey : setImplementation._primaryKey())
             {
                 RelationalOperationElementProcessor.populateColumnExpressionReferenceUsages(primaryKey, repository, processorSupport);
             }
@@ -327,9 +327,9 @@ public class RelationalInstanceSetImplementationProcessor extends Processor<Root
     {
         Mapping parentMapping = (Mapping)ImportStub.withImportStubByPass(implementation._parentCoreInstance(), processorSupport);
         SetImplementation superMapping = org.finos.legend.pure.m2.dsl.mapping.Mapping.getClassMappingById(parentMapping, implementation._superSetImplementationId(), processorSupport);
-        if (superMapping instanceof RootRelationalInstanceSetImplementation)
+        if (superMapping instanceof RootRelationalInstanceSetImplementation setImplementation)
         {
-            return (RootRelationalInstanceSetImplementation)superMapping;
+            return setImplementation;
         }
         throw new PureCompilationException(implementation.getSourceInformation(), "Invalid superMapping for mapping [" + implementation._id() + "]");
     }

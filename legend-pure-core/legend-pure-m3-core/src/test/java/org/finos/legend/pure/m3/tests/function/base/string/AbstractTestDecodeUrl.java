@@ -15,7 +15,7 @@
 package org.finos.legend.pure.m3.tests.function.base.string;
 
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public abstract class AbstractTestDecodeUrl extends AbstractPureTestWithCoreCompiled
 {
@@ -23,10 +23,12 @@ public abstract class AbstractTestDecodeUrl extends AbstractPureTestWithCoreComp
     public void testBasicUrlEncoding()
     {
         compileTestSource("fromString.pure",
-                "function test():Boolean[1]\n" +
-                        "{\n" +
-                        "   assert('abc,xyz % +' == 'abc%2Cxyz+%25+%2B'->decodeUrl(), | '');\n" +
-                        "}\n");
+                """
+                function test():Boolean[1]
+                {
+                   assert('abc,xyz % +' == 'abc%2Cxyz+%25+%2B'->decodeUrl(), | '');
+                }
+                """);
         this.execute("test():Boolean[1]");
     }
 
@@ -34,10 +36,12 @@ public abstract class AbstractTestDecodeUrl extends AbstractPureTestWithCoreComp
     public void testUrlEncodingWithNonDefaultCharset()
     {
         compileTestSource("fromString.pure",
-                "function test():Boolean[1]\n" +
-                        "{\n" +
-                        "   assert('abc,xyz % +' == 'abc%2Cxyz+%25+%2B'->decodeUrl('ascii'), | '');\n" +
-                        "}\n");
+                """
+                function test():Boolean[1]
+                {
+                   assert('abc,xyz % +' == 'abc%2Cxyz+%25+%2B'->decodeUrl('ascii'), | '');
+                }
+                """);
         this.execute("test():Boolean[1]");
     }
 }

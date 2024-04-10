@@ -391,7 +391,7 @@ public class ProcessorState extends MatcherState
         @Override
         public void startProcessing(CoreInstance instance)
         {
-            this.message.setMessage(String.format("Binding (%,d)", ++this.count));
+            this.message.setMessage("Binding (%,d)".formatted(++this.count));
         }
     }
 }

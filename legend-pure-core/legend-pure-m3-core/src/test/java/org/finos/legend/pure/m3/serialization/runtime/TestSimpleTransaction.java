@@ -18,20 +18,20 @@ import org.finos.legend.pure.m3.navigation.M3Properties;
 import org.finos.legend.pure.m3.serialization.runtime.IncrementalCompiler.IncrementalCompilerTransaction;
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiledPlatform;
 import org.finos.legend.pure.m4.transaction.framework.ThreadLocalTransactionContext;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestSimpleTransaction extends AbstractPureTestWithCoreCompiledPlatform
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getExtra());
     }
 
-    @After
+    @AfterEach
     public void clearRuntime()
     {
         runtime.delete("source2.pure");
@@ -40,39 +40,45 @@ public class TestSimpleTransaction extends AbstractPureTestWithCoreCompiledPlatf
     @Test
     public void testSimpleGraph() throws Exception
     {
-        compileTestSource("Class myTest::Product\n" +
-                "{\n" +
-                "   name : String[1];\n" +
-                "}\n");
+        compileTestSource("""
+                Class myTest::Product
+                {
+                   name : String[1];
+                }
+                """);
 
-        Assert.assertEquals(1, processorSupport.package_getByUserPath("myTest").getValueForMetaPropertyToMany(M3Properties.children).size());
+        Assertions.assertEquals(1, processorSupport.package_getByUserPath("myTest").getValueForMetaPropertyToMany(M3Properties.children).size());
 
-        Source source = runtime.createInMemorySource("source2.pure", "Class myTest::Synonym\n" +
-                "{\n" +
-                "   name : String[1];\n" +
-                "}\n");
+        Source source = runtime.createInMemorySource("source2.pure", """
+                Class myTest::Synonym
+                {
+                   name : String[1];
+                }
+                """);
         IncrementalCompilerTransaction transaction = runtime.getIncrementalCompiler().newTransaction(true);
         try (ThreadLocalTransactionContext ignore = transaction.openInCurrentThread())
         {
             runtime.getIncrementalCompiler().compileInCurrentTransaction(source);
-            Assert.assertEquals(2, processorSupport.package_getByUserPath("myTest").getValueForMetaPropertyToMany(M3Properties.children).size());
+            Assertions.assertEquals(2, processorSupport.package_getByUserPath("myTest").getValueForMetaPropertyToMany(M3Properties.children).size());
         }
-        Assert.assertEquals(1, processorSupport.package_getByUserPath("myTest").getValueForMetaPropertyToMany(M3Properties.children).size());
+        Assertions.assertEquals(1, processorSupport.package_getByUserPath("myTest").getValueForMetaPropertyToMany(M3Properties.children).size());
         try (ThreadLocalTransactionContext ignore = transaction.openInCurrentThread())
         {
-            Assert.assertEquals(2, processorSupport.package_getByUserPath("myTest").getValueForMetaPropertyToMany(M3Properties.children).size());
+            Assertions.assertEquals(2, processorSupport.package_getByUserPath("myTest").getValueForMetaPropertyToMany(M3Properties.children).size());
         }
         transaction.rollback();
-        Assert.assertEquals(1, processorSupport.package_getByUserPath("myTest").getValueForMetaPropertyToMany(M3Properties.children).size());
+        Assertions.assertEquals(1, processorSupport.package_getByUserPath("myTest").getValueForMetaPropertyToMany(M3Properties.children).size());
     }
 
     @Test
     public void testFunction() throws Exception
     {
-        Source source = runtime.createInMemorySource("source2.pure", "function myFunc():Nil[0]" +
-                "{" +
-                "    print('ok',1);" +
-                "}");
+        Source source = runtime.createInMemorySource("source2.pure", """
+                function myFunc():Nil[0]\
+                {\
+                    print('ok',1);\
+                }\
+                """);
         IncrementalCompilerTransaction transaction = runtime.getIncrementalCompiler().newTransaction(true);
         try (ThreadLocalTransactionContext ignore = transaction.openInCurrentThread())
         {
@@ -81,13 +87,13 @@ public class TestSimpleTransaction extends AbstractPureTestWithCoreCompiledPlatf
 //            Assert.assertNotNull(processorSupport.package_getByUserPath("myFunc__Nil_0_"));
         }
 
-        Assert.assertNull(processorSupport.package_getByUserPath("myFunc__Nil_0_"));
+        Assertions.assertNull(processorSupport.package_getByUserPath("myFunc__Nil_0_"));
         try (ThreadLocalTransactionContext ignore = transaction.openInCurrentThread())
         {
-            Assert.assertNotNull(processorSupport.package_getByUserPath("myFunc__Nil_0_"));
+            Assertions.assertNotNull(processorSupport.package_getByUserPath("myFunc__Nil_0_"));
         }
 
         transaction.commit();
-        Assert.assertNotNull(processorSupport.package_getByUserPath("myFunc__Nil_0_"));
+        Assertions.assertNotNull(processorSupport.package_getByUserPath("myFunc__Nil_0_"));
     }
 }

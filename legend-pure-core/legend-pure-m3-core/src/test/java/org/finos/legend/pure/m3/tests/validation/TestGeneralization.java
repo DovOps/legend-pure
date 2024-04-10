@@ -25,16 +25,16 @@ import org.finos.legend.pure.m3.serialization.filesystem.repository.GenericCodeR
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiledPlatform;
 import org.finos.legend.pure.m4.exception.PureCompilationException;
 import org.finos.legend.pure.m4.serialization.grammar.antlr.PureParserException;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.util.regex.Pattern;
 
 public class TestGeneralization extends AbstractPureTestWithCoreCompiledPlatform
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getFunctionExecution(), new CompositeCodeStorage(new ClassLoaderCodeStorage(getCodeRepositories())), getFactoryRegistryOverride(), getOptions(), getExtra());
@@ -47,7 +47,7 @@ public class TestGeneralization extends AbstractPureTestWithCoreCompiledPlatform
                 GenericCodeRepository.build("test", "test(::.*)?", "platform", "system"));
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("testSource.pure");
@@ -60,7 +60,7 @@ public class TestGeneralization extends AbstractPureTestWithCoreCompiledPlatform
     public void testClassGeneralizationToEnum()
     {
         compileTestSource("fromString.pure", "Enum test::TestEnum {A, B, C}");
-        PureCompilationException e = Assert.assertThrows(PureCompilationException.class, () -> compileTestSource("testSource.pure", "Class test::TestClass extends test::TestEnum {}"));
+        PureCompilationException e = Assertions.assertThrows(PureCompilationException.class, () -> compileTestSource("testSource.pure", "Class test::TestClass extends test::TestEnum {}"));
         assertPureException(PureCompilationException.class, "Invalid generalization: test::TestClass cannot extend test::TestEnum as it is not a Class", "testSource.pure", 1, 1, 1, 13, 1, 47, e);
     }
 
@@ -68,7 +68,7 @@ public class TestGeneralization extends AbstractPureTestWithCoreCompiledPlatform
     public void testEnumGeneralizationToEnum()
     {
         compileTestSource("fromString.pure", "Enum test::TestEnum {A, B, C}");
-        PureParserException e = Assert.assertThrows(PureParserException.class, () -> compileTestSource("testSource.pure", "Enum test::TestEnum2 extends test::TestEnum {}"));
+        PureParserException e = Assertions.assertThrows(PureParserException.class, () -> compileTestSource("testSource.pure", "Enum test::TestEnum2 extends test::TestEnum {}"));
         assertPureException(PureParserException.class, "expected: '{' found: 'extends'", "testSource.pure", 1, 22, 1, 22, 1, 29, e);
     }
 
@@ -77,11 +77,11 @@ public class TestGeneralization extends AbstractPureTestWithCoreCompiledPlatform
     {
         for (String typeName : PrimitiveUtilities.getPrimitiveTypeNames())
         {
-            String sourceFile = String.format("test%s.pure", typeName);
+            String sourceFile = "test%s.pure".formatted(typeName);
             try
             {
-                PureCompilationException e = Assert.assertThrows(PureCompilationException.class, () -> compileTestSource(sourceFile, String.format("Class test::TestClass extends %s {}", typeName)));
-                String expectedMessage = String.format("Invalid generalization: test::TestClass cannot extend %s as it is not a Class", typeName);
+                PureCompilationException e = Assertions.assertThrows(PureCompilationException.class, () -> compileTestSource(sourceFile, "Class test::TestClass extends %s {}".formatted(typeName)));
+                String expectedMessage = "Invalid generalization: test::TestClass cannot extend %s as it is not a Class".formatted(typeName);
                 assertPureException(PureCompilationException.class, expectedMessage, sourceFile, 1, 1, 1, 13, 1, 33 + typeName.length(), e);
             }
             finally
@@ -95,64 +95,74 @@ public class TestGeneralization extends AbstractPureTestWithCoreCompiledPlatform
     @Test
     public void testDiamondWithGenericIssue()
     {
-        PureCompilationException e = Assert.assertThrows(PureCompilationException.class, () -> compileTestSource(
+        PureCompilationException e = Assertions.assertThrows(PureCompilationException.class, () -> compileTestSource(
                 "fromString.pure",
-                "Class A<T>{prop:T[1];}\n" +
-                        "Class B extends A<String>{}\n" +
-                        "Class C extends A<Integer>{}\n" +
-                        "Class D extends B,C{}\n" +
-                        "function simpleTest():D[1]\n" +
-                        "{\n" +
-                        "   ^D(prop=333);\n" +
-                        "}\n"));
+                """
+                Class A<T>{prop:T[1];}
+                Class B extends A<String>{}
+                Class C extends A<Integer>{}
+                Class D extends B,C{}
+                function simpleTest():D[1]
+                {
+                   ^D(prop=333);
+                }
+                """));
         assertPureException(PureCompilationException.class, Pattern.compile("^Diamond inheritance error! (('Integer' is not compatible with 'String')|('String' is not compatible with 'Integer')) going from 'D' to 'A<T>'$"), 7, 4, e);
     }
 
     @Test
     public void testGeneralizationWithSelfReferenceInGenerics()
     {
-        PureCompilationException e = Assert.assertThrows(PureCompilationException.class, () -> compileTestSource(
+        PureCompilationException e = Assertions.assertThrows(PureCompilationException.class, () -> compileTestSource(
                 "/test/testModel.pure",
-                "import test::*;\n" +
-                        "Class test::A<T> {}\n" +
-                        "Class test::B extends A<B> {}\n"));
+                """
+                import test::*;
+                Class test::A<T> {}
+                Class test::B extends A<B> {}
+                """));
         assertPureException(PureCompilationException.class, "Class B extends A<B> which contains a reference to B itself", "/test/testModel.pure", 3, 13, e);
     }
 
     @Test
     public void testGeneralizationWithNestedSelfReferenceInGenerics()
     {
-        PureCompilationException e = Assert.assertThrows(PureCompilationException.class, () -> compileTestSource(
+        PureCompilationException e = Assertions.assertThrows(PureCompilationException.class, () -> compileTestSource(
                 "/test/testModel.pure",
-                "import test::*;\n" +
-                        "Class test::A<T> {}\n" +
-                        "Class test::B<U> {}\n" +
-                        "Class test::C extends A<B<C>> {}\n"));
+                """
+                import test::*;
+                Class test::A<T> {}
+                Class test::B<U> {}
+                Class test::C extends A<B<C>> {}
+                """));
         assertPureException(PureCompilationException.class, "Class C extends A<B<C>> which contains a reference to C itself", "/test/testModel.pure", 4, 13, e);
     }
 
     @Test
     public void testGeneralizationWithSubtypeReferenceInGenerics()
     {
-        PureCompilationException e = Assert.assertThrows(PureCompilationException.class, () -> compileTestSource(
+        PureCompilationException e = Assertions.assertThrows(PureCompilationException.class, () -> compileTestSource(
                 "/test/testModel.pure",
-                "import test::*;\n" +
-                        "Class test::A<T> {}\n" +
-                        "Class test::B extends A<C> {}\n" +
-                        "Class test::C extends B {}\n"));
+                """
+                import test::*;
+                Class test::A<T> {}
+                Class test::B extends A<C> {}
+                Class test::C extends B {}
+                """));
         assertPureException(PureCompilationException.class, "Class B extends A<C> which contains a reference to C which is a subtype of B", "/test/testModel.pure", 3, 13, e);
     }
 
     @Test
     public void testGeneralizationWithNestedSubtypeReferenceInGenerics()
     {
-        PureCompilationException e = Assert.assertThrows(PureCompilationException.class, () -> compileTestSource(
+        PureCompilationException e = Assertions.assertThrows(PureCompilationException.class, () -> compileTestSource(
                 "/test/testModel.pure",
-                "import test::*;\n" +
-                        "Class test::A<T> {}\n" +
-                        "Class test::B<U> {}\n" +
-                        "Class test::C extends A<B<D>> {}\n" +
-                        "Class test::D extends C {}\n"));
+                """
+                import test::*;
+                Class test::A<T> {}
+                Class test::B<U> {}
+                Class test::C extends A<B<D>> {}
+                Class test::D extends C {}
+                """));
         assertPureException(PureCompilationException.class, "Class C extends A<B<D>> which contains a reference to D which is a subtype of C", "/test/testModel.pure", 4, 13, e);
     }
 }

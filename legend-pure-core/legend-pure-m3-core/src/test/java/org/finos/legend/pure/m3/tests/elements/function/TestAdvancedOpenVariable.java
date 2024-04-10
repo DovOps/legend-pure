@@ -15,12 +15,12 @@
 package org.finos.legend.pure.m3.tests.elements.function;
 
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 public abstract class TestAdvancedOpenVariable extends AbstractPureTestWithCoreCompiled
 {
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("fromString.pure");
@@ -29,15 +29,17 @@ public abstract class TestAdvancedOpenVariable extends AbstractPureTestWithCoreC
     @Test
     public void testNestedOpenVariables()
     {
-        compileTestSource("fromString.pure","function func(a:String[1]):Function<{String[1]->String[1]}>[*]\n" +
-                "{\n" +
-                "     [{z:String[1]|$z+$a},{z:String[1]|$z+$a+'2'}];\n" +
-                "}\n" +
-                "\n" +
-                "function go():Any[*]\n" +
-                "{\n" +
-                "     assert(['ede:)', 'ede:)2'] == func(':)')->map(ok|$ok->eval('ede')),|'');\n" +
-                "}");
+        compileTestSource("fromString.pure","""
+                function func(a:String[1]):Function<{String[1]->String[1]}>[*]
+                {
+                     [{z:String[1]|$z+$a},{z:String[1]|$z+$a+'2'}];
+                }
+                
+                function go():Any[*]
+                {
+                     assert(['ede:)', 'ede:)2'] == func(':)')->map(ok|$ok->eval('ede')),|'');
+                }\
+                """);
         this.execute("go():Any[*]");
 
     }
@@ -45,25 +47,26 @@ public abstract class TestAdvancedOpenVariable extends AbstractPureTestWithCoreC
     @Test
     public void testOpenVariablesForPropagatedBusinessDates()
     {
-        compileTestSource("fromString.pure","Class <<temporal.businesstemporal>> MyClass\n" +
-                "{\n" +
-                "  account : Account[1]; \n" +
-                "}\n" +
-                "" +
-                "function project<K>(set:K[*], functions:Function<{K[1]->Any[*]}>[*], ids:String[*]):Any[*]" +
-                "{" +
-                "   'bla';" +
-                "}\n" +
-                "\n" +
-                "Class <<temporal.businesstemporal>> Account\n" +
-                "{\n" +
-                "   \n" +
-                "}\n" +
-                "function do():Any[*]\n" +
-                "{\n" +
-                "   let bd = %2010-10-10;" +
-                "   assert('bd' == {|MyClass.all($bd)->project(c|if(true,|$c.account,|'ee'),'e')}.expressionSequence->evaluateAndDeactivate()->cast(@FunctionExpression).parametersValues->at(1)->cast(@InstanceValue).values->cast(@LambdaFunction<Any>).openVariables, |'');" +
-                "}");
+        compileTestSource("fromString.pure","""
+                Class <<temporal.businesstemporal>> MyClass
+                {
+                  account : Account[1];\s
+                }
+                function project<K>(set:K[*], functions:Function<{K[1]->Any[*]}>[*], ids:String[*]):Any[*]\
+                {\
+                   'bla';\
+                }
+                
+                Class <<temporal.businesstemporal>> Account
+                {
+                  \s
+                }
+                function do():Any[*]
+                {
+                   let bd = %2010-10-10;\
+                   assert('bd' == {|MyClass.all($bd)->project(c|if(true,|$c.account,|'ee'),'e')}.expressionSequence->evaluateAndDeactivate()->cast(@FunctionExpression).parametersValues->at(1)->cast(@InstanceValue).values->cast(@LambdaFunction<Any>).openVariables, |'');\
+                }\
+                """);
         this.execute("do():Any[*]");
 
     }

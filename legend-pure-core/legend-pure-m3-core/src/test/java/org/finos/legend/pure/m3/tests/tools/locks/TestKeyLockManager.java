@@ -15,9 +15,9 @@
 package org.finos.legend.pure.m3.tests.tools.locks;
 
 import org.finos.legend.pure.m3.tools.locks.KeyLockManager;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class TestKeyLockManager
 {
@@ -26,7 +26,7 @@ public class TestKeyLockManager
 
     private KeyLockManager<String> manager;
 
-    @Before
+    @BeforeEach
     public void setUp()
     {
         this.manager = KeyLockManager.newManager();
@@ -38,8 +38,8 @@ public class TestKeyLockManager
         Object lock1 = this.manager.getLock(KEY1);
         Object lock2 = this.manager.getLock(KEY2);
 
-        Assert.assertSame(lock1, this.manager.getLock(KEY1));
-        Assert.assertSame(lock2, this.manager.getLock(KEY2));
-        Assert.assertFalse(lock1.equals(lock2));
+        Assertions.assertSame(lock1, this.manager.getLock(KEY1));
+        Assertions.assertSame(lock2, this.manager.getLock(KEY2));
+        Assertions.assertFalse(lock1.equals(lock2));
     }
 }

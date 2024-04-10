@@ -17,18 +17,19 @@ package org.finos.legend.pure.runtime.java.extension.relation;
 import org.finos.legend.pure.m3.execution.FunctionExecution;
 import org.finos.legend.pure.m3.tests.function.base.PureExpressionTest;
 import org.finos.legend.pure.runtime.java.compiled.execution.FunctionExecutionCompiledBuilder;
-import org.junit.After;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestFunctionTester extends PureExpressionTest
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getFunctionExecution());
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("fromString.pure");
@@ -40,23 +41,25 @@ public class TestFunctionTester extends PureExpressionTest
         return new FunctionExecutionCompiledBuilder().build();
     }
 
-    @org.junit.Test
+    @org.junit.jupiter.api.Test
     public void testFunction()
     {
         compileTestSource("fromString.pure",
-                                "function test():Any[*]\n" +
-                                        "{" +
-                                        "print(#TDS\n" +
-                                "                  value, str\n" +
-                                "                  1, a\n" +
-                                "                  3, ewe\n" +
-                                "                  4, qw\n" +
-                                "                #\n" +
-                                "                ->filter\n" +
-                                "                (\n" +
-                                "                  x|$x.value == 1" +
-                                        "        )->toString(),1);\n" +
-                                "}");
+                                """
+                                function test():Any[*]
+                                {\
+                                print(#TDS
+                                                  value, str
+                                                  1, a
+                                                  3, ewe
+                                                  4, qw
+                                                #
+                                                ->filter
+                                                (
+                                                  x|$x.value == 1\
+                                        )->toString(),1);
+                                }\
+                                """);
         this.execute("test():Any[*]");
         runtime.delete("fromString.pure");
 

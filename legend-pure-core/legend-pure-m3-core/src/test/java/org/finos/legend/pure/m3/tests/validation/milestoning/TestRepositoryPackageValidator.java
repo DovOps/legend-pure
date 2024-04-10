@@ -16,20 +16,20 @@ package org.finos.legend.pure.m3.tests.validation.milestoning;
 
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiledPlatform;
 import org.finos.legend.pure.m4.exception.PureCompilationException;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestRepositoryPackageValidator extends AbstractPureTestWithCoreCompiledPlatform
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getExtra());
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("testSource.pure");
@@ -42,12 +42,14 @@ public class TestRepositoryPackageValidator extends AbstractPureTestWithCoreComp
         {
             compileTestSource(
                     "testSource.pure",
-                    "function Root::hello():Any[*]\n" +
-                            "{\n" +
-                            "   'hello';\n" +
-                            "}"
+                    """
+                    function Root::hello():Any[*]
+                    {
+                       'hello';
+                    }\
+                    """
             );
-            Assert.fail();
+            Assertions.fail();
         }
         catch (Exception e)
         {
@@ -62,12 +64,14 @@ public class TestRepositoryPackageValidator extends AbstractPureTestWithCoreComp
         {
             compileTestSource(
                     "testSource.pure",
-                    "function Root::a::hello():Any[*]\n" +
-                            "{\n" +
-                            "   'hello';\n" +
-                            "}"
+                    """
+                    function Root::a::hello():Any[*]
+                    {
+                       'hello';
+                    }\
+                    """
             );
-            Assert.fail();
+            Assertions.fail();
         }
         catch (Exception e)
         {
@@ -82,12 +86,14 @@ public class TestRepositoryPackageValidator extends AbstractPureTestWithCoreComp
         {
             compileTestSource(
                     "testSource.pure",
-                    "function a::Root::hello():Any[*]\n" +
-                            "{\n" +
-                            "   'hello';\n" +
-                            "}"
+                    """
+                    function a::Root::hello():Any[*]
+                    {
+                       'hello';
+                    }\
+                    """
             );
-            Assert.fail();
+            Assertions.fail();
         }
         catch (Exception e)
         {
@@ -102,12 +108,14 @@ public class TestRepositoryPackageValidator extends AbstractPureTestWithCoreComp
         {
             compileTestSource(
                     "testSource.pure",
-                    "function a::Root::b::hello():Any[*]\n" +
-                            "{\n" +
-                            "   'hello';\n" +
-                            "}"
+                    """
+                    function a::Root::b::hello():Any[*]
+                    {
+                       'hello';
+                    }\
+                    """
             );
-            Assert.fail();
+            Assertions.fail();
         }
         catch (Exception e)
         {

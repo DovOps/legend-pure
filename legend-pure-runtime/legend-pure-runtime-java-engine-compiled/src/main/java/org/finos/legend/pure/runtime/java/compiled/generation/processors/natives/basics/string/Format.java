@@ -35,13 +35,15 @@ public class Format extends AbstractNative
     @Override
     public String buildBody()
     {
-        return "new DefendedPureFunction2<String, Object, Object>()\n" +
-                "        {\n" +
-                "            @Override\n" +
-                "            public Object value(String formatString, Object formatArgs, ExecutionSupport es)\n" +
-                "            {\n" +
-                "               return CoreGen.format(formatString, formatArgs, es);\n" +
-                "            }\n" +
-                "        }";
+        return """
+                new DefendedPureFunction2<String, Object, Object>()
+                        {
+                            @Override
+                            public Object value(String formatString, Object formatArgs, ExecutionSupport es)
+                            {
+                               return CoreGen.format(formatString, formatArgs, es);
+                            }
+                        }\
+                """;
     }
 }

@@ -24,15 +24,15 @@ import org.finos.legend.pure.m3.navigation.PackageableElement.PackageableElement
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiledPlatform;
 import org.finos.legend.pure.m3.tools.PackageTreeIterable;
 import org.finos.legend.pure.m4.tools.GraphNodeIterable;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.util.Iterator;
 
 public class TestPackageTreeIterable extends AbstractPureTestWithCoreCompiledPlatform
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getExtra());
@@ -73,7 +73,7 @@ public class TestPackageTreeIterable extends AbstractPureTestWithCoreCompiledPla
                 ListIterable<String> previousSplitPath = PackageableElement.splitUserPath(previousPath);
                 String currentPath = PackageableElement.getUserPathForPackageableElement(current);
                 ListIterable<String> currentSplitPath = PackageableElement.splitUserPath(currentPath);
-                Assert.assertTrue("Package " + previousPath + " should not precede " + currentPath + " in a depth first search", previousSplitPath.size() >= currentSplitPath.size());
+                Assertions.assertTrue(previousSplitPath.size() >= currentSplitPath.size(), "Package " + previousPath + " should not precede " + currentPath + " in a depth first search");
             }
             previous = current;
         }
@@ -92,7 +92,7 @@ public class TestPackageTreeIterable extends AbstractPureTestWithCoreCompiledPla
             Package current = it.next();
             String currentPath = PackageableElement.getUserPathForPackageableElement(current);
             ListIterable<String> currentSplitPath = PackageableElement.splitUserPath(currentPath);
-            Assert.assertTrue("Package " + previousPath + " should not precede " + currentPath + " in a breadth first search", previousSplitPath.size() <= currentSplitPath.size());
+            Assertions.assertTrue(previousSplitPath.size() <= currentSplitPath.size(), "Package " + previousPath + " should not precede " + currentPath + " in a breadth first search");
             previous = current;
             previousPath = currentPath;
             previousSplitPath = currentSplitPath;

@@ -49,8 +49,8 @@ public abstract class Shared extends NativeFunction
 
     public TestTDS getTDS(CoreInstance value, ProcessorSupport processorSupport)
     {
-        return value instanceof TDSCoreInstance ?
-                ((TDSCoreInstance) value).getTDS() :
+        return value instanceof TDSCoreInstance tdsci ?
+                tdsci.getTDS() :
                 new TestTDSInterpreted(readCsv((value.getValueForMetaPropertyToOne("csv")).getName()), repository, processorSupport);
     }
 

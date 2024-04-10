@@ -16,8 +16,8 @@ package org.finos.legend.pure.runtime.java.compiled.generation.processors.suppor
 
 import org.apache.commons.codec.binary.Base64;
 import org.finos.legend.pure.runtime.java.extension.functions.shared.cipher.AESCipherUtil;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
@@ -41,6 +41,6 @@ public class AESCipherUtilTest
 
         byte[] cipherMessage = AESCipherUtil.encrypt(keyString, plainText.getBytes());
         byte[] decrypted = AESCipherUtil.decrypt(keyString, cipherMessage);
-        Assert.assertEquals(plainText, new String(decrypted));
+        Assertions.assertEquals(plainText, new String(decrypted));
     }
 }

@@ -16,8 +16,8 @@ package org.finos.legend.pure.runtime.java.compiled;
 
 import org.eclipse.collections.api.list.ListIterable;
 import org.finos.legend.pure.runtime.java.compiled.generation.JavaPurePrimitiveTypeMapping;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class TestJavaPrimitiveTypeMapping
 {
@@ -35,7 +35,7 @@ public class TestJavaPrimitiveTypeMapping
     {
         ListIterable<String> chunks = JavaPurePrimitiveTypeMapping.chunk(value, 5);
 
-        Assert.assertArrayEquals(expected, chunks.toArray());
-        Assert.assertEquals(value, chunks.makeString(""));
+        Assertions.assertArrayEquals(expected, chunks.toArray());
+        Assertions.assertEquals(value, chunks.makeString(""));
     }
 }

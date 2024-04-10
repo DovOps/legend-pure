@@ -74,9 +74,9 @@ public class RootRouteNodeValidator implements MatchRunner<RootRouteNode>
                 validatePropertyStub(propertyStub, processorSupport);
             }
 
-            if (treePathNode instanceof ExistingPropertyRouteNode)
+            if (treePathNode instanceof ExistingPropertyRouteNode node)
             {
-                validatePropertyStub(((ExistingPropertyRouteNode)treePathNode)._property(), processorSupport);
+                validatePropertyStub(node._property(), processorSupport);
             }
 
             for (PropertyRouteNode childNode : treePathNode._children())

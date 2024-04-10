@@ -80,9 +80,9 @@ class MilestoningPropertyMappingUnbind
         relationalPropertyMapping._propertyRemove();
         relationalPropertyMapping._localMappingPropertyRemove();
         relationalPropertyMapping._relationalOperationElementRemove();
-        if (relationalOperationElement instanceof Literal)
+        if (relationalOperationElement instanceof Literal literal)
         {
-            unbindLiteral((Literal)relationalOperationElement);
+            unbindLiteral(literal);
         }
         else
         {

@@ -83,7 +83,7 @@ public class JsonDeserializer
                 }
             }
         }
-        throw new PureExecutionException(si, String.format("Could not find a sub-type of \"%s\" with name \"%s\".", PackageableElement.getUserPathForPackageableElement(classFromPropertyDefinition), specifiedType));
+        throw new PureExecutionException(si, "Could not find a sub-type of \"%s\" with name \"%s\".".formatted(PackageableElement.getUserPathForPackageableElement(classFromPropertyDefinition), specifiedType));
     }
 
     @SuppressWarnings("unchecked")

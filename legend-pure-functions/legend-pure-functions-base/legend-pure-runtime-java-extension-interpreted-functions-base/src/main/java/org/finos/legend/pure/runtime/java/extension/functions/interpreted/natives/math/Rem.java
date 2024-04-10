@@ -61,16 +61,16 @@ public class Rem extends NativeFunction
         {
             if (dividend instanceof BigInteger || divisor instanceof BigInteger)
             {
-                BigInteger dividendBigInteger = dividend instanceof BigInteger ? (BigInteger)dividend : BigInteger.valueOf(dividend.longValue());
-                BigInteger divisorBigInteger = divisor instanceof BigInteger ? (BigInteger)divisor : BigInteger.valueOf(divisor.longValue());
+                BigInteger dividendBigInteger = dividend instanceof BigInteger bi ? bi : BigInteger.valueOf(dividend.longValue());
+                BigInteger divisorBigInteger = divisor instanceof BigInteger bi ? bi : BigInteger.valueOf(divisor.longValue());
                 BigInteger result = dividendBigInteger.remainder(divisorBigInteger);
                 return NumericUtilities.toPureNumberValueExpression(result, false, this.repository, processorSupport);
             }
             long result = dividend.longValue() % divisor.longValue();
             return NumericUtilities.toPureNumberValueExpression(result, false, this.repository, processorSupport);
         }
-        BigDecimal dividendBigDecimal = dividend instanceof BigDecimal ? (BigDecimal)dividend : new BigDecimal(dividend.toString());
-        BigDecimal divisorBigDecimal = divisor instanceof BigDecimal ? (BigDecimal)divisor : new BigDecimal(divisor.toString());
+        BigDecimal dividendBigDecimal = dividend instanceof BigDecimal bd ? bd : new BigDecimal(dividend.toString());
+        BigDecimal divisorBigDecimal = divisor instanceof BigDecimal bd ? bd : new BigDecimal(divisor.toString());
         BigDecimal result = dividendBigDecimal.remainder(divisorBigDecimal);
         return NumericUtilities.toPureNumberValueExpression(result, bigDecimalToPureDecimal, this.repository, processorSupport);
     }

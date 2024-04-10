@@ -16,7 +16,10 @@ package org.finos.legend.pure.m3.tests.function.base.io;
 
 import com.sun.net.httpserver.*;
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
-import org.junit.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -25,7 +28,7 @@ public abstract class AbstractTestHttp extends AbstractPureTestWithCoreCompiled
 {
     private static HttpServer httpServer;
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeClass() throws Exception
     {
         httpServer = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
@@ -33,7 +36,7 @@ public abstract class AbstractTestHttp extends AbstractPureTestWithCoreCompiled
         httpServer.start();
     }
 
-    @AfterClass
+    @AfterAll
     public static void stopHttp() throws Exception
     {
         httpServer.stop(0);
@@ -45,7 +48,7 @@ public abstract class AbstractTestHttp extends AbstractPureTestWithCoreCompiled
         exchange.close();
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("testHttp.pure");

@@ -15,8 +15,8 @@
 package org.finos.legend.pure.m3.tests.function.base.string;
 
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 public abstract class AbstractTestSubstring extends AbstractPureTestWithCoreCompiled
 {
@@ -24,15 +24,17 @@ public abstract class AbstractTestSubstring extends AbstractPureTestWithCoreComp
     public void testStart()
     {
            compileTestSource("substring.pure",
-                    "function testStart():Boolean[1]\n" +
-                            "{\n" +
-                            "    let string = 'the quick brown fox jumps over the lazy dog';\n" +
-                            "    assertEquals('the quick brown fox jumps over the lazy dog', substring($string, 0));\n" +
-                            "    assertEquals('he quick brown fox jumps over the lazy dog', substring($string, 1));\n" +
-                            "    assertEquals('e quick brown fox jumps over the lazy dog', substring($string, 2));\n" +
-                            "    assertEquals(' quick brown fox jumps over the lazy dog', substring($string, 3));\n" +
-                            "    assertEquals('quick brown fox jumps over the lazy dog', substring($string, 4));\n" +
-                            "}");
+                    """
+                    function testStart():Boolean[1]
+                    {
+                        let string = 'the quick brown fox jumps over the lazy dog';
+                        assertEquals('the quick brown fox jumps over the lazy dog', substring($string, 0));
+                        assertEquals('he quick brown fox jumps over the lazy dog', substring($string, 1));
+                        assertEquals('e quick brown fox jumps over the lazy dog', substring($string, 2));
+                        assertEquals(' quick brown fox jumps over the lazy dog', substring($string, 3));
+                        assertEquals('quick brown fox jumps over the lazy dog', substring($string, 4));
+                    }\
+                    """);
             this.execute("testStart():Boolean[1]");
     }
 
@@ -40,15 +42,17 @@ public abstract class AbstractTestSubstring extends AbstractPureTestWithCoreComp
     public void testStartEnd()
     {
        compileTestSource("substring.pure",
-                "function testStartEnd():Boolean[1]\n" +
-                        "{\n" +
-                        "    let string = 'the quick brown fox jumps over the lazy dog';\n" +
-                        "    assertEquals('the quick brown fox jumps over the lazy dog', substring($string, 0, 43));\n" +
-                        "    assertEquals('he quick brown fox jumps over the lazy do', substring($string, 1, 42));\n" +
-                        "    assertEquals('e quick brown fox jumps over the lazy d', substring($string, 2, 41));\n" +
-                        "    assertEquals(' quick brown fox jumps over the lazy ', substring($string, 3, 40));\n" +
-                        "    assertEquals('quick brown fox jumps over the lazy', substring($string, 4, 39));\n" +
-                        "}\n");
+                """
+                function testStartEnd():Boolean[1]
+                {
+                    let string = 'the quick brown fox jumps over the lazy dog';
+                    assertEquals('the quick brown fox jumps over the lazy dog', substring($string, 0, 43));
+                    assertEquals('he quick brown fox jumps over the lazy do', substring($string, 1, 42));
+                    assertEquals('e quick brown fox jumps over the lazy d', substring($string, 2, 41));
+                    assertEquals(' quick brown fox jumps over the lazy ', substring($string, 3, 40));
+                    assertEquals('quick brown fox jumps over the lazy', substring($string, 4, 39));
+                }
+                """);
         this.execute("testStartEnd():Boolean[1]");
     }
 
@@ -56,15 +60,17 @@ public abstract class AbstractTestSubstring extends AbstractPureTestWithCoreComp
     public void testStartWithReflection()
     {
         compileTestSource("substring.pure",
-                "function testStart():Boolean[1]\n" +
-                        "{\n" +
-                        "    let string = 'the quick brown fox jumps over the lazy dog';\n" +
-                        "    assertEquals('the quick brown fox jumps over the lazy dog', substring_String_1__Integer_1__String_1_->eval($string, 0));\n" +
-                        "    assertEquals('he quick brown fox jumps over the lazy dog', substring_String_1__Integer_1__String_1_->eval($string, 1));\n" +
-                        "    assertEquals('e quick brown fox jumps over the lazy dog', substring_String_1__Integer_1__String_1_->eval($string, 2));\n" +
-                        "    assertEquals(' quick brown fox jumps over the lazy dog', substring_String_1__Integer_1__String_1_->eval($string, 3));\n" +
-                        "    assertEquals('quick brown fox jumps over the lazy dog', substring_String_1__Integer_1__String_1_->eval($string, 4));\n" +
-                        "}");
+                """
+                function testStart():Boolean[1]
+                {
+                    let string = 'the quick brown fox jumps over the lazy dog';
+                    assertEquals('the quick brown fox jumps over the lazy dog', substring_String_1__Integer_1__String_1_->eval($string, 0));
+                    assertEquals('he quick brown fox jumps over the lazy dog', substring_String_1__Integer_1__String_1_->eval($string, 1));
+                    assertEquals('e quick brown fox jumps over the lazy dog', substring_String_1__Integer_1__String_1_->eval($string, 2));
+                    assertEquals(' quick brown fox jumps over the lazy dog', substring_String_1__Integer_1__String_1_->eval($string, 3));
+                    assertEquals('quick brown fox jumps over the lazy dog', substring_String_1__Integer_1__String_1_->eval($string, 4));
+                }\
+                """);
         this.execute("testStart():Boolean[1]");
     }
 
@@ -72,19 +78,21 @@ public abstract class AbstractTestSubstring extends AbstractPureTestWithCoreComp
     public void testStartEndWithReflection()
     {
         compileTestSource("substring.pure",
-                "function testStartEnd():Boolean[1]\n" +
-                        "{\n" +
-                        "    let string = 'the quick brown fox jumps over the lazy dog';\n" +
-                        "    assertEquals('the quick brown fox jumps over the lazy dog', substring_String_1__Integer_1__Integer_1__String_1_->eval($string, 0, 43));\n" +
-                        "    assertEquals('he quick brown fox jumps over the lazy do', substring_String_1__Integer_1__Integer_1__String_1_->eval($string, 1, 42));\n" +
-                        "    assertEquals('e quick brown fox jumps over the lazy d', substring_String_1__Integer_1__Integer_1__String_1_->eval($string, 2, 41));\n" +
-                        "    assertEquals(' quick brown fox jumps over the lazy ', substring_String_1__Integer_1__Integer_1__String_1_->eval($string, 3, 40));\n" +
-                        "    assertEquals('quick brown fox jumps over the lazy', substring_String_1__Integer_1__Integer_1__String_1_->eval($string, 4, 39));\n" +
-                        "}\n");
+                """
+                function testStartEnd():Boolean[1]
+                {
+                    let string = 'the quick brown fox jumps over the lazy dog';
+                    assertEquals('the quick brown fox jumps over the lazy dog', substring_String_1__Integer_1__Integer_1__String_1_->eval($string, 0, 43));
+                    assertEquals('he quick brown fox jumps over the lazy do', substring_String_1__Integer_1__Integer_1__String_1_->eval($string, 1, 42));
+                    assertEquals('e quick brown fox jumps over the lazy d', substring_String_1__Integer_1__Integer_1__String_1_->eval($string, 2, 41));
+                    assertEquals(' quick brown fox jumps over the lazy ', substring_String_1__Integer_1__Integer_1__String_1_->eval($string, 3, 40));
+                    assertEquals('quick brown fox jumps over the lazy', substring_String_1__Integer_1__Integer_1__String_1_->eval($string, 4, 39));
+                }
+                """);
         this.execute("testStartEnd():Boolean[1]");
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("substring.pure");

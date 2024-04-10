@@ -71,9 +71,9 @@ public class Extend extends Shared
                     resolvedTypeParameters, resolvedMultiplicityParameters, variableContext, functionExpressionToUseInStack, profiler, instantiationContext, executionSupport, processorSupport, relationType
             );
         }
-        else if (extendFunction instanceof FuncColSpecArray)
+        else if (extendFunction instanceof FuncColSpecArray array)
         {
-            result = ((FuncColSpecArray<?, ?>) extendFunction)._funcSpecs().injectInto(tds, (a, b) ->
+            result = array._funcSpecs().injectInto(tds, (a, b) ->
                     processFuncColSpec(a,
                             (LambdaFunction<CoreInstance>) b._function(),
                             b._name(),

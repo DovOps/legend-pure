@@ -21,19 +21,19 @@ import org.finos.legend.pure.m3.tests.RuntimeVerifier;
 import org.finos.legend.pure.m3.execution.FunctionExecution;
 import org.finos.legend.pure.runtime.java.compiled.execution.FunctionExecutionCompiledBuilder;
 import org.finos.legend.pure.runtime.java.compiled.factory.JavaModelFactoryRegistryLoader;
-import org.junit.After;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestQualifiedPropertyInheritance extends AbstractPureTestWithCoreCompiled
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getFunctionExecution(), JavaModelFactoryRegistryLoader.loader());
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("file1.pure");
@@ -45,22 +45,24 @@ public class TestQualifiedPropertyInheritance extends AbstractPureTestWithCoreCo
     public void testQualifiedPropertyInheritance_OneSource()
     {
         String sourceId = "file1.pure";
-        String sourceCode = "Class test::A\n" +
-                "{\n" +
-                "  value : Float[1];\n" +
-                "}\n" +
-                "\n" +
-                "Class test::B\n" +
-                "{\n" +
-                "  prop1 : test::A[*];\n" +
-                "  prop2()\n" +
-                "  {\n" +
-                "    $this.prop1->map(x | $x.value)\n" +
-                "  }:Float[*];\n" +
-                "}\n" +
-                "Class test::C extends test::B\n" +
-                "{\n" +
-                "}";
+        String sourceCode = """
+                Class test::A
+                {
+                  value : Float[1];
+                }
+                
+                Class test::B
+                {
+                  prop1 : test::A[*];
+                  prop2()
+                  {
+                    $this.prop1->map(x | $x.value)
+                  }:Float[*];
+                }
+                Class test::C extends test::B
+                {
+                }\
+                """;
         new RuntimeTestScriptBuilder()
                 .createInMemorySource(sourceId, sourceCode)
                 .compile()
@@ -77,23 +79,27 @@ public class TestQualifiedPropertyInheritance extends AbstractPureTestWithCoreCo
     public void testQualifiedPropertyInheritance_TwoSources()
     {
         String sourceId1 = "file1.pure";
-        String sourceCode1 = "Class test::A\n" +
-                "{\n" +
-                "  value : Float[1];\n" +
-                "}\n" +
-                "\n" +
-                "Class test::B\n" +
-                "{\n" +
-                "  prop1 : test::A[*];\n" +
-                "  prop2()\n" +
-                "  {\n" +
-                "    $this.prop1->map(x | $x.value)\n" +
-                "  }:Float[*];\n" +
-                "}";
+        String sourceCode1 = """
+                Class test::A
+                {
+                  value : Float[1];
+                }
+                
+                Class test::B
+                {
+                  prop1 : test::A[*];
+                  prop2()
+                  {
+                    $this.prop1->map(x | $x.value)
+                  }:Float[*];
+                }\
+                """;
         String sourceId2 = "file2.pure";
-        String sourceCode2 = "Class test::C extends test::B\n" +
-                "{\n" +
-                "}";
+        String sourceCode2 = """
+                Class test::C extends test::B
+                {
+                }\
+                """;
         new RuntimeTestScriptBuilder()
                 .createInMemorySource(sourceId1, sourceCode1)
                 .createInMemorySource(sourceId2, sourceCode2)
@@ -111,31 +117,35 @@ public class TestQualifiedPropertyInheritance extends AbstractPureTestWithCoreCo
     public void testQualifiedPropertyInheritance_TwoSourcesAutomapLambdaInQualifier()
     {
         String sourceId1 = "file1.pure";
-        String sourceCode1 = "Class test::A\n" +
-                "{\n" +
-                "  value : Float[1];\n" +
-                "}\n" +
-                "Class test::C\n" +
-                "{\n" +
-                "  prop3 : test::A[*];\n" +
-                "  prop4()\n" +
-                "  {\n" +
-                "    $this.prop3.value\n" +
-                "  }:Float[*];\n" +
-                "}\n" +
-                "\n" +
-                "Class test::B\n" +
-                "{\n" +
-                "  prop1 : test::A[*];\n" +
-                "  prop2()\n" +
-                "  {\n" +
-                "    $this.prop1.value\n" +
-                "  }:Float[*];\n" +
-                "}";
+        String sourceCode1 = """
+                Class test::A
+                {
+                  value : Float[1];
+                }
+                Class test::C
+                {
+                  prop3 : test::A[*];
+                  prop4()
+                  {
+                    $this.prop3.value
+                  }:Float[*];
+                }
+                
+                Class test::B
+                {
+                  prop1 : test::A[*];
+                  prop2()
+                  {
+                    $this.prop1.value
+                  }:Float[*];
+                }\
+                """;
         String sourceId2 = "file2.pure";
-        String sourceCode2 = "Class test::D extends test::B\n" +
-                "{\n" +
-                "}";
+        String sourceCode2 = """
+                Class test::D extends test::B
+                {
+                }\
+                """;
         new RuntimeTestScriptBuilder()
                 .createInMemorySource(sourceId1, sourceCode1)
                 .createInMemorySource(sourceId2, sourceCode2)
@@ -153,37 +163,43 @@ public class TestQualifiedPropertyInheritance extends AbstractPureTestWithCoreCo
     public void testQualifiedPropertyInheritance_ThreeSources()
     {
         String sourceId1 = "file1.pure";
-        String sourceCode1 = "Class test::A\n" +
-                "{\n" +
-                "  value1 : Float[1];\n" +
-                "  value2 : Integer[1];\n" +
-                "}\n" +
-                "\n" +
-                "Class test::B\n" +
-                "{\n" +
-                "  prop1 : test::A[*];\n" +
-                "  prop2()\n" +
-                "  {\n" +
-                "    $this.prop1->map(x | $x.value1)\n" +
-                "  }:Float[*];\n" +
-                "}\n" +
-                "\n" +
-                "Class test::C\n" +
-                "{\n" +
-                "  prop1 : test::A[*];\n" +
-                "  prop2()\n" +
-                "  {\n" +
-                "    $this.prop1->map(y | $y.value2)\n" +
-                "  }:Integer[*];\n" +
-                "}";
+        String sourceCode1 = """
+                Class test::A
+                {
+                  value1 : Float[1];
+                  value2 : Integer[1];
+                }
+                
+                Class test::B
+                {
+                  prop1 : test::A[*];
+                  prop2()
+                  {
+                    $this.prop1->map(x | $x.value1)
+                  }:Float[*];
+                }
+                
+                Class test::C
+                {
+                  prop1 : test::A[*];
+                  prop2()
+                  {
+                    $this.prop1->map(y | $y.value2)
+                  }:Integer[*];
+                }\
+                """;
         String sourceId2 = "file2.pure";
-        String sourceCode2 = "Class test::D extends test::B\n" +
-                "{\n" +
-                "}";
+        String sourceCode2 = """
+                Class test::D extends test::B
+                {
+                }\
+                """;
         String sourceId3 = "file3.pure";
-        String sourceCode3 = "Class test::E extends test::C\n" +
-                "{\n" +
-                "}";
+        String sourceCode3 = """
+                Class test::E extends test::C
+                {
+                }\
+                """;
         new RuntimeTestScriptBuilder()
                 .createInMemorySource(sourceId1, sourceCode1)
                 .createInMemorySource(sourceId2, sourceCode2)

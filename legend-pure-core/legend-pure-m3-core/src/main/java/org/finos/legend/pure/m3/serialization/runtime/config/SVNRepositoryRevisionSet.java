@@ -56,8 +56,8 @@ public class SVNRepositoryRevisionSet
     public boolean equals(Object other)
     {
         return (other == this) ||
-                ((other instanceof SVNRepositoryRevisionSet) &&
-                        this.repoRevisions.equals(((SVNRepositoryRevisionSet)other).repoRevisions));
+                ((other instanceof SVNRepositoryRevisionSet svnrrs) &&
+                        this.repoRevisions.equals(svnrrs.repoRevisions));
     }
 
     @Override

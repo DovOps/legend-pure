@@ -25,15 +25,15 @@ import org.finos.legend.pure.m3.serialization.filesystem.usercodestorage.classpa
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
 import org.finos.legend.pure.m4.exception.PureCompilationException;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;
 
 public abstract class AbstractTestNewAtRuntime extends AbstractPureTestWithCoreCompiled
 {
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("fromString.pure");
@@ -44,44 +44,50 @@ public abstract class AbstractTestNewAtRuntime extends AbstractPureTestWithCoreC
     @Test
     public void testGetterFromDynamicInstanceWithWrongProperty()
     {
-        PureCompilationException e = Assert.assertThrows(PureCompilationException.class, () -> compileTestSource(
+        PureCompilationException e = Assertions.assertThrows(PureCompilationException.class, () -> compileTestSource(
                 "fromString.pure",
-                "Class test::Person\n" +
-                        "{\n" +
-                        "   lastName:String[1];\n" +
-                        "}\n" +
-                        "function testGet():Nil[0]\n" +
-                        "{\n" +
-                        "   let p = ^test::Person(lastName='last');\n" +
-                        "   print($p.wrongProperty);\n" +
-                        "}"));
+                """
+                Class test::Person
+                {
+                   lastName:String[1];
+                }
+                function testGet():Nil[0]
+                {
+                   let p = ^test::Person(lastName='last');
+                   print($p.wrongProperty);
+                }\
+                """));
         assertPureException(PureCompilationException.class, "Can't find the property 'wrongProperty' in the class test::Person", 8, 13, e);
     }
 
     @Test
     public void testNewWithInvalidProperty()
     {
-        PureCompilationException e = Assert.assertThrows(PureCompilationException.class, () -> compileTestSource(
+        PureCompilationException e = Assertions.assertThrows(PureCompilationException.class, () -> compileTestSource(
                 "fromString.pure",
-                "Class Person\n" +
-                    "{\n" +
-                    "   lastName:String[1];\n" +
-                    "}\n" +
-                    "function testNew():Person[1]\n" +
-                    "{\n" +
-                    "   ^Person(lastName='last', wrongProperty='wrong');\n" +
-                    "}"));
+                """
+                Class Person
+                {
+                   lastName:String[1];
+                }
+                function testNew():Person[1]
+                {
+                   ^Person(lastName='last', wrongProperty='wrong');
+                }\
+                """));
         assertPureException(PureCompilationException.class, "The property 'wrongProperty' can't be found in the type 'Person' or in its hierarchy.", 7, 29, e);
     }
 
     @Test
     public void testNewNil() throws Exception
     {
-        compileTestSource("fromString.pure", "function testNewNil():Nil[1]\n" +
-                "{\n" +
-                "    ^Nil();\n" +
-                "}");
-        PureExecutionException e = Assert.assertThrows(PureExecutionException.class, () -> execute("testNewNil():Nil[1]"));
+        compileTestSource("fromString.pure", """
+                function testNewNil():Nil[1]
+                {
+                    ^Nil();
+                }\
+                """);
+        PureExecutionException e = Assertions.assertThrows(PureExecutionException.class, () -> execute("testNewNil():Nil[1]"));
         assertNewNilException(e);
     }
 
@@ -93,206 +99,216 @@ public abstract class AbstractTestNewAtRuntime extends AbstractPureTestWithCoreC
     @Test
     public void testNewWithReverseZeroToOneProperty()
     {
-        compileTestSource("fromString.pure", "function test(): Any[*]\n" +
-                "{\n" +
-                "   let car = ^test::Car(name='Bugatti', owner= ^test::Owner(firstName='John', lastName='Roe'));\n" +
-                "   print($car.owner.car->size()->toString(), 1);\n" +
-                "   $car;" +
-                "}\n" +
-                "\n" +
-                "Class\n" +
-                "test::Car\n" +
-                "{\n" +
-                "   name : String[1];\n" +
-                "}\n" +
-                "\n" +
-                "Class\n" +
-                "test::Owner\n" +
-                "{\n" +
-                "   firstName: String[1];\n" +
-                "   lastName: String[1];\n" +
-                "}\n" +
-                "\n" +
-                "Association test::Car_Owner\n" +
-                "{\n" +
-                "   owner : test::Owner[1];\n" +
-                "   car  : test::Car[0..1];\n" +
-                "}");
+        compileTestSource("fromString.pure", """
+                function test(): Any[*]
+                {
+                   let car = ^test::Car(name='Bugatti', owner= ^test::Owner(firstName='John', lastName='Roe'));
+                   print($car.owner.car->size()->toString(), 1);
+                   $car;\
+                }
+                
+                Class
+                test::Car
+                {
+                   name : String[1];
+                }
+                
+                Class
+                test::Owner
+                {
+                   firstName: String[1];
+                   lastName: String[1];
+                }
+                
+                Association test::Car_Owner
+                {
+                   owner : test::Owner[1];
+                   car  : test::Car[0..1];
+                }\
+                """);
         try
         {
             execute("test():Any[*]");
             String result = functionExecution.getConsole().getLine(0);
-            Assert.assertEquals("'1'", result);
+            Assertions.assertEquals("'1'", result);
         }
         catch (Exception e)
         {
-            Assert.fail("Failed to set the reverse properties for a zero-to-one association.");
+            Assertions.fail("Failed to set the reverse properties for a zero-to-one association.");
         }
     }
 
     @Test
     public void testNewWithReverseZeroToManyProperty()
     {
-        compileTestSource("fromString.pure", "function test(): Any[*]\n" +
-                "{\n" +
-                "   let car = ^test::Car(name='Bugatti', owner= ^test::Owner(firstName='John', lastName='Roe'));\n" +
-                "   print($car.owner.cars->size()->toString(), 1);\n" +
-                "   $car;" +
-                "}\n" +
-                "\n" +
-                "Class\n" +
-                "test::Car\n" +
-                "{\n" +
-                "   name : String[1];\n" +
-                "}\n" +
-                "\n" +
-                "Class\n" +
-                "test::Owner\n" +
-                "{\n" +
-                "   firstName: String[1];\n" +
-                "   lastName: String[1];\n" +
-                "}\n" +
-                "\n" +
-                "Association test::Car_Owner\n" +
-                "{\n" +
-                "   owner : test::Owner[1];\n" +
-                "   cars  : test::Car[0..*];\n" +
-                "}");
+        compileTestSource("fromString.pure", """
+                function test(): Any[*]
+                {
+                   let car = ^test::Car(name='Bugatti', owner= ^test::Owner(firstName='John', lastName='Roe'));
+                   print($car.owner.cars->size()->toString(), 1);
+                   $car;\
+                }
+                
+                Class
+                test::Car
+                {
+                   name : String[1];
+                }
+                
+                Class
+                test::Owner
+                {
+                   firstName: String[1];
+                   lastName: String[1];
+                }
+                
+                Association test::Car_Owner
+                {
+                   owner : test::Owner[1];
+                   cars  : test::Car[0..*];
+                }\
+                """);
         try
         {
             execute("test():Any[*]");
             String result = functionExecution.getConsole().getLine(0);
-            Assert.assertEquals("'1'", result);
+            Assertions.assertEquals("'1'", result);
         }
         catch (Exception e)
         {
-            Assert.fail("Failed to set the reverse properties for a zero-to-many association.");
+            Assertions.fail("Failed to set the reverse properties for a zero-to-many association.");
         }
     }
 
     @Test
     public void testNewWithReverseOneToOneProperty()
     {
-        compileTestSource("fromString.pure", "function test(): Any[*]\n" +
-                "{\n" +
-                "   let car = ^test::Car(name='Bugatti', owner= ^test::Owner(firstName='John', lastName='Roe'));\n" +
-                "   print($car.owner.car->size()->toString(), 1);\n" +
-                "   $car;" +
-                "}\n" +
-                "\n" +
-                "Class\n" +
-                "test::Car\n" +
-                "{\n" +
-                "   name : String[1];\n" +
-                "}\n" +
-                "\n" +
-                "Class\n" +
-                "test::Owner\n" +
-                "{\n" +
-                "   firstName: String[1];\n" +
-                "   lastName: String[1];\n" +
-                "}\n" +
-                "\n" +
-                "Association test::Car_Owner\n" +
-                "{\n" +
-                "   owner : test::Owner[1];\n" +
-                "   car  : test::Car[1];\n" +
-                "}");
+        compileTestSource("fromString.pure", """
+                function test(): Any[*]
+                {
+                   let car = ^test::Car(name='Bugatti', owner= ^test::Owner(firstName='John', lastName='Roe'));
+                   print($car.owner.car->size()->toString(), 1);
+                   $car;\
+                }
+                
+                Class
+                test::Car
+                {
+                   name : String[1];
+                }
+                
+                Class
+                test::Owner
+                {
+                   firstName: String[1];
+                   lastName: String[1];
+                }
+                
+                Association test::Car_Owner
+                {
+                   owner : test::Owner[1];
+                   car  : test::Car[1];
+                }\
+                """);
         try
         {
             execute("test():Any[*]");
             String result = functionExecution.getConsole().getLine(0);
-            Assert.assertEquals("'1'", result);
+            Assertions.assertEquals("'1'", result);
         }
         catch (Exception e)
         {
-            Assert.fail("Failed to set the reverse properties for a one-to-one association.");
+            Assertions.fail("Failed to set the reverse properties for a one-to-one association.");
         }
     }
 
     @Test
     public void testNewWithReverseOneToManyProperty()
     {
-        compileTestSource("fromString.pure", "function test(): Any[*]\n" +
-                "{\n" +
-                "   let car = ^test::Car(name='Bugatti', owner= ^test::Owner(firstName='John', lastName='Roe'));\n" +
-                "   print($car.owner.cars->size()->toString(), 1);\n" +
-                "   $car;" +
-                "}\n" +
-                "\n" +
-                "Class\n" +
-                "test::Car\n" +
-                "{\n" +
-                "   name : String[1];\n" +
-                "}\n" +
-                "\n" +
-                "Class\n" +
-                "test::Owner\n" +
-                "{\n" +
-                "   firstName: String[1];\n" +
-                "   lastName: String[1];\n" +
-                "}\n" +
-                "\n" +
-                "Association test::Car_Owner\n" +
-                "{\n" +
-                "   owner : test::Owner[1];\n" +
-                "   cars  : test::Car[1..*];\n" +
-                "}");
+        compileTestSource("fromString.pure", """
+                function test(): Any[*]
+                {
+                   let car = ^test::Car(name='Bugatti', owner= ^test::Owner(firstName='John', lastName='Roe'));
+                   print($car.owner.cars->size()->toString(), 1);
+                   $car;\
+                }
+                
+                Class
+                test::Car
+                {
+                   name : String[1];
+                }
+                
+                Class
+                test::Owner
+                {
+                   firstName: String[1];
+                   lastName: String[1];
+                }
+                
+                Association test::Car_Owner
+                {
+                   owner : test::Owner[1];
+                   cars  : test::Car[1..*];
+                }\
+                """);
         try
         {
             execute("test():Any[*]");
             String result = functionExecution.getConsole().getLine(0);
-            Assert.assertEquals("'1'", result);
+            Assertions.assertEquals("'1'", result);
         }
         catch (Exception e)
         {
-            Assert.fail("Failed to set the reverse properties for a one-to-many association.");
+            Assertions.fail("Failed to set the reverse properties for a one-to-many association.");
         }
     }
 
     @Test
     public void testNewWithChildWithReverseOneToManyProperty()
     {
-        compileTestSource("fromString.pure", "function test(): Any[*]\n" +
-                "{\n" +
-                "   let car = ^test::Car(name='Bugatti', owner= ^test::Owner(firstName='John', lastName='Roe', cars=[^test::Car(name='Audi')]));\n" +
-                "   print($car.owner.cars->size()->toString(), 1);\n" +
-                "   print($car.owner.cars->sortBy(c|$c.name)->at(0).name, 1);\n" +
-                "   print($car.owner.cars->sortBy(c|$c.name)->at(1).name, 1);\n" +
-                "   $car;" +
-                "}\n" +
-                "function meta::pure::functions::collection::sortBy<T,U|m>(col:T[m], key:Function<{T[1]->U[1]}>[0..1]):T[m]\n" +
-                "{\n" +
-                "    sort($col, $key, [])\n" +
-                "}\n" +
-                "Class\n" +
-                "test::Car\n" +
-                "{\n" +
-                "   name : String[1];\n" +
-                "}\n" +
-                "\n" +
-                "Class\n" +
-                "test::Owner\n" +
-                "{\n" +
-                "   firstName: String[1];\n" +
-                "   lastName: String[1];\n" +
-                "}\n" +
-                "\n" +
-                "Association test::Car_Owner\n" +
-                "{\n" +
-                "   owner : test::Owner[1];\n" +
-                "   cars  : test::Car[1..*];\n" +
-                "}");
+        compileTestSource("fromString.pure", """
+                function test(): Any[*]
+                {
+                   let car = ^test::Car(name='Bugatti', owner= ^test::Owner(firstName='John', lastName='Roe', cars=[^test::Car(name='Audi')]));
+                   print($car.owner.cars->size()->toString(), 1);
+                   print($car.owner.cars->sortBy(c|$c.name)->at(0).name, 1);
+                   print($car.owner.cars->sortBy(c|$c.name)->at(1).name, 1);
+                   $car;\
+                }
+                function meta::pure::functions::collection::sortBy<T,U|m>(col:T[m], key:Function<{T[1]->U[1]}>[0..1]):T[m]
+                {
+                    sort($col, $key, [])
+                }
+                Class
+                test::Car
+                {
+                   name : String[1];
+                }
+                
+                Class
+                test::Owner
+                {
+                   firstName: String[1];
+                   lastName: String[1];
+                }
+                
+                Association test::Car_Owner
+                {
+                   owner : test::Owner[1];
+                   cars  : test::Car[1..*];
+                }\
+                """);
         try
         {
             execute("test():Any[*]");
-            Assert.assertEquals("'2'", functionExecution.getConsole().getLine(0));
-            Assert.assertEquals("'Audi'", functionExecution.getConsole().getLine(1));
-            Assert.assertEquals("'Bugatti'", functionExecution.getConsole().getLine(2));
+            Assertions.assertEquals("'2'", functionExecution.getConsole().getLine(0));
+            Assertions.assertEquals("'Audi'", functionExecution.getConsole().getLine(1));
+            Assertions.assertEquals("'Bugatti'", functionExecution.getConsole().getLine(2));
         }
         catch (Exception e)
         {
-            Assert.fail("Failed to set the reverse property of a child for a one-to-many association.");
+            Assertions.fail("Failed to set the reverse property of a child for a one-to-many association.");
         }
     }
 
@@ -300,28 +316,30 @@ public abstract class AbstractTestNewAtRuntime extends AbstractPureTestWithCoreC
     public void testNewWithZeroToOneAssociationExplicitNull()
     {
         compileTestSource("/test/testModel.pure",
-                "import test::*;\n" +
-                        "Class test::TestClassA\n" +
-                        "{\n" +
-                        "  name : String[1];\n" +
-                        "}\n" +
-                        "\n" +
-                        "Class test::TestClassB\n" +
-                        "{\n" +
-                        "}\n" +
-                        "\n" +
-                        "Association test::TestAssocAB\n" +
-                        "{\n" +
-                        "  toB : TestClassB[0..1];\n" +
-                        "  toA : TestClassA[1];\n" +
-                        "}\n" +
-                        "\n" +
-                        "function test::testFn():Any[*]\n" +
-                        "{\n" +
-                        "  let a = ^TestClassA(name='A', toB=[]);\n" +
-                        "  assert('A' == $a.name, |'');\n" +
-                        "  assert($a.toB->isEmpty(), |'');\n" +
-                        "}\n");
+                """
+                import test::*;
+                Class test::TestClassA
+                {
+                  name : String[1];
+                }
+                
+                Class test::TestClassB
+                {
+                }
+                
+                Association test::TestAssocAB
+                {
+                  toB : TestClassB[0..1];
+                  toA : TestClassA[1];
+                }
+                
+                function test::testFn():Any[*]
+                {
+                  let a = ^TestClassA(name='A', toB=[]);
+                  assert('A' == $a.name, |'');
+                  assert($a.toB->isEmpty(), |'');
+                }
+                """);
         CoreInstance func = runtime.getFunction("test::testFn():Any[*]");
         functionExecution.start(func, Lists.immutable.empty());
     }
@@ -330,28 +348,30 @@ public abstract class AbstractTestNewAtRuntime extends AbstractPureTestWithCoreC
     public void testNewWithZeroToManyAssociationExplicitNull()
     {
         compileTestSource("/test/testModel.pure",
-                "import test::*;\n" +
-                        "Class test::TestClassA\n" +
-                        "{\n" +
-                        "  name : String[1];\n" +
-                        "}\n" +
-                        "\n" +
-                        "Class test::TestClassB\n" +
-                        "{\n" +
-                        "}\n" +
-                        "\n" +
-                        "Association test::TestAssocAB\n" +
-                        "{\n" +
-                        "  toB : TestClassB[*];\n" +
-                        "  toA : TestClassA[1];\n" +
-                        "}\n" +
-                        "\n" +
-                        "function test::testFn():Any[*]\n" +
-                        "{\n" +
-                        "  let a = ^TestClassA(name='A', toB=[]);\n" +
-                        "  assert('A' == $a.name, |'');\n" +
-                        "  assert($a.toB->isEmpty(), |'');\n" +
-                        "}\n");
+                """
+                import test::*;
+                Class test::TestClassA
+                {
+                  name : String[1];
+                }
+                
+                Class test::TestClassB
+                {
+                }
+                
+                Association test::TestAssocAB
+                {
+                  toB : TestClassB[*];
+                  toA : TestClassA[1];
+                }
+                
+                function test::testFn():Any[*]
+                {
+                  let a = ^TestClassA(name='A', toB=[]);
+                  assert('A' == $a.name, |'');
+                  assert($a.toB->isEmpty(), |'');
+                }
+                """);
         CoreInstance func = runtime.getFunction("test::testFn():Any[*]");
         functionExecution.start(func, Lists.immutable.empty());
     }
@@ -360,10 +380,16 @@ public abstract class AbstractTestNewAtRuntime extends AbstractPureTestWithCoreC
     public void testNewParametrizedClassWithEmptyPropertiesSet()
     {
         String source =
-                "Class A<T1, T2> \n{ prop1:T1[*];\n prop2:T2[*]; }\n" +
-                        "Class B<T> \n{ prop1:String[*];\n prop2:T[*]; }\n" +
-                        "function test::testFn():Any[*] { ^A<String, Integer>(prop1=[], prop2=[]); ^B<Integer>(prop1='Hello', prop2=[]);}\n" +
-                        "function test::testGenericFn<R, T>():Any[*] { ^A<R, T>(prop1=[], prop2=[]); }\n";
+                """
+                Class A<T1, T2>\s
+                { prop1:T1[*];
+                 prop2:T2[*]; }
+                Class B<T>\s
+                { prop1:String[*];
+                 prop2:T[*]; }
+                function test::testFn():Any[*] { ^A<String, Integer>(prop1=[], prop2=[]); ^B<Integer>(prop1='Hello', prop2=[]);}
+                function test::testGenericFn<R, T>():Any[*] { ^A<R, T>(prop1=[], prop2=[]); }
+                """;
         compileTestSource("fromString.pure", source);
         compileAndExecute("test::testFn():Any[*]");
         // TODO should this be allowed?
@@ -374,15 +400,17 @@ public abstract class AbstractTestNewAtRuntime extends AbstractPureTestWithCoreC
     public void testNewWithoutKeyExpressions()
     {
         String source =
-                "Class A\n" +
-                "{" +
-                "   prop1:String[*];\n" +
-                "}\n" +
-                "function test::testFn():Any[*] " +
-                "{" +
-                "   let lambda = {| ^A()};\n" +
-                "   $lambda.expressionSequence->toOne()->meta::pure::functions::meta::reactivate(meta::pure::functions::collection::newMap([])->cast(@Map<String, List<Any>>));" +
-                "}\n";
+                """
+                Class A
+                {\
+                   prop1:String[*];
+                }
+                function test::testFn():Any[*] \
+                {\
+                   let lambda = {| ^A()};
+                   $lambda.expressionSequence->toOne()->meta::pure::functions::meta::reactivate(meta::pure::functions::collection::newMap([])->cast(@Map<String, List<Any>>));\
+                }
+                """;
         compileTestSource("fromString.pure", source);
         compileAndExecute("test::testFn():Any[*]");
     }

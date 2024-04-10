@@ -95,18 +95,18 @@ public class RootRouteNodePostProcessor extends Processor<RootRouteNode>
             {
                 GenericTypeTraceability.addTraceForTreePath(node, repository, processorSupport);
                 addReferenceUsagesForToManyProperty(node, node._resolvedPropertiesCoreInstance(), M3Properties.resolvedProperties, repository, processorSupport);
-                if (node instanceof ExistingPropertyRouteNode)
+                if (node instanceof ExistingPropertyRouteNode routeNode)
                 {
                     GenericTypeTraceability.addTraceForTreePath(node, repository, processorSupport);
-                    RouteNodePropertyStub propertyStub = ((ExistingPropertyRouteNode) node)._property();
+                    RouteNodePropertyStub propertyStub = routeNode._property();
                     // TODO Fix this: the reference usage should be to the RouteNodePropertyStub, not to the ExistingPropertyRouteNode
 //                addReferenceUsageForToOneProperty(propertyStub, M3Properties.property, repository, context, processorSupport);
                     AbstractProperty<?> property = (AbstractProperty<?>) ImportStub.withImportStubByPass(propertyStub._propertyCoreInstance().getFirst(), processorSupport);
                     addReferenceUsage(node, property, M3Properties.property, 0, repository, processorSupport);
                 }
-                else if (node instanceof NewPropertyRouteNode)
+                else if (node instanceof NewPropertyRouteNode routeNode)
                 {
-                    NewPropertyRouteNodeFunctionDefinition<?, ?> functionDefinition = ((NewPropertyRouteNode) node)._functionDefinition();
+                    NewPropertyRouteNodeFunctionDefinition<?, ?> functionDefinition = routeNode._functionDefinition();
                     GenericTypeTraceability.addTraceForNewPropertyRouteNodeFunctionDefinition(functionDefinition, repository, processorSupport);
                 }
                 for (PropertyRouteNode child : node._children())
@@ -143,13 +143,13 @@ public class RootRouteNodePostProcessor extends Processor<RootRouteNode>
     {
         to._resolvedPropertiesCoreInstance(FastList.<CoreInstance>newList(to._resolvedPropertiesCoreInstance().size() + from._resolvedPropertiesCoreInstance().size()).withAll(to._resolvedPropertiesCoreInstance()).withAll(from._resolvedPropertiesCoreInstance()));
         to._children(FastList.<PropertyRouteNode>newList(to._children().size() + from._children().size()).withAll(to._children()).withAll(from._children()));
-        if (from instanceof NewPropertyRouteNode)
+        if (from instanceof NewPropertyRouteNode node)
         {
-            ((NewPropertyRouteNode) to)._specifications(FastList.<ValueSpecification>newList(((NewPropertyRouteNode) to)._specifications().size() + ((NewPropertyRouteNode) from)._specifications().size()).withAll(((NewPropertyRouteNode) to)._specifications()).withAll(((NewPropertyRouteNode) from)._specifications()));
+            ((NewPropertyRouteNode) to)._specifications(FastList.<ValueSpecification>newList(((NewPropertyRouteNode) to)._specifications().size() + node._specifications().size()).withAll(((NewPropertyRouteNode) to)._specifications()).withAll(node._specifications()));
         }
-        if (to instanceof PropertyRouteNode && ((PropertyRouteNode) to)._root() == null)
+        if (to instanceof PropertyRouteNode node && node._root() == null)
         {
-            ((PropertyRouteNode) to)._root(root);
+            node._root(root);
         }
     }
 
@@ -165,7 +165,7 @@ public class RootRouteNodePostProcessor extends Processor<RootRouteNode>
             Type alreadyProcessedNodeType = (Type) ImportStub.withImportStubByPass(resolvedTreeNodes.get(nodeName).getFirst()._type()._rawTypeCoreInstance(), processorSupport);
             if (alreadyProcessedNodeType != type)
             {
-                throw new PureCompilationException(treePathNode.getSourceInformation(), String.format("Invalid Treepath! 2 nodes with same name %s but with different types %s %s", nodeName, type.getName(), alreadyProcessedNodeType.getName()));
+                throw new PureCompilationException(treePathNode.getSourceInformation(), "Invalid Treepath! 2 nodes with same name %s but with different types %s %s".formatted(nodeName, type.getName(), alreadyProcessedNodeType.getName()));
             }
             resolvedTreeNodes.put(nodeName, treePathNode);
             return;
@@ -180,9 +180,9 @@ public class RootRouteNodePostProcessor extends Processor<RootRouteNode>
             {
                 childNode._root(root);
             }
-            if (childNode instanceof ExistingPropertyRouteNode)
+            if (childNode instanceof ExistingPropertyRouteNode node)
             {
-                resolveExistingPropertyNode(root, type, matcher, state, repository, context, resolvedTreeNodes, processorSupport, (ExistingPropertyRouteNode) childNode);
+                resolveExistingPropertyNode(root, type, matcher, state, repository, context, resolvedTreeNodes, processorSupport, node);
             }
             else
             {

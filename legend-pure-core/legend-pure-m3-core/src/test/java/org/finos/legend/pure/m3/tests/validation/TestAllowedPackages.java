@@ -23,14 +23,14 @@ import org.finos.legend.pure.m3.serialization.filesystem.repository.CodeReposito
 import org.finos.legend.pure.m3.serialization.filesystem.repository.GenericCodeRepository;
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiledPlatform;
 import org.finos.legend.pure.m4.exception.PureCompilationException;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestAllowedPackages extends AbstractPureTestWithCoreCompiledPlatform
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getFunctionExecution(), new CompositeCodeStorage(new ClassLoaderCodeStorage(getCodeRepositories())), getFactoryRegistryOverride(), getOptions(), getExtra());
@@ -44,7 +44,7 @@ public class TestAllowedPackages extends AbstractPureTestWithCoreCompiledPlatfor
                 GenericCodeRepository.build("test", "test(::.*)?", "platform", "system"));
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("/platform/testSource1.pure");
@@ -60,16 +60,20 @@ public class TestAllowedPackages extends AbstractPureTestWithCoreCompiledPlatfor
     {
         // This should compile
         compileTestSource("/platform/testSource1.pure",
-                "Class meta::pure::MyTestClass\n" +
-                        "{\n" +
-                        "}\n");
+                """
+                Class meta::pure::MyTestClass
+                {
+                }
+                """);
 
         // This should not compile
-        PureCompilationException e = Assert.assertThrows(PureCompilationException.class, () -> compileTestSource(
+        PureCompilationException e = Assertions.assertThrows(PureCompilationException.class, () -> compileTestSource(
                 "/platform/testSource2.pure",
-                "Class model::test::MyTestClass\n" +
-                        "{\n" +
-                        "}\n"));
+                """
+                Class model::test::MyTestClass
+                {
+                }
+                """));
         assertPureException(PureCompilationException.class, "Package model::test is not allowed in platform; only packages matching ((meta)|(system)|(apps::pure))(::.*)? are allowed", "/platform/testSource2.pure", 1, 1, 1, 20, 3, 1, e);
     }
 
@@ -78,28 +82,34 @@ public class TestAllowedPackages extends AbstractPureTestWithCoreCompiledPlatfor
     {
         // This should compile
         compileTestSource("/test/testSource1.pure",
-                "Class test::MyTestClass\n" +
-                        "{\n" +
-                        "}\n");
+                """
+                Class test::MyTestClass
+                {
+                }
+                """);
 
         // This should not compile
-        PureCompilationException e = Assert.assertThrows(PureCompilationException.class, () -> compileTestSource(
+        PureCompilationException e = Assertions.assertThrows(PureCompilationException.class, () -> compileTestSource(
                 "/test/testSource2.pure",
-                "Class meta::pure::MyTestClass\n" +
-                        "{\n" +
-                        "}\n"));
+                """
+                Class meta::pure::MyTestClass
+                {
+                }
+                """));
         assertPureException(PureCompilationException.class, "Package meta::pure is not allowed in test; only packages matching test(::.*)? are allowed", "/test/testSource2.pure", 1, 1, 1, 19, 3, 1, e);
     }
 
     @Test
     public void testPackagePatternOfModelInModelValidationRepo()
     {
-        PureCompilationException e = Assert.assertThrows(PureCompilationException.class, () -> compileTestSource(
+        PureCompilationException e = Assertions.assertThrows(PureCompilationException.class, () -> compileTestSource(
                 "/model_validation/testFile2.pure",
-                "function model::somepk::producers::bu::validationFunc():Boolean[1]\n" +
-                        "{\n" +
-                        "    true;\n" +
-                        "}\n"));
+                """
+                function model::somepk::producers::bu::validationFunc():Boolean[1]
+                {
+                    true;
+                }
+                """));
         assertPureException(PureCompilationException.class, "Package model::somepk::producers::bu is not allowed in model_validation; only packages matching (model::producers)(::.*)? are allowed", "/model_validation/testFile2.pure", 1, 1, 1, 40, 4, 1, e);
     }
 }

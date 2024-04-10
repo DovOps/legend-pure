@@ -62,9 +62,9 @@ public class OperationSetImplementationProcessor extends Processor<OperationSetI
             }
         }
 
-        if (operationSetImplementation instanceof org.finos.legend.pure.m3.coreinstance.meta.pure.mapping.MergeOperationSetImplementation)
+        if (operationSetImplementation instanceof org.finos.legend.pure.m3.coreinstance.meta.pure.mapping.MergeOperationSetImplementation implementation)
         {
-            matcher.fullMatch(((MergeOperationSetImplementation) operationSetImplementation)._validationFunction(), state);
+            matcher.fullMatch(implementation._validationFunction(), state);
         }
     }
 

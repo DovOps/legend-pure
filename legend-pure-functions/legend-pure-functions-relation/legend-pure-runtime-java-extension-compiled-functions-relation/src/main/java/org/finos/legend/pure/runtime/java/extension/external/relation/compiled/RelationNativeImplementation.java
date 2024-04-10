@@ -47,8 +47,8 @@ public class RelationNativeImplementation
 {
     public static TestTDSCompiled getTDS(Object value)
     {
-        return value instanceof TDSContainer ?
-                ((TDSContainer) value).tds :
+        return value instanceof TDSContainer tdsc ?
+                tdsc.tds :
                 new TestTDSCompiled(readCsv((((CoreInstance) value).getValueForMetaPropertyToOne("csv")).getName()), ((CoreInstance) value).getValueForMetaPropertyToOne(M3Properties.classifierGenericType));
     }
 

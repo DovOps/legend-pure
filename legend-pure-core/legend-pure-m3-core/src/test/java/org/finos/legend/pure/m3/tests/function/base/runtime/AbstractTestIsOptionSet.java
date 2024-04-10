@@ -20,13 +20,13 @@ import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
 import org.finos.legend.pure.m3.navigation.valuespecification.ValueSpecification;
 import org.finos.legend.pure.m3.serialization.runtime.RuntimeOptions;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public abstract class AbstractTestIsOptionSet extends AbstractPureTestWithCoreCompiled
 {
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("fromString.pure");
@@ -37,36 +37,42 @@ public abstract class AbstractTestIsOptionSet extends AbstractPureTestWithCoreCo
     public void testOptionThatIsSetOn()
     {
         compileTestSource("fromString.pure",
-                "function test():Boolean[1]\n" +
-                        "{\n" +
-                        "    meta::core::runtime::isOptionSet('TestSetOn');" +
-                        "}\n");
+                """
+                function test():Boolean[1]
+                {
+                    meta::core::runtime::isOptionSet('TestSetOn');\
+                }
+                """);
         CoreInstance result = this.execute("test():Boolean[1]");
-        Assert.assertEquals("true", ValueSpecification.getValue(result, processorSupport).getName());
+        Assertions.assertEquals("true", ValueSpecification.getValue(result, processorSupport).getName());
     }
 
     @Test
     public void testOptionThatIsSetOff()
     {
         compileTestSource("fromString.pure",
-                "function test():Boolean[1]\n" +
-                        "{\n" +
-                        "    meta::core::runtime::isOptionSet('TestSetOff');" +
-                        "}\n");
+                """
+                function test():Boolean[1]
+                {
+                    meta::core::runtime::isOptionSet('TestSetOff');\
+                }
+                """);
         CoreInstance result = this.execute("test():Boolean[1]");
-        Assert.assertEquals("false", ValueSpecification.getValue(result, processorSupport).getName());
+        Assertions.assertEquals("false", ValueSpecification.getValue(result, processorSupport).getName());
     }
 
     @Test
     public void testOptionThatIsNotSet()
     {
         compileTestSource("fromString.pure",
-                "function test():Boolean[1]\n" +
-                        "{\n" +
-                        "    meta::core::runtime::isOptionSet('TestUnset');" +
-                        "}\n");
+                """
+                function test():Boolean[1]
+                {
+                    meta::core::runtime::isOptionSet('TestUnset');\
+                }
+                """);
         CoreInstance result = this.execute("test():Boolean[1]");
-        Assert.assertEquals("false", ValueSpecification.getValue(result, processorSupport).getName());
+        Assertions.assertEquals("false", ValueSpecification.getValue(result, processorSupport).getName());
     }
 
     protected static RuntimeOptions getOptions()

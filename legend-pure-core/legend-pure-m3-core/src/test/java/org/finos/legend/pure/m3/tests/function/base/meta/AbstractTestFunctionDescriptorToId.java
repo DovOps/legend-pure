@@ -16,13 +16,13 @@ package org.finos.legend.pure.m3.tests.function.base.meta;
 
 import org.finos.legend.pure.m3.exception.PureExecutionException;
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public abstract class AbstractTestFunctionDescriptorToId extends AbstractPureTestWithCoreCompiled
 {
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("testFunc.pure");
@@ -33,11 +33,13 @@ public abstract class AbstractTestFunctionDescriptorToId extends AbstractPureTes
     public void testInvalidFunctionDescriptorException()
     {
         compileTestSource("testFunc.pure",
-                "function test():String[1]\n" +
-                        "{\n" +
-                        "   meta::pure::functions::meta::functionDescriptorToId('meta::pure::functions::meta::pathToElement(path:String[1]):PackageableElement[1]');\n" +
-                        "}\n");
-        PureExecutionException e = Assert.assertThrows(PureExecutionException.class, () -> execute("test():String[1]"));
+                """
+                function test():String[1]
+                {
+                   meta::pure::functions::meta::functionDescriptorToId('meta::pure::functions::meta::pathToElement(path:String[1]):PackageableElement[1]');
+                }
+                """);
+        PureExecutionException e = Assertions.assertThrows(PureExecutionException.class, () -> execute("test():String[1]"));
         assertPureException(PureExecutionException.class, "Invalid function descriptor: meta::pure::functions::meta::pathToElement(path:String[1]):PackageableElement[1]", "testFunc.pure", 3, 33, e);
     }
 }

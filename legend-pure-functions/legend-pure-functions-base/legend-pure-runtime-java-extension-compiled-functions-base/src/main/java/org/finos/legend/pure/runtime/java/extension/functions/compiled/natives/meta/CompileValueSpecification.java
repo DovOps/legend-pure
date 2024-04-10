@@ -45,13 +45,15 @@ public class CompileValueSpecification extends AbstractNative
     public String buildBody()
     {
 
-        return "new DefendedPureFunction1<Object, Object>()\n" +
-                "        {\n" +
-                "            @Override\n" +
-                "            public Object value(Object input, ExecutionSupport es)\n" +
-                "            {\n" +
-                "                return input instanceof RichIterable ? org.finos.legend.pure.generated.FunctionsGen.compileCodeBlocks((RichIterable) input, es) : org.finos.legend.pure.generated.FunctionsGen.compileCodeBlock((String) input, es);\n" +
-                "            }\n" +
-                "        }";
+        return """
+                new DefendedPureFunction1<Object, Object>()
+                        {
+                            @Override
+                            public Object value(Object input, ExecutionSupport es)
+                            {
+                                return input instanceof RichIterable ? org.finos.legend.pure.generated.FunctionsGen.compileCodeBlocks((RichIterable) input, es) : org.finos.legend.pure.generated.FunctionsGen.compileCodeBlock((String) input, es);
+                            }
+                        }\
+                """;
     }
 }

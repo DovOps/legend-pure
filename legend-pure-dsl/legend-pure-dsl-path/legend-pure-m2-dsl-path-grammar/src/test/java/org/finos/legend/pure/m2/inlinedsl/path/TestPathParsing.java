@@ -17,20 +17,20 @@ package org.finos.legend.pure.m2.inlinedsl.path;
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
 import org.finos.legend.pure.m4.exception.PureCompilationException;
 import org.finos.legend.pure.m4.serialization.grammar.antlr.PureParserException;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestPathParsing extends AbstractPureTestWithCoreCompiled
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime();
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("testSource.pure");
@@ -43,17 +43,19 @@ public class TestPathParsing extends AbstractPureTestWithCoreCompiled
         try
         {
             compileTestSource("testSource.pure",
-                    "import meta::pure::metamodel::path::*;\n" +
-                            "Class TestClass\n" +
-                            "{\n" +
-                            "    prop : String[1];\n" +
-                            "}\n" +
-                            "\n" +
-                            "function test():Path[1]\n" +
-                            "{\n" +
-                            "    #/TestClass#\n" +
-                            "}\n");
-            Assert.fail("Expected parser error");
+                    """
+                    import meta::pure::metamodel::path::*;
+                    Class TestClass
+                    {
+                        prop : String[1];
+                    }
+                    
+                    function test():Path[1]
+                    {
+                        #/TestClass#
+                    }
+                    """);
+            Assertions.fail("Expected parser error");
         }
         catch (RuntimeException e)
         {
@@ -67,17 +69,19 @@ public class TestPathParsing extends AbstractPureTestWithCoreCompiled
         try
         {
             compileTestSource("testSource.pure",
-                    "import meta::pure::metamodel::path::*;\n" +
-                            "Class TestClass\n" +
-                            "{\n" +
-                            "    prop : String[1];\n" +
-                            "}\n" +
-                            "\n" +
-                            "function test():Path[1]\n" +
-                            "{\n" +
-                            "    #/TestClass/nonProp#\n" +
-                            "}\n");
-            Assert.fail("Expected compilation error");
+                    """
+                    import meta::pure::metamodel::path::*;
+                    Class TestClass
+                    {
+                        prop : String[1];
+                    }
+                    
+                    function test():Path[1]
+                    {
+                        #/TestClass/nonProp#
+                    }
+                    """);
+            Assertions.fail("Expected compilation error");
         }
         catch (RuntimeException e)
         {
@@ -87,22 +91,24 @@ public class TestPathParsing extends AbstractPureTestWithCoreCompiled
         try
         {
             compileTestSource("testSource2.pure",
-                    "import meta::pure::metamodel::path::*;\n" +
-                            "Class TestClass1\n" +
-                            "{\n" +
-                            "    prop1 : TestClass2[1];\n" +
-                            "}\n" +
-                            "\n" +
-                            "Class TestClass2\n" +
-                            "{\n" +
-                            "    prop2 : String[1];\n" +
-                            "}\n" +
-                            "\n" +
-                            "function test():Path[1]\n" +
-                            "{\n" +
-                            "    #/TestClass1/prop1/nonProp#\n" +
-                            "}\n");
-            Assert.fail("Expected compilation error");
+                    """
+                    import meta::pure::metamodel::path::*;
+                    Class TestClass1
+                    {
+                        prop1 : TestClass2[1];
+                    }
+                    
+                    Class TestClass2
+                    {
+                        prop2 : String[1];
+                    }
+                    
+                    function test():Path[1]
+                    {
+                        #/TestClass1/prop1/nonProp#
+                    }
+                    """);
+            Assertions.fail("Expected compilation error");
         }
         catch (RuntimeException e)
         {

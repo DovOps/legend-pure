@@ -20,20 +20,20 @@ import org.finos.legend.pure.m3.execution.FunctionExecution;
 import org.finos.legend.pure.m3.tests.elements._class.AbstractTestConstraints;
 import org.finos.legend.pure.runtime.java.compiled.execution.FunctionExecutionCompiledBuilder;
 import org.finos.legend.pure.runtime.java.compiled.factory.JavaModelFactoryRegistryLoader;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestConstraints extends AbstractTestConstraints
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getFunctionExecution(), getCodeStorage(), JavaModelFactoryRegistryLoader.loader(), getOptions(), getExtra());
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("/test/source1.pure");
@@ -45,33 +45,37 @@ public class TestConstraints extends AbstractTestConstraints
     public void testInheritanceInSeparateFile()
     {
         String source1Name = "/test/source1.pure";
-        String source1Code = "Class test::SuperClass\n" +
-                "[\n" +
-                "  nameNotEmpty: $this.name->length() > 0\n" +
-                "]\n" +
-                "{\n" +
-                "  name : String[1];\n" +
-                "}\n" +
-                "\n" +
-                "Class test::OtherClass\n" +
-                "[\n" +
-                "  otherNameNotEmpty: $this.otherName->length() > 0\n" +
-                "]\n" +
-                "{\n" +
-                "  otherName : String[1];\n" +
-                "}\n";
+        String source1Code = """
+                Class test::SuperClass
+                [
+                  nameNotEmpty: $this.name->length() > 0
+                ]
+                {
+                  name : String[1];
+                }
+                
+                Class test::OtherClass
+                [
+                  otherNameNotEmpty: $this.otherName->length() > 0
+                ]
+                {
+                  otherName : String[1];
+                }
+                """;
         String source2Name = "/test/source2.pure";
-        String source2Code = "Class test::SubClass extends test::SuperClass\n" +
-                "{\n" +
-                "}\n" +
-                "\n" +
-                "function test::testNew():Any[*]\n" +
-                "{\n" +
-                "  ^test::SubClass(name='')\n" +
-                "}\n";
+        String source2Code = """
+                Class test::SubClass extends test::SuperClass
+                {
+                }
+                
+                function test::testNew():Any[*]
+                {
+                  ^test::SubClass(name='')
+                }
+                """;
         // The two sources must be compiled together to test the issue
         runtime.createInMemoryAndCompile(Tuples.pair(source1Name, source1Code), Tuples.pair(source2Name, source2Code));
-        PureExecutionException e = Assert.assertThrows(PureExecutionException.class, () -> execute("test::testNew():Any[*]"));
+        PureExecutionException e = Assertions.assertThrows(PureExecutionException.class, () -> execute("test::testNew():Any[*]"));
         assertPureException(PureExecutionException.class, "Constraint :[nameNotEmpty] violated in the Class SuperClass", "/test/source2.pure", 7, 3, e);
     }
 

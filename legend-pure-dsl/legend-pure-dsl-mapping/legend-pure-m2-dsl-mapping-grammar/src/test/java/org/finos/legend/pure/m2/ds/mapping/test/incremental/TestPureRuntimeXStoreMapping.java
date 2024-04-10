@@ -19,94 +19,108 @@ import org.eclipse.collections.api.factory.Maps;
 import org.finos.legend.pure.m2.ds.mapping.test.AbstractPureMappingTestWithCoreCompiled;
 import org.finos.legend.pure.m3.tests.RuntimeTestScriptBuilder;
 import org.finos.legend.pure.m3.tests.RuntimeVerifier;
-import org.junit.After;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestPureRuntimeXStoreMapping extends AbstractPureMappingTestWithCoreCompiled
 {
     public static String model =
-            "Class Firm\n" +
-                    "{\n" +
-                    "   legalName : String[1];\n" +
-                    "}\n" +
-                    "\n" +
-                    "Class Person\n" +
-                    "{\n" +
-                    "   lastName : String[1];\n" +
-                    "}\n" +
-                    "\n" +
-                    "Association Firm_Person\n" +
-                    "{\n" +
-                    "   firm : Firm[1];\n" +
-                    "   employees : Person[*];\n" +
-                    "}\n";
+            """
+            Class Firm
+            {
+               legalName : String[1];
+            }
+            
+            Class Person
+            {
+               lastName : String[1];
+            }
+            
+            Association Firm_Person
+            {
+               firm : Firm[1];
+               employees : Person[*];
+            }
+            """;
 
     public static String modelInheritanceSuper =
-            "Class SuperFirm" +
-                    "{" +
-                    "   id : String[1];\n" +
-                    "}";
+            """
+            Class SuperFirm\
+            {\
+               id : String[1];
+            }\
+            """;
 
     public static String modelInheritanceSuper2 =
-            "Class SuperFirm" +
-                    "{" +
-                    "   id2 : String[1];\n" +
-                    "}";
+            """
+            Class SuperFirm\
+            {\
+               id2 : String[1];
+            }\
+            """;
 
     public static String modelInheritance =
-            "Class Firm extends SuperFirm\n" +
-                    "{\n" +
-                    "   legalName : String[1];\n" +
-                    "}\n" +
-                    "\n" +
-                    "Class Person\n" +
-                    "{\n" +
-                    "   lastName : String[1];\n" +
-                    "}\n" +
-                    "\n" +
-                    "Association Firm_Person\n" +
-                    "{\n" +
-                    "   firm : Firm[1];\n" +
-                    "   employees : Person[*];\n" +
-                    "}\n";
+            """
+            Class Firm extends SuperFirm
+            {
+               legalName : String[1];
+            }
+            
+            Class Person
+            {
+               lastName : String[1];
+            }
+            
+            Association Firm_Person
+            {
+               firm : Firm[1];
+               employees : Person[*];
+            }
+            """;
 
     public static String coreMapping =
-            "   Firm[f1] : Pure\n" +
-                    "   {\n" +
-                    "~src SrcFirm" +
-                    "      +id:String[1] : $src.id,\n" +
-                    "      legalName : $src.legalName\n" +
-                    "   }\n" +
-                    "   \n" +
-                    "   Person[e] : Pure\n" +
-                    "   {\n" +
-                    "~src SrcPerson" +
-                    "      +firmId:String[1] : $src.firmId,\n" +
-                    "      lastName : $src.lastName\n" +
-                    "   }\n";
+            """
+               Firm[f1] : Pure
+               {
+            ~src SrcFirm\
+                  +id:String[1] : $src.id,
+                  legalName : $src.legalName
+               }
+              \s
+               Person[e] : Pure
+               {
+            ~src SrcPerson\
+                  +firmId:String[1] : $src.firmId,
+                  lastName : $src.lastName
+               }
+            """;
 
     public static String coreMappingInheritance =
-            "   Firm[f1] : Pure\n" +
-                    "   {\n" +
-                    "~src SrcFirm" +
-                    "      id : $src.id,\n" +
-                    "      legalName : $src.legalName\n" +
-                    "   }\n" +
-                    "   \n" +
-                    "   Person[e] : Pure\n" +
-                    "   {\n" +
-                    "~src SrcPerson" +
-                    "      +firmId:String[1] : $src.firmId,\n" +
-                    "      lastName : $src.lastName\n" +
-                    "   }\n";
+            """
+               Firm[f1] : Pure
+               {
+            ~src SrcFirm\
+                  id : $src.id,
+                  legalName : $src.legalName
+               }
+              \s
+               Person[e] : Pure
+               {
+            ~src SrcPerson\
+                  +firmId:String[1] : $src.firmId,
+                  lastName : $src.lastName
+               }
+            """;
 
     public static String assoMapping =
-            "   Firm_Person : XStore\n" +
-                    "   {\n" +
-                    "      firm[e, f1] : $this.firmId == $that.id,\n" +
-                    "      employees[f1, e] : $this.id == $that.firmId\n" +
-                    "   }\n";
+            """
+               Firm_Person : XStore
+               {
+                  firm[e, f1] : $this.firmId == $that.id,
+                  employees[f1, e] : $this.id == $that.firmId
+               }
+            """;
 
 
     public static String initialMapping = "###Mapping\nMapping FirmMapping\n(" + coreMapping + ")";
@@ -122,25 +136,27 @@ public class TestPureRuntimeXStoreMapping extends AbstractPureMappingTestWithCor
     public static String mainMapping = "###Mapping\nMapping FirmMapping\n(\ninclude ModelMapping\n" + assoMapping + ")\n";
 
     public static String relational =
-            "###Pure\n" +
-                    "Class SrcFirm" +
-                    "{" +
-                    "   id: String[1];" +
-                    "   legalName : String[1];" +
-                    "}\n" +
-                    "Class SrcPerson" +
-                    "{" +
-                    "   firmId: String[1];" +
-                    "   lastName : String[1];" +
-                    "}\n";
+            """
+            ###Pure
+            Class SrcFirm\
+            {\
+               id: String[1];\
+               legalName : String[1];\
+            }
+            Class SrcPerson\
+            {\
+               firmId: String[1];\
+               lastName : String[1];\
+            }
+            """;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime();
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("source1.pure");

@@ -15,20 +15,20 @@
 package org.finos.legend.pure.m3.tests.elements.function.functionMatching;
 
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiledPlatform;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestQualifierFunctionMatching extends AbstractPureTestWithCoreCompiledPlatform
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getExtra());
     }
 
-    @After
+    @AfterEach
     public void clearRuntime()
     {
         runtime.delete("id.pure");
@@ -39,18 +39,20 @@ public class TestQualifierFunctionMatching extends AbstractPureTestWithCoreCompi
     {
         try
         {
-            compileTestSource("id.pure", "Class A\n" +
-                    "{\n" +
-                    "   t(i:Integer[1]){$i}:Integer[1];\n" +
-                    "}" +
-                    "function a():Integer[1]" +
-                    "{" +
-                    "   ^A().t('1');" +
-                    "}");
+            compileTestSource("id.pure", """
+                    Class A
+                    {
+                       t(i:Integer[1]){$i}:Integer[1];
+                    }\
+                    function a():Integer[1]\
+                    {\
+                       ^A().t('1');\
+                    }\
+                    """);
         }
         catch (Exception e)
         {
-            Assert.assertEquals("Compilation error at (resource:id.pure line:4 column:34), \"The system can't find a match for the function: t(_:A[1],_:String[1])\"", e.getMessage());
+            Assertions.assertEquals("Compilation error at (resource:id.pure line:4 column:34), \"The system can't find a match for the function: t(_:A[1],_:String[1])\"", e.getMessage());
         }
     }
 
@@ -59,51 +61,57 @@ public class TestQualifierFunctionMatching extends AbstractPureTestWithCoreCompi
     {
         try
         {
-            compileTestSource("id.pure", "Class A\n" +
-                    "{\n" +
-                    "   t(){2}:Integer[1];\n" +
-                    "}" +
-                    "function a():Integer[1]" +
-                    "{" +
-                    "   ^A().t()+3;" +
-                    "}");
+            compileTestSource("id.pure", """
+                    Class A
+                    {
+                       t(){2}:Integer[1];
+                    }\
+                    function a():Integer[1]\
+                    {\
+                       ^A().t()+3;\
+                    }\
+                    """);
         }
         catch (Exception e)
         {
-            Assert.assertEquals("Compilation error at (resource:id.pure line:4 column:34), \"The system can't find a match for the function: t(_:A[1],_:String[1])\"", e.getMessage());
+            Assertions.assertEquals("Compilation error at (resource:id.pure line:4 column:34), \"The system can't find a match for the function: t(_:A[1],_:String[1])\"", e.getMessage());
         }
     }
 
     @Test
     public void testQualifierFunctionMatchingUsingDistance()
     {
-        compileTestSource("id.pure", "Class A\n" +
-                "{\n" +
-                "   t(i:Integer[1]){1}:Integer[1];\n" +
-                "   t(i:Number[1]){'1'}:String[1];\n" +
-                "}\n" +
-                "function a():Any[*]\n" +
-                "{\n" +
-                "   ^A().t(1)+1;\n" +
-                "   ^A().t(1.0)+'ok';\n" +
-                "}");
+        compileTestSource("id.pure", """
+                Class A
+                {
+                   t(i:Integer[1]){1}:Integer[1];
+                   t(i:Number[1]){'1'}:String[1];
+                }
+                function a():Any[*]
+                {
+                   ^A().t(1)+1;
+                   ^A().t(1.0)+'ok';
+                }\
+                """);
     }
 
     @Test
     public void testQualifierFunctionMatching01Source()
     {
-        compileTestSource("id.pure", "Class A\n" +
-                "{\n" +
-                "   t(){2}:Integer[1];\n" +
-                "}" +
-                "function getA():A[0..1]" +
-                "{" +
-                "   ^A();" +
-                "}" +
-                "function a():Integer[1]" +
-                "{" +
-                "   getA()->toOne().t()+3;" +
-                "}");
+        compileTestSource("id.pure", """
+                Class A
+                {
+                   t(){2}:Integer[1];
+                }\
+                function getA():A[0..1]\
+                {\
+                   ^A();\
+                }\
+                function a():Integer[1]\
+                {\
+                   getA()->toOne().t()+3;\
+                }\
+                """);
     }
 
 
@@ -112,61 +120,67 @@ public class TestQualifierFunctionMatching extends AbstractPureTestWithCoreCompi
     {
         try
         {
-            compileTestSource("id.pure", "Class A\n" +
-                    "{\n" +
-                    "   t(){2}:Integer[1];\n" +
-                    "}" +
-                    "Class B extends A" +
-                    "{" +
-                    "   t(){'2'}:String[1];" +
-                    "}" +
-                    "function a():Integer[1]" +
-                    "{" +
-                    "   3;" +
-                    "}");
-            Assert.fail();
+            compileTestSource("id.pure", """
+                    Class A
+                    {
+                       t(){2}:Integer[1];
+                    }\
+                    Class B extends A\
+                    {\
+                       t(){'2'}:String[1];\
+                    }\
+                    function a():Integer[1]\
+                    {\
+                       3;\
+                    }\
+                    """);
+            Assertions.fail();
         }
         catch (Exception e)
         {
-            Assert.assertEquals("Compilation error at (resource:id.pure line:4 column:8), \"Property conflict on class B: property 't' defined on B conflicts with property 't' defined on A\"", e.getMessage());
+            Assertions.assertEquals("Compilation error at (resource:id.pure line:4 column:8), \"Property conflict on class B: property 't' defined on B conflicts with property 't' defined on A\"", e.getMessage());
         }
     }
 
     @Test
     public void testQualifierFunctionMatchingInheritance()
     {
-        compileTestSource("id.pure", "Class A\n" +
-                "{\n" +
-                "   t(){2}:Number[1];\n" +
-                "}" +
-                "Class B extends A" +
-                "{" +
-                "   t(){2.0}:Float[1];" +
-                "}" +
-                "function a():Integer[1]" +
-                "{" +
-                "   3;" +
-                "}");
+        compileTestSource("id.pure", """
+                Class A
+                {
+                   t(){2}:Number[1];
+                }\
+                Class B extends A\
+                {\
+                   t(){2.0}:Float[1];\
+                }\
+                function a():Integer[1]\
+                {\
+                   3;\
+                }\
+                """);
     }
 
     @Test
     public void testQualifierFunctionMatchingInheritanceTricky()
     {
-        compileTestSource("id.pure", "Class K {}" +
-                "Class SubK extends K {name : String[1];}" +
-                "Class A\n" +
-                "{\n" +
-                "   t(s:Integer[1]){^K();}:K[1];\n" +
-                "   t(s:String[1]){'2'}:String[1];\n" +
-                "}" +
-                "Class B extends A" +
-                "{" +
-                "   t(s:Number[1]){^SubK(name='e')}:SubK[1];" +
-                "}" +
-                "function a():Any[*]" +
-                "{" +
-                "   ^B().t(1).name;" +
-                "   ^B().t('1')+'1';" +
-                "}");
+        compileTestSource("id.pure", """
+                Class K {}\
+                Class SubK extends K {name : String[1];}\
+                Class A
+                {
+                   t(s:Integer[1]){^K();}:K[1];
+                   t(s:String[1]){'2'}:String[1];
+                }\
+                Class B extends A\
+                {\
+                   t(s:Number[1]){^SubK(name='e')}:SubK[1];\
+                }\
+                function a():Any[*]\
+                {\
+                   ^B().t(1).name;\
+                   ^B().t('1')+'1';\
+                }\
+                """);
     }
 }

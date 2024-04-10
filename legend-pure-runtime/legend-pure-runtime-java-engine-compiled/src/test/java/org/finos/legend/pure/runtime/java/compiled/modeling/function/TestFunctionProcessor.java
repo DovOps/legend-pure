@@ -18,12 +18,12 @@ import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
 import org.finos.legend.pure.m3.execution.FunctionExecution;
 import org.finos.legend.pure.runtime.java.compiled.execution.FunctionExecutionCompiledBuilder;
 import org.finos.legend.pure.runtime.java.compiled.factory.JavaModelFactoryRegistryLoader;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestFunctionProcessor extends AbstractPureTestWithCoreCompiled
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getFunctionExecution(), JavaModelFactoryRegistryLoader.loader());
@@ -32,62 +32,80 @@ public class TestFunctionProcessor extends AbstractPureTestWithCoreCompiled
     @Test
     public void testProcessFunctionDefinitionContent()
     {
-        compileTestSource("function pkg::f1():Boolean[1]\n" +
-                "{\n" +
-                "   true;\n" +
-                "   true;\n" +
-                "}\n");
+        compileTestSource("""
+                function pkg::f1():Boolean[1]
+                {
+                   true;
+                   true;
+                }
+                """);
 
-        compileTestSource("function pkg::f2():Boolean[1]\n" +
-                "{\n" +
-                "   1;\n" +
-                "   true;\n" +
-                "}\n");
+        compileTestSource("""
+                function pkg::f2():Boolean[1]
+                {
+                   1;
+                   true;
+                }
+                """);
 
-        compileTestSource("function pkg::f3():Boolean[1]\n" +
-                "{\n" +
-                "   [];\n" +
-                "   true;\n" +
-                "}\n");
+        compileTestSource("""
+                function pkg::f3():Boolean[1]
+                {
+                   [];
+                   true;
+                }
+                """);
 
-        compileTestSource("function pkg::f4():String[1]\n" +
-                "{\n" +
-                "   [true, false];\n" +
-                "   'string';\n" +
-                "}\n");
+        compileTestSource("""
+                function pkg::f4():String[1]
+                {
+                   [true, false];
+                   'string';
+                }
+                """);
 
-        compileTestSource("function pkg::f5():String[1]\n" +
-                "{\n" +
-                "   let a = 99;\n" +
-                "   $a;\n" +
-                "   'string';\n" +
-                "}\n");
+        compileTestSource("""
+                function pkg::f5():String[1]
+                {
+                   let a = 99;
+                   $a;
+                   'string';
+                }
+                """);
 
-        compileTestSource("function pkg::f6():String[1]\n" +
-                "{\n" +
-                "   [];\n" +
-                "   'string';\n" +
-                "}\n");
+        compileTestSource("""
+                function pkg::f6():String[1]
+                {
+                   [];
+                   'string';
+                }
+                """);
 
-        compileTestSource("function pkg::f7():Boolean[1]\n" +
-                "{\n" +
-                "   1==1;\n" +
-                "   2==2;\n" +
-                "}\n");
+        compileTestSource("""
+                function pkg::f7():Boolean[1]
+                {
+                   1==1;
+                   2==2;
+                }
+                """);
 
-        compileTestSource("function pkg::f8():Boolean[1]\n" +
-                "{\n" +
-                "   if(true, |true;true;, |1==2;3==4;);\n" +
-                "   if(false, |true;true;, |1==2;3==4;);\n" +
-                "   false;\n" +
-                "}\n");
+        compileTestSource("""
+                function pkg::f8():Boolean[1]
+                {
+                   if(true, |true;true;, |1==2;3==4;);
+                   if(false, |true;true;, |1==2;3==4;);
+                   false;
+                }
+                """);
 
-        compileTestSource("Class pkg::C{}\n" +
-                "function pkg::f9():Boolean[1]\n" +
-                "{\n" +
-                "   ^pkg::C();\n" +
-                "   true;\n" +
-                "}\n");
+        compileTestSource("""
+                Class pkg::C{}
+                function pkg::f9():Boolean[1]
+                {
+                   ^pkg::C();
+                   true;
+                }
+                """);
     }
 
     protected static FunctionExecution getFunctionExecution()

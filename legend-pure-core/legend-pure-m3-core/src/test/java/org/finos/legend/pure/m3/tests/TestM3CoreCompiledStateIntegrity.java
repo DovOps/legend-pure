@@ -15,16 +15,16 @@
 package org.finos.legend.pure.m3.tests;
 
 import org.finos.legend.pure.m3.serialization.filesystem.usercodestorage.composite.CompositeCodeStorage;
+import org.junit.jupiter.api.BeforeAll;
 import org.finos.legend.pure.m3.serialization.filesystem.repository.CodeRepositoryProviderHelper;
 import org.finos.legend.pure.m3.serialization.filesystem.usercodestorage.MutableRepositoryCodeStorage;
 import org.finos.legend.pure.m3.serialization.filesystem.usercodestorage.classpath.ClassLoaderCodeStorage;
-import org.junit.BeforeClass;
 
 import java.nio.file.Path;
 
 public class TestM3CoreCompiledStateIntegrity extends AbstractCompiledStateIntegrityTest
 {
-    @BeforeClass
+    @BeforeAll
     public static void initialize()
     {
         MutableRepositoryCodeStorage codeStorage = new CompositeCodeStorage(new ClassLoaderCodeStorage(CodeRepositoryProviderHelper.findPlatformCodeRepository()));

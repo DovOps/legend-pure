@@ -44,8 +44,8 @@ public class PropertyInstanceBuilder
 
     static ListIterable<AbstractProperty<?>> createMilestonedProperties(CoreInstance sourceProperty, CoreInstance propertyOwner, ListIterable<MilestonePropertyCodeBlock> propertyCodeBlocks, Context context, ProcessorSupport processorSupport, ModelRepository modelRepository)
     {
-        CoreInstance rawType = sourceProperty instanceof AbstractProperty ? ((AbstractProperty<?>) sourceProperty)._genericType()._rawTypeCoreInstance() : null;
-        ImportGroup importId = rawType instanceof org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel._import.ImportStub ? ((org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel._import.ImportStub) rawType)._importGroup() : null;
+        CoreInstance rawType = sourceProperty instanceof AbstractProperty ap ? ap._genericType()._rawTypeCoreInstance() : null;
+        ImportGroup importId = rawType instanceof org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel._import.ImportStub is ? is._importGroup() : null;
         return createM3MilestonedProperties(propertyOwner, importId, propertyCodeBlocks, context, processorSupport, modelRepository);
     }
 
@@ -100,10 +100,10 @@ public class PropertyInstanceBuilder
             property._stereotypesAddAll(propertyCodeBlock.getNonMilestonedStereotypes(processorSupport));
             property._taggedValuesAddAll(propertyCodeBlock.getTaggedValues());
             AbstractProperty<?> sourceProperty = propertyCodeBlock.getSourceProperty();
-            if (sourceProperty instanceof Property && property instanceof Property)
+            if (sourceProperty instanceof Property property1 && property instanceof Property property1)
             {
-                Enum aggregation = ((Property<?, ?>) sourceProperty)._aggregation();
-                ((Property<?, ?>) property)._aggregation(aggregation);
+                Enum aggregation = property1._aggregation();
+                property1._aggregation(aggregation);
             }
         }
         return property;

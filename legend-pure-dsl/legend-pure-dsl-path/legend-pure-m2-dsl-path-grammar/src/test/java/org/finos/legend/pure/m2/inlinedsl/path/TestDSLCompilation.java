@@ -15,20 +15,20 @@
 package org.finos.legend.pure.m2.inlinedsl.path;
 
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestDSLCompilation extends AbstractPureTestWithCoreCompiled
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime();
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("file.pure");
@@ -40,78 +40,88 @@ public class TestDSLCompilation extends AbstractPureTestWithCoreCompiled
     {
         try
         {
-            runtime.createInMemorySource("file.pure", "Class Person{address:Address[1];} Class Firm<T> {employees : Person[1];address:Address[1];} Class Address{}\n" +
-                    "function test():Any[*]\n" +
-                    "{\n" +
-                    "    print(#/UnknownFirm/employees/address#,2);\n" +
-                    "}\n");
+            runtime.createInMemorySource("file.pure", """
+                    Class Person{address:Address[1];} Class Firm<T> {employees : Person[1];address:Address[1];} Class Address{}
+                    function test():Any[*]
+                    {
+                        print(#/UnknownFirm/employees/address#,2);
+                    }
+                    """);
             runtime.compile();
-            Assert.fail();
+            Assertions.fail();
         }
         catch (Exception e)
         {
-            Assert.assertEquals("Compilation error at (resource:file.pure line:4 column:12), \"UnknownFirm has not been defined!\"", e.getMessage());
+            Assertions.assertEquals("Compilation error at (resource:file.pure line:4 column:12), \"UnknownFirm has not been defined!\"", e.getMessage());
         }
 
         try
         {
-            runtime.modify("file.pure", "Class Person{address:Address[1];} Class Firm<T> {employees : Person[1];address:Address[1];} Class Address{}\n" +
-                    "function test():Any[*]\n" +
-                    "{\n" +
-                    "    print(#/Firm/employees/address#,2);\n" +
-                    "}\n");
+            runtime.modify("file.pure", """
+                    Class Person{address:Address[1];} Class Firm<T> {employees : Person[1];address:Address[1];} Class Address{}
+                    function test():Any[*]
+                    {
+                        print(#/Firm/employees/address#,2);
+                    }
+                    """);
             runtime.compile();
-            Assert.fail();
+            Assertions.fail();
         }
         catch (Exception e)
         {
-            Assert.assertEquals("Compilation error at (resource:file.pure line:4 column:12), \"Type argument mismatch for the class Firm<T> (expected 1, got 0): Firm\"", e.getMessage());
+            Assertions.assertEquals("Compilation error at (resource:file.pure line:4 column:12), \"Type argument mismatch for the class Firm<T> (expected 1, got 0): Firm\"", e.getMessage());
         }
 
         try
         {
-            runtime.modify("file.pure", "Class Person{address:Address[1];} Class Firm<T> {employees : Person[1];address:Address[1];} Class Address{}\n" +
-                    "function test():Any[*]\n" +
-                    "{\n" +
-                    "    print(#/Firm<BlaBla>/employees/address#,2);\n" +
-                    "}\n");
+            runtime.modify("file.pure", """
+                    Class Person{address:Address[1];} Class Firm<T> {employees : Person[1];address:Address[1];} Class Address{}
+                    function test():Any[*]
+                    {
+                        print(#/Firm<BlaBla>/employees/address#,2);
+                    }
+                    """);
             runtime.compile();
-            Assert.fail();
+            Assertions.fail();
         }
         catch (Exception e)
         {
-            Assert.assertEquals("Compilation error at (resource:file.pure line:4 column:18), \"BlaBla has not been defined!\"", e.getMessage());
+            Assertions.assertEquals("Compilation error at (resource:file.pure line:4 column:18), \"BlaBla has not been defined!\"", e.getMessage());
         }
 
 
         try
         {
-            runtime.modify("file.pure", "Class Person{address:Address[1];} Class Firm<T> {employees : Person[1];address:Address[1];} Class Address{}\n" +
-                    "function test():Any[*]\n" +
-                    "{\n" +
-                    "    print(#/Firm<Any>/employee/address#,2);\n" +
-                    "}\n");
+            runtime.modify("file.pure", """
+                    Class Person{address:Address[1];} Class Firm<T> {employees : Person[1];address:Address[1];} Class Address{}
+                    function test():Any[*]
+                    {
+                        print(#/Firm<Any>/employee/address#,2);
+                    }
+                    """);
             runtime.compile();
-            Assert.fail();
+            Assertions.fail();
         }
         catch (Exception e)
         {
-            Assert.assertEquals("Compilation error at (resource:file.pure line:4 column:23), \"The property 'employee' can't be found in the type 'Firm' (or any supertype).\"", e.getMessage());
+            Assertions.assertEquals("Compilation error at (resource:file.pure line:4 column:23), \"The property 'employee' can't be found in the type 'Firm' (or any supertype).\"", e.getMessage());
         }
 
         try
         {
-            runtime.modify("file.pure", "Class Person{address:Address[1];} Class Firm<T> {employees : Person[1];address:Address[1];} Class Address{}\n" +
-                    "function test():Any[*]\n" +
-                    "{\n" +
-                    "    print(#/Firm/employees/address2#,2);\n" +
-                    "}\n");
+            runtime.modify("file.pure", """
+                    Class Person{address:Address[1];} Class Firm<T> {employees : Person[1];address:Address[1];} Class Address{}
+                    function test():Any[*]
+                    {
+                        print(#/Firm/employees/address2#,2);
+                    }
+                    """);
             runtime.compile();
-            Assert.fail();
+            Assertions.fail();
         }
         catch (Exception e)
         {
-            Assert.assertEquals("Compilation error at (resource:file.pure line:4 column:28), \"The property 'address2' can't be found in the type 'Person' (or any supertype).\"", e.getMessage());
+            Assertions.assertEquals("Compilation error at (resource:file.pure line:4 column:28), \"The property 'address2' can't be found in the type 'Person' (or any supertype).\"", e.getMessage());
         }
 
     }
@@ -119,31 +129,33 @@ public class TestDSLCompilation extends AbstractPureTestWithCoreCompiled
     @Test
     public void testPathWithImports() throws Exception
     {
-        runtime.createInMemorySource("file.pure", "import meta::relational::tests::mapping::enumeration::model::domain::*;\n" +
-                "Class meta::relational::tests::mapping::enumeration::model::domain::Product\n" +
-                "{\n" +
-                "   description: String[1];\n" +
-                "   synonyms: ProductSynonym[*];\n" +
-                "   synonymsByType(type:ProductSynonymType[1])\n" +
-                "   {\n" +
-                "      $this.synonyms->filter(s | $s.type == $type);\n" +
-                "   }:ProductSynonym[*];\n" +
-                "}\n" +
-                "Class meta::relational::tests::mapping::enumeration::model::domain::ProductSynonym\n" +
-                "{\n" +
-                "   type:ProductSynonymType[1];\n" +
-                "   value:String[1];\n" +
-                "}\n" +
-                "Enum meta::relational::tests::mapping::enumeration::model::domain::ProductSynonymType\n" +
-                "{\n" +
-                "   CUSIP,\n" +
-                "   GS_NUMBER\n" +
-                "}\n" +
-                "function test():Any[*]\n" +
-                "{\n" +
-                "    print(#/Product/description#,2);\n" +
-                "    print(#/Product/synonymsByType(ProductSynonymType.CUSIP)/value!cusip#,2);\n" +
-                "}\n");
+        runtime.createInMemorySource("file.pure", """
+                import meta::relational::tests::mapping::enumeration::model::domain::*;
+                Class meta::relational::tests::mapping::enumeration::model::domain::Product
+                {
+                   description: String[1];
+                   synonyms: ProductSynonym[*];
+                   synonymsByType(type:ProductSynonymType[1])
+                   {
+                      $this.synonyms->filter(s | $s.type == $type);
+                   }:ProductSynonym[*];
+                }
+                Class meta::relational::tests::mapping::enumeration::model::domain::ProductSynonym
+                {
+                   type:ProductSynonymType[1];
+                   value:String[1];
+                }
+                Enum meta::relational::tests::mapping::enumeration::model::domain::ProductSynonymType
+                {
+                   CUSIP,
+                   GS_NUMBER
+                }
+                function test():Any[*]
+                {
+                    print(#/Product/description#,2);
+                    print(#/Product/synonymsByType(ProductSynonymType.CUSIP)/value!cusip#,2);
+                }
+                """);
         runtime.compile();
     }
 
@@ -153,59 +165,67 @@ public class TestDSLCompilation extends AbstractPureTestWithCoreCompiled
     {
 
         runtime.createInMemorySource("file.pure",
-                "Class Person\n" +
-                        "{\n" +
-                        "    firstName : String[1];\n" +
-                        "    lastName : String[1];\n" +
-                        "    nameWithTitle(title:String[1]){$title+' '+$this.firstName+' '+$this.lastName}:String[1];" +
-                        "nameWithPrefixAndSuffix(prefix:String[0..1], suffixes:String[*])\n" +
-                        "    {\n" +
-                        "        if($prefix->isEmpty(),\n" +
-                        "           | if($suffixes->isEmpty(),\n" +
-                        "                | $this.firstName + ' ' + $this.lastName,\n" +
-                        "                | $this.firstName + ' ' + $this.lastName + ', ' + $suffixes->joinStrings(', ')),\n" +
-                        "           | if($suffixes->isEmpty(),\n" +
-                        "                | $prefix->toOne() + ' ' + $this.firstName + ' ' + $this.lastName,\n" +
-                        "                | $prefix->toOne() + ' ' + $this.firstName + ' ' + $this.lastName + ', ' + $suffixes->joinStrings(', ')))\n" +
-                        "    }:String[1];" +
-                        "}\n");
+                """
+                Class Person
+                {
+                    firstName : String[1];
+                    lastName : String[1];
+                    nameWithTitle(title:String[1]){$title+' '+$this.firstName+' '+$this.lastName}:String[1];\
+                nameWithPrefixAndSuffix(prefix:String[0..1], suffixes:String[*])
+                    {
+                        if($prefix->isEmpty(),
+                           | if($suffixes->isEmpty(),
+                                | $this.firstName + ' ' + $this.lastName,
+                                | $this.firstName + ' ' + $this.lastName + ', ' + $suffixes->joinStrings(', ')),
+                           | if($suffixes->isEmpty(),
+                                | $prefix->toOne() + ' ' + $this.firstName + ' ' + $this.lastName,
+                                | $prefix->toOne() + ' ' + $this.firstName + ' ' + $this.lastName + ', ' + $suffixes->joinStrings(', ')))
+                    }:String[1];\
+                }
+                """);
 
         try
         {
             runtime.createInMemorySource("function.pure",
-                    "function test():Any[*]\n" +
-                            "{\n" +
-                            "    print(#/Person/nameWithTitle()#,2);\n" +
-                            "}\n");
+                    """
+                    function test():Any[*]
+                    {
+                        print(#/Person/nameWithTitle()#,2);
+                    }
+                    """);
             runtime.compile();
-            Assert.fail();
+            Assertions.fail();
         }
         catch (Exception e)
         {
-            Assert.assertEquals("Compilation error at (resource:function.pure line:3 column:12), \"Error finding match for function 'nameWithTitle'. Incorrect number of parameters, function expects 1 parameters\"", e.getMessage());
+            Assertions.assertEquals("Compilation error at (resource:function.pure line:3 column:12), \"Error finding match for function 'nameWithTitle'. Incorrect number of parameters, function expects 1 parameters\"", e.getMessage());
         }
 
 
         try
         {
             runtime.modify("function.pure",
-                    "function test():Any[*]\n" +
-                            "{\n" +
-                            "    print(#/Person/nameWithTitle(1)#,2);\n" +
-                            "}\n");
+                    """
+                    function test():Any[*]
+                    {
+                        print(#/Person/nameWithTitle(1)#,2);
+                    }
+                    """);
             runtime.compile();
-            Assert.fail();
+            Assertions.fail();
         }
         catch (Exception e)
         {
-            Assert.assertEquals("Compilation error at (resource:function.pure line:3 column:12), \"Parameter type mismatch for function 'nameWithTitle'. Expected:String, Found:Integer\"", e.getMessage());
+            Assertions.assertEquals("Compilation error at (resource:function.pure line:3 column:12), \"Parameter type mismatch for function 'nameWithTitle'. Expected:String, Found:Integer\"", e.getMessage());
         }
 
         runtime.modify("function.pure",
-                "function test():Any[*]\n" +
-                        "{\n" +
-                        "    print(#/Person/nameWithTitle('1')#,2);\n" +
-                        "}\n");
+                """
+                function test():Any[*]
+                {
+                    print(#/Person/nameWithTitle('1')#,2);
+                }
+                """);
         runtime.compile();
     }
 
@@ -214,95 +234,109 @@ public class TestDSLCompilation extends AbstractPureTestWithCoreCompiled
     {
 
         runtime.createInMemorySource("file.pure",
-                "Class Person\n" +
-                        "{\n" +
-                        "    firstName : String[1];\n" +
-                        "    lastName : String[1];\n" +
-                        "    nameWithTitle(title:String[1]){$title+' '+$this.firstName+' '+$this.lastName}:String[1];" +
-                        "    nameWithPrefixAndSuffix(prefix:String[0..1], suffixes:String[*])\n" +
-                        "    {\n" +
-                        "        if($prefix->isEmpty(),\n" +
-                        "           | if($suffixes->isEmpty(),\n" +
-                        "                | $this.firstName + ' ' + $this.lastName,\n" +
-                        "                | $this.firstName + ' ' + $this.lastName + ', ' + $suffixes->joinStrings(', ')),\n" +
-                        "           | if($suffixes->isEmpty(),\n" +
-                        "                | $prefix->toOne() + ' ' + $this.firstName + ' ' + $this.lastName,\n" +
-                        "                | $prefix->toOne() + ' ' + $this.firstName + ' ' + $this.lastName + ', ' + $suffixes->joinStrings(', ')))\n" +
-                        "    }:String[1];" +
-                        "    memberOf(org:Organization[1]){true}:Boolean[1];" +
-                        "}\n" +
-                        "Class Organization\n" +
-                        "{\n" +
-                        "}" +
-                        "Class Team extends Organization\n" +
-                        "{\n" +
-                        "}");
+                """
+                Class Person
+                {
+                    firstName : String[1];
+                    lastName : String[1];
+                    nameWithTitle(title:String[1]){$title+' '+$this.firstName+' '+$this.lastName}:String[1];\
+                    nameWithPrefixAndSuffix(prefix:String[0..1], suffixes:String[*])
+                    {
+                        if($prefix->isEmpty(),
+                           | if($suffixes->isEmpty(),
+                                | $this.firstName + ' ' + $this.lastName,
+                                | $this.firstName + ' ' + $this.lastName + ', ' + $suffixes->joinStrings(', ')),
+                           | if($suffixes->isEmpty(),
+                                | $prefix->toOne() + ' ' + $this.firstName + ' ' + $this.lastName,
+                                | $prefix->toOne() + ' ' + $this.firstName + ' ' + $this.lastName + ', ' + $suffixes->joinStrings(', ')))
+                    }:String[1];\
+                    memberOf(org:Organization[1]){true}:Boolean[1];\
+                }
+                Class Organization
+                {
+                }\
+                Class Team extends Organization
+                {
+                }\
+                """);
 
         runtime.createInMemorySource("function.pure",
-                "function test():Any[*]\n" +
-                        "{\n" +
-                        "    print(#/Person/nameWithPrefixAndSuffix('a', 'b')#,2);\n" +
-                        "}\n");
+                """
+                function test():Any[*]
+                {
+                    print(#/Person/nameWithPrefixAndSuffix('a', 'b')#,2);
+                }
+                """);
         runtime.compile();
 
 
         runtime.modify("function.pure",
-                "function test():Any[*]\n" +
-                        "{\n" +
-                        "    print(#/Person/nameWithPrefixAndSuffix('a', ['a', 'b'])#,2);\n" +
-                        "}\n");
+                """
+                function test():Any[*]
+                {
+                    print(#/Person/nameWithPrefixAndSuffix('a', ['a', 'b'])#,2);
+                }
+                """);
         runtime.compile();
 
         runtime.modify("function.pure",
-                "function test():Any[*]\n" +
-                        "{\n" +
-                        "    print(#/Person/nameWithPrefixAndSuffix([], ['a', 'b'])#,2);\n" +
-                        "}\n");
+                """
+                function test():Any[*]
+                {
+                    print(#/Person/nameWithPrefixAndSuffix([], ['a', 'b'])#,2);
+                }
+                """);
         runtime.compile();
 
         try
         {
             runtime.modify("function.pure",
-                    "function test():Any[*]\n" +
-                            "{\n" +
-                            "    print(#/Person/nameWithPrefixAndSuffix('a', [1, 2])#,2);\n" +
-                            "}\n");
+                    """
+                    function test():Any[*]
+                    {
+                        print(#/Person/nameWithPrefixAndSuffix('a', [1, 2])#,2);
+                    }
+                    """);
             runtime.compile();
-            Assert.fail();
+            Assertions.fail();
         }
         catch (Exception e)
         {
-            Assert.assertEquals("Compilation error at (resource:function.pure line:3 column:12), \"Parameter type mismatch for function 'nameWithPrefixAndSuffix'. Expected:String, Found:Integer\"", e.getMessage());
+            Assertions.assertEquals("Compilation error at (resource:function.pure line:3 column:12), \"Parameter type mismatch for function 'nameWithPrefixAndSuffix'. Expected:String, Found:Integer\"", e.getMessage());
         }
 
         try
         {
             runtime.modify("function.pure",
-                    "function test():Any[*]\n" +
-                            "{\n" +
-                            "    print(#/Person/nameWithPrefixAndSuffix('a', [1, 'b'])#,2);\n" +
-                            "}\n");
+                    """
+                    function test():Any[*]
+                    {
+                        print(#/Person/nameWithPrefixAndSuffix('a', [1, 'b'])#,2);
+                    }
+                    """);
             runtime.compile();
-            Assert.fail();
+            Assertions.fail();
         }
         catch (Exception e)
         {
-            Assert.assertEquals("Compilation error at (resource:function.pure line:3 column:12), \"Parameter type mismatch for function 'nameWithPrefixAndSuffix'. Expected:String, Found:Any\"", e.getMessage());
+            Assertions.assertEquals("Compilation error at (resource:function.pure line:3 column:12), \"Parameter type mismatch for function 'nameWithPrefixAndSuffix'. Expected:String, Found:Any\"", e.getMessage());
         }
 
         try
         {
             runtime.modify("function.pure",
-                    "function test():Any[*]\n" +
-                            "{\n" +
-                            "    print(#/Person/nameWithPrefixAndSuffix('a')#,2);\n" +
-                            "}\n");
+                    """
+                    function test():Any[*]
+                    {
+                        print(#/Person/nameWithPrefixAndSuffix('a')#,2);
+                    }
+                    """);
             runtime.compile();
-            Assert.fail();
+            Assertions.fail();
         }
         catch (Exception e)
         {
-            Assert.assertEquals("Compilation error at (resource:function.pure line:3 column:12), \"Error finding match for function 'nameWithPrefixAndSuffix'. Incorrect number of parameters, function expects 2 parameters\"", e.getMessage());
+            Assertions.assertEquals("Compilation error at (resource:function.pure line:3 column:12), \"Error finding match for function 'nameWithPrefixAndSuffix'. Incorrect number of parameters, function expects 2 parameters\"", e.getMessage());
         }
     }
 
@@ -312,22 +346,26 @@ public class TestDSLCompilation extends AbstractPureTestWithCoreCompiled
         try
         {
             runtime.createInMemorySource("file.pure",
-                    "Class <<access.private>> a::Person\n" +
-                            "{\n" +
-                            "    firstName : String[1];\n" +
-                            "}\n");
+                    """
+                    Class <<access.private>> a::Person
+                    {
+                        firstName : String[1];
+                    }
+                    """);
 
             runtime.createInMemorySource("function.pure",
-                    "function test():Any[*]\n" +
-                            "{\n" +
-                            "    print(#/a::Person/firstName#,2);\n" +
-                            "}\n");
+                    """
+                    function test():Any[*]
+                    {
+                        print(#/a::Person/firstName#,2);
+                    }
+                    """);
             runtime.compile();
-            Assert.fail();
+            Assertions.fail();
         }
         catch (Exception e)
         {
-            Assert.assertEquals("Compilation error at (resource:function.pure line:3 column:16), \"a::Person is not accessible in Root\"", e.getMessage());
+            Assertions.assertEquals("Compilation error at (resource:function.pure line:3 column:16), \"a::Person is not accessible in Root\"", e.getMessage());
         }
     }
 
@@ -335,17 +373,21 @@ public class TestDSLCompilation extends AbstractPureTestWithCoreCompiled
     public void testMapReturn() throws Exception
     {
         runtime.createInMemorySource("file.pure",
-                "Class <<access.private>> Person\n" +
-                        "{\n" +
-                        "    firstName : String[1];" +
-                        "    stuff : Map<String, Integer>[1];\n" +
-                        "}\n");
+                """
+                Class <<access.private>> Person
+                {
+                    firstName : String[1];\
+                    stuff : Map<String, Integer>[1];
+                }
+                """);
 
         runtime.createInMemorySource("function.pure",
-                "function test():Any[*]\n" +
-                        "{\n" +
-                        "    print(#/Person/stuff#,2);\n" +
-                        "}\n");
+                """
+                function test():Any[*]
+                {
+                    print(#/Person/stuff#,2);
+                }
+                """);
         runtime.compile();
     }
 }

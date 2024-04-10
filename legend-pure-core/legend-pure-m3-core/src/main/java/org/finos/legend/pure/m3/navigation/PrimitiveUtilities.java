@@ -42,7 +42,7 @@ public class PrimitiveUtilities
 
     public static boolean getBooleanValue(CoreInstance instance)
     {
-        return (instance instanceof BooleanCoreInstance) ? ((BooleanCoreInstance)instance).getValue() : ModelRepository.BOOLEAN_TRUE.equals(instance.getName());
+        return (instance instanceof BooleanCoreInstance bci) ? bci.getValue() : ModelRepository.BOOLEAN_TRUE.equals(instance.getName());
     }
 
     public static boolean getBooleanValue(CoreInstance instance, boolean defaultIfNull)
@@ -52,7 +52,7 @@ public class PrimitiveUtilities
 
     public static PureDate getDateValue(CoreInstance instance)
     {
-        return (instance instanceof DateCoreInstance) ? ((DateCoreInstance)instance).getValue() : DateFunctions.parsePureDate(instance.getName());
+        return (instance instanceof DateCoreInstance dci) ? dci.getValue() : DateFunctions.parsePureDate(instance.getName());
     }
 
     public static PureDate getDateValue(CoreInstance instance, PureDate defaultIfNull)
@@ -62,7 +62,7 @@ public class PrimitiveUtilities
 
     public static BigDecimal getFloatValue(CoreInstance instance)
     {
-        return (instance instanceof FloatCoreInstance) ? ((FloatCoreInstance)instance).getValue() : new BigDecimal(instance.getName());
+        return (instance instanceof FloatCoreInstance fci) ? fci.getValue() : new BigDecimal(instance.getName());
     }
 
     public static BigDecimal getFloatValue(CoreInstance instance, BigDecimal defaultIfNull)
@@ -72,7 +72,7 @@ public class PrimitiveUtilities
 
     public static BigDecimal getDecimalValue(CoreInstance instance)
     {
-        return (instance instanceof DecimalCoreInstance) ? ((DecimalCoreInstance)instance).getValue() : new BigDecimal(instance.getName());
+        return (instance instanceof DecimalCoreInstance dci) ? dci.getValue() : new BigDecimal(instance.getName());
     }
 
     public static BigDecimal getDecimalValue(CoreInstance instance, BigDecimal defaultIfNull)
@@ -82,9 +82,9 @@ public class PrimitiveUtilities
 
     public static Number getIntegerValue(CoreInstance instance)
     {
-        if (instance instanceof IntegerCoreInstance)
+        if (instance instanceof IntegerCoreInstance coreInstance)
         {
-            return ((IntegerCoreInstance)instance).getValue();
+            return coreInstance.getValue();
         }
 
         String name = instance.getName();

@@ -17,13 +17,13 @@ package org.finos.legend.pure.runtime.java.interpreted;
 import org.eclipse.collections.impl.tuple.Tuples;
 import org.finos.legend.pure.m3.execution.FunctionExecution;
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestPrint extends AbstractPureTestWithCoreCompiled
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getFunctionExecution());
@@ -33,37 +33,43 @@ public class TestPrint extends AbstractPureTestWithCoreCompiled
     public void testFunctionPrint()
     {
         runtime.createInMemoryAndCompile(Tuples.pair("testSource.pure",
-                        "function testFunction():String[1]\n" +
-                                "{\n" +
-                                "   'Test'\n" +
-                                "}\n" +
-                                "function testFunction2():String[1]\n" +
-                                "{\n" +
-                                "   testFunction()\n" +
-                                "}\n"),
+                        """
+                        function testFunction():String[1]
+                        {
+                           'Test'
+                        }
+                        function testFunction2():String[1]
+                        {
+                           testFunction()
+                        }
+                        """),
                 Tuples.pair(
                         "testSource2.pure",
-                        "function go():Nil[0]\n" +
-                                "{\n" +
-                                "   print(testFunction__String_1_,0);\n" +
-                                "}"
+                        """
+                        function go():Nil[0]
+                        {
+                           print(testFunction__String_1_,0);
+                        }\
+                        """
                 ));
         this.execute("go():Nil[0]");
-        Assert.assertEquals("testFunction__String_1_ instance ConcreteFunctionDefinition\n" +
-                "    applications(Property):\n" +
-                "        [>0] Anonymous_StripedId instance SimpleFunctionExpression\n" +
-                "    classifierGenericType(Property):\n" +
-                "        [>0] Anonymous_StripedId instance GenericType\n" +
-                "    expressionSequence(Property):\n" +
-                "        [>0] Anonymous_StripedId instance InstanceValue\n" +
-                "    functionName(Property):\n" +
-                "        [>0] testFunction instance String\n" +
-                "    name(Property):\n" +
-                "        [>0] testFunction__String_1_ instance String\n" +
-                "    package(Property):\n" +
-                "        [X] Root instance Package\n" +
-                "    referenceUsages(Property):\n" +
-                "        [>0] Anonymous_StripedId instance ReferenceUsage", functionExecution.getConsole().getLine(0));
+        Assertions.assertEquals("""
+                testFunction__String_1_ instance ConcreteFunctionDefinition
+                    applications(Property):
+                        [>0] Anonymous_StripedId instance SimpleFunctionExpression
+                    classifierGenericType(Property):
+                        [>0] Anonymous_StripedId instance GenericType
+                    expressionSequence(Property):
+                        [>0] Anonymous_StripedId instance InstanceValue
+                    functionName(Property):
+                        [>0] testFunction instance String
+                    name(Property):
+                        [>0] testFunction__String_1_ instance String
+                    package(Property):
+                        [X] Root instance Package
+                    referenceUsages(Property):
+                        [>0] Anonymous_StripedId instance ReferenceUsage\
+                """, functionExecution.getConsole().getLine(0));
     }
 
     protected static FunctionExecution getFunctionExecution()

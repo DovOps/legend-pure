@@ -24,22 +24,22 @@ import org.finos.legend.pure.m3.serialization.filesystem.usercodestorage.Mutable
 import org.finos.legend.pure.m3.serialization.filesystem.usercodestorage.classpath.ClassLoaderCodeStorage;
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
 import org.finos.legend.pure.m4.exception.PureCompilationException;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;
 
 public class TestVisibility extends AbstractPureMappingTestWithCoreCompiled
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getCodeStorage());
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("/datamart_datamt/testFile.pure");
@@ -74,18 +74,20 @@ public class TestVisibility extends AbstractPureMappingTestWithCoreCompiled
         compileTestSource(
                 "/datamart_datamt/testFile2.pure",
                 "Class datamarts::datamt::domain::TestClass2 {}\n");
-        Assert.assertNotNull(runtime.getCoreInstance("datamarts::datamt::domain::TestClass2"));
+        Assertions.assertNotNull(runtime.getCoreInstance("datamarts::datamt::domain::TestClass2"));
 
-        PureCompilationException e = Assert.assertThrows(PureCompilationException.class, () -> compileTestSource(
+        PureCompilationException e = Assertions.assertThrows(PureCompilationException.class, () -> compileTestSource(
                 "/system/testFile.pure",
-                "function meta::pure::a():meta::pure::mapping::SetImplementation[*]{[]}\n" +
-                        "###Mapping\n" +
-                        "Mapping system::myMap(\n" +
-                        "   datamarts::datamt::domain::TestClass2[ppp]: Operation\n" +
-                        "           {\n" +
-                        "               meta::pure::a__SetImplementation_MANY_()\n" +
-                        "           }\n" +
-                        ")\n"));
+                """
+                function meta::pure::a():meta::pure::mapping::SetImplementation[*]{[]}
+                ###Mapping
+                Mapping system::myMap(
+                   datamarts::datamt::domain::TestClass2[ppp]: Operation
+                           {
+                               meta::pure::a__SetImplementation_MANY_()
+                           }
+                )
+                """));
 
         assertPureException(PureCompilationException.class, "datamarts::datamt::domain::TestClass2 is not visible in the file /system/testFile.pure", "/system/testFile.pure", 4, 31, e);
     }
@@ -96,19 +98,21 @@ public class TestVisibility extends AbstractPureMappingTestWithCoreCompiled
         compileTestSource(
                 "/datamart_datamt/testFile.pure",
                 "Enum datamarts::datamt::domain::TestEnum1{ VAL }\n");
-        Assert.assertNotNull(runtime.getCoreInstance("datamarts::datamt::domain::TestEnum1"));
+        Assertions.assertNotNull(runtime.getCoreInstance("datamarts::datamt::domain::TestEnum1"));
 
-        PureCompilationException e = Assert.assertThrows(PureCompilationException.class, () -> compileTestSource(
+        PureCompilationException e = Assertions.assertThrows(PureCompilationException.class, () -> compileTestSource(
                 "/system/testFile2.pure",
-                "###Mapping\n" +
-                        "Mapping meta::pure::TestMapping1\n" +
-                        "(\n" +
-                        "\n" +
-                        "    datamarts::datamt::domain::TestEnum1: EnumerationMapping Foo\n" +
-                        "    {\n" +
-                        "        VAL:  'a'\n" +
-                        "    }\n" +
-                        ")\n"));
+                """
+                ###Mapping
+                Mapping meta::pure::TestMapping1
+                (
+                
+                    datamarts::datamt::domain::TestEnum1: EnumerationMapping Foo
+                    {
+                        VAL:  'a'
+                    }
+                )
+                """));
         assertPureException(PureCompilationException.class, "datamarts::datamt::domain::TestEnum1 is not visible in the file /system/testFile2.pure", "/system/testFile2.pure", 5, 32, e);
     }
 
@@ -117,23 +121,27 @@ public class TestVisibility extends AbstractPureMappingTestWithCoreCompiled
     {
         compileTestSource(
                 "/datamart_datamt/testFile.pure",
-                "Class datamarts::datamt::domain::TestClass2 {}\n" +
-                        "function datamarts::datamt::mapping::a():meta::pure::mapping::SetImplementation[*]{[]}\n" +
-                        "###Mapping\n" +
-                        "Mapping datamarts::datamt::mapping::myMap1(\n" +
-                        "   datamarts::datamt::domain::TestClass2[ppp]: Operation\n" +
-                        "           {\n" +
-                        "               datamarts::datamt::mapping::a__SetImplementation_MANY_()\n" +
-                        "           }\n" +
-                        ")\n");
-        Assert.assertNotNull(runtime.getCoreInstance("datamarts::datamt::domain::TestClass2"));
+                """
+                Class datamarts::datamt::domain::TestClass2 {}
+                function datamarts::datamt::mapping::a():meta::pure::mapping::SetImplementation[*]{[]}
+                ###Mapping
+                Mapping datamarts::datamt::mapping::myMap1(
+                   datamarts::datamt::domain::TestClass2[ppp]: Operation
+                           {
+                               datamarts::datamt::mapping::a__SetImplementation_MANY_()
+                           }
+                )
+                """);
+        Assertions.assertNotNull(runtime.getCoreInstance("datamarts::datamt::domain::TestClass2"));
 
-        PureCompilationException e = Assert.assertThrows(PureCompilationException.class, () -> compileTestSource(
+        PureCompilationException e = Assertions.assertThrows(PureCompilationException.class, () -> compileTestSource(
                 "/system/testFile1.pure",
-                "###Mapping\n" +
-                        "Mapping system::myMap(\n" +
-                        "  include datamarts::datamt::mapping::myMap1\n" +
-                        ")\n"));
+                """
+                ###Mapping
+                Mapping system::myMap(
+                  include datamarts::datamt::mapping::myMap1
+                )
+                """));
         assertPureException(PureCompilationException.class, "datamarts::datamt::mapping::myMap1 is not visible in the file /system/testFile1.pure", "/system/testFile1.pure", 2, 17, e);
     }
 }

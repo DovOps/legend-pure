@@ -20,22 +20,22 @@ import org.finos.legend.pure.m3.exception.PureExecutionException;
 import org.finos.legend.pure.m3.navigation.ValueSpecificationBootstrap;
 import org.finos.legend.pure.m3.execution.FunctionExecution;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestFunctionExecutionStart extends AbstractPureTestWithCoreCompiled
 {
     static FunctionExecutionInterpreted functionExecution = new FunctionExecutionInterpreted();
 
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getFunctionExecution());
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("fromString.pure");
@@ -47,7 +47,7 @@ public class TestFunctionExecutionStart extends AbstractPureTestWithCoreCompiled
     {
         compileTestSource("fromString.pure", "function testFn(s1:String[1], s2:String[1]):String[1] { $s1 + $s2 }");
         CoreInstance func = runtime.getFunction("testFn(String[1], String[1]):String[1]");
-        Assert.assertNotNull(func);
+        Assertions.assertNotNull(func);
 
         try
         {
@@ -64,16 +64,18 @@ public class TestFunctionExecutionStart extends AbstractPureTestWithCoreCompiled
         }
         catch (Exception e)
         {
-            assertPureException(PureExecutionException.class, "Error executing the function:testFn(String[1], String[1]):String[1]. Mismatch between the number of function parameters (2) and the number of supplied arguments (1)\n" +
-                    "Anonymous_StripedId instance InstanceValue\n" +
-                    "    genericType(Property):\n" +
-                    "        Anonymous_StripedId instance GenericType\n" +
-                    "            rawType(Property):\n" +
-                    "                String instance PrimitiveType\n" +
-                    "    multiplicity(Property):\n" +
-                    "        PureOne instance PackageableMultiplicity\n" +
-                    "    values(Property):\n" +
-                    "        string instance String", e);
+            assertPureException(PureExecutionException.class, """
+                    Error executing the function:testFn(String[1], String[1]):String[1]. Mismatch between the number of function parameters (2) and the number of supplied arguments (1)
+                    Anonymous_StripedId instance InstanceValue
+                        genericType(Property):
+                            Anonymous_StripedId instance GenericType
+                                rawType(Property):
+                                    String instance PrimitiveType
+                        multiplicity(Property):
+                            PureOne instance PackageableMultiplicity
+                        values(Property):
+                            string instance String\
+                    """, e);
         }
     }
 
@@ -82,23 +84,25 @@ public class TestFunctionExecutionStart extends AbstractPureTestWithCoreCompiled
     {
         compileTestSource("fromString.pure", "function testFn():String[1] { 'the quick brown fox jumps over the lazy dog' }");
         CoreInstance func = runtime.getFunction("testFn():String[1]");
-        Assert.assertNotNull(func);
+        Assertions.assertNotNull(func);
         try
         {
             functionExecution.start(func, Lists.mutable.with(ValueSpecificationBootstrap.newStringLiteral(repository, "string", processorSupport)));
         }
         catch (Exception e)
         {
-            assertPureException(PureExecutionException.class, "Error executing the function:testFn():String[1]. Mismatch between the number of function parameters (0) and the number of supplied arguments (1)\n" +
-                    "Anonymous_StripedId instance InstanceValue\n" +
-                    "    genericType(Property):\n" +
-                    "        Anonymous_StripedId instance GenericType\n" +
-                    "            rawType(Property):\n" +
-                    "                String instance PrimitiveType\n" +
-                    "    multiplicity(Property):\n" +
-                    "        PureOne instance PackageableMultiplicity\n" +
-                    "    values(Property):\n" +
-                    "        string instance String", e);
+            assertPureException(PureExecutionException.class, """
+                    Error executing the function:testFn():String[1]. Mismatch between the number of function parameters (0) and the number of supplied arguments (1)
+                    Anonymous_StripedId instance InstanceValue
+                        genericType(Property):
+                            Anonymous_StripedId instance GenericType
+                                rawType(Property):
+                                    String instance PrimitiveType
+                        multiplicity(Property):
+                            PureOne instance PackageableMultiplicity
+                        values(Property):
+                            string instance String\
+                    """, e);
         }
     }
 

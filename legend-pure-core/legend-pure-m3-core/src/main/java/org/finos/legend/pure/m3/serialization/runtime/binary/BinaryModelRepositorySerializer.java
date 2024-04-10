@@ -106,7 +106,7 @@ public class BinaryModelRepositorySerializer
             return null;
         }
         RepositoryCodeStorage codeStorage = this.runtime.getCodeStorage();
-        Optional<String> repoRevision = codeStorage instanceof VersionControlledCodeStorage ? ((VersionControlledCodeStorage) codeStorage).getCurrentRevision(this.repositoryName) : Optional.empty();
+        Optional<String> repoRevision = codeStorage instanceof VersionControlledCodeStorage vccs ? vccs.getCurrentRevision(this.repositoryName) : Optional.empty();
         return repoRevision.isPresent() ? ("SNAPSHOT-FROM-SVN-" + repoRevision.get()) : null;
     }
 

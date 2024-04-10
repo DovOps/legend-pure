@@ -15,7 +15,7 @@
 package org.finos.legend.pure.m3.tests.function.base.collection;
 
 import org.finos.legend.pure.m3.tests.function.base.PureExpressionTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public abstract class AbstractTestFirst extends PureExpressionTest
 {
@@ -23,12 +23,14 @@ public abstract class AbstractTestFirst extends PureExpressionTest
     public void testBasic()
     {
         compileTestSource("fromString.pure",
-                "function test():Boolean[1]\n" +
-                        "{\n" +
-                        "   assert(1 == [1,2,3]->first(), |'');\n" +
-                        "   assert(1 == 1->first(), |'');\n" +
-                        "   assert([] == []->first(), |'');\n" +
-                        "}\n");
+                """
+                function test():Boolean[1]
+                {
+                   assert(1 == [1,2,3]->first(), |'');
+                   assert(1 == 1->first(), |'');
+                   assert([] == []->first(), |'');
+                }
+                """);
         this.execute("test():Boolean[1]");
     }
 
@@ -36,11 +38,13 @@ public abstract class AbstractTestFirst extends PureExpressionTest
     public void testEval()
     {
         compileTestSource("fromString.pure",
-                "function test():Boolean[1]\n" +
-                        "{\n" +
-                        "   assert(1 == first_T_MANY__T_$0_1$_->eval([1,2,3]), |'');\n" +
-                        "   assert(1 == first_T_MANY__T_$0_1$_->eval(1), |'');\n" +
-                        "}\n");
+                """
+                function test():Boolean[1]
+                {
+                   assert(1 == first_T_MANY__T_$0_1$_->eval([1,2,3]), |'');
+                   assert(1 == first_T_MANY__T_$0_1$_->eval(1), |'');
+                }
+                """);
         this.execute("test():Boolean[1]");
     }
 }

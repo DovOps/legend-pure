@@ -99,9 +99,9 @@ public abstract class GenericTreeNode implements TreeNode<GenericTreeNode>, Comp
 
     protected void findNodeToBreak(List<GenericTreeNode> nodesToReprocess, char separator)
     {
-        if (this.object instanceof CutPathAndEncapsulatedObject && (this.isLeaf() || ((CutPathAndEncapsulatedObject) this.object).getEncapsulatedObjects().size() > 1))
+        if (this.object instanceof CutPathAndEncapsulatedObject encapsulatedObject && (this.isLeaf() || encapsulatedObject.getEncapsulatedObjects().size() > 1))
         {
-            String oldPath = ((CutPathAndEncapsulatedObject) this.object).getCutPath();
+            String oldPath = encapsulatedObject.getCutPath();
             if (oldPath.indexOf(separator) != -1 && oldPath.indexOf(separator) != oldPath.length() - 1)
             {
                 nodesToReprocess.add(this);

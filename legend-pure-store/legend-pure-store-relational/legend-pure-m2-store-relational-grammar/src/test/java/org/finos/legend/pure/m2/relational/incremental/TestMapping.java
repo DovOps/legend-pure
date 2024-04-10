@@ -21,8 +21,8 @@ import org.finos.legend.pure.m3.tests.RuntimeTestScriptBuilder;
 import org.finos.legend.pure.m3.tests.RuntimeVerifier;
 import org.finos.legend.pure.m3.tests.RuntimeVerifier.FunctionExecutionStateVerifier;
 import org.finos.legend.pure.m4.exception.PureCompilationException;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class TestMapping extends AbstractPureRelationalTestWithCoreCompiled
 {
@@ -63,7 +63,7 @@ public class TestMapping extends AbstractPureRelationalTestWithCoreCompiled
             try
             {
                 this.runtime.compile();
-                Assert.fail();
+                Assertions.fail();
             }
             catch (Exception e)
             {
@@ -78,7 +78,7 @@ public class TestMapping extends AbstractPureRelationalTestWithCoreCompiled
                                                              "Mapping myMap2(Person:Relational{name : [db]myTable.name})"
                 );
                 this.runtime.compile();
-                Assert.fail();
+                Assertions.fail();
             }
             catch (Exception e)
             {
@@ -88,7 +88,7 @@ public class TestMapping extends AbstractPureRelationalTestWithCoreCompiled
             this.runtime.delete(SOURCE_ID);
             this.runtime.createInMemorySource(SOURCE_ID, CLASS_PERSON + RELATIONAL_DATABASE + CLASS_MAPPING);
             this.runtime.compile();
-            Assert.assertEquals(size, this.runtime.getModelRepository().serialize().length);
+            Assertions.assertEquals(size, this.runtime.getModelRepository().serialize().length);
         }
     }
 
@@ -96,10 +96,12 @@ public class TestMapping extends AbstractPureRelationalTestWithCoreCompiled
     public void testMappingClassReference() throws Exception
     {
         this.runtime.createInMemorySource("sourceId.pure", "Class Person{name:String[1];}\n");
-        this.runtime.createInMemorySource("userId.pure", "###Relational\n" +
-                                                    "Database db(Table myTable(name VARCHAR(200)))\n" +
-                                                    "###Mapping\n" +
-                                                    "Mapping myMap(Person:Relational{name : [db]myTable.name})");
+        this.runtime.createInMemorySource("userId.pure", """
+                                                    ###Relational
+                                                    Database db(Table myTable(name VARCHAR(200)))
+                                                    ###Mapping
+                                                    Mapping myMap(Person:Relational{name : [db]myTable.name})\
+                                                    """);
 
         this.runtime.compile();
         int size = this.runtime.getModelRepository().serialize().length;
@@ -110,7 +112,7 @@ public class TestMapping extends AbstractPureRelationalTestWithCoreCompiled
             try
             {
                 this.runtime.compile();
-                Assert.fail();
+                Assertions.fail();
             }
             catch (Exception e)
             {
@@ -119,24 +121,28 @@ public class TestMapping extends AbstractPureRelationalTestWithCoreCompiled
 
             this.runtime.createInMemorySource(SOURCE_ID, CLASS_PERSON);
             this.runtime.compile();
-            Assert.assertEquals(size, this.runtime.getModelRepository().serialize().length);
+            Assertions.assertEquals(size, this.runtime.getModelRepository().serialize().length);
         }
     }
 
     @Test
     public void testMappingMainTable() throws Exception
     {
-        this.runtime.createInMemorySource("sourceId.pure", "###Relational\n" +
-                                                      "Database db(Table myTable(name VARCHAR(200)))\n");
-        this.runtime.createInMemorySource("userId.pure", "###Pure\n" +
-                                                    "Class Person{name : String[1];}\n" +
-                                                    "###Mapping\n" +
-                                                    "Mapping myMap(\n" +
-                                                    "   Person:Relational{\n" +
-                                                    "       ~mainTable [db]myTable\n" +
-                                                    "       name : [db]myTable.name\n" +
-                                                    "   }\n" +
-                                                    ")\n");
+        this.runtime.createInMemorySource("sourceId.pure", """
+                                                      ###Relational
+                                                      Database db(Table myTable(name VARCHAR(200)))
+                                                      """);
+        this.runtime.createInMemorySource("userId.pure", """
+                                                    ###Pure
+                                                    Class Person{name : String[1];}
+                                                    ###Mapping
+                                                    Mapping myMap(
+                                                       Person:Relational{
+                                                           ~mainTable [db]myTable
+                                                           name : [db]myTable.name
+                                                       }
+                                                    )
+                                                    """);
 
         this.runtime.compile();
         int size = this.runtime.getModelRepository().serialize().length;
@@ -147,17 +153,19 @@ public class TestMapping extends AbstractPureRelationalTestWithCoreCompiled
             try
             {
                 this.runtime.compile();
-                Assert.fail();
+                Assertions.fail();
             }
             catch (Exception e)
             {
                 assertPureException(PureCompilationException.class, "db has not been defined!", "userId.pure", 7, 16, e);
             }
 
-            this.runtime.createInMemorySource(SOURCE_ID, "###Relational\n" +
-                                                         "Database db(Table myTable(name VARCHAR(200)))\n");
+            this.runtime.createInMemorySource(SOURCE_ID, """
+                                                         ###Relational
+                                                         Database db(Table myTable(name VARCHAR(200)))
+                                                         """);
             this.runtime.compile();
-            Assert.assertEquals(size, this.runtime.getModelRepository().serialize().length);
+            Assertions.assertEquals(size, this.runtime.getModelRepository().serialize().length);
         }
     }
 
@@ -181,7 +189,7 @@ public class TestMapping extends AbstractPureRelationalTestWithCoreCompiled
             try
             {
                 this.runtime.compile();
-                Assert.fail();
+                Assertions.fail();
             }
             catch (Exception e)
             {
@@ -192,7 +200,7 @@ public class TestMapping extends AbstractPureRelationalTestWithCoreCompiled
             {
                 this.runtime.createInMemorySource(SOURCE_ID, "Class PersonError{name:String[1];}\n");
                 this.runtime.compile();
-                Assert.fail();
+                Assertions.fail();
             }
             catch (Exception e)
             {
@@ -202,7 +210,7 @@ public class TestMapping extends AbstractPureRelationalTestWithCoreCompiled
             this.runtime.delete(SOURCE_ID);
             this.runtime.createInMemorySource(SOURCE_ID, CLASS_PERSON);
             this.runtime.compile();
-            Assert.assertEquals(size, this.runtime.getModelRepository().serialize().length);
+            Assertions.assertEquals(size, this.runtime.getModelRepository().serialize().length);
         }
     }
 
@@ -267,7 +275,7 @@ public class TestMapping extends AbstractPureRelationalTestWithCoreCompiled
                                                    "###Pure\n" +
                                                    "function test():Boolean[1]{assert('Person' == myMap->meta::pure::mapping::_classMappingByClass(Person).class.name, |'');}");
         this.runtime.compile();
-        Assert.assertEquals(size, this.runtime.getModelRepository().serialize().length);
+        Assertions.assertEquals(size, this.runtime.getModelRepository().serialize().length);
     }
 
 
@@ -294,7 +302,7 @@ public class TestMapping extends AbstractPureRelationalTestWithCoreCompiled
             try
             {
                 this.runtime.compile();
-                Assert.fail();
+                Assertions.fail();
             }
             catch (Exception e)
             {
@@ -303,7 +311,7 @@ public class TestMapping extends AbstractPureRelationalTestWithCoreCompiled
 
             this.runtime.createInMemorySource(SOURCE_ID, RELATIONAL_DATABASE);
             this.runtime.compile();
-            Assert.assertEquals(size, this.runtime.getModelRepository().serialize().length);
+            Assertions.assertEquals(size, this.runtime.getModelRepository().serialize().length);
         }
     }
 
@@ -330,7 +338,7 @@ public class TestMapping extends AbstractPureRelationalTestWithCoreCompiled
             try
             {
                 this.runtime.compile();
-                Assert.fail();
+                Assertions.fail();
             }
             catch (Exception e)
             {
@@ -339,7 +347,7 @@ public class TestMapping extends AbstractPureRelationalTestWithCoreCompiled
 
             this.runtime.createInMemorySource(SOURCE_ID, RELATIONAL_DATABASE);
             this.runtime.compile();
-            Assert.assertEquals(size, this.runtime.getModelRepository().serialize().length);
+            Assertions.assertEquals(size, this.runtime.getModelRepository().serialize().length);
         }
     }
 
@@ -365,7 +373,7 @@ public class TestMapping extends AbstractPureRelationalTestWithCoreCompiled
             try
             {
                 this.runtime.compile();
-                Assert.fail();
+                Assertions.fail();
             }
             catch (Exception e)
             {
@@ -377,7 +385,7 @@ public class TestMapping extends AbstractPureRelationalTestWithCoreCompiled
                 this.runtime.createInMemorySource(SOURCE_ID, RELATIONAL +
                                                              "Database db(Table myTable2(name VARCHAR(200)))\n");
                 this.runtime.compile();
-                Assert.fail();
+                Assertions.fail();
             }
             catch (Exception e)
             {
@@ -387,7 +395,7 @@ public class TestMapping extends AbstractPureRelationalTestWithCoreCompiled
             this.runtime.delete(SOURCE_ID);
             this.runtime.createInMemorySource(SOURCE_ID, RELATIONAL_DATABASE);
             this.runtime.compile();
-            Assert.assertEquals(size, this.runtime.getModelRepository().serialize().length);
+            Assertions.assertEquals(size, this.runtime.getModelRepository().serialize().length);
         }
     }
 
@@ -417,18 +425,18 @@ public class TestMapping extends AbstractPureRelationalTestWithCoreCompiled
             try
             {
                 this.runtime.compile();
-                Assert.fail();
+                Assertions.fail();
             }
             catch (Exception e)
             {
-                Assert.assertTrue(e.getMessage().equals("Compilation error at (resource:userId.pure line:3 column:7), \"db has not been defined!\"") |
+                Assertions.assertTrue(e.getMessage().equals("Compilation error at (resource:userId.pure line:3 column:7), \"db has not been defined!\"") |
                         e.getMessage().equals("Compilation error at (resource:userId.pure line:3 column:31), \"db has not been defined!\""));
             }
 
             this.runtime.createInMemorySource(SOURCE_ID, RELATIONAL +
                                                          "Database db(Table personTb(name VARCHAR(200), firm VARCHAR(200)) Table firmTb(name VARCHAR(200)) Join myJoin(personTb.firm = firmTb.name))\n");
             this.runtime.compile();
-            Assert.assertEquals(size, this.runtime.getModelRepository().serialize().length);
+            Assertions.assertEquals(size, this.runtime.getModelRepository().serialize().length);
         }
     }
 
@@ -455,11 +463,11 @@ public class TestMapping extends AbstractPureRelationalTestWithCoreCompiled
             try
             {
                 this.runtime.compile();
-                Assert.fail();
+                Assertions.fail();
             }
             catch (Exception e)
             {
-                Assert.assertTrue(e.getMessage().equals("Compilation error at (resource:userId.pure line:3 column:7), \"db has not been defined!\"") |
+                Assertions.assertTrue(e.getMessage().equals("Compilation error at (resource:userId.pure line:3 column:7), \"db has not been defined!\"") |
                                   e.getMessage().equals("Compilation error at (resource:userId.pure line:3 column:31), \"db has not been defined!\""));
             }
 
@@ -468,7 +476,7 @@ public class TestMapping extends AbstractPureRelationalTestWithCoreCompiled
                 this.runtime.createInMemorySource(SOURCE_ID, RELATIONAL +
                                                              "Database db(Table personTb(name VARCHAR(200), firm VARCHAR(200)) Table firmTb(name VARCHAR(200)) Join myJoin32(personTb.firm = firmTb.name))\n");
                 this.runtime.compile();
-                Assert.fail();
+                Assertions.fail();
             }
             catch (Exception e)
             {
@@ -479,7 +487,7 @@ public class TestMapping extends AbstractPureRelationalTestWithCoreCompiled
             this.runtime.createInMemorySource(SOURCE_ID, RELATIONAL +
                     "Database db(Table personTb(name VARCHAR(200), firm VARCHAR(200)) Table firmTb(name VARCHAR(200)) Join myJoin(personTb.firm = firmTb.name))\n");
             this.runtime.compile();
-            Assert.assertEquals(size, this.runtime.getModelRepository().serialize().length);
+            Assertions.assertEquals(size, this.runtime.getModelRepository().serialize().length);
         }
     }
 
@@ -515,7 +523,7 @@ public class TestMapping extends AbstractPureRelationalTestWithCoreCompiled
             this.runtime.compile();
             this.runtime.delete(USER_ID);
             this.runtime.compile();
-            Assert.assertEquals("Failed on iteration #" + i, size, this.runtime.getModelRepository().serialize().length);
+            Assertions.assertEquals(size, this.runtime.getModelRepository().serialize().length, "Failed on iteration #" + i);
         }
     }
 
@@ -556,7 +564,7 @@ public class TestMapping extends AbstractPureRelationalTestWithCoreCompiled
             this.runtime.compile();
             this.runtime.delete(USER_ID);
             this.runtime.compile();
-            Assert.assertEquals("Failed on iteration #" + i, size, this.runtime.getModelRepository().serialize().length);
+            Assertions.assertEquals(size, this.runtime.getModelRepository().serialize().length, "Failed on iteration #" + i);
         }
     }
 
@@ -596,7 +604,7 @@ public class TestMapping extends AbstractPureRelationalTestWithCoreCompiled
             try
             {
                 this.runtime.compile();
-                Assert.fail();
+                Assertions.fail();
             }
             catch (Exception e)
             {
@@ -605,7 +613,7 @@ public class TestMapping extends AbstractPureRelationalTestWithCoreCompiled
             this.runtime.delete(USER_ID);
         }
 
-        Assert.assertEquals(size, this.runtime.getModelRepository().serialize().length);
+        Assertions.assertEquals(size, this.runtime.getModelRepository().serialize().length);
     }
 
     @Test
@@ -645,7 +653,7 @@ public class TestMapping extends AbstractPureRelationalTestWithCoreCompiled
             {
 
                 this.runtime.compile();
-                Assert.fail();
+                Assertions.fail();
             }
             catch (Exception e)
             {
@@ -654,7 +662,7 @@ public class TestMapping extends AbstractPureRelationalTestWithCoreCompiled
             this.runtime.delete(USER_ID);
         }
 
-        Assert.assertEquals(size, this.runtime.getModelRepository().serialize().length);
+        Assertions.assertEquals(size, this.runtime.getModelRepository().serialize().length);
     }
 
 
@@ -693,7 +701,7 @@ public class TestMapping extends AbstractPureRelationalTestWithCoreCompiled
             this.runtime.compile();
             this.runtime.delete(USER_ID);
             this.runtime.compile();
-            Assert.assertEquals("Failed on iteration #" + i, size, this.runtime.getModelRepository().serialize().length);
+            Assertions.assertEquals(size, this.runtime.getModelRepository().serialize().length, "Failed on iteration #" + i);
         }
     }
 
@@ -735,7 +743,7 @@ public class TestMapping extends AbstractPureRelationalTestWithCoreCompiled
             this.runtime.compile();
             this.runtime.delete(USER_ID);
             this.runtime.compile();
-            Assert.assertEquals("Failed on iteration #" + i, size, this.runtime.getModelRepository().serialize().length);
+            Assertions.assertEquals(size, this.runtime.getModelRepository().serialize().length, "Failed on iteration #" + i);
         }
     }
 
@@ -780,7 +788,7 @@ public class TestMapping extends AbstractPureRelationalTestWithCoreCompiled
             this.runtime.compile();
             this.runtime.delete(USER_ID);
             this.runtime.compile();
-            Assert.assertEquals("Failed on iteration #" + i, size, this.runtime.getModelRepository().serialize().length);
+            Assertions.assertEquals(size, this.runtime.getModelRepository().serialize().length, "Failed on iteration #" + i);
         }
     }
 
@@ -855,7 +863,7 @@ public class TestMapping extends AbstractPureRelationalTestWithCoreCompiled
         try
         {
             this.runtime.compile();
-            Assert.fail("Expected compilation exception");
+            Assertions.fail("Expected compilation exception");
         }
         catch (Exception e)
         {
@@ -866,63 +874,69 @@ public class TestMapping extends AbstractPureRelationalTestWithCoreCompiled
     @Test
     public void testMappingWithJoinSequence()
     {
-        this.runtime.createInMemorySource("testModel.pure", "###Pure\n" +
-                "\n" +
-                "Class Table1\n" +
-                "{\n" +
-                "   name: String[1];\n" +
-                "   table3: Table3[0..1];\n" +
-                "}\n" +
-                "\n" +
-                "Class Table2\n" +
-                "{\n" +
-                "   name:String[1];\n" +
-                "}\n" +
-                "Class Table3\n" +
-                "{\n" +
-                "   name:String[1];\n" +
-                "}\n");
+        this.runtime.createInMemorySource("testModel.pure", """
+                ###Pure
+                
+                Class Table1
+                {
+                   name: String[1];
+                   table3: Table3[0..1];
+                }
+                
+                Class Table2
+                {
+                   name:String[1];
+                }
+                Class Table3
+                {
+                   name:String[1];
+                }
+                """);
 
-        this.runtime.createInMemorySource("testRelational.pure", "###Relational\n" +
-                "Database db\n" +
-                "(\n" +
-                "   Table table1\n" +
-                "   (\n" +
-                "       name VARCHAR(200) PRIMARY KEY,\n" +
-                "       t2name VARCHAR(200)\n" +
-                "   )\n" +
-                "   Table table2\n" +
-                "   (\n" +
-                "       name VARCHAR(200) PRIMARY KEY,\n" +
-                "       t3name VARCHAR(200)\n" +
-                "   )\n" +
-                "   Table table3\n" +
-                "   (\n" +
-                "       name VARCHAR(200) PRIMARY KEY\n" +
-                "   )\n" +
-                "   Join T1_T2(table1.t2name = table2.name)" +
-                "   Join T2_T3(table2.t3name = table3.name)\n" +
-                ")");
+        this.runtime.createInMemorySource("testRelational.pure", """
+                ###Relational
+                Database db
+                (
+                   Table table1
+                   (
+                       name VARCHAR(200) PRIMARY KEY,
+                       t2name VARCHAR(200)
+                   )
+                   Table table2
+                   (
+                       name VARCHAR(200) PRIMARY KEY,
+                       t3name VARCHAR(200)
+                   )
+                   Table table3
+                   (
+                       name VARCHAR(200) PRIMARY KEY
+                   )
+                   Join T1_T2(table1.t2name = table2.name)\
+                   Join T2_T3(table2.t3name = table3.name)
+                )\
+                """);
 
-        this.runtime.createInMemorySource("testMapping.pure", "###Mapping\n" +
-                "Mapping mapping\n" +
-                "(\n" +
-                "    Table1: Relational\n" +
-                "    {\n" +
-                "        name: [db]table1.name,\n" +
-                "        table3: [db]@T1_T2 > (INNER) [db]@T2_T3\n" +
-                "    }\n" +
-                "\n" +
-                "    Table2: Relational\n" +
-                "    {\n" +
-                "        name: [db]table2.name\n" +
-                "    }\n" +
-                "\n" +
-                "    Table3: Relational\n" +
-                "    {\n" +
-                "        name: [db]table3.name\n" +
-                "    }\n" +
-                ")\n");
+        this.runtime.createInMemorySource("testMapping.pure", """
+                ###Mapping
+                Mapping mapping
+                (
+                    Table1: Relational
+                    {
+                        name: [db]table1.name,
+                        table3: [db]@T1_T2 > (INNER) [db]@T2_T3
+                    }
+                
+                    Table2: Relational
+                    {
+                        name: [db]table2.name
+                    }
+                
+                    Table3: Relational
+                    {
+                        name: [db]table3.name
+                    }
+                )
+                """);
 
         this.runtime.compile();
     }
@@ -930,87 +944,95 @@ public class TestMapping extends AbstractPureRelationalTestWithCoreCompiled
     @Test
     public void testMappingWithJoinSequenceWithRecompile()
     {
-        this.runtime.createInMemorySource("testModel.pure", "###Pure\n" +
-                "\n" +
-                "Class Table1\n" +
-                "{\n" +
-                "   name: String[1];\n" +
-                "   table3: Table3[0..1];\n" +
-                "}\n" +
-                "\n" +
-                "Class Table2\n" +
-                "{\n" +
-                "   name:String[1];\n" +
-                "}\n" +
-                "Class Table3\n" +
-                "{\n" +
-                "   name:String[1];\n" +
-                "}\n");
+        this.runtime.createInMemorySource("testModel.pure", """
+                ###Pure
+                
+                Class Table1
+                {
+                   name: String[1];
+                   table3: Table3[0..1];
+                }
+                
+                Class Table2
+                {
+                   name:String[1];
+                }
+                Class Table3
+                {
+                   name:String[1];
+                }
+                """);
 
-        this.runtime.createInMemorySource("testRelational.pure", "###Relational\n" +
-                "Database db\n" +
-                "(\n" +
-                "   Table table1\n" +
-                "   (\n" +
-                "       name VARCHAR(200) PRIMARY KEY,\n" +
-                "       t2name VARCHAR(200)\n" +
-                "   )\n" +
-                "   Table table2\n" +
-                "   (\n" +
-                "       name VARCHAR(200) PRIMARY KEY,\n" +
-                "       t3name VARCHAR(200)\n" +
-                "   )\n" +
-                "   Table table3\n" +
-                "   (\n" +
-                "       name VARCHAR(200) PRIMARY KEY\n" +
-                "   )\n" +
-                "   Join T1_T2(table1.t2name = table2.name)" +
-                "   Join T2_T3(table2.t3name = table3.name)\n" +
-                ")");
+        this.runtime.createInMemorySource("testRelational.pure", """
+                ###Relational
+                Database db
+                (
+                   Table table1
+                   (
+                       name VARCHAR(200) PRIMARY KEY,
+                       t2name VARCHAR(200)
+                   )
+                   Table table2
+                   (
+                       name VARCHAR(200) PRIMARY KEY,
+                       t3name VARCHAR(200)
+                   )
+                   Table table3
+                   (
+                       name VARCHAR(200) PRIMARY KEY
+                   )
+                   Join T1_T2(table1.t2name = table2.name)\
+                   Join T2_T3(table2.t3name = table3.name)
+                )\
+                """);
 
-        this.runtime.createInMemorySource("testMapping.pure", "###Mapping\n" +
-                "Mapping mapping\n" +
-                "(\n" +
-                "    Table1: Relational\n" +
-                "    {\n" +
-                "        name: [db]table1.name,\n" +
-                "        table3: [db]@T1_T2 > (INNER) [db]@T2_T3\n" +
-                "    }\n" +
-                "\n" +
-                "    Table2: Relational\n" +
-                "    {\n" +
-                "        name: [db]table2.name\n" +
-                "    }\n" +
-                "\n" +
-                "    Table3: Relational\n" +
-                "    {\n" +
-                "        name: [db]table3.name\n" +
-                "    }\n" +
-                ")\n");
+        this.runtime.createInMemorySource("testMapping.pure", """
+                ###Mapping
+                Mapping mapping
+                (
+                    Table1: Relational
+                    {
+                        name: [db]table1.name,
+                        table3: [db]@T1_T2 > (INNER) [db]@T2_T3
+                    }
+                
+                    Table2: Relational
+                    {
+                        name: [db]table2.name
+                    }
+                
+                    Table3: Relational
+                    {
+                        name: [db]table3.name
+                    }
+                )
+                """);
 
         this.runtime.compile();
 
         this.runtime.delete("testMapping.pure");
 
-        this.runtime.createInMemorySource("testMapping.pure", "###Mapping\n" +
-                "Mapping mapping\n" +
-                "(\n" +
-                "    Table1: Relational\n" +
-                "    {\n" +
-                "        name: [db]table1.name,\n" +
-                "        table3: [db]@T1_T2 > (INNER) [db]@T2_T3\n" +
-                "    }\n" +
-                "\n" +
-                "    Table2: Relational\n" +
-                "    {\n" +
-                "        name: [db]table2.name\n" +
-                "    }\n" +
-                "\n" +
-                "    Table3: Relational\n" +
-                "    {\n" +
-                "        name: [db]table3.name\n" +
-                "    }\n" +
-                ")\n");
+        this.runtime.createInMemorySource("testMapping.pure", """
+                ###Mapping
+                Mapping mapping
+                (
+                    Table1: Relational
+                    {
+                        name: [db]table1.name,
+                        table3: [db]@T1_T2 > (INNER) [db]@T2_T3
+                    }
+                
+                    Table2: Relational
+                    {
+                        name: [db]table2.name
+                    }
+                
+                    Table3: Relational
+                    {
+                        name: [db]table3.name
+                    }
+                )
+                """);
 
         this.runtime.compile();
     }

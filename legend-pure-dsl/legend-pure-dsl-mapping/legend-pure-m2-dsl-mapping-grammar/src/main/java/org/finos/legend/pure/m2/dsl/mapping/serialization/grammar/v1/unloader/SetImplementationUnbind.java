@@ -46,10 +46,10 @@ public class SetImplementationUnbind implements MatchRunner<SetImplementation>
             Shared.cleanImportStub(_class, processorSupport);
         }
 
-        if (setImplementation instanceof InstanceSetImplementation && ((InstanceSetImplementation)setImplementation)._mappingClass() != null)
+        if (setImplementation instanceof InstanceSetImplementation implementation && implementation._mappingClass() != null)
         {
-            matcher.fullMatch(((InstanceSetImplementation)setImplementation)._mappingClass(), state);
-            ((InstanceSetImplementation)setImplementation)._mappingClassRemove();
+            matcher.fullMatch(implementation._mappingClass(), state);
+            implementation._mappingClassRemove();
         }
     }
 }

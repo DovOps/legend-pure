@@ -15,12 +15,12 @@
 package org.finos.legend.pure.m3.tests.function.base.meta;
 
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 public abstract class AbstractTestCanReactivateDynamically extends AbstractPureTestWithCoreCompiled
 {
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("fromString.pure");
@@ -31,10 +31,12 @@ public abstract class AbstractTestCanReactivateDynamically extends AbstractPureT
     public void testBasicInstanceValue()
     {
         compileTestSource("fromString.pure",
-                "function test():Boolean[1]\n" +
-                        "{\n" +
-                        "   assert(true == canReactivateDynamically({|1}->evaluateAndDeactivate().expressionSequence->toOne()), |'');\n" +
-                        "}\n");
+                """
+                function test():Boolean[1]
+                {
+                   assert(true == canReactivateDynamically({|1}->evaluateAndDeactivate().expressionSequence->toOne()), |'');
+                }
+                """);
         this.execute("test():Boolean[1]");
     }
 
@@ -42,10 +44,12 @@ public abstract class AbstractTestCanReactivateDynamically extends AbstractPureT
     public void testSimpleFuncExpressionParams()
     {
         compileTestSource("fromString.pure",
-                "function test():Boolean[1]\n" +
-                        "{\n" +
-                        "   assert(true == canReactivateDynamically({|1->map(s|$s->toString())->joinStrings('')->map(x|'*' + $x + '*')}->evaluateAndDeactivate().expressionSequence->toOne()), |'');\n" +
-                        "}\n");
+                """
+                function test():Boolean[1]
+                {
+                   assert(true == canReactivateDynamically({|1->map(s|$s->toString())->joinStrings('')->map(x|'*' + $x + '*')}->evaluateAndDeactivate().expressionSequence->toOne()), |'');
+                }
+                """);
         this.execute("test():Boolean[1]");
     }
 
@@ -53,10 +57,12 @@ public abstract class AbstractTestCanReactivateDynamically extends AbstractPureT
     public void testEval()
     {
         compileTestSource("fromString.pure",
-                "function test():Boolean[1]\n" +
-                        "{\n" +
-                        "   assert(true == canReactivateDynamically_ValueSpecification_1__Boolean_1_->eval({|1}->evaluateAndDeactivate().expressionSequence->toOne()), |'');\n" +
-                        "}\n");
+                """
+                function test():Boolean[1]
+                {
+                   assert(true == canReactivateDynamically_ValueSpecification_1__Boolean_1_->eval({|1}->evaluateAndDeactivate().expressionSequence->toOne()), |'');
+                }
+                """);
         this.execute("test():Boolean[1]");
     }
 }

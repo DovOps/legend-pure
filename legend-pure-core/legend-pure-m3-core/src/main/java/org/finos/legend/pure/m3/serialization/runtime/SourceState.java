@@ -105,7 +105,7 @@ public class SourceState
     @Override
     public boolean equals(Object o)
     {
-        return (this == o) || ((o instanceof SourceState) && Objects.equals(this.source, ((SourceState) o).source));
+        return (this == o) || ((o instanceof SourceState ss) && Objects.equals(this.source, ss.source));
     }
 
     @Override

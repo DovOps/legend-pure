@@ -19,14 +19,14 @@ import org.finos.legend.pure.m3.coreinstance.PackageCoreInstanceWrapper;
 import org.finos.legend.pure.m3.coreinstance.PackageInstance;
 import org.finos.legend.pure.m4.coreinstance.indexing.IDIndex;
 import org.finos.legend.pure.m4.coreinstance.indexing.IndexSpecifications;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class TestIDIndex extends AbstractPureTestWithCoreCompiledPlatform
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getExtra());

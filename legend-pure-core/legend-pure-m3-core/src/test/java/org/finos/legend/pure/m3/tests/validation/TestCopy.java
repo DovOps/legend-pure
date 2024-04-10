@@ -16,20 +16,20 @@ package org.finos.legend.pure.m3.tests.validation;
 
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiledPlatform;
 import org.finos.legend.pure.m4.exception.PureCompilationException;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestCopy extends AbstractPureTestWithCoreCompiledPlatform
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime();
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("testModel.pure");
@@ -40,17 +40,21 @@ public class TestCopy extends AbstractPureTestWithCoreCompiledPlatform
     public void testIncompatiblePrimitiveTypes()
     {
         compileTestSource("testModel.pure",
-                "Class A\n" +
-                        "{\n" +
-                        "    prop:String[1];\n" +
-                        "}");
-        PureCompilationException e = Assert.assertThrows(PureCompilationException.class, () -> compileTestSource(
+                """
+                Class A
+                {
+                    prop:String[1];
+                }\
+                """);
+        PureCompilationException e = Assertions.assertThrows(PureCompilationException.class, () -> compileTestSource(
                 "testFunc.pure",
-                "function testFunc():A[1]\n" +
-                        "{\n" +
-                        "    let a = ^A(prop='the quick brown fox');\n" +
-                        "    ^$a(prop=1);" +
-                        "}"));
+                """
+                function testFunc():A[1]
+                {
+                    let a = ^A(prop='the quick brown fox');
+                    ^$a(prop=1);\
+                }\
+                """));
         assertPureException(PureCompilationException.class, "Type Error: Integer not a subtype of String", "testFunc.pure", 4, 13, 4, 13, 4, 13, e);
     }
 
@@ -58,25 +62,29 @@ public class TestCopy extends AbstractPureTestWithCoreCompiledPlatform
     public void testIncompatibleClasses()
     {
         compileTestSource("testModel.pure",
-                "Class A\n" +
-                        "{\n" +
-                        "    prop:B[1];\n" +
-                        "}\n" +
-                        "\n" +
-                        "Class B\n" +
-                        "{\n" +
-                        "}\n" +
-                        "\n" +
-                        "Class C\n" +
-                        "{\n" +
-                        "}");
-        PureCompilationException e = Assert.assertThrows(PureCompilationException.class, () -> compileTestSource(
+                """
+                Class A
+                {
+                    prop:B[1];
+                }
+                
+                Class B
+                {
+                }
+                
+                Class C
+                {
+                }\
+                """);
+        PureCompilationException e = Assertions.assertThrows(PureCompilationException.class, () -> compileTestSource(
                 "testFunc.pure",
-                "function testFunc():A[1]\n" +
-                        "{\n" +
-                        "    let a = ^A(prop=^B());\n" +
-                        "    ^$a(prop=^C());\n" +
-                        "}"));
+                """
+                function testFunc():A[1]
+                {
+                    let a = ^A(prop=^B());
+                    ^$a(prop=^C());
+                }\
+                """));
         assertPureException(PureCompilationException.class, "Type Error: C not a subtype of B", "testFunc.pure", 4, 13, 4, 13, 4, 13, e);
     }
 
@@ -84,21 +92,25 @@ public class TestCopy extends AbstractPureTestWithCoreCompiledPlatform
     public void testIncompatibleMixedTypes1()
     {
         compileTestSource("testModel.pure",
-                "Class A\n" +
-                        "{\n" +
-                        "    prop:B[1];\n" +
-                        "}\n" +
-                        "\n" +
-                        "Class B\n" +
-                        "{\n" +
-                        "}");
-        PureCompilationException e = Assert.assertThrows(PureCompilationException.class, () -> compileTestSource(
+                """
+                Class A
+                {
+                    prop:B[1];
+                }
+                
+                Class B
+                {
+                }\
+                """);
+        PureCompilationException e = Assertions.assertThrows(PureCompilationException.class, () -> compileTestSource(
                 "testFunc.pure",
-                "function testFunc():A[1]\n" +
-                        "{\n" +
-                        "    let a = ^A(prop=^B());\n" +
-                        "    ^$a(prop='the quick brown fox');\n" +
-                        "}"));
+                """
+                function testFunc():A[1]
+                {
+                    let a = ^A(prop=^B());
+                    ^$a(prop='the quick brown fox');
+                }\
+                """));
         assertPureException(PureCompilationException.class, "Type Error: String not a subtype of B", "testFunc.pure", 4, 13, 4, 13, 4, 13, e);
     }
 
@@ -106,21 +118,25 @@ public class TestCopy extends AbstractPureTestWithCoreCompiledPlatform
     public void testIncompatibleMixedTypes2()
     {
         compileTestSource("testModel.pure",
-                "Class A\n" +
-                        "{\n" +
-                        "    prop:String[1];\n" +
-                        "}\n" +
-                        "\n" +
-                        "Class B\n" +
-                        "{\n" +
-                        "}");
-        PureCompilationException e = Assert.assertThrows(PureCompilationException.class, () -> compileTestSource(
+                """
+                Class A
+                {
+                    prop:String[1];
+                }
+                
+                Class B
+                {
+                }\
+                """);
+        PureCompilationException e = Assertions.assertThrows(PureCompilationException.class, () -> compileTestSource(
                 "testFunc.pure",
-                "function testFunc():A[1]\n" +
-                        "{\n" +
-                        "    let a = ^A(prop='the quick brown fox');\n" +
-                        "    ^$a(prop=^B());\n" +
-                        "}"));
+                """
+                function testFunc():A[1]
+                {
+                    let a = ^A(prop='the quick brown fox');
+                    ^$a(prop=^B());
+                }\
+                """));
         assertPureException(PureCompilationException.class, "Type Error: B not a subtype of String", "testFunc.pure", 4, 13, 4, 13, 4, 13, e);
     }
 
@@ -128,17 +144,21 @@ public class TestCopy extends AbstractPureTestWithCoreCompiledPlatform
     public void testIncompatibleInstanceValueMultiplicity()
     {
         compileTestSource("testModel.pure",
-                "Class A\n" +
-                        "{\n" +
-                        "    prop:String[1];\n" +
-                        "}\n");
-        PureCompilationException e = Assert.assertThrows(PureCompilationException.class, () -> compileTestSource(
+                """
+                Class A
+                {
+                    prop:String[1];
+                }
+                """);
+        PureCompilationException e = Assertions.assertThrows(PureCompilationException.class, () -> compileTestSource(
                 "testFunc.pure",
-                "function testFunc():A[1]\n" +
-                        "{\n" +
-                        "    let a = ^A(prop='one string');\n" +
-                        "    ^$a(prop=['one string', 'two string', 'red string', 'blue string']);\n" +
-                        "}"));
+                """
+                function testFunc():A[1]
+                {
+                    let a = ^A(prop='one string');
+                    ^$a(prop=['one string', 'two string', 'red string', 'blue string']);
+                }\
+                """));
         assertPureException(PureCompilationException.class, "Multiplicity Error: [4] is not compatible with [1]", "testFunc.pure", 4, 13, 4, 13, 4, 13, e);
     }
 
@@ -146,22 +166,26 @@ public class TestCopy extends AbstractPureTestWithCoreCompiledPlatform
     public void testIncompatibleExpressionMultiplicity()
     {
         compileTestSource("testModel.pure",
-                "Class A\n" +
-                        "{\n" +
-                        "    prop:String[1];\n" +
-                        "}\n" +
-                        "\n" +
-                        "function someStrings():String[*]\n" +
-                        "{\n" +
-                        "    ['one string', 'two string', 'red string', 'blue string'];\n" +
-                        "}");
-        PureCompilationException e = Assert.assertThrows(PureCompilationException.class, () -> compileTestSource(
+                """
+                Class A
+                {
+                    prop:String[1];
+                }
+                
+                function someStrings():String[*]
+                {
+                    ['one string', 'two string', 'red string', 'blue string'];
+                }\
+                """);
+        PureCompilationException e = Assertions.assertThrows(PureCompilationException.class, () -> compileTestSource(
                 "testFunc.pure",
-                "function testFunc():A[1]\n" +
-                        "{\n" +
-                        "    let a = ^A(prop='one string');\n" +
-                        "    ^$a(prop=someStrings());\n" +
-                        "}"));
+                """
+                function testFunc():A[1]
+                {
+                    let a = ^A(prop='one string');
+                    ^$a(prop=someStrings());
+                }\
+                """));
         assertPureException(PureCompilationException.class, "Multiplicity Error: [*] is not compatible with [1]", "testFunc.pure", 4, 13, 4, 13, 4, 13, e);
     }
 
@@ -169,27 +193,31 @@ public class TestCopy extends AbstractPureTestWithCoreCompiledPlatform
     public void testIncompatibleExpressionMultiplicity_Deep()
     {
         compileTestSource("testModel.pure",
-                "Class A\n" +
-                        "{\n" +
-                        "    toB:B[1];\n" +
-                        "}\n" +
-                        "\n" +
-                        "Class B\n" +
-                        "{\n" +
-                        "    prop:String[1];\n" +
-                        "}\n" +
-                        "\n" +
-                        "function someStrings():String[*]\n" +
-                        "{\n" +
-                        "    ['one string', 'two string', 'red string', 'blue string'];\n" +
-                        "}");
-        PureCompilationException e = Assert.assertThrows(PureCompilationException.class, () -> compileTestSource(
+                """
+                Class A
+                {
+                    toB:B[1];
+                }
+                
+                Class B
+                {
+                    prop:String[1];
+                }
+                
+                function someStrings():String[*]
+                {
+                    ['one string', 'two string', 'red string', 'blue string'];
+                }\
+                """);
+        PureCompilationException e = Assertions.assertThrows(PureCompilationException.class, () -> compileTestSource(
                 "testFunc.pure",
-                "function testFunc():A[1]\n" +
-                        "{\n" +
-                        "    let a = ^A(toB=^B(prop='one string'));\n" +
-                        "    ^$a(toB.prop=someStrings());\n" +
-                        "}"));
+                """
+                function testFunc():A[1]
+                {
+                    let a = ^A(toB=^B(prop='one string'));
+                    ^$a(toB.prop=someStrings());
+                }\
+                """));
         assertPureException(PureCompilationException.class, "Multiplicity Error: [*] is not compatible with [1]", "testFunc.pure", 4, 17, 4, 17, 4, 17, e);
     }
 }

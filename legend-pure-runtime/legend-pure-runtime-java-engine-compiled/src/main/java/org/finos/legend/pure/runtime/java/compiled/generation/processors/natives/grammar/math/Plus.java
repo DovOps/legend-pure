@@ -30,15 +30,17 @@ public class Plus extends AbstractNativeFunctionGeneric
     @Override
     public String buildBody()
     {
-        return "new DefendedPureFunction1<Object, Object>()\n" +
-                "        {\n" +
-                "            @Override\n" +
-                "            public Object value(Object input, final ExecutionSupport es)\n" +
-                "            {\n" +
-                "                return input instanceof RichIterable \n" +
-                "                   ? CompiledSupport.plus((RichIterable) input) \n" +
-                "                   : CompiledSupport.plus((Number) input);\n" +
-                "            }\n" +
-                "        }";
+        return """
+                new DefendedPureFunction1<Object, Object>()
+                        {
+                            @Override
+                            public Object value(Object input, final ExecutionSupport es)
+                            {
+                                return input instanceof RichIterable\s
+                                   ? CompiledSupport.plus((RichIterable) input)\s
+                                   : CompiledSupport.plus((Number) input);
+                            }
+                        }\
+                """;
     }
 }

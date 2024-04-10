@@ -151,9 +151,9 @@ public class PureJavaCompileException extends Exception
 
             JavaFileObject source = firstDiagnostic.getSource();
             String[] sourceLines;
-            if (source instanceof StringJavaSource)
+            if (source instanceof StringJavaSource javaSource)
             {
-                sourceLines = this.lineSplitter.split(((StringJavaSource) source).getCode());
+                sourceLines = this.lineSplitter.split(javaSource.getCode());
                 addLine("");
                 addLine(sourceName);
             }
@@ -174,7 +174,7 @@ public class PureJavaCompileException extends Exception
                 long end = Math.min(diagnostic.getLineNumber() + SOURCE_CONTEXT_LINES, sourceLines.length);
                 if (lineNo - sourceLinesHighwater > 2)
                 {
-                    addLine(String.format("%04d:%04d ...", sourceLinesHighwater + 1, lineNo - 1));
+                    addLine("%04d:%04d ...".formatted(sourceLinesHighwater + 1, lineNo - 1));
                     sourceLinesHighwater = lineNo - 1;
                 }
                 else
@@ -186,7 +186,7 @@ public class PureJavaCompileException extends Exception
                 {
                     if (sourceLinesHighwater < lineNo)
                     {
-                        addLine(String.format("%04d %s", lineNo, sourceLines[(int) (lineNo - 1)]));
+                        addLine("%04d %s".formatted(lineNo, sourceLines[(int) (lineNo - 1)]));
                         sourceLinesHighwater = lineNo;
                     }
                     lineNo++;

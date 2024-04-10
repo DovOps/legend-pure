@@ -127,7 +127,7 @@ public class GraphStatistics
 
     private static String getDefaultFormatString(String indent, String description1, String description2)
     {
-        return String.format("%s%%s - %s: %%,d; %s: %%,d; delta: %%,d%%n", (indent == null) ? "" : indent, (description1 == null) ? "first" : description1, (description2 == null) ? "second" : description2);
+        return "%s%%s - %s: %%,d; %s: %%,d; delta: %%,d%%n".formatted((indent == null) ? "" : indent, (description1 == null) ? "first" : description1, (description2 == null) ? "second" : description2);
     }
 
     private static void writeInstanceCountsByClassifierPathDeltas(Appendable appendable, String formatString, SetIterable<String> classifierPaths, ToIntFunction<String> countFn1, ToIntFunction<String> countFn2)
@@ -183,7 +183,7 @@ public class GraphStatistics
 
     public static LazyIterable<GraphPath> allPathsBetween(Iterable<String> startNodePaths, Iterable<? extends CoreInstance> endNodes, int maxPathLength, ProcessorSupport processorSupport)
     {
-        Set<?> endNodesSet = (endNodes instanceof Set) ? (Set<?>) endNodes : Sets.mutable.withAll(endNodes);
+        Set<?> endNodesSet = (endNodes instanceof Set s) ? s : Sets.mutable.withAll(endNodes);
         return allPathsBetween(startNodePaths, endNodesSet::contains, maxPathLength, processorSupport);
     }
 

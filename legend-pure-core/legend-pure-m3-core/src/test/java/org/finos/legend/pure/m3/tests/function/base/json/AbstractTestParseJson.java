@@ -15,7 +15,7 @@
 package org.finos.legend.pure.m3.tests.function.base.json;
 
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public abstract class AbstractTestParseJson extends AbstractPureTestWithCoreCompiled
 {
@@ -23,11 +23,13 @@ public abstract class AbstractTestParseJson extends AbstractPureTestWithCoreComp
     public void testParseJsonSuccess()
     {
         compileTestSource(
-                "function test():Boolean[1]\n" +
-                        "{\n" +
-                        "   let s = '{\"name\":\"some name\",\"nested\":{\"nestedName\":\"some other name\",\"amount\":-12.3,\"furtherNested\":{\"integer\":0,\"description\":\"nested object\"}},\"list\":[{},1,2,3.14159,false,\"the quick brown fox\",null]}';\n" +
-                        "   assert(!meta::json::parseJSON($s)->isEmpty(), |'');\n" +
-                        "}");
+                """
+                function test():Boolean[1]
+                {
+                   let s = '{"name":"some name","nested":{"nestedName":"some other name","amount":-12.3,"furtherNested":{"integer":0,"description":"nested object"}},"list":[{},1,2,3.14159,false,"the quick brown fox",null]}';
+                   assert(!meta::json::parseJSON($s)->isEmpty(), |'');
+                }\
+                """);
         this.execute("test():Boolean[1]");
     }
 

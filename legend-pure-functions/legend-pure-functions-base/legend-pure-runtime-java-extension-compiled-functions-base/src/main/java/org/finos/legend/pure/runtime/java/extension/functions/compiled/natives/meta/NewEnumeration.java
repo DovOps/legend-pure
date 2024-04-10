@@ -37,13 +37,15 @@ public class NewEnumeration extends AbstractNative
     public String buildBody()
     {
 
-        return "new SharedPureFunction<Object>()\n" +
-                "        {\n" +
-                "            @Override\n" +
-                "            public Object execute(ListIterable<?> vars, final ExecutionSupport es)\n" +
-                "            {\n" +
-                "                return FunctionsGen.newEnumeration((String) vars.get(0), CompiledSupport.toPureCollection(vars.get(1)), ((CompiledExecutionSupport) es).getMetadataAccessor(), null);\n" +
-                "            }\n" +
-                "        }";
+        return """
+                new SharedPureFunction<Object>()
+                        {
+                            @Override
+                            public Object execute(ListIterable<?> vars, final ExecutionSupport es)
+                            {
+                                return FunctionsGen.newEnumeration((String) vars.get(0), CompiledSupport.toPureCollection(vars.get(1)), ((CompiledExecutionSupport) es).getMetadataAccessor(), null);
+                            }
+                        }\
+                """;
     }
 }

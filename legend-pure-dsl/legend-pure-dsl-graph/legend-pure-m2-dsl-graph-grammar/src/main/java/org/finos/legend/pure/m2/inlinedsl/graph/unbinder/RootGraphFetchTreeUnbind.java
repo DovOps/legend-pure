@@ -77,9 +77,9 @@ public class RootGraphFetchTreeUnbind implements MatchRunner<RootGraphFetchTree>
 
         for (ValueSpecification vs : propertyGraphFetchTree._parameters())
         {
-            if (vs instanceof InstanceValue)
+            if (vs instanceof InstanceValue instanceValue)
             {
-                for (CoreInstance value : ((InstanceValue) vs)._valuesCoreInstance())
+                for (CoreInstance value : instanceValue._valuesCoreInstance())
                 {
                     Shared.cleanEnumStub(value, processorSupport);
                 }

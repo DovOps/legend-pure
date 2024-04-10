@@ -17,11 +17,11 @@ package org.finos.legend.pure.runtime.java.interpreted.function.base.runtime;
 import org.finos.legend.pure.m3.execution.FunctionExecution;
 import org.finos.legend.pure.m3.tests.function.base.runtime.AbstractTestIsOptionSet;
 import org.finos.legend.pure.runtime.java.interpreted.FunctionExecutionInterpreted;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.BeforeAll;
 
 public class TestIsOptionSetInterpreted extends AbstractTestIsOptionSet
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getFunctionExecution(), getOptions());

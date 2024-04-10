@@ -26,15 +26,15 @@ import org.finos.legend.pure.m3.serialization.filesystem.usercodestorage.Mutable
 import org.finos.legend.pure.m3.serialization.filesystem.usercodestorage.classpath.ClassLoaderCodeStorage;
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;
 
 public abstract class AbstractTestChunk extends AbstractPureTestWithCoreCompiled
 {
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("/test/testChunk.pure");
@@ -45,11 +45,13 @@ public abstract class AbstractTestChunk extends AbstractPureTestWithCoreCompiled
     public void testChunkZeroSize()
     {
         compileTestSource("/test/testChunk.pure",
-                "function test():Any[*]\n" +
-                        "{\n" +
-                        "   'the quick brown fox jumps over the lazy dog'->chunk(0)\n" +
-                        "}\n");
-        PureExecutionException e = Assert.assertThrows(PureExecutionException.class, () -> execute("test():Any[*]"));
+                """
+                function test():Any[*]
+                {
+                   'the quick brown fox jumps over the lazy dog'->chunk(0)
+                }
+                """);
+        PureExecutionException e = Assertions.assertThrows(PureExecutionException.class, () -> execute("test():Any[*]"));
         assertPureException(PureExecutionException.class, "Invalid chunk size: 0", "/test/testChunk.pure", 3, 51, e);
     }
 
@@ -57,11 +59,13 @@ public abstract class AbstractTestChunk extends AbstractPureTestWithCoreCompiled
     public void testChunkNegativeSize()
     {
         compileTestSource("/test/testChunk.pure",
-                "function test():Any[*]\n" +
-                        "{\n" +
-                        "   'the quick brown fox jumps over the lazy dog'->chunk(-1)\n" +
-                        "}\n");
-        PureExecutionException e = Assert.assertThrows(PureExecutionException.class, () -> execute("test():Any[*]"));
+                """
+                function test():Any[*]
+                {
+                   'the quick brown fox jumps over the lazy dog'->chunk(-1)
+                }
+                """);
+        PureExecutionException e = Assertions.assertThrows(PureExecutionException.class, () -> execute("test():Any[*]"));
         assertPureException(PureExecutionException.class, "Invalid chunk size: -1", "/test/testChunk.pure", 3, 51, e);
     }
 
@@ -69,10 +73,12 @@ public abstract class AbstractTestChunk extends AbstractPureTestWithCoreCompiled
     public void testChunkEmptyString()
     {
         compileTestSource("/test/testChunk.pure",
-                    "function test():Any[*]\n" +
-                            "{\n" +
-                            "   ''->chunk(1)\n" +
-                            "}\n");
+                    """
+                    function test():Any[*]
+                    {
+                       ''->chunk(1)
+                    }
+                    """);
         CoreInstance result = execute("test():Any[*]");
         Verify.assertInstanceOf(InstanceValue.class, result);
         Verify.assertEmpty(((InstanceValue)result)._values());
@@ -82,10 +88,12 @@ public abstract class AbstractTestChunk extends AbstractPureTestWithCoreCompiled
     public void testChunkLargerThanString()
     {
         compileTestSource("/test/testChunk.pure",
-                "function test():Any[*]\n" +
-                        "{\n" +
-                        "   'the quick brown fox jumped over the lazy dog'->chunk(1000)\n" +
-                        "}\n");
+                """
+                function test():Any[*]
+                {
+                   'the quick brown fox jumped over the lazy dog'->chunk(1000)
+                }
+                """);
         CoreInstance result = execute("test():Any[*]");
         Verify.assertInstanceOf(InstanceValue.class, result);
         Verify.assertListsEqual(Lists.mutable.with("the quick brown fox jumped over the lazy dog"), ((InstanceValue)result)._values().toList());

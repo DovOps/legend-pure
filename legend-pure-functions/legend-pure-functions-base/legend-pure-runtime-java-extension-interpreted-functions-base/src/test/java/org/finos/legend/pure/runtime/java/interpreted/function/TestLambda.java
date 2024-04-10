@@ -20,15 +20,11 @@ import org.finos.legend.pure.m4.coreinstance.SourceInformation;
 import org.finos.legend.pure.m4.exception.PureCompilationException;
 import org.finos.legend.pure.m4.exception.PureException;
 import org.finos.legend.pure.runtime.java.interpreted.FunctionExecutionInterpreted;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.*;
 
 public class TestLambda extends AbstractPureTestWithCoreCompiled
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getFunctionExecution());
@@ -37,13 +33,13 @@ public class TestLambda extends AbstractPureTestWithCoreCompiled
 //        System.setProperty("pure.typeinference.test", "true");
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("inferenceTest.pure");
     }
 
-    @AfterClass
+    @AfterAll
     public static void unsetObserver()
     {
         System.clearProperty("pure.typeinference.test");
@@ -54,30 +50,31 @@ public class TestLambda extends AbstractPureTestWithCoreCompiled
     {
         try
         {
-            compileTestSource("inferenceTest.pure", "" +
-                    "function myFunc(func:Function<{String[1],Boolean[1]->String[1]}>[1], b: Boolean[1]):String[1]\n" +
-                    "{\n" +
-                    "    $func->eval('ok', $b);\n" +
-                    "}\n" +
-                    "\n" +
-                    "function testMany():Nil[0]\n" +
-                    "{\n" +
-                    "    let l = {a,b|$a+if($b,|'eee',|'rrrr')};\n" +
-                    "    print($l->myFunc(true)+$l->myFunc(false));\n" +
-                    "}\n");
-            Assert.fail();
+            compileTestSource("inferenceTest.pure", """
+                    function myFunc(func:Function<{String[1],Boolean[1]->String[1]}>[1], b: Boolean[1]):String[1]
+                    {
+                        $func->eval('ok', $b);
+                    }
+                    
+                    function testMany():Nil[0]
+                    {
+                        let l = {a,b|$a+if($b,|'eee',|'rrrr')};
+                        print($l->myFunc(true)+$l->myFunc(false));
+                    }
+                    """);
+            Assertions.fail();
         }
         catch (Exception e)
         {
             PureException pe = PureException.findPureException(e);
-            Assert.assertNotNull(pe);
-            Assert.assertTrue(pe instanceof PureCompilationException);
-            Assert.assertEquals("Can't infer the parameters' types for the lambda. Please specify it in the signature.", pe.getInfo());
+            Assertions.assertNotNull(pe);
+            Assertions.assertTrue(pe instanceof PureCompilationException);
+            Assertions.assertEquals("Can't infer the parameters' types for the lambda. Please specify it in the signature.", pe.getInfo());
 
             SourceInformation sourceInfo = pe.getSourceInformation();
-            Assert.assertNotNull(sourceInfo);
-            Assert.assertEquals(8, sourceInfo.getLine());
-            Assert.assertEquals(14, sourceInfo.getColumn());
+            Assertions.assertNotNull(sourceInfo);
+            Assertions.assertEquals(8, sourceInfo.getLine());
+            Assertions.assertEquals(14, sourceInfo.getColumn());
         }
     }
 
@@ -86,29 +83,29 @@ public class TestLambda extends AbstractPureTestWithCoreCompiled
     {
         try
         {
-            compileTestSource("inferenceTest.pure", "" +
-                    "function myFunc(func:Function<Any>[1]):String[1]\n" +
-                    "{\n" +
-                    "    'ok'\n" +
-                    "}\n" +
-                    "" +
-                    "function testMany():String[1]\n" +
-                    "{\n" +
-                    "    myFunc(a|$a+'eee');\n" +
-                    "}\n");
-            Assert.fail();
+            compileTestSource("inferenceTest.pure", """
+                    function myFunc(func:Function<Any>[1]):String[1]
+                    {
+                        'ok'
+                    }
+                    function testMany():String[1]
+                    {
+                        myFunc(a|$a+'eee');
+                    }
+                    """);
+            Assertions.fail();
         }
         catch (Exception e)
         {
             PureException pe = PureException.findPureException(e);
-            Assert.assertNotNull(pe);
-            Assert.assertTrue(pe instanceof PureCompilationException);
-            Assert.assertEquals("Can't infer the parameters' types for the lambda. Please specify it in the signature.", pe.getInfo());
+            Assertions.assertNotNull(pe);
+            Assertions.assertTrue(pe instanceof PureCompilationException);
+            Assertions.assertEquals("Can't infer the parameters' types for the lambda. Please specify it in the signature.", pe.getInfo());
 
             SourceInformation sourceInfo = pe.getSourceInformation();
-            Assert.assertNotNull(sourceInfo);
-            Assert.assertEquals(7, sourceInfo.getLine());
-            Assert.assertEquals(12, sourceInfo.getColumn());
+            Assertions.assertNotNull(sourceInfo);
+            Assertions.assertEquals(7, sourceInfo.getLine());
+            Assertions.assertEquals(12, sourceInfo.getColumn());
         }
     }
 
@@ -117,24 +114,25 @@ public class TestLambda extends AbstractPureTestWithCoreCompiled
     {
         try
         {
-            compileTestSource("inferenceTest.pure", "" +
-                    "function test():Nil[0]\n" +
-                    "{\n" +
-                    "    print({a:Employee[1], b:Integer[1]|$b});\n" +
-                    "}\n");
-            Assert.fail();
+            compileTestSource("inferenceTest.pure", """
+                    function test():Nil[0]
+                    {
+                        print({a:Employee[1], b:Integer[1]|$b});
+                    }
+                    """);
+            Assertions.fail();
         }
         catch (Exception e)
         {
             PureException pe = PureException.findPureException(e);
-            Assert.assertNotNull(pe);
-            Assert.assertTrue(pe instanceof PureCompilationException);
-            Assert.assertEquals("Employee has not been defined!", pe.getInfo());
+            Assertions.assertNotNull(pe);
+            Assertions.assertTrue(pe instanceof PureCompilationException);
+            Assertions.assertEquals("Employee has not been defined!", pe.getInfo());
 
             SourceInformation sourceInfo = pe.getSourceInformation();
-            Assert.assertNotNull(sourceInfo);
-            Assert.assertEquals(3, sourceInfo.getLine());
-            Assert.assertEquals(14, sourceInfo.getColumn());
+            Assertions.assertNotNull(sourceInfo);
+            Assertions.assertEquals(3, sourceInfo.getLine());
+            Assertions.assertEquals(14, sourceInfo.getColumn());
         }
     }
 

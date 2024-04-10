@@ -380,4 +380,8 @@ public class ConnectionWrapper implements Connection
     {
         return this.connection;
     }
+
+    public void setNetworkTimeout(java.util.concurrent.Executor executor, int milliseconds) {
+        // TODO Auto-generated method stub
+    }
 }

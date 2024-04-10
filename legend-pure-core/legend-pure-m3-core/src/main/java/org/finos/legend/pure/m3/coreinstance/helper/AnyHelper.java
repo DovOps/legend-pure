@@ -39,50 +39,50 @@ public class AnyHelper
         }
 
         Object result = ((PrimitiveCoreInstance<?>) instance).getValue();
-        if (result instanceof Integer)
+        if (result instanceof Integer integer)
         {
-            return ((Integer) result).longValue();
+            return integer.longValue();
         }
-        if (result instanceof BigDecimal && instance instanceof FloatCoreInstance)
+        if (result instanceof BigDecimal decimal && instance instanceof FloatCoreInstance)
         {
-            return ((BigDecimal) result).doubleValue();
+            return decimal.doubleValue();
         }
         return result;
     }
 
     public static CoreInstance wrapPrimitives(Object object, ModelRepository modelRepository)
     {
-        if (object instanceof CoreInstance)
+        if (object instanceof CoreInstance instance)
         {
-            return (CoreInstance) object;
+            return instance;
         }
         if (object instanceof Integer || object instanceof Long || object instanceof BigInteger)
         {
             return PrimitiveHelper.integerToCoreInstance((Number) object, modelRepository);
         }
-        if (object instanceof String)
+        if (object instanceof String string)
         {
-            return PrimitiveHelper.stringToCoreInstance((String) object, modelRepository);
+            return PrimitiveHelper.stringToCoreInstance(string, modelRepository);
         }
-        if (object instanceof Boolean)
+        if (object instanceof Boolean boolean1)
         {
-            return PrimitiveHelper.booleanToCoreInstance((Boolean) object, modelRepository);
+            return PrimitiveHelper.booleanToCoreInstance(boolean1, modelRepository);
         }
-        if (object instanceof PureDate)
+        if (object instanceof PureDate date)
         {
-            return PrimitiveHelper.dateToCoreInstance((PureDate) object, modelRepository);
+            return PrimitiveHelper.dateToCoreInstance(date, modelRepository);
         }
         if ((object instanceof Float) || (object instanceof Double))
         {
             return PrimitiveHelper.floatToCoreInstance(BigDecimal.valueOf(((Number) object).doubleValue()), modelRepository);
         }
-        if (object instanceof BigDecimal)
+        if (object instanceof BigDecimal decimal)
         {
-            return PrimitiveHelper.decimalToCoreInstance((BigDecimal) object, modelRepository);
+            return PrimitiveHelper.decimalToCoreInstance(decimal, modelRepository);
         }
-        if (object instanceof PureStrictTime)
+        if (object instanceof PureStrictTime time)
         {
-            return PrimitiveHelper.strictTimeToCoreInstance((PureStrictTime) object, modelRepository);
+            return PrimitiveHelper.strictTimeToCoreInstance(time, modelRepository);
         }
         throw new IllegalArgumentException("Unhandled type: " + object.getClass().getName() + " (value=" + object + ")");
     }

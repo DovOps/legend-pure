@@ -16,11 +16,11 @@ package org.finos.legend.pure.runtime.java.interpreted;
 
 import org.finos.legend.pure.m3.execution.FunctionExecution;
 import org.finos.legend.pure.m3.tests.elements.function.TestAdvancedOpenVariable;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.BeforeAll;
 
 public class TestAdvancedOpenVariableInterpreted extends TestAdvancedOpenVariable
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getFunctionExecution());

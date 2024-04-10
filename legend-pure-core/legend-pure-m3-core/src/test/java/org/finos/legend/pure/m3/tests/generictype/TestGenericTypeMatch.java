@@ -26,10 +26,10 @@ import org.finos.legend.pure.m3.navigation.generictype.match.GenericTypeMatch;
 import org.finos.legend.pure.m3.navigation.generictype.match.ParameterMatchBehavior;
 import org.finos.legend.pure.m3.navigation.type.Type;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestGenericTypeMatch extends AbstractPureTestWithCoreCompiledPlatform
 {
@@ -38,7 +38,7 @@ public class TestGenericTypeMatch extends AbstractPureTestWithCoreCompiledPlatfo
     private static CoreInstance one;
     private static CoreInstance zeroMany;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getExtra());
@@ -48,7 +48,7 @@ public class TestGenericTypeMatch extends AbstractPureTestWithCoreCompiledPlatfo
         zeroMany = runtime.getCoreInstance(M3Paths.ZeroMany);
     }
 
-    @After
+    @AfterEach
     public void clearRuntime()
     {
         runtime.delete("fromString.pure");
@@ -58,9 +58,11 @@ public class TestGenericTypeMatch extends AbstractPureTestWithCoreCompiledPlatfo
     public void testMatches_ConcreteCovariantNoGenerics()
     {
         compileTestSource("fromString.pure",
-                "Class test::A {}\n" +
-                        "Class test::B extends test::A {}\n" +
-                        "Class test::C {}\n");
+                """
+                Class test::A {}
+                Class test::B extends test::A {}
+                Class test::C {}
+                """);
         CoreInstance a = newGenericType("test::A");
         CoreInstance b = newGenericType("test::B");
         CoreInstance c = newGenericType("test::C");
@@ -100,9 +102,11 @@ public class TestGenericTypeMatch extends AbstractPureTestWithCoreCompiledPlatfo
     public void testMatches_ConcreteContravariantNoGenerics()
     {
         compileTestSource("fromString.pure",
-                "Class test::A {}\n" +
-                        "Class test::B extends test::A {}\n" +
-                        "Class test::C {}\n");
+                """
+                Class test::A {}
+                Class test::B extends test::A {}
+                Class test::C {}
+                """);
         CoreInstance a = newGenericType("test::A");
         CoreInstance b = newGenericType("test::B");
         CoreInstance c = newGenericType("test::C");
@@ -142,9 +146,11 @@ public class TestGenericTypeMatch extends AbstractPureTestWithCoreCompiledPlatfo
     public void testMatches_ConcreteCovariantWithGenerics()
     {
         compileTestSource("fromString.pure",
-                "Class test::A<X> {}\n" +
-                        "Class test::B<Y> extends test::A<Y> {}\n" +
-                        "Class test::C<Z> {}\n");
+                """
+                Class test::A<X> {}
+                Class test::B<Y> extends test::A<Y> {}
+                Class test::C<Z> {}
+                """);
 
         CoreInstance aT = newGenericType("test::A", Lists.immutable.with(newNonConcreteGenericType("T")));
         CoreInstance aAny = newGenericType("test::A", Lists.immutable.with(any));
@@ -252,9 +258,11 @@ public class TestGenericTypeMatch extends AbstractPureTestWithCoreCompiledPlatfo
     public void testMatches_ConcreteContravariantWithGenerics()
     {
         compileTestSource("fromString.pure",
-                "Class test::A<X> {}\n" +
-                        "Class test::B<Y> extends test::A<Y> {}\n" +
-                        "Class test::C<Z> {}\n");
+                """
+                Class test::A<X> {}
+                Class test::B<Y> extends test::A<Y> {}
+                Class test::C<Z> {}
+                """);
 
         CoreInstance aT = newGenericType("test::A", Lists.immutable.with(newNonConcreteGenericType("T")));
         CoreInstance aAny = newGenericType("test::A", Lists.immutable.with(any));
@@ -362,9 +370,11 @@ public class TestGenericTypeMatch extends AbstractPureTestWithCoreCompiledPlatfo
     public void testMatches_NonConcreteTarget()
     {
         compileTestSource("fromString.pure",
-                "Class test::A {}\n" +
-                        "Class test::B extends test::A {}\n" +
-                        "Class test::C<T> {}\n");
+                """
+                Class test::A {}
+                Class test::B extends test::A {}
+                Class test::C<T> {}
+                """);
         CoreInstance a = newGenericType("test::A");
         CoreInstance b = newGenericType("test::B");
         CoreInstance cString = newGenericType("test::C", Lists.immutable.with(newGenericType(M3Paths.String)));
@@ -433,21 +443,23 @@ public class TestGenericTypeMatch extends AbstractPureTestWithCoreCompiledPlatfo
     public void testMatches_ConcreteCovariantWithComplexGenerics()
     {
         compileTestSource("fromString.pure",
-                "Class test::A\n" +
-                        "{\n" +
-                        "  aPropToOne : String[1];\n" +
-                        "  aPropToMany : String[*];\n" +
-                        "}\n" +
-                        "Class test::B extends test::A\n" +
-                        "{\n" +
-                        "  bPropToOne : String[1];\n" +
-                        "  bPropToMany : String[*];\n" +
-                        "}\n" +
-                        "Class test::C\n" +
-                        "{\n" +
-                        "  cPropToOne : String[1];\n" +
-                        "  cPropToMany : String[*];\n" +
-                        "}\n");
+                """
+                Class test::A
+                {
+                  aPropToOne : String[1];
+                  aPropToMany : String[*];
+                }
+                Class test::B extends test::A
+                {
+                  bPropToOne : String[1];
+                  bPropToMany : String[*];
+                }
+                Class test::C
+                {
+                  cPropToOne : String[1];
+                  cPropToMany : String[*];
+                }
+                """);
 
         CoreInstance propertyNilAnyOne = newGenericType(M3Paths.Property, Lists.immutable.with(nil, any), Lists.immutable.with(one));
         CoreInstance propertyNilAnyMany = newGenericType(M3Paths.Property, Lists.immutable.with(nil, any), Lists.immutable.with(zeroMany));
@@ -641,7 +653,7 @@ public class TestGenericTypeMatch extends AbstractPureTestWithCoreCompiledPlatfo
             GenericType.print(message.append(", value="), valueGenericType, processorSupport);
             message.append(", covariant=").append(covariant);
             message.append(", everythingMatchesNonConcreteTarget=").append(everythingMatchesNonConcreteTarget);
-            Assert.fail(message.toString());
+            Assertions.fail(message.toString());
         }
     }
 
@@ -654,7 +666,7 @@ public class TestGenericTypeMatch extends AbstractPureTestWithCoreCompiledPlatfo
             GenericType.print(message.append(", value="), valueGenericType, processorSupport);
             message.append(", covariant=").append(covariant);
             message.append(", everythingMatchesNonConcreteTarget=").append(everythingMatchesNonConcreteTarget);
-            Assert.fail(message.toString());
+            Assertions.fail(message.toString());
         }
     }
 

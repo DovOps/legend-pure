@@ -21,20 +21,20 @@ import org.finos.legend.pure.m3.navigation.Instance;
 import org.finos.legend.pure.m3.navigation.M3Properties;
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestSourceMutation extends AbstractPureTestWithCoreCompiled
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime();
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("testDiagram.pure");
@@ -46,22 +46,24 @@ public class TestSourceMutation extends AbstractPureTestWithCoreCompiled
     public void testTypeViewWithNonExistentType()
     {
         SourceMutation m = compileTestSource("testDiagram.pure",
-                "###Diagram\n" +
-                        "Diagram test::pure::TestDiagram(width=10.0, height=10.0)\n" +
-                        "{\n" +
-                        "    TypeView TestClass1(type=test::pure::TestClass1, stereotypesVisible=true, attributesVisible=true,\n" +
-                        "                        attributeStereotypesVisible=true, attributeTypesVisible=true,\n" +
-                        "                        color=#FFFFCC, lineWidth=1.0,\n" +
-                        "                        position=(874.0, 199.46875), width=353.0, height=57.1875)\n" +
-                        "}\n");
+                """
+                ###Diagram
+                Diagram test::pure::TestDiagram(width=10.0, height=10.0)
+                {
+                    TypeView TestClass1(type=test::pure::TestClass1, stereotypesVisible=true, attributesVisible=true,
+                                        attributeStereotypesVisible=true, attributeTypesVisible=true,
+                                        color=#FFFFCC, lineWidth=1.0,
+                                        position=(874.0, 199.46875), width=353.0, height=57.1875)
+                }
+                """);
 
         Verify.assertSetsEqual(Sets.mutable.with("testDiagram.pure"), m.getModifiedFiles().toSet());
         Verify.assertSize(1, m.getLineRangesToRemoveByFile().get("testDiagram.pure"));
-        Assert.assertEquals(4, m.getLineRangesToRemoveByFile().get("testDiagram.pure").get(0).getOne());
-        Assert.assertEquals(7, m.getLineRangesToRemoveByFile().get("testDiagram.pure").get(0).getTwo());
+        Assertions.assertEquals(4, m.getLineRangesToRemoveByFile().get("testDiagram.pure").get(0).getOne());
+        Assertions.assertEquals(7, m.getLineRangesToRemoveByFile().get("testDiagram.pure").get(0).getTwo());
 
         CoreInstance testDiagram = runtime.getCoreInstance("test::pure::TestDiagram");
-        Assert.assertNotNull(testDiagram);
+        Assertions.assertNotNull(testDiagram);
         Verify.assertEmpty(Instance.getValueForMetaPropertyToManyResolved(testDiagram, M3Properties.typeViews, processorSupport));
         Verify.assertEmpty(Instance.getValueForMetaPropertyToManyResolved(testDiagram, M3Properties.associationViews, processorSupport));
         Verify.assertEmpty(Instance.getValueForMetaPropertyToManyResolved(testDiagram, M3Properties.propertyViews, processorSupport));
@@ -72,38 +74,42 @@ public class TestSourceMutation extends AbstractPureTestWithCoreCompiled
     public void testAssociationViewWithNonExistentAssociation()
     {
         compileTestSource("testModel.pure",
-                "Class test::pure::TestClass1 {}\n" +
-                        "Class test::pure::TestClass2 {}\n");
+                """
+                Class test::pure::TestClass1 {}
+                Class test::pure::TestClass2 {}
+                """);
         SourceMutation m = compileTestSource("testDiagram.pure",
-                "###Diagram\n" +
-                        "Diagram test::pure::TestDiagram(width=10.0, height=10.0)\n" +
-                        "{\n" +
-                        "    TypeView TestClass1(type=test::pure::TestClass1, stereotypesVisible=true, attributesVisible=true,\n" +
-                        "                        attributeStereotypesVisible=true, attributeTypesVisible=true,\n" +
-                        "                        color=#FFFFCC, lineWidth=1.0,\n" +
-                        "                        position=(874.0, 199.46875), width=353.0, height=57.1875)\n" +
-                        "    TypeView TestClass2(type=test::pure::TestClass2, stereotypesVisible=true, attributesVisible=true,\n" +
-                        "                        attributeStereotypesVisible=true, attributeTypesVisible=true,\n" +
-                        "                        color=#FFFFCC, lineWidth=1.0,\n" +
-                        "                        position=(75.0, 97.1875), width=113.0, height=57.1875)\n" +
-                        "    AssociationView TestAssociation(association=test::pure::TestAssociation, stereotypesVisible=true, nameVisible=false,\n" +
-                        "                                    color=#000000, lineWidth=1.0,\n" +
-                        "                                    lineStyle=SIMPLE, points=[(132.5, 77.0), (155.2, 77.0)],\n" +
-                        "                                    label='TestAssociation',\n" +
-                        "                                    source=TestClass1,\n" +
-                        "                                    target=TestClass2,\n" +
-                        "                                    sourcePropertyPosition=(132.5, 76.2),\n" +
-                        "                                    sourceMultiplicityPosition=(132.5, 80.0),\n" +
-                        "                                    targetPropertyPosition=(155.2, 76.2),\n" +
-                        "                                    targetMultiplicityPosition=(155.2, 80.0))\n" +
-                        "}\n");
+                """
+                ###Diagram
+                Diagram test::pure::TestDiagram(width=10.0, height=10.0)
+                {
+                    TypeView TestClass1(type=test::pure::TestClass1, stereotypesVisible=true, attributesVisible=true,
+                                        attributeStereotypesVisible=true, attributeTypesVisible=true,
+                                        color=#FFFFCC, lineWidth=1.0,
+                                        position=(874.0, 199.46875), width=353.0, height=57.1875)
+                    TypeView TestClass2(type=test::pure::TestClass2, stereotypesVisible=true, attributesVisible=true,
+                                        attributeStereotypesVisible=true, attributeTypesVisible=true,
+                                        color=#FFFFCC, lineWidth=1.0,
+                                        position=(75.0, 97.1875), width=113.0, height=57.1875)
+                    AssociationView TestAssociation(association=test::pure::TestAssociation, stereotypesVisible=true, nameVisible=false,
+                                                    color=#000000, lineWidth=1.0,
+                                                    lineStyle=SIMPLE, points=[(132.5, 77.0), (155.2, 77.0)],
+                                                    label='TestAssociation',
+                                                    source=TestClass1,
+                                                    target=TestClass2,
+                                                    sourcePropertyPosition=(132.5, 76.2),
+                                                    sourceMultiplicityPosition=(132.5, 80.0),
+                                                    targetPropertyPosition=(155.2, 76.2),
+                                                    targetMultiplicityPosition=(155.2, 80.0))
+                }
+                """);
         Verify.assertSetsEqual(Sets.mutable.with("testDiagram.pure"), m.getModifiedFiles().toSet());
         Verify.assertSize(1, m.getLineRangesToRemoveByFile().get("testDiagram.pure"));
-        Assert.assertEquals(12, m.getLineRangesToRemoveByFile().get("testDiagram.pure").get(0).getOne());
-        Assert.assertEquals(21, m.getLineRangesToRemoveByFile().get("testDiagram.pure").get(0).getTwo());
+        Assertions.assertEquals(12, m.getLineRangesToRemoveByFile().get("testDiagram.pure").get(0).getOne());
+        Assertions.assertEquals(21, m.getLineRangesToRemoveByFile().get("testDiagram.pure").get(0).getTwo());
 
         CoreInstance testDiagram = runtime.getCoreInstance("test::pure::TestDiagram");
-        Assert.assertNotNull(testDiagram);
+        Assertions.assertNotNull(testDiagram);
         Verify.assertSize(2, Instance.getValueForMetaPropertyToManyResolved(testDiagram, M3Properties.typeViews, processorSupport));
         Verify.assertEmpty(Instance.getValueForMetaPropertyToManyResolved(testDiagram, M3Properties.associationViews, processorSupport));
         Verify.assertEmpty(Instance.getValueForMetaPropertyToManyResolved(testDiagram, M3Properties.propertyViews, processorSupport));
@@ -114,36 +120,40 @@ public class TestSourceMutation extends AbstractPureTestWithCoreCompiled
     public void testPropertyViewWithNonExistentProperty()
     {
         compileTestSource("testModel.pure",
-                "Class test::pure::TestClass1 {}\n" +
-                        "Class test::pure::TestClass2 {}\n");
+                """
+                Class test::pure::TestClass1 {}
+                Class test::pure::TestClass2 {}
+                """);
         SourceMutation m = compileTestSource("testDiagram.pure",
-                "###Diagram\n" +
-                        "Diagram test::pure::TestDiagram(width=10.0, height=10.0)\n" +
-                        "{\n" +
-                        "    TypeView TestClass1(type=test::pure::TestClass1, stereotypesVisible=true, attributesVisible=true,\n" +
-                        "                        attributeStereotypesVisible=true, attributeTypesVisible=true,\n" +
-                        "                        color=#FFFFCC, lineWidth=1.0,\n" +
-                        "                        position=(874.0, 199.46875), width=353.0, height=57.1875)\n" +
-                        "    TypeView TestClass2(type=test::pure::TestClass2, stereotypesVisible=true, attributesVisible=true,\n" +
-                        "                        attributeStereotypesVisible=true, attributeTypesVisible=true,\n" +
-                        "                        color=#FFFFCC, lineWidth=1.0,\n" +
-                        "                        position=(75.0, 97.1875), width=113.0, height=57.1875)\n" +
-                        "    PropertyView TestClass1_testProperty(property=test::pure::TestClass1.testProperty, stereotypesVisible=true, nameVisible=false,\n" +
-                        "                                         color=#000000, lineWidth=1.0,\n" +
-                        "                                         lineStyle=SIMPLE, points=[(132.5, 77.0), (155.2, 77.0)],\n" +
-                        "                                         label='Employment',\n" +
-                        "                                         source=TestClass1,\n" +
-                        "                                         target=TestClass2,\n" +
-                        "                                         propertyPosition=(132.5, 76.2),\n" +
-                        "                                         multiplicityPosition=(132.5, 80.0))\n" +
-                        "}\n");
+                """
+                ###Diagram
+                Diagram test::pure::TestDiagram(width=10.0, height=10.0)
+                {
+                    TypeView TestClass1(type=test::pure::TestClass1, stereotypesVisible=true, attributesVisible=true,
+                                        attributeStereotypesVisible=true, attributeTypesVisible=true,
+                                        color=#FFFFCC, lineWidth=1.0,
+                                        position=(874.0, 199.46875), width=353.0, height=57.1875)
+                    TypeView TestClass2(type=test::pure::TestClass2, stereotypesVisible=true, attributesVisible=true,
+                                        attributeStereotypesVisible=true, attributeTypesVisible=true,
+                                        color=#FFFFCC, lineWidth=1.0,
+                                        position=(75.0, 97.1875), width=113.0, height=57.1875)
+                    PropertyView TestClass1_testProperty(property=test::pure::TestClass1.testProperty, stereotypesVisible=true, nameVisible=false,
+                                                         color=#000000, lineWidth=1.0,
+                                                         lineStyle=SIMPLE, points=[(132.5, 77.0), (155.2, 77.0)],
+                                                         label='Employment',
+                                                         source=TestClass1,
+                                                         target=TestClass2,
+                                                         propertyPosition=(132.5, 76.2),
+                                                         multiplicityPosition=(132.5, 80.0))
+                }
+                """);
         Verify.assertSetsEqual(Sets.mutable.with("testDiagram.pure"), m.getModifiedFiles().toSet());
         Verify.assertSize(1, m.getLineRangesToRemoveByFile().get("testDiagram.pure"));
-        Assert.assertEquals(12, m.getLineRangesToRemoveByFile().get("testDiagram.pure").get(0).getOne());
-        Assert.assertEquals(19, m.getLineRangesToRemoveByFile().get("testDiagram.pure").get(0).getTwo());
+        Assertions.assertEquals(12, m.getLineRangesToRemoveByFile().get("testDiagram.pure").get(0).getOne());
+        Assertions.assertEquals(19, m.getLineRangesToRemoveByFile().get("testDiagram.pure").get(0).getTwo());
 
         CoreInstance testDiagram = runtime.getCoreInstance("test::pure::TestDiagram");
-        Assert.assertNotNull(testDiagram);
+        Assertions.assertNotNull(testDiagram);
         Verify.assertSize(2, Instance.getValueForMetaPropertyToManyResolved(testDiagram, M3Properties.typeViews, processorSupport));
         Verify.assertEmpty(Instance.getValueForMetaPropertyToManyResolved(testDiagram, M3Properties.associationViews, processorSupport));
         Verify.assertEmpty(Instance.getValueForMetaPropertyToManyResolved(testDiagram, M3Properties.propertyViews, processorSupport));
@@ -156,32 +166,34 @@ public class TestSourceMutation extends AbstractPureTestWithCoreCompiled
         compileTestSource("testModel.pure",
                 "Class test::pure::TestClass1 {}\n");
         SourceMutation m = compileTestSource("testDiagram.pure",
-                "###Diagram\n" +
-                        "Diagram test::pure::TestDiagram(width=10.0, height=10.0)\n" +
-                        "{\n" +
-                        "    TypeView TestClass1(type=test::pure::TestClass1, stereotypesVisible=true, attributesVisible=true,\n" +
-                        "                        attributeStereotypesVisible=true, attributeTypesVisible=true,\n" +
-                        "                        color=#FFFFCC, lineWidth=1.0,\n" +
-                        "                        position=(874.0, 199.46875), width=353.0, height=57.1875)\n" +
-                        "    TypeView TestClass2(type=test::pure::TestClass2, stereotypesVisible=true, attributesVisible=true,\n" +
-                        "                        attributeStereotypesVisible=true, attributeTypesVisible=true,\n" +
-                        "                        color=#FFFFCC, lineWidth=1.0,\n" +
-                        "                        position=(75.0, 97.1875), width=113.0, height=57.1875)\n" +
-                        "    GeneralizationView TestClass1_TestClass2(color=#000000, lineWidth=1.0,\n" +
-                        "                                             lineStyle=SIMPLE, points=[(132.5, 77.0), (155.2, 77.0)],\n" +
-                        "                                             label='',\n" +
-                        "                                             source=TestClass1,\n" +
-                        "                                             target=TestClass2)\n" +
-                        "}\n");
+                """
+                ###Diagram
+                Diagram test::pure::TestDiagram(width=10.0, height=10.0)
+                {
+                    TypeView TestClass1(type=test::pure::TestClass1, stereotypesVisible=true, attributesVisible=true,
+                                        attributeStereotypesVisible=true, attributeTypesVisible=true,
+                                        color=#FFFFCC, lineWidth=1.0,
+                                        position=(874.0, 199.46875), width=353.0, height=57.1875)
+                    TypeView TestClass2(type=test::pure::TestClass2, stereotypesVisible=true, attributesVisible=true,
+                                        attributeStereotypesVisible=true, attributeTypesVisible=true,
+                                        color=#FFFFCC, lineWidth=1.0,
+                                        position=(75.0, 97.1875), width=113.0, height=57.1875)
+                    GeneralizationView TestClass1_TestClass2(color=#000000, lineWidth=1.0,
+                                                             lineStyle=SIMPLE, points=[(132.5, 77.0), (155.2, 77.0)],
+                                                             label='',
+                                                             source=TestClass1,
+                                                             target=TestClass2)
+                }
+                """);
         Verify.assertSetsEqual(Sets.mutable.with("testDiagram.pure"), m.getModifiedFiles().toSet());
         Verify.assertSize(2, m.getLineRangesToRemoveByFile().get("testDiagram.pure"));
-        Assert.assertEquals(8, m.getLineRangesToRemoveByFile().get("testDiagram.pure").get(0).getOne());
-        Assert.assertEquals(11, m.getLineRangesToRemoveByFile().get("testDiagram.pure").get(0).getTwo());
-        Assert.assertEquals(12, m.getLineRangesToRemoveByFile().get("testDiagram.pure").get(1).getOne());
-        Assert.assertEquals(16, m.getLineRangesToRemoveByFile().get("testDiagram.pure").get(1).getTwo());
+        Assertions.assertEquals(8, m.getLineRangesToRemoveByFile().get("testDiagram.pure").get(0).getOne());
+        Assertions.assertEquals(11, m.getLineRangesToRemoveByFile().get("testDiagram.pure").get(0).getTwo());
+        Assertions.assertEquals(12, m.getLineRangesToRemoveByFile().get("testDiagram.pure").get(1).getOne());
+        Assertions.assertEquals(16, m.getLineRangesToRemoveByFile().get("testDiagram.pure").get(1).getTwo());
 
         CoreInstance testDiagram = runtime.getCoreInstance("test::pure::TestDiagram");
-        Assert.assertNotNull(testDiagram);
+        Assertions.assertNotNull(testDiagram);
         Verify.assertSize(1, Instance.getValueForMetaPropertyToManyResolved(testDiagram, M3Properties.typeViews, processorSupport));
         Verify.assertEmpty(Instance.getValueForMetaPropertyToManyResolved(testDiagram, M3Properties.associationViews, processorSupport));
         Verify.assertEmpty(Instance.getValueForMetaPropertyToManyResolved(testDiagram, M3Properties.propertyViews, processorSupport));
@@ -192,33 +204,37 @@ public class TestSourceMutation extends AbstractPureTestWithCoreCompiled
     public void testGeneralizationViewWithNonExistentGeneralization()
     {
         compileTestSource("testModel.pure",
-                "Class test::pure::TestClass1 {}\n" +
-                        "Class test::pure::TestClass2 {}\n");
+                """
+                Class test::pure::TestClass1 {}
+                Class test::pure::TestClass2 {}
+                """);
         SourceMutation m = compileTestSource("testDiagram.pure",
-                "###Diagram\n" +
-                        "Diagram test::pure::TestDiagram(width=10.0, height=10.0)\n" +
-                        "{\n" +
-                        "    TypeView TestClass1(type=test::pure::TestClass1, stereotypesVisible=true, attributesVisible=true,\n" +
-                        "                        attributeStereotypesVisible=true, attributeTypesVisible=true,\n" +
-                        "                        color=#FFFFCC, lineWidth=1.0,\n" +
-                        "                        position=(874.0, 199.46875), width=353.0, height=57.1875)\n" +
-                        "    TypeView TestClass2(type=test::pure::TestClass2, stereotypesVisible=true, attributesVisible=true,\n" +
-                        "                        attributeStereotypesVisible=true, attributeTypesVisible=true,\n" +
-                        "                        color=#FFFFCC, lineWidth=1.0,\n" +
-                        "                        position=(75.0, 97.1875), width=113.0, height=57.1875)\n" +
-                        "    GeneralizationView TestClass1_TestClass2(color=#000000, lineWidth=1.0,\n" +
-                        "                                             lineStyle=SIMPLE, points=[(132.5, 77.0), (155.2, 77.0)],\n" +
-                        "                                             label='',\n" +
-                        "                                             source=TestClass1,\n" +
-                        "                                             target=TestClass2)\n" +
-                        "}\n");
+                """
+                ###Diagram
+                Diagram test::pure::TestDiagram(width=10.0, height=10.0)
+                {
+                    TypeView TestClass1(type=test::pure::TestClass1, stereotypesVisible=true, attributesVisible=true,
+                                        attributeStereotypesVisible=true, attributeTypesVisible=true,
+                                        color=#FFFFCC, lineWidth=1.0,
+                                        position=(874.0, 199.46875), width=353.0, height=57.1875)
+                    TypeView TestClass2(type=test::pure::TestClass2, stereotypesVisible=true, attributesVisible=true,
+                                        attributeStereotypesVisible=true, attributeTypesVisible=true,
+                                        color=#FFFFCC, lineWidth=1.0,
+                                        position=(75.0, 97.1875), width=113.0, height=57.1875)
+                    GeneralizationView TestClass1_TestClass2(color=#000000, lineWidth=1.0,
+                                                             lineStyle=SIMPLE, points=[(132.5, 77.0), (155.2, 77.0)],
+                                                             label='',
+                                                             source=TestClass1,
+                                                             target=TestClass2)
+                }
+                """);
         Verify.assertSetsEqual(Sets.mutable.with("testDiagram.pure"), m.getModifiedFiles().toSet());
         Verify.assertSize(1, m.getLineRangesToRemoveByFile().get("testDiagram.pure"));
-        Assert.assertEquals(12, m.getLineRangesToRemoveByFile().get("testDiagram.pure").get(0).getOne());
-        Assert.assertEquals(16, m.getLineRangesToRemoveByFile().get("testDiagram.pure").get(0).getTwo());
+        Assertions.assertEquals(12, m.getLineRangesToRemoveByFile().get("testDiagram.pure").get(0).getOne());
+        Assertions.assertEquals(16, m.getLineRangesToRemoveByFile().get("testDiagram.pure").get(0).getTwo());
 
         CoreInstance testDiagram = runtime.getCoreInstance("test::pure::TestDiagram");
-        Assert.assertNotNull(testDiagram);
+        Assertions.assertNotNull(testDiagram);
         Verify.assertSize(2, Instance.getValueForMetaPropertyToManyResolved(testDiagram, M3Properties.typeViews, processorSupport));
         Verify.assertEmpty(Instance.getValueForMetaPropertyToManyResolved(testDiagram, M3Properties.associationViews, processorSupport));
         Verify.assertEmpty(Instance.getValueForMetaPropertyToManyResolved(testDiagram, M3Properties.propertyViews, processorSupport));
@@ -229,44 +245,48 @@ public class TestSourceMutation extends AbstractPureTestWithCoreCompiled
     public void testAssociationViewWithNonExistentTypeViewId()
     {
         compileTestSource("testModel.pure",
-                "Class test::pure::TestClass1 {}\n" +
-                        "Class test::pure::TestClass2 {}\n" +
-                        "Association test::pure::TestAssociation\n" +
-                        "{\n" +
-                        "    prop1:test::pure::TestClass1[0..1];\n" +
-                        "    prop2:test::pure::TestClass2[1..*];\n" +
-                        "}\n");
+                """
+                Class test::pure::TestClass1 {}
+                Class test::pure::TestClass2 {}
+                Association test::pure::TestAssociation
+                {
+                    prop1:test::pure::TestClass1[0..1];
+                    prop2:test::pure::TestClass2[1..*];
+                }
+                """);
         SourceMutation m = compileTestSource("testDiagram.pure",
-                "###Diagram\n" +
-                        "Diagram test::pure::TestDiagram(width=10.0, height=10.0)\n" +
-                        "{\n" +
-                        "    TypeView TestClass1(type=test::pure::TestClass1, stereotypesVisible=true, attributesVisible=true,\n" +
-                        "                        attributeStereotypesVisible=true, attributeTypesVisible=true,\n" +
-                        "                        color=#FFFFCC, lineWidth=1.0,\n" +
-                        "                        position=(874.0, 199.46875), width=353.0, height=57.1875)\n" +
-                        "    TypeView TestClass2(type=test::pure::TestClass2, stereotypesVisible=true, attributesVisible=true,\n" +
-                        "                        attributeStereotypesVisible=true, attributeTypesVisible=true,\n" +
-                        "                        color=#FFFFCC, lineWidth=1.0,\n" +
-                        "                        position=(75.0, 97.1875), width=113.0, height=57.1875)\n" +
-                        "    AssociationView TestAssociation(association=test::pure::TestAssociation, stereotypesVisible=true, nameVisible=false,\n" +
-                        "                                    color=#000000, lineWidth=1.0,\n" +
-                        "                                    lineStyle=SIMPLE, points=[(132.5, 77.0), (155.2, 77.0)],\n" +
-                        "                                    label='TestAssociation',\n" +
-                        "                                    source=TestClass1,\n" +
-                        "                                    target=TestClass3,\n" +
-                        "                                    sourcePropertyPosition=(132.5, 76.2),\n" +
-                        "                                    sourceMultiplicityPosition=(132.5, 80.0),\n" +
-                        "                                    targetPropertyPosition=(155.2, 76.2),\n" +
-                        "                                    targetMultiplicityPosition=(155.2, 80.0))\n" +
-                        "}\n");
+                """
+                ###Diagram
+                Diagram test::pure::TestDiagram(width=10.0, height=10.0)
+                {
+                    TypeView TestClass1(type=test::pure::TestClass1, stereotypesVisible=true, attributesVisible=true,
+                                        attributeStereotypesVisible=true, attributeTypesVisible=true,
+                                        color=#FFFFCC, lineWidth=1.0,
+                                        position=(874.0, 199.46875), width=353.0, height=57.1875)
+                    TypeView TestClass2(type=test::pure::TestClass2, stereotypesVisible=true, attributesVisible=true,
+                                        attributeStereotypesVisible=true, attributeTypesVisible=true,
+                                        color=#FFFFCC, lineWidth=1.0,
+                                        position=(75.0, 97.1875), width=113.0, height=57.1875)
+                    AssociationView TestAssociation(association=test::pure::TestAssociation, stereotypesVisible=true, nameVisible=false,
+                                                    color=#000000, lineWidth=1.0,
+                                                    lineStyle=SIMPLE, points=[(132.5, 77.0), (155.2, 77.0)],
+                                                    label='TestAssociation',
+                                                    source=TestClass1,
+                                                    target=TestClass3,
+                                                    sourcePropertyPosition=(132.5, 76.2),
+                                                    sourceMultiplicityPosition=(132.5, 80.0),
+                                                    targetPropertyPosition=(155.2, 76.2),
+                                                    targetMultiplicityPosition=(155.2, 80.0))
+                }
+                """);
         // TODO consider whether this is the correct behavior
         Verify.assertSetsEqual(Sets.mutable.with("testDiagram.pure"), m.getModifiedFiles().toSet());
         Verify.assertSize(1, m.getLineRangesToRemoveByFile().get("testDiagram.pure"));
-        Assert.assertEquals(12, m.getLineRangesToRemoveByFile().get("testDiagram.pure").get(0).getOne());
-        Assert.assertEquals(21, m.getLineRangesToRemoveByFile().get("testDiagram.pure").get(0).getTwo());
+        Assertions.assertEquals(12, m.getLineRangesToRemoveByFile().get("testDiagram.pure").get(0).getOne());
+        Assertions.assertEquals(21, m.getLineRangesToRemoveByFile().get("testDiagram.pure").get(0).getTwo());
 
         CoreInstance testDiagram = runtime.getCoreInstance("test::pure::TestDiagram");
-        Assert.assertNotNull(testDiagram);
+        Assertions.assertNotNull(testDiagram);
         Verify.assertSize(2, Instance.getValueForMetaPropertyToManyResolved(testDiagram, M3Properties.typeViews, processorSupport));
         Verify.assertEmpty(Instance.getValueForMetaPropertyToManyResolved(testDiagram, M3Properties.associationViews, processorSupport));
         Verify.assertEmpty(Instance.getValueForMetaPropertyToManyResolved(testDiagram, M3Properties.propertyViews, processorSupport));
@@ -277,81 +297,85 @@ public class TestSourceMutation extends AbstractPureTestWithCoreCompiled
     public void testAssociationViewWithSourceViewWithNonExistentTypeInTheSameFile()
     {
         SourceMutation m1 = compileTestSource("testFile.pure",
-                "Class test::pure::TestClass1 {}\n" +
-                        "Class test::pure::TestClass2 {}\n" +
-                        "Association test::pure::TestAssociation\n" +
-                        "{\n" +
-                        "  toTC1_1 : test::pure::TestClass1[*];\n" +
-                        "  toTC2_1 : test::pure::TestClass2[*];\n" +
-                        "}\n" +
-                        "###Diagram\n" +
-                        "Diagram test::pure::TestDiagram(width=10.0, height=10.0)\n" +
-                        "{\n" +
-                        "    TypeView TestClass1(type=test::pure::TestClass1, stereotypesVisible=true, attributesVisible=true,\n" +
-                        "                        attributeStereotypesVisible=true, attributeTypesVisible=true,\n" +
-                        "                        color=#FFFFCC, lineWidth=1.0,\n" +
-                        "                        position=(874.0, 199.46875), width=353.0, height=57.1875)\n" +
-                        "    TypeView TestClass2(type=test::pure::TestClass2, stereotypesVisible=true, attributesVisible=true,\n" +
-                        "                        attributeStereotypesVisible=true, attributeTypesVisible=true,\n" +
-                        "                        color=#FFFFCC, lineWidth=1.0,\n" +
-                        "                        position=(75.0, 97.1875), width=113.0, height=57.1875)\n" +
-                        "    AssociationView TestAssociation(association=test::pure::TestAssociation, stereotypesVisible=true, nameVisible=false,\n" +
-                        "                                    color=#000000, lineWidth=1.0,\n" +
-                        "                                    lineStyle=SIMPLE, points=[(132.5, 77.0), (155.2, 77.0)],\n" +
-                        "                                    label='TestAssociation',\n" +
-                        "                                    source=TestClass1,\n" +
-                        "                                    target=TestClass2,\n" +
-                        "                                    sourcePropertyPosition=(132.5, 76.2),\n" +
-                        "                                    sourceMultiplicityPosition=(132.5, 80.0),\n" +
-                        "                                    targetPropertyPosition=(155.2, 76.2),\n" +
-                        "                                    targetMultiplicityPosition=(155.2, 80.0))\n" +
-                        "}\n");
+                """
+                Class test::pure::TestClass1 {}
+                Class test::pure::TestClass2 {}
+                Association test::pure::TestAssociation
+                {
+                  toTC1_1 : test::pure::TestClass1[*];
+                  toTC2_1 : test::pure::TestClass2[*];
+                }
+                ###Diagram
+                Diagram test::pure::TestDiagram(width=10.0, height=10.0)
+                {
+                    TypeView TestClass1(type=test::pure::TestClass1, stereotypesVisible=true, attributesVisible=true,
+                                        attributeStereotypesVisible=true, attributeTypesVisible=true,
+                                        color=#FFFFCC, lineWidth=1.0,
+                                        position=(874.0, 199.46875), width=353.0, height=57.1875)
+                    TypeView TestClass2(type=test::pure::TestClass2, stereotypesVisible=true, attributesVisible=true,
+                                        attributeStereotypesVisible=true, attributeTypesVisible=true,
+                                        color=#FFFFCC, lineWidth=1.0,
+                                        position=(75.0, 97.1875), width=113.0, height=57.1875)
+                    AssociationView TestAssociation(association=test::pure::TestAssociation, stereotypesVisible=true, nameVisible=false,
+                                                    color=#000000, lineWidth=1.0,
+                                                    lineStyle=SIMPLE, points=[(132.5, 77.0), (155.2, 77.0)],
+                                                    label='TestAssociation',
+                                                    source=TestClass1,
+                                                    target=TestClass2,
+                                                    sourcePropertyPosition=(132.5, 76.2),
+                                                    sourceMultiplicityPosition=(132.5, 80.0),
+                                                    targetPropertyPosition=(155.2, 76.2),
+                                                    targetMultiplicityPosition=(155.2, 80.0))
+                }
+                """);
         Verify.assertEmpty(m1.getLineRangesToRemoveByFile());
         Verify.assertEmpty(m1.getMarkedForDeletion());
         Verify.assertEmpty(m1.getModifiedFiles());
 
         runtime.modify("testFile.pure",
-                "Class test::pure::TestClass1 {}\n" +
-                        "Class test::pure::TestClass3 {}\n" +
-                        "Association test::pure::TestAssociation\n" +
-                        "{\n" +
-                        "  toTC1_1 : test::pure::TestClass1[*];\n" +
-                        "  toTC2_1 : test::pure::TestClass3[*];\n" +
-                        "}\n" +
-                        "\n" +
-                        "###Diagram\n" +
-                        "Diagram test::pure::TestDiagram(width=10.0, height=10.0)\n" +
-                        "{\n" +
-                        "    TypeView TestClass1(type=test::pure::TestClass1, stereotypesVisible=true, attributesVisible=true,\n" +
-                        "                        attributeStereotypesVisible=true, attributeTypesVisible=true,\n" +
-                        "                        color=#FFFFCC, lineWidth=1.0,\n" +
-                        "                        position=(874.0, 199.46875), width=353.0, height=57.1875)\n" +
-                        "    TypeView TestClass2(type=test::pure::TestClass2, stereotypesVisible=true, attributesVisible=true,\n" +
-                        "                        attributeStereotypesVisible=true, attributeTypesVisible=true,\n" +
-                        "                        color=#FFFFCC, lineWidth=1.0,\n" +
-                        "                        position=(75.0, 97.1875), width=113.0, height=57.1875)\n" +
-                        "    AssociationView TestAssociation(association=test::pure::TestAssociation, stereotypesVisible=true, nameVisible=false,\n" +
-                        "                                    color=#000000, lineWidth=1.0,\n" +
-                        "                                    lineStyle=SIMPLE, points=[(132.5, 77.0), (155.2, 77.0)],\n" +
-                        "                                    label='TestAssociation',\n" +
-                        "                                    source=TestClass1,\n" +
-                        "                                    target=TestClass2,\n" +
-                        "                                    sourcePropertyPosition=(132.5, 76.2),\n" +
-                        "                                    sourceMultiplicityPosition=(132.5, 80.0),\n" +
-                        "                                    targetPropertyPosition=(155.2, 76.2),\n" +
-                        "                                    targetMultiplicityPosition=(155.2, 80.0))\n" +
-                        "}\n");
+                """
+                Class test::pure::TestClass1 {}
+                Class test::pure::TestClass3 {}
+                Association test::pure::TestAssociation
+                {
+                  toTC1_1 : test::pure::TestClass1[*];
+                  toTC2_1 : test::pure::TestClass3[*];
+                }
+                
+                ###Diagram
+                Diagram test::pure::TestDiagram(width=10.0, height=10.0)
+                {
+                    TypeView TestClass1(type=test::pure::TestClass1, stereotypesVisible=true, attributesVisible=true,
+                                        attributeStereotypesVisible=true, attributeTypesVisible=true,
+                                        color=#FFFFCC, lineWidth=1.0,
+                                        position=(874.0, 199.46875), width=353.0, height=57.1875)
+                    TypeView TestClass2(type=test::pure::TestClass2, stereotypesVisible=true, attributesVisible=true,
+                                        attributeStereotypesVisible=true, attributeTypesVisible=true,
+                                        color=#FFFFCC, lineWidth=1.0,
+                                        position=(75.0, 97.1875), width=113.0, height=57.1875)
+                    AssociationView TestAssociation(association=test::pure::TestAssociation, stereotypesVisible=true, nameVisible=false,
+                                                    color=#000000, lineWidth=1.0,
+                                                    lineStyle=SIMPLE, points=[(132.5, 77.0), (155.2, 77.0)],
+                                                    label='TestAssociation',
+                                                    source=TestClass1,
+                                                    target=TestClass2,
+                                                    sourcePropertyPosition=(132.5, 76.2),
+                                                    sourceMultiplicityPosition=(132.5, 80.0),
+                                                    targetPropertyPosition=(155.2, 76.2),
+                                                    targetMultiplicityPosition=(155.2, 80.0))
+                }
+                """);
         SourceMutation m2 = runtime.compile();
 
         Verify.assertSetsEqual(Sets.mutable.with("testFile.pure"), m2.getModifiedFiles().toSet());
         Verify.assertSize(2, m2.getLineRangesToRemoveByFile().get("testFile.pure"));
-        Assert.assertEquals(16, m2.getLineRangesToRemoveByFile().get("testFile.pure").get(0).getOne());
-        Assert.assertEquals(19, m2.getLineRangesToRemoveByFile().get("testFile.pure").get(0).getTwo());
-        Assert.assertEquals(20, m2.getLineRangesToRemoveByFile().get("testFile.pure").get(1).getOne());
-        Assert.assertEquals(29, m2.getLineRangesToRemoveByFile().get("testFile.pure").get(1).getTwo());
+        Assertions.assertEquals(16, m2.getLineRangesToRemoveByFile().get("testFile.pure").get(0).getOne());
+        Assertions.assertEquals(19, m2.getLineRangesToRemoveByFile().get("testFile.pure").get(0).getTwo());
+        Assertions.assertEquals(20, m2.getLineRangesToRemoveByFile().get("testFile.pure").get(1).getOne());
+        Assertions.assertEquals(29, m2.getLineRangesToRemoveByFile().get("testFile.pure").get(1).getTwo());
 
         CoreInstance testDiagram = runtime.getCoreInstance("test::pure::TestDiagram");
-        Assert.assertNotNull(testDiagram);
+        Assertions.assertNotNull(testDiagram);
         Verify.assertSize(1, Instance.getValueForMetaPropertyToManyResolved(testDiagram, M3Properties.typeViews, processorSupport));
         Verify.assertEmpty(Instance.getValueForMetaPropertyToManyResolved(testDiagram, M3Properties.associationViews, processorSupport));
         Verify.assertEmpty(Instance.getValueForMetaPropertyToManyResolved(testDiagram, M3Properties.propertyViews, processorSupport));

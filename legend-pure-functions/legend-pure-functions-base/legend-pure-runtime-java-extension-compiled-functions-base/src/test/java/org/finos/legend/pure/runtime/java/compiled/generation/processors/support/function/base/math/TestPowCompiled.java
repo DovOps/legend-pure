@@ -20,14 +20,13 @@ import org.finos.legend.pure.m3.tests.function.base.math.AbstractTestPow;
 import org.finos.legend.pure.m3.tools.test.ToFix;
 import org.finos.legend.pure.runtime.java.compiled.execution.FunctionExecutionCompiledBuilder;
 import org.finos.legend.pure.runtime.java.compiled.factory.JavaModelFactoryRegistryLoader;
-import org.junit.After;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 public class TestPowCompiled extends AbstractTestPow
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         AbstractPureTestWithCoreCompiled.setUpRuntime(getFunctionExecution(), JavaModelFactoryRegistryLoader.loader());
@@ -39,7 +38,7 @@ public class TestPowCompiled extends AbstractTestPow
     }
 
     @ToFix
-    @Ignore
+    @Disabled
     @Test
     @Override
     public void testPow() throws Exception

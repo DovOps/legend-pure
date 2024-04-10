@@ -20,9 +20,9 @@ import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Token;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyInt;
@@ -40,7 +40,7 @@ public class RelationalGraphBuilderTest
     private org.finos.legend.pure.m2.relational.serialization.grammar.v1.antlr.RelationalLexer lexer;
     private RelationalGraphBuilder subject;
 
-    @Before
+    @BeforeEach
     public void setUpMocks()
     {
         when(sourceInformation.getOffsetColumn()).thenReturn(1);
@@ -67,7 +67,7 @@ public class RelationalGraphBuilderTest
         setup("Join Firm_Person_In0(firmTable.ID = personTable.FIRMID and firmTable.ID = 1 or firmTable.ID = 2 or firmTable.ID = 3)");
         String joinResult = subject.visitJoin(parser.join());
 
-        Assert.assertEquals(
+        Assertions.assertEquals(
                 "^meta::relational::metamodel::join::Join Firm_Person_In0?[sourceId:1,1,1,1,1,1]?(name='Firm_Person_In0', operation=^meta::relational::metamodel::DynaFunction(name = 'and', parameters = [^meta::relational::metamodel::DynaFunction(name = 'equal', parameters=[^meta::relational::metamodel::TableAliasColumn?[sourceId:1,1,1,1,1,1]?(columnName='ID',alias=^meta::relational::metamodel::TableAlias?[sourceId:1,1,1,1,1,1]?(name = 'firmTable')),^meta::relational::metamodel::TableAliasColumn?[sourceId:1,1,1,1,1,1]?(columnName='FIRMID',alias=^meta::relational::metamodel::TableAlias?[sourceId:1,1,1,1,1,1]?(name = 'personTable'))]), ^meta::relational::metamodel::DynaFunction(name = 'group', parameters = ^meta::relational::metamodel::DynaFunction(name = 'or', parameters = [^meta::relational::metamodel::DynaFunction(name = 'equal', parameters=[^meta::relational::metamodel::TableAliasColumn?[sourceId:1,1,1,1,1,1]?(columnName='ID',alias=^meta::relational::metamodel::TableAlias?[sourceId:1,1,1,1,1,1]?(name = 'firmTable')),^meta::relational::metamodel::Literal(value=1)]), ^meta::relational::metamodel::DynaFunction(name = 'equal', parameters=[^meta::relational::metamodel::TableAliasColumn?[sourceId:1,1,1,1,1,1]?(columnName='ID',alias=^meta::relational::metamodel::TableAlias?[sourceId:1,1,1,1,1,1]?(name = 'firmTable')),^meta::relational::metamodel::Literal(value=2)]), ^meta::relational::metamodel::DynaFunction(name = 'equal', parameters=[^meta::relational::metamodel::TableAliasColumn?[sourceId:1,1,1,1,1,1]?(columnName='ID',alias=^meta::relational::metamodel::TableAlias?[sourceId:1,1,1,1,1,1]?(name = 'firmTable')),^meta::relational::metamodel::Literal(value=3)])]))]))",
                 joinResult
         );
@@ -79,7 +79,7 @@ public class RelationalGraphBuilderTest
         setup("Join Firm_Person_In1_Prefix(firmTable.ID = personTable.FIRMID and in(firmTable.ID, [2,3,4]))");
         String joinResult = subject.visitJoin(parser.join());
 
-        Assert.assertEquals(
+        Assertions.assertEquals(
                 "^meta::relational::metamodel::join::Join Firm_Person_In1_Prefix?[sourceId:1,1,1,1,1,1]?(name='Firm_Person_In1_Prefix', operation=^meta::relational::metamodel::DynaFunction(name = 'and', parameters = [^meta::relational::metamodel::DynaFunction(name = 'equal', parameters=[^meta::relational::metamodel::TableAliasColumn?[sourceId:1,1,1,1,1,1]?(columnName='ID',alias=^meta::relational::metamodel::TableAlias?[sourceId:1,1,1,1,1,1]?(name = 'firmTable')),^meta::relational::metamodel::TableAliasColumn?[sourceId:1,1,1,1,1,1]?(columnName='FIRMID',alias=^meta::relational::metamodel::TableAlias?[sourceId:1,1,1,1,1,1]?(name = 'personTable'))]), ^meta::relational::metamodel::DynaFunction(name = 'in', parameters=[^meta::relational::metamodel::TableAliasColumn?[sourceId:1,1,1,1,1,1]?(columnName='ID',alias=^meta::relational::metamodel::TableAlias?[sourceId:1,1,1,1,1,1]?(name = 'firmTable')),^meta::relational::metamodel::LiteralList(values=[^meta::relational::metamodel::Literal(value=2),^meta::relational::metamodel::Literal(value=3),^meta::relational::metamodel::Literal(value=4)])])]))",
                 joinResult
         );
@@ -91,7 +91,7 @@ public class RelationalGraphBuilderTest
         setup("Join Firm_Person_In2_Prefix(firmTable.ID = personTable.FIRMID and in(firmTable.LEGALNAME, ['Google', 'Apple']))");
         String joinResult = subject.visitJoin(parser.join());
 
-        Assert.assertEquals(
+        Assertions.assertEquals(
                 "^meta::relational::metamodel::join::Join Firm_Person_In2_Prefix?[sourceId:1,1,1,1,1,1]?(name='Firm_Person_In2_Prefix', operation=^meta::relational::metamodel::DynaFunction(name = 'and', parameters = [^meta::relational::metamodel::DynaFunction(name = 'equal', parameters=[^meta::relational::metamodel::TableAliasColumn?[sourceId:1,1,1,1,1,1]?(columnName='ID',alias=^meta::relational::metamodel::TableAlias?[sourceId:1,1,1,1,1,1]?(name = 'firmTable')),^meta::relational::metamodel::TableAliasColumn?[sourceId:1,1,1,1,1,1]?(columnName='FIRMID',alias=^meta::relational::metamodel::TableAlias?[sourceId:1,1,1,1,1,1]?(name = 'personTable'))]), ^meta::relational::metamodel::DynaFunction(name = 'in', parameters=[^meta::relational::metamodel::TableAliasColumn?[sourceId:1,1,1,1,1,1]?(columnName='LEGALNAME',alias=^meta::relational::metamodel::TableAlias?[sourceId:1,1,1,1,1,1]?(name = 'firmTable')),^meta::relational::metamodel::LiteralList(values=[^meta::relational::metamodel::Literal(value='Google'),^meta::relational::metamodel::Literal(value='Apple')])])]))",
                 joinResult
         );

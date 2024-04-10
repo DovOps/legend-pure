@@ -51,9 +51,9 @@ public class CompileStateSet extends AbstractImmutableSet<CompileState>
             return true;
         }
 
-        if (object instanceof CompileStateSet)
+        if (object instanceof CompileStateSet set)
         {
-            return this.bits == ((CompileStateSet) object).bits;
+            return this.bits == set.bits;
         }
 
         if (!(object instanceof Set))
@@ -82,7 +82,7 @@ public class CompileStateSet extends AbstractImmutableSet<CompileState>
     @Override
     public boolean contains(Object o)
     {
-        return (o instanceof CompileState) && contains((CompileState) o);
+        return (o instanceof CompileState cs) && contains(cs);
     }
 
     public boolean contains(CompileState state)
@@ -237,9 +237,9 @@ public class CompileStateSet extends AbstractImmutableSet<CompileState>
 
     public static int addCompileStatesToBitSet(int bits, Iterable<? extends CompileState> states)
     {
-        if (states instanceof CompileStateSet)
+        if (states instanceof CompileStateSet set)
         {
-            return addCompileStatesToBitSet(bits, (CompileStateSet) states);
+            return addCompileStatesToBitSet(bits, set);
         }
 
         int result = bits;
@@ -272,9 +272,9 @@ public class CompileStateSet extends AbstractImmutableSet<CompileState>
 
     public static int removeCompileStatesFromBitSet(int bits, Iterable<? extends CompileState> states)
     {
-        if (states instanceof CompileStateSet)
+        if (states instanceof CompileStateSet set)
         {
-            return removeCompileStatesFromBitSet(bits, (CompileStateSet) states);
+            return removeCompileStatesFromBitSet(bits, set);
         }
 
         int result = bits;
@@ -312,7 +312,7 @@ public class CompileStateSet extends AbstractImmutableSet<CompileState>
 
     public static int toBitSet(Iterable<? extends CompileState> states)
     {
-        return (states instanceof CompileStateSet) ? toBitSet((CompileStateSet) states) : addCompileStatesToBitSet(0, states);
+        return (states instanceof CompileStateSet css) ? toBitSet(css) : addCompileStatesToBitSet(0, states);
     }
 
     /**

@@ -19,91 +19,103 @@ import org.eclipse.collections.api.factory.Maps;
 import org.finos.legend.pure.m2.relational.AbstractPureRelationalTestWithCoreCompiled;
 import org.finos.legend.pure.m3.tests.RuntimeTestScriptBuilder;
 import org.finos.legend.pure.m3.tests.RuntimeVerifier;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class TestPureRuntimeExtendMapping extends AbstractPureRelationalTestWithCoreCompiled
 {
-    private static final String INITIAL_DATA = "import other::*;\n" +
-            "Class other::Person\n" +
-            "{\n" +
-            "    name:String[1];\n" +
-            "    otherInfo:String[1];\n" +
-            "}\n";
+    private static final String INITIAL_DATA = """
+            import other::*;
+            Class other::Person
+            {
+                name:String[1];
+                otherInfo:String[1];
+            }
+            """;
 
 
     private static final String STORE =
-            "###Relational\n" +
-                    "Database mapping::db(\n" +
-                    "   Table employeeTable\n" +
-                    "   (\n" +
-                    "    id INT PRIMARY KEY,\n" +
-                    "    name VARCHAR(200),\n" +
-                    "    firmId INT,\n" +
-                    "    other VARCHAR(200),\n" +
-                    "    address1 VARCHAR(200),\n" +
-                    "    postcode VARCHAR(10)\n" +
-                    "   )\n" +
-                    ")\n";
+            """
+            ###Relational
+            Database mapping::db(
+               Table employeeTable
+               (
+                id INT PRIMARY KEY,
+                name VARCHAR(200),
+                firmId INT,
+                other VARCHAR(200),
+                address1 VARCHAR(200),
+                postcode VARCHAR(10)
+               )
+            )
+            """;
 
 
     private static final String INITIAL_MAPPING =
-            "###Mapping\n" +
-                    "import other::*;\n" +
-                    "import mapping::*;\n" +
-                    "Mapping mappingPackage::myMapping\n" +
-                    "(\n" +
-                    "    *Person[person1]: Relational\n" +
-                    "    {\n" +
-                    "       otherInfo: [db]employeeTable.other\n" +
-                    "    }\n" +
-                    "    Person[alias1] extends [person1]: Relational\n" +
-                    "    {\n" +
-                    "        name : [db]employeeTable.name\n" +
-                    "    }\n" +
-                    ")\n";
+            """
+            ###Mapping
+            import other::*;
+            import mapping::*;
+            Mapping mappingPackage::myMapping
+            (
+                *Person[person1]: Relational
+                {
+                   otherInfo: [db]employeeTable.other
+                }
+                Person[alias1] extends [person1]: Relational
+                {
+                    name : [db]employeeTable.name
+                }
+            )
+            """;
 
     private static final String MAPPING1 =
-            "###Mapping\n" +
-                    "import other::*;\n" +
-                    "import mapping::*;\n" +
-                    "Mapping mappingPackage::myMapping\n" +
-                    "(\n" +
-                    "    *Person[person1]: Relational\n" +
-                    "    {\n" +
-                    "       otherInfo: [db]employeeTable.other\n" +
-                    "    }\n" +
-                    "    Person[alias1] extends [person2] : Relational\n" +
-                    "    {\n" +
-                    "        name : [db]employeeTable.name\n" +
-                    "    }\n" +
-                    ")\n";
+            """
+            ###Mapping
+            import other::*;
+            import mapping::*;
+            Mapping mappingPackage::myMapping
+            (
+                *Person[person1]: Relational
+                {
+                   otherInfo: [db]employeeTable.other
+                }
+                Person[alias1] extends [person2] : Relational
+                {
+                    name : [db]employeeTable.name
+                }
+            )
+            """;
 
     private static final String CHANGE_SUPER__MAPPING =
-            "###Mapping\n" +
-                    "import other::*;\n" +
-                    "import mapping::*;\n" +
-                    "Mapping mappingPackage::myMapping\n" +
-                    "(\n" +
-                    "    *Person[person2]: Relational\n" +
-                    "    {\n" +
-                    "       otherInfo: [db]employeeTable.other\n" +
-                    "    }\n" +
-                    "    Person[alias1] extends [person1]: Relational\n" +
-                    "    {\n" +
-                    "        name : [db]employeeTable.name\n" +
-                    "    }\n" +
-                    ")\n";
+            """
+            ###Mapping
+            import other::*;
+            import mapping::*;
+            Mapping mappingPackage::myMapping
+            (
+                *Person[person2]: Relational
+                {
+                   otherInfo: [db]employeeTable.other
+                }
+                Person[alias1] extends [person1]: Relational
+                {
+                    name : [db]employeeTable.name
+                }
+            )
+            """;
     private static final String DELETE_SUPER__MAPPING =
-            "###Mapping\n" +
-                    "import other::*;\n" +
-                    "import mapping::*;\n" +
-                    "Mapping mappingPackage::myMapping\n" +
-                    "(\n" +
-                    "    Person[alias1] extends [person1]: Relational\n" +
-                    "    {\n" +
-                    "        name : [db]employeeTable.name\n" +
-                    "    }\n" +
-                    ")\n";
+            """
+            ###Mapping
+            import other::*;
+            import mapping::*;
+            Mapping mappingPackage::myMapping
+            (
+                Person[alias1] extends [person1]: Relational
+                {
+                    name : [db]employeeTable.name
+                }
+            )
+            """;
 
     @Test
     public void testChangeMapping() throws Exception

@@ -243,7 +243,7 @@ public class Source
     @Override
     public boolean equals(Object o)
     {
-        return (this == o) || ((o instanceof Source) && this.id.equals(((Source) o).id));
+        return (this == o) || ((o instanceof Source s) && this.id.equals(s.id));
     }
 
     @Override
@@ -289,9 +289,9 @@ public class Source
                 found = found.getValueForMetaPropertyToOne(M3Properties.rawType);
             }
 
-            else if (found instanceof VariableExpression)
+            else if (found instanceof VariableExpression expression)
             {
-                found = resolveVariableOrParameter(line, column, (VariableExpression) found);
+                found = resolveVariableOrParameter(line, column, expression);
             }
 
             else if (found instanceof InstanceValue)
@@ -373,7 +373,7 @@ public class Source
         {
             // scan for the let expressions then follows by the parameters
             RichIterable<InstanceValueInstance> letVars = fn.getValueForMetaPropertyToMany(M3Properties.expressionSequence)
-                    .select(expression -> expression instanceof SimpleFunctionExpression && "letFunction".equals(((SimpleFunctionExpression) expression)._functionName()))
+                    .select(expression -> expression instanceof SimpleFunctionExpression sfe && "letFunction".equals(sfe._functionName()))
                     .collect(expression -> ((SimpleFunctionExpression) expression)._parametersValues().toList().getFirst())
                     // NOTE: make sure to only consider let statements prior to the call
                     .select(letVar -> letVar.getSourceInformation().getEndLine() < line || (letVar.getSourceInformation().getEndLine() == line && letVar.getSourceInformation().getEndColumn() < column))

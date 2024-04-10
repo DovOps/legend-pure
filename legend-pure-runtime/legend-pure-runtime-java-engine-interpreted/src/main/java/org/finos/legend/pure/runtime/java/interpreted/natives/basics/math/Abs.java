@@ -48,29 +48,29 @@ public class Abs extends NativeFunction
         CoreInstance number = Instance.getValueForMetaPropertyToOneResolved(params.get(0), M3Properties.values, processorSupport);
         boolean bigDecimalToPureDecimal = NumericUtilities.IS_DECIMAL_CORE_INSTANCE(processorSupport).accept(number);
         Number javaNumber = NumericUtilities.toJavaNumber(number, processorSupport);
-        if (javaNumber instanceof Integer)
+        if (javaNumber instanceof Integer integer)
         {
-            return NumericUtilities.toPureNumberValueExpression(Math.abs((Integer) javaNumber), bigDecimalToPureDecimal, this.repository, processorSupport);
+            return NumericUtilities.toPureNumberValueExpression(Math.abs(integer), bigDecimalToPureDecimal, this.repository, processorSupport);
         }
-        if (javaNumber instanceof Long)
+        if (javaNumber instanceof Long long1)
         {
-            return NumericUtilities.toPureNumberValueExpression(Math.abs((Long) javaNumber), bigDecimalToPureDecimal, this.repository, processorSupport);
+            return NumericUtilities.toPureNumberValueExpression(Math.abs(long1), bigDecimalToPureDecimal, this.repository, processorSupport);
         }
-        if (javaNumber instanceof Double)
+        if (javaNumber instanceof Double double1)
         {
-            return NumericUtilities.toPureNumberValueExpression(Math.abs((Double) javaNumber), bigDecimalToPureDecimal, this.repository, processorSupport);
+            return NumericUtilities.toPureNumberValueExpression(Math.abs(double1), bigDecimalToPureDecimal, this.repository, processorSupport);
         }
-        if (javaNumber instanceof Float)
+        if (javaNumber instanceof Float float1)
         {
-            return NumericUtilities.toPureNumberValueExpression(Math.abs((Float) javaNumber), bigDecimalToPureDecimal, this.repository, processorSupport);
+            return NumericUtilities.toPureNumberValueExpression(Math.abs(float1), bigDecimalToPureDecimal, this.repository, processorSupport);
         }
-        if (javaNumber instanceof BigInteger)
+        if (javaNumber instanceof BigInteger integer)
         {
-            return NumericUtilities.toPureNumberValueExpression(((BigInteger)javaNumber).abs(), bigDecimalToPureDecimal, this.repository, processorSupport);
+            return NumericUtilities.toPureNumberValueExpression(integer.abs(), bigDecimalToPureDecimal, this.repository, processorSupport);
         }
-        if (javaNumber instanceof BigDecimal)
+        if (javaNumber instanceof BigDecimal decimal)
         {
-            return NumericUtilities.toPureNumberValueExpression(((BigDecimal)javaNumber).abs(), bigDecimalToPureDecimal, this.repository, processorSupport);
+            return NumericUtilities.toPureNumberValueExpression(decimal.abs(), bigDecimalToPureDecimal, this.repository, processorSupport);
         }
         throw new IllegalArgumentException("Unhandled number: " + javaNumber);
     }

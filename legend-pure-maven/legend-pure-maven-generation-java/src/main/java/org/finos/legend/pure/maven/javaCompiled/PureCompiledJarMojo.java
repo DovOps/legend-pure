@@ -118,8 +118,8 @@ public class PureCompiledJarMojo extends AbstractMojo
         }
         catch (Exception e)
         {
-            log.error(String.format("    Error (%.9fs)", durationSinceInSeconds(start)), e);
-            log.error(String.format("    FAILURE building Pure compiled mode jar (%.9fs)", durationSinceInSeconds(start)));
+            log.error("    Error (%.9fs)".formatted(durationSinceInSeconds(start)), e);
+            log.error("    FAILURE building Pure compiled mode jar (%.9fs)".formatted(durationSinceInSeconds(start)));
             throw new MojoExecutionException("Error building Pure compiled mode jar", e);
         }
         finally

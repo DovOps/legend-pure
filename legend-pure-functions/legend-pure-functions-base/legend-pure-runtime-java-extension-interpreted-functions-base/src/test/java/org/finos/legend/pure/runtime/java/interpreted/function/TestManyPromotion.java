@@ -18,20 +18,20 @@ import org.finos.legend.pure.m3.execution.FunctionExecution;
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
 import org.finos.legend.pure.m4.exception.PureCompilationException;
 import org.finos.legend.pure.runtime.java.interpreted.FunctionExecutionInterpreted;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestManyPromotion extends AbstractPureTestWithCoreCompiled
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getFunctionExecution());
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("fromString.pure");
@@ -41,16 +41,18 @@ public class TestManyPromotion extends AbstractPureTestWithCoreCompiled
     @Test
     public void testString()
     {
-        compileTestSource("fromString.pure", "function func():String[*]\n" +
-                "{\n" +
-                "    'ok';\n" +
-                "}\n" +
-                "function test():Nil[0]\n" +
-                "{\n" +
-                "    print(func(),1);" +
-                "}\n");
+        compileTestSource("fromString.pure", """
+                function func():String[*]
+                {
+                    'ok';
+                }
+                function test():Nil[0]
+                {
+                    print(func(),1);\
+                }
+                """);
         this.execute("test():Nil[0]");
-        Assert.assertEquals("'ok'", functionExecution.getConsole().getLine(0));
+        Assertions.assertEquals("'ok'", functionExecution.getConsole().getLine(0));
     }
 
     @Test
@@ -59,14 +61,16 @@ public class TestManyPromotion extends AbstractPureTestWithCoreCompiled
         try
         {
             compileTestSource("fromString.pure",
-                    "function func():String[1]\n" +
-                            "{\n" +
-                            "    ['ok','ok2'];\n" +
-                            "}\n" +
-                            "function test():Nil[0]\n" +
-                            "{\n" +
-                            "    print(func());" +
-                            "}\n");
+                    """
+                    function func():String[1]
+                    {
+                        ['ok','ok2'];
+                    }
+                    function test():Nil[0]
+                    {
+                        print(func());\
+                    }
+                    """);
         }
         catch (Exception e)
         {
@@ -78,18 +82,20 @@ public class TestManyPromotion extends AbstractPureTestWithCoreCompiled
     @Test
     public void testFunctionMatchingMultiplicity()
     {
-        compileTestSource("fromString.pure", "function func(a:Any[1]):Any[*]\n" +
-                "{\n" +
-                "    $a;\n" +
-                "}\n" +
-                "function test():Nil[0]\n" +
-                "{\n" +
-                "    print(func(test__Nil_0_)->size(), 1);" +
-                "    print(test__Nil_0_->map(c|func($c))->size(), 1);" +
-                "}\n");
+        compileTestSource("fromString.pure", """
+                function func(a:Any[1]):Any[*]
+                {
+                    $a;
+                }
+                function test():Nil[0]
+                {
+                    print(func(test__Nil_0_)->size(), 1);\
+                    print(test__Nil_0_->map(c|func($c))->size(), 1);\
+                }
+                """);
         this.execute("test():Nil[0]");
-        Assert.assertEquals("1", functionExecution.getConsole().getLine(0));
-        Assert.assertEquals("1", functionExecution.getConsole().getLine(1));
+        Assertions.assertEquals("1", functionExecution.getConsole().getLine(0));
+        Assertions.assertEquals("1", functionExecution.getConsole().getLine(1));
     }
 
     protected static FunctionExecution getFunctionExecution()

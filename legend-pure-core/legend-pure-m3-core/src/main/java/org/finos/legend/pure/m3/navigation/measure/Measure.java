@@ -75,9 +75,8 @@ public class Measure
                 {
                     return true;
                 }
-                if (rawType instanceof ImportStub)
+                if (rawType instanceof ImportStub importStub)
                 {
-                    ImportStub importStub = (ImportStub) rawType;
                     CoreInstance resolvedRawType = importStub._resolvedNodeCoreInstance();
                     if (resolvedRawType == null)
                     {

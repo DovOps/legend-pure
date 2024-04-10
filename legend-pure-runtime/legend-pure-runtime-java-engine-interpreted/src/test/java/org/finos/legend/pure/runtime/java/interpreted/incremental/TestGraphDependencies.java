@@ -15,10 +15,10 @@
 package org.finos.legend.pure.runtime.java.interpreted.incremental;
 
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
-@Ignore
+@Disabled
 public class TestGraphDependencies extends AbstractPureTestWithCoreCompiled
 {
 //    @Test
@@ -39,47 +39,49 @@ public class TestGraphDependencies extends AbstractPureTestWithCoreCompiled
 //        Assert.assertEquals("hello__String_1_ instance SimpleFunctionDefinition\n", this.functionExecution.getConsole().getLine(1));
 //    }
 
-    @Ignore
+    @Disabled
     @Test
     public void testFunctionApplicationsAndFunctionExpressionContext()
     {
-        compileTestSource("Class A\n" +
-                          "{\n" +
-                          "   b(){'3';hello();'1';}:String[1];\n" +
-                          "}\n" +
-                          "\n" +
-                          "function other(s:String[1]):String[1]\n" +
-                          "{\n" +
-                          "   $s\n" +
-                          "}\n" +
-                          "\n" +
-                          "function hello():String[1]\n" +
-                          "{\n" +
-                          "   'a';\n" +
-                          "}\n" +
-                          "\n" +
-                          "function omg():Nil[0]\n" +
-                          "{\n" +
-                          "   2;\n" +
-                          "   5;\n" +
-                          "   other(hello());\n" +
-                          "   hello();\n" +
-                          "   [];\n" +
-                          "}\n" +
-                          "\n" +
-                          "function go():Boolean[1]\n" +
-                          "{\n" +
-                          "    hello();\n" +
-                          "    let r = hello__String_1_;\n" +
-                          "    assertEq(4, $r.applications->size());\n" +
-                          "    assertEq(1, $r.referenceUsages->size());\n" +
-                          "    let set = $r.applications->evaluateAndDeactivate().usageContext->map(u|$u->match([\n" +
-                          "                                                                                         a:ExpressionSequenceValueSpecificationContext[1]|$a.functionDefinition.functionName->toOne()+'[expr]',\n" +
-                          "                                                                                         a:ParameterValueSpecificationContext[1]|$a.functionExpression.func.functionName->toOne()+'[param]'\n" +
-                          "                                                                                         ])\n" +
-                          "                                                                            );\n" +
-                          "    assertEq('b[expr],go[expr],omg[expr],other[param]', $set->sort({a,b|$a->compare($b)})->makeString(','));\n" +
-                          "}");
+        compileTestSource("""
+                          Class A
+                          {
+                             b(){'3';hello();'1';}:String[1];
+                          }
+                          
+                          function other(s:String[1]):String[1]
+                          {
+                             $s
+                          }
+                          
+                          function hello():String[1]
+                          {
+                             'a';
+                          }
+                          
+                          function omg():Nil[0]
+                          {
+                             2;
+                             5;
+                             other(hello());
+                             hello();
+                             [];
+                          }
+                          
+                          function go():Boolean[1]
+                          {
+                              hello();
+                              let r = hello__String_1_;
+                              assertEq(4, $r.applications->size());
+                              assertEq(1, $r.referenceUsages->size());
+                              let set = $r.applications->evaluateAndDeactivate().usageContext->map(u|$u->match([
+                                                                                                                   a:ExpressionSequenceValueSpecificationContext[1]|$a.functionDefinition.functionName->toOne()+'[expr]',
+                                                                                                                   a:ParameterValueSpecificationContext[1]|$a.functionExpression.func.functionName->toOne()+'[param]'
+                                                                                                                   ])
+                                                                                                      );
+                              assertEq('b[expr],go[expr],omg[expr],other[param]', $set->sort({a,b|$a->compare($b)})->makeString(','));
+                          }\
+                          """);
         this.execute("go():Boolean[1]");
     }
 

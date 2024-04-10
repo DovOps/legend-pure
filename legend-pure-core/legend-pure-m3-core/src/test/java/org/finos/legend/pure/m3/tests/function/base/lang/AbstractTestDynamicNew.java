@@ -24,46 +24,48 @@ import org.finos.legend.pure.m3.serialization.filesystem.usercodestorage.classpa
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
 import org.finos.legend.pure.m3.tests.elements.property.AbstractTestDefaultValue;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;
 
 public abstract class AbstractTestDynamicNew extends AbstractPureTestWithCoreCompiled
 {
-    private static final String DECLARATION = "Enum myEnum{A,B}"
-            + "Class A \n"
-            + "[ testConstraint: $this.a == 'rrr']\n"
-            + "{ \n"
-            + "    a: String[1];      \n"
-            + "    b: String[0..1];   \n"
-            + "    c: String[*];      \n"
-            + "    d : D[0..1];       \n"
-            + "    ds : D[*];         \n"
-            + "    enum : myEnum[1];  \n"
-            + "    enums : myEnum[*]; \n"
-            + "}  \n"
-            + "Class D \n"
-            + "{  \n"
-            + "   name : String[1];\n"
-            + "}                   \n"
-            + "                    \n"
-            + "Class E \n"
-            + "{  \n"
-            + "   handler : ConstraintsOverride[0..1];\n"
-            + "}                   \n"
-            + "                    \n"
-            + "function getterOverrideToMany(o:Any[1], property:Property<Nil,Any|*>[1]):Any[*] \n"
-            + "{\n"
-            + "    [^D(name = $o->cast(@A).a + $o->getHiddenPayload()->cast(@String)->toOne()), ^D(name = $o->cast(@A).b->toOne() + $o->getHiddenPayload()->cast(@String)->toOne())]  \n"
-            + "}  \n"
-            + "   \n"
-            + "function getterOverrideToOne(o:Any[1], property:Property<Nil,Any|0..1>[1]):Any[0..1] \n"
-            + "{ \n"
-            + "   ^D(name = $o->cast(@A).a + $o->getHiddenPayload()->cast(@String)->toOne());   \n"
-            + "} ";
+    private static final String DECLARATION = """
+            Enum myEnum{A,B}\
+            Class A\s
+            [ testConstraint: $this.a == 'rrr']
+            {\s
+                a: String[1];     \s
+                b: String[0..1];  \s
+                c: String[*];     \s
+                d : D[0..1];      \s
+                ds : D[*];        \s
+                enum : myEnum[1]; \s
+                enums : myEnum[*];\s
+            } \s
+            Class D\s
+            { \s
+               name : String[1];
+            }                  \s
+                               \s
+            Class E\s
+            { \s
+               handler : ConstraintsOverride[0..1];
+            }                  \s
+                               \s
+            function getterOverrideToMany(o:Any[1], property:Property<Nil,Any|*>[1]):Any[*]\s
+            {
+                [^D(name = $o->cast(@A).a + $o->getHiddenPayload()->cast(@String)->toOne()), ^D(name = $o->cast(@A).b->toOne() + $o->getHiddenPayload()->cast(@String)->toOne())] \s
+            } \s
+              \s
+            function getterOverrideToOne(o:Any[1], property:Property<Nil,Any|0..1>[1]):Any[0..1]\s
+            {\s
+               ^D(name = $o->cast(@A).a + $o->getHiddenPayload()->cast(@String)->toOne());  \s
+            } \
+            """;
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("testSource.pure");
@@ -176,25 +178,27 @@ public abstract class AbstractTestDynamicNew extends AbstractPureTestWithCoreCom
     public void cyclicalReferencesAreNotImplicit()
     {
         compileTestSource("testSource.pure",
-                "Class F \n"
-                        + "{            \n"
-                        + "   str : String[1]; \n"
-                        + "   g : G[1]; \n"
-                        + "}            \n"
-                        + "Class G      \n"
-                        + "{            \n"
-                        + "   f : F[1]; \n"
-                        + "}            \n"
-                        + "function test():Any[*] \n"
-                        + "{"
-                        + " let f = dynamicNew(F, \n"
-                        + "     [ ^KeyValue(key='str',value='foo') ] ) -> cast(@F);\n"
-                        + " let g = dynamicNew(G, \n"
-                        + "     [ ^KeyValue(key='f',value=$f) ]) -> cast(@G);\n"
-                        + " assert($f.g == [], |'');\n"
-                        + " assert($g.f == $f, |'');\n"
-                        + " assert($g.f.g == [], |'');\n"
-                        + "}\n");
+                """
+                Class F\s
+                {           \s
+                   str : String[1];\s
+                   g : G[1];\s
+                }           \s
+                Class G     \s
+                {           \s
+                   f : F[1];\s
+                }           \s
+                function test():Any[*]\s
+                {\
+                 let f = dynamicNew(F,\s
+                     [ ^KeyValue(key='str',value='foo') ] ) -> cast(@F);
+                 let g = dynamicNew(G,\s
+                     [ ^KeyValue(key='f',value=$f) ]) -> cast(@G);
+                 assert($f.g == [], |'');
+                 assert($g.f == $f, |'');
+                 assert($g.f.g == [], |'');
+                }
+                """);
         CoreInstance func = runtime.getFunction("test():Any[*]");
         functionExecution.start(func, Lists.immutable.empty());
     }
@@ -203,27 +207,29 @@ public abstract class AbstractTestDynamicNew extends AbstractPureTestWithCoreCom
     public void cyclicalReferencesAreImplicitWhenFromAssociations()
     {
         compileTestSource("testSource.pure",
-                "Class H        \n"
-                        + "{            \n"
-                        + "   str : String[1]; \n"
-                        + "}            \n"
-                        + "Class I      \n"
-                        + "{}            \n"
-                        + "Association assoc \n"
-                        + "{"
-                        + "    i : I[1];   \n"
-                        + "    h : H[1];   \n"
-                        + "}"
-                        + "function test():Any[*] \n"
-                        + "{"
-                        + "    let h = dynamicNew(H, \n"
-                        + "        [ ^KeyValue(key='str',value='foo') ] ) -> cast(@H);\n"
-                        + "    let i = dynamicNew(I, \n"
-                        + "        [ ^KeyValue(key='h',value=$h) ]) -> cast(@I);\n"
-                        + "    assert($h.i == $i, |'');\n"
-                        + "    assert($i.h == $h, |'');\n"
-                        + "    assert($i.h.i == $i, |'');\n"
-                        + "}\n");
+                """
+                Class H       \s
+                {           \s
+                   str : String[1];\s
+                }           \s
+                Class I     \s
+                {}           \s
+                Association assoc\s
+                {\
+                    i : I[1];  \s
+                    h : H[1];  \s
+                }\
+                function test():Any[*]\s
+                {\
+                    let h = dynamicNew(H,\s
+                        [ ^KeyValue(key='str',value='foo') ] ) -> cast(@H);
+                    let i = dynamicNew(I,\s
+                        [ ^KeyValue(key='h',value=$h) ]) -> cast(@I);
+                    assert($h.i == $i, |'');
+                    assert($i.h == $h, |'');
+                    assert($i.h.i == $i, |'');
+                }
+                """);
         CoreInstance func = runtime.getFunction("test():Any[*]");
         functionExecution.start(func, Lists.immutable.empty());
     }
@@ -232,28 +238,30 @@ public abstract class AbstractTestDynamicNew extends AbstractPureTestWithCoreCom
     public void testDynamicNewWithZeroToOneAssociationExplicitNull()
     {
         compileTestSource("/test/testModel.pure",
-                "import test::*;\n" +
-                        "Class test::TestClassA\n" +
-                        "{\n" +
-                        "  name : String[1];\n" +
-                        "}\n" +
-                        "\n" +
-                        "Class test::TestClassB\n" +
-                        "{\n" +
-                        "}\n" +
-                        "\n" +
-                        "Association test::TestAssocAB\n" +
-                        "{\n" +
-                        "  toB : TestClassB[0..1];\n" +
-                        "  toA : TestClassA[1];\n" +
-                        "}\n" +
-                        "\n" +
-                        "function test::testFn():Any[*]\n" +
-                        "{\n" +
-                        "  let a = dynamicNew(TestClassA, [^KeyValue(key='name', value='A'), ^KeyValue(key='toB', value=[])])->cast(@TestClassA);\n" +
-                        "  assert('A' == $a.name, |'');\n" +
-                        "  assert($a.toB->isEmpty(), |'');\n" +
-                        "}\n");
+                """
+                import test::*;
+                Class test::TestClassA
+                {
+                  name : String[1];
+                }
+                
+                Class test::TestClassB
+                {
+                }
+                
+                Association test::TestAssocAB
+                {
+                  toB : TestClassB[0..1];
+                  toA : TestClassA[1];
+                }
+                
+                function test::testFn():Any[*]
+                {
+                  let a = dynamicNew(TestClassA, [^KeyValue(key='name', value='A'), ^KeyValue(key='toB', value=[])])->cast(@TestClassA);
+                  assert('A' == $a.name, |'');
+                  assert($a.toB->isEmpty(), |'');
+                }
+                """);
         CoreInstance func = runtime.getFunction("test::testFn():Any[*]");
         functionExecution.start(func, Lists.immutable.empty());
     }
@@ -262,28 +270,30 @@ public abstract class AbstractTestDynamicNew extends AbstractPureTestWithCoreCom
     public void testDynamicNewWithZeroToManyAssociationExplicitNull()
     {
         compileTestSource("/test/testModel.pure",
-                "import test::*;\n" +
-                        "Class test::TestClassA\n" +
-                        "{\n" +
-                        "  name : String[1];\n" +
-                        "}\n" +
-                        "\n" +
-                        "Class test::TestClassB\n" +
-                        "{\n" +
-                        "}\n" +
-                        "\n" +
-                        "Association test::TestAssocAB\n" +
-                        "{\n" +
-                        "  toB : TestClassB[*];\n" +
-                        "  toA : TestClassA[1];\n" +
-                        "}\n" +
-                        "\n" +
-                        "function test::testFn():Any[*]\n" +
-                        "{\n" +
-                        "  let a = dynamicNew(TestClassA, [^KeyValue(key='name', value='A'), ^KeyValue(key='toB', value=[])])->cast(@TestClassA);\n" +
-                        "  assert('A' == $a.name, |'');\n" +
-                        "  assert($a.toB->isEmpty(), |'');\n" +
-                        "}\n");
+                """
+                import test::*;
+                Class test::TestClassA
+                {
+                  name : String[1];
+                }
+                
+                Class test::TestClassB
+                {
+                }
+                
+                Association test::TestAssocAB
+                {
+                  toB : TestClassB[*];
+                  toA : TestClassA[1];
+                }
+                
+                function test::testFn():Any[*]
+                {
+                  let a = dynamicNew(TestClassA, [^KeyValue(key='name', value='A'), ^KeyValue(key='toB', value=[])])->cast(@TestClassA);
+                  assert('A' == $a.name, |'');
+                  assert($a.toB->isEmpty(), |'');
+                }
+                """);
         CoreInstance func = runtime.getFunction("test::testFn():Any[*]");
         functionExecution.start(func, Lists.immutable.empty());
     }

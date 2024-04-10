@@ -18,20 +18,20 @@ import org.finos.legend.pure.m3.execution.FunctionExecution;
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
 import org.finos.legend.pure.m4.exception.PureCompilationException;
 import org.finos.legend.pure.runtime.java.interpreted.FunctionExecutionInterpreted;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestPureRuntimeFunction_AsPointer extends AbstractPureTestWithCoreCompiled
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getFunctionExecution());
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("sourceId.pure");
@@ -46,120 +46,122 @@ public class TestPureRuntimeFunction_AsPointer extends AbstractPureTestWithCoreC
         runtime.createInMemorySource("userId.pure", "function go():Nil[0]{print(sourceFunction__String_1_, 10)}\n");
         this.compileAndExecute("go():Nil[0]");
         int size = runtime.getModelRepository().serialize().length;
-        Assert.assertEquals("sourceFunction__String_1_ instance ConcreteFunctionDefinition\n" +
-                "    classifierGenericType(Property):\n" +
-                "        Anonymous_StripedId instance GenericType\n" +
-                "            rawType(Property):\n" +
-                "                [X] ConcreteFunctionDefinition instance Class\n" +
-                "            typeArguments(Property):\n" +
-                "                Anonymous_StripedId instance GenericType\n" +
-                "                    rawType(Property):\n" +
-                "                        Anonymous_StripedId instance FunctionType\n" +
-                "                            function(Property):\n" +
-                "                                [X] sourceFunction__String_1_ instance ConcreteFunctionDefinition\n" +
-                "                            returnMultiplicity(Property):\n" +
-                "                                [X] PureOne instance PackageableMultiplicity\n" +
-                "                            returnType(Property):\n" +
-                "                                Anonymous_StripedId instance GenericType\n" +
-                "                                    rawType(Property):\n" +
-                "                                        [X] String instance PrimitiveType\n" +
-                "                                    referenceUsages(Property):\n" +
-                "                                        Anonymous_StripedId instance ReferenceUsage\n" +
-                "                                            offset(Property):\n" +
-                "                                                0 instance Integer\n" +
-                "                                            owner(Property):\n" +
-                "                                                [_] Anonymous_StripedId instance FunctionType\n" +
-                "                                            propertyName(Property):\n" +
-                "                                                returnType instance String\n" +
-                "    expressionSequence(Property):\n" +
-                "        Anonymous_StripedId instance InstanceValue\n" +
-                "            genericType(Property):\n" +
-                "                Anonymous_StripedId instance GenericType\n" +
-                "                    rawType(Property):\n" +
-                "                        [X] String instance PrimitiveType\n" +
-                "            multiplicity(Property):\n" +
-                "                [X] PureOne instance PackageableMultiplicity\n" +
-                "            usageContext(Property):\n" +
-                "                Anonymous_StripedId instance ExpressionSequenceValueSpecificationContext\n" +
-                "                    functionDefinition(Property):\n" +
-                "                        [X] sourceFunction__String_1_ instance ConcreteFunctionDefinition\n" +
-                "                    offset(Property):\n" +
-                "                        0 instance Integer\n" +
-                "            values(Property):\n" +
-                "                theFunc instance String\n" +
-                "    functionName(Property):\n" +
-                "        sourceFunction instance String\n" +
-                "    name(Property):\n" +
-                "        sourceFunction__String_1_ instance String\n" +
-                "    package(Property):\n" +
-                "        [X] Root instance Package\n" +
-                "    referenceUsages(Property):\n" +
-                "        Anonymous_StripedId instance ReferenceUsage\n" +
-                "            offset(Property):\n" +
-                "                0 instance Integer\n" +
-                "            owner(Property):\n" +
-                "                Anonymous_StripedId instance InstanceValue\n" +
-                "                    genericType(Property):\n" +
-                "                        Anonymous_StripedId instance GenericType\n" +
-                "                            rawType(Property):\n" +
-                "                                [X] ConcreteFunctionDefinition instance Class\n" +
-                "                            typeArguments(Property):\n" +
-                "                                Anonymous_StripedId instance GenericType\n" +
-                "                                    rawType(Property):\n" +
-                "                                        Anonymous_StripedId instance FunctionType\n" +
-                "                                            returnMultiplicity(Property):\n" +
-                "                                                [X] PureOne instance PackageableMultiplicity\n" +
-                "                                            returnType(Property):\n" +
-                "                                                Anonymous_StripedId instance GenericType\n" +
-                "                                                    rawType(Property):\n" +
-                "                                                        [X] String instance PrimitiveType\n" +
-                "                    multiplicity(Property):\n" +
-                "                        [X] PureOne instance PackageableMultiplicity\n" +
-                "                    usageContext(Property):\n" +
-                "                        Anonymous_StripedId instance ParameterValueSpecificationContext\n" +
-                "                            functionExpression(Property):\n" +
-                "                                Anonymous_StripedId instance SimpleFunctionExpression\n" +
-                "                                    func(Property):\n" +
-                "                                        [X] print_Any_MANY__Integer_1__Nil_0_ instance NativeFunction\n" +
-                "                                    functionName(Property):\n" +
-                "                                        print instance String\n" +
-                "                                    genericType(Property):\n" +
-                "                                        Anonymous_StripedId instance InferredGenericType\n" +
-                "                                            rawType(Property):\n" +
-                "                                                [~>] Nil instance Class\n" +
-                "                                    importGroup(Property):\n" +
-                "                                        [X] import_userId_pure_1 instance ImportGroup\n" +
-                "                                    multiplicity(Property):\n" +
-                "                                        [X] PureZero instance PackageableMultiplicity\n" +
-                "                                    parametersValues(Property):\n" +
-                "                                        [_] Anonymous_StripedId instance InstanceValue\n" +
-                "                                        Anonymous_StripedId instance InstanceValue\n" +
-                "                                            genericType(Property):\n" +
-                "                                                Anonymous_StripedId instance GenericType\n" +
-                "                                                    rawType(Property):\n" +
-                "                                                        [X] Integer instance PrimitiveType\n" +
-                "                                            multiplicity(Property):\n" +
-                "                                                [X] PureOne instance PackageableMultiplicity\n" +
-                "                                            usageContext(Property):\n" +
-                "                                                Anonymous_StripedId instance ParameterValueSpecificationContext\n" +
-                "                                                    functionExpression(Property):\n" +
-                "                                                        [_] Anonymous_StripedId instance SimpleFunctionExpression\n" +
-                "                                                    offset(Property):\n" +
-                "                                                        1 instance Integer\n" +
-                "                                            values(Property):\n" +
-                "                                                10 instance Integer\n" +
-                "                                    usageContext(Property):\n" +
-                "                                        Anonymous_StripedId instance ExpressionSequenceValueSpecificationContext\n" +
-                "                                            functionDefinition(Property):\n" +
-                "                                                [X] go__Nil_0_ instance ConcreteFunctionDefinition\n" +
-                "                                            offset(Property):\n" +
-                "                                                0 instance Integer\n" +
-                "                            offset(Property):\n" +
-                "                                0 instance Integer\n" +
-                "                    values(Property):\n" +
-                "                        [~>] sourceFunction__String_1_ instance ConcreteFunctionDefinition\n" +
-                "            propertyName(Property):\n" +
-                "                values instance String", functionExecution.getConsole().getLine(0));
+        Assertions.assertEquals("""
+                sourceFunction__String_1_ instance ConcreteFunctionDefinition
+                    classifierGenericType(Property):
+                        Anonymous_StripedId instance GenericType
+                            rawType(Property):
+                                [X] ConcreteFunctionDefinition instance Class
+                            typeArguments(Property):
+                                Anonymous_StripedId instance GenericType
+                                    rawType(Property):
+                                        Anonymous_StripedId instance FunctionType
+                                            function(Property):
+                                                [X] sourceFunction__String_1_ instance ConcreteFunctionDefinition
+                                            returnMultiplicity(Property):
+                                                [X] PureOne instance PackageableMultiplicity
+                                            returnType(Property):
+                                                Anonymous_StripedId instance GenericType
+                                                    rawType(Property):
+                                                        [X] String instance PrimitiveType
+                                                    referenceUsages(Property):
+                                                        Anonymous_StripedId instance ReferenceUsage
+                                                            offset(Property):
+                                                                0 instance Integer
+                                                            owner(Property):
+                                                                [_] Anonymous_StripedId instance FunctionType
+                                                            propertyName(Property):
+                                                                returnType instance String
+                    expressionSequence(Property):
+                        Anonymous_StripedId instance InstanceValue
+                            genericType(Property):
+                                Anonymous_StripedId instance GenericType
+                                    rawType(Property):
+                                        [X] String instance PrimitiveType
+                            multiplicity(Property):
+                                [X] PureOne instance PackageableMultiplicity
+                            usageContext(Property):
+                                Anonymous_StripedId instance ExpressionSequenceValueSpecificationContext
+                                    functionDefinition(Property):
+                                        [X] sourceFunction__String_1_ instance ConcreteFunctionDefinition
+                                    offset(Property):
+                                        0 instance Integer
+                            values(Property):
+                                theFunc instance String
+                    functionName(Property):
+                        sourceFunction instance String
+                    name(Property):
+                        sourceFunction__String_1_ instance String
+                    package(Property):
+                        [X] Root instance Package
+                    referenceUsages(Property):
+                        Anonymous_StripedId instance ReferenceUsage
+                            offset(Property):
+                                0 instance Integer
+                            owner(Property):
+                                Anonymous_StripedId instance InstanceValue
+                                    genericType(Property):
+                                        Anonymous_StripedId instance GenericType
+                                            rawType(Property):
+                                                [X] ConcreteFunctionDefinition instance Class
+                                            typeArguments(Property):
+                                                Anonymous_StripedId instance GenericType
+                                                    rawType(Property):
+                                                        Anonymous_StripedId instance FunctionType
+                                                            returnMultiplicity(Property):
+                                                                [X] PureOne instance PackageableMultiplicity
+                                                            returnType(Property):
+                                                                Anonymous_StripedId instance GenericType
+                                                                    rawType(Property):
+                                                                        [X] String instance PrimitiveType
+                                    multiplicity(Property):
+                                        [X] PureOne instance PackageableMultiplicity
+                                    usageContext(Property):
+                                        Anonymous_StripedId instance ParameterValueSpecificationContext
+                                            functionExpression(Property):
+                                                Anonymous_StripedId instance SimpleFunctionExpression
+                                                    func(Property):
+                                                        [X] print_Any_MANY__Integer_1__Nil_0_ instance NativeFunction
+                                                    functionName(Property):
+                                                        print instance String
+                                                    genericType(Property):
+                                                        Anonymous_StripedId instance InferredGenericType
+                                                            rawType(Property):
+                                                                [~>] Nil instance Class
+                                                    importGroup(Property):
+                                                        [X] import_userId_pure_1 instance ImportGroup
+                                                    multiplicity(Property):
+                                                        [X] PureZero instance PackageableMultiplicity
+                                                    parametersValues(Property):
+                                                        [_] Anonymous_StripedId instance InstanceValue
+                                                        Anonymous_StripedId instance InstanceValue
+                                                            genericType(Property):
+                                                                Anonymous_StripedId instance GenericType
+                                                                    rawType(Property):
+                                                                        [X] Integer instance PrimitiveType
+                                                            multiplicity(Property):
+                                                                [X] PureOne instance PackageableMultiplicity
+                                                            usageContext(Property):
+                                                                Anonymous_StripedId instance ParameterValueSpecificationContext
+                                                                    functionExpression(Property):
+                                                                        [_] Anonymous_StripedId instance SimpleFunctionExpression
+                                                                    offset(Property):
+                                                                        1 instance Integer
+                                                            values(Property):
+                                                                10 instance Integer
+                                                    usageContext(Property):
+                                                        Anonymous_StripedId instance ExpressionSequenceValueSpecificationContext
+                                                            functionDefinition(Property):
+                                                                [X] go__Nil_0_ instance ConcreteFunctionDefinition
+                                                            offset(Property):
+                                                                0 instance Integer
+                                            offset(Property):
+                                                0 instance Integer
+                                    values(Property):
+                                        [~>] sourceFunction__String_1_ instance ConcreteFunctionDefinition
+                            propertyName(Property):
+                                values instance String\
+                """, functionExecution.getConsole().getLine(0));
 
         for (int i = 0; i < 10; i++)
         {
@@ -167,7 +169,7 @@ public class TestPureRuntimeFunction_AsPointer extends AbstractPureTestWithCoreC
             try
             {
                 runtime.compile();
-                Assert.fail();
+                Assertions.fail();
             }
             catch (Exception e)
             {
@@ -176,126 +178,128 @@ public class TestPureRuntimeFunction_AsPointer extends AbstractPureTestWithCoreC
 
             runtime.createInMemorySource("sourceId.pure", "function sourceFunction():String[1]{'beuh!'}");
             this.compileAndExecute("go():Nil[0]");
-            Assert.assertEquals("sourceFunction__String_1_ instance ConcreteFunctionDefinition\n" +
-                    "    classifierGenericType(Property):\n" +
-                    "        Anonymous_StripedId instance GenericType\n" +
-                    "            rawType(Property):\n" +
-                    "                [X] ConcreteFunctionDefinition instance Class\n" +
-                    "            typeArguments(Property):\n" +
-                    "                Anonymous_StripedId instance GenericType\n" +
-                    "                    rawType(Property):\n" +
-                    "                        Anonymous_StripedId instance FunctionType\n" +
-                    "                            function(Property):\n" +
-                    "                                [X] sourceFunction__String_1_ instance ConcreteFunctionDefinition\n" +
-                    "                            returnMultiplicity(Property):\n" +
-                    "                                [X] PureOne instance PackageableMultiplicity\n" +
-                    "                            returnType(Property):\n" +
-                    "                                Anonymous_StripedId instance GenericType\n" +
-                    "                                    rawType(Property):\n" +
-                    "                                        [X] String instance PrimitiveType\n" +
-                    "                                    referenceUsages(Property):\n" +
-                    "                                        Anonymous_StripedId instance ReferenceUsage\n" +
-                    "                                            offset(Property):\n" +
-                    "                                                0 instance Integer\n" +
-                    "                                            owner(Property):\n" +
-                    "                                                [_] Anonymous_StripedId instance FunctionType\n" +
-                    "                                            propertyName(Property):\n" +
-                    "                                                returnType instance String\n" +
-                    "    expressionSequence(Property):\n" +
-                    "        Anonymous_StripedId instance InstanceValue\n" +
-                    "            genericType(Property):\n" +
-                    "                Anonymous_StripedId instance GenericType\n" +
-                    "                    rawType(Property):\n" +
-                    "                        [X] String instance PrimitiveType\n" +
-                    "            multiplicity(Property):\n" +
-                    "                [X] PureOne instance PackageableMultiplicity\n" +
-                    "            usageContext(Property):\n" +
-                    "                Anonymous_StripedId instance ExpressionSequenceValueSpecificationContext\n" +
-                    "                    functionDefinition(Property):\n" +
-                    "                        [X] sourceFunction__String_1_ instance ConcreteFunctionDefinition\n" +
-                    "                    offset(Property):\n" +
-                    "                        0 instance Integer\n" +
-                    "            values(Property):\n" +
-                    "                beuh! instance String\n" +
-                    "    functionName(Property):\n" +
-                    "        sourceFunction instance String\n" +
-                    "    name(Property):\n" +
-                    "        sourceFunction__String_1_ instance String\n" +
-                    "    package(Property):\n" +
-                    "        [X] Root instance Package\n" +
-                    "    referenceUsages(Property):\n" +
-                    "        Anonymous_StripedId instance ReferenceUsage\n" +
-                    "            offset(Property):\n" +
-                    "                0 instance Integer\n" +
-                    "            owner(Property):\n" +
-                    "                Anonymous_StripedId instance InstanceValue\n" +
-                    "                    genericType(Property):\n" +
-                    "                        Anonymous_StripedId instance GenericType\n" +
-                    "                            rawType(Property):\n" +
-                    "                                [X] ConcreteFunctionDefinition instance Class\n" +
-                    "                            typeArguments(Property):\n" +
-                    "                                Anonymous_StripedId instance GenericType\n" +
-                    "                                    rawType(Property):\n" +
-                    "                                        Anonymous_StripedId instance FunctionType\n" +
-                    "                                            returnMultiplicity(Property):\n" +
-                    "                                                [X] PureOne instance PackageableMultiplicity\n" +
-                    "                                            returnType(Property):\n" +
-                    "                                                Anonymous_StripedId instance GenericType\n" +
-                    "                                                    rawType(Property):\n" +
-                    "                                                        [X] String instance PrimitiveType\n" +
-                    "                    multiplicity(Property):\n" +
-                    "                        [X] PureOne instance PackageableMultiplicity\n" +
-                    "                    usageContext(Property):\n" +
-                    "                        Anonymous_StripedId instance ParameterValueSpecificationContext\n" +
-                    "                            functionExpression(Property):\n" +
-                    "                                Anonymous_StripedId instance SimpleFunctionExpression\n" +
-                    "                                    func(Property):\n" +
-                    "                                        [X] print_Any_MANY__Integer_1__Nil_0_ instance NativeFunction\n" +
-                    "                                    functionName(Property):\n" +
-                    "                                        print instance String\n" +
-                    "                                    genericType(Property):\n" +
-                    "                                        Anonymous_StripedId instance InferredGenericType\n" +
-                    "                                            rawType(Property):\n" +
-                    "                                                [~>] Nil instance Class\n" +
-                    "                                    importGroup(Property):\n" +
-                    "                                        [X] import_userId_pure_1 instance ImportGroup\n" +
-                    "                                    multiplicity(Property):\n" +
-                    "                                        [X] PureZero instance PackageableMultiplicity\n" +
-                    "                                    parametersValues(Property):\n" +
-                    "                                        [_] Anonymous_StripedId instance InstanceValue\n" +
-                    "                                        Anonymous_StripedId instance InstanceValue\n" +
-                    "                                            genericType(Property):\n" +
-                    "                                                Anonymous_StripedId instance GenericType\n" +
-                    "                                                    rawType(Property):\n" +
-                    "                                                        [X] Integer instance PrimitiveType\n" +
-                    "                                            multiplicity(Property):\n" +
-                    "                                                [X] PureOne instance PackageableMultiplicity\n" +
-                    "                                            usageContext(Property):\n" +
-                    "                                                Anonymous_StripedId instance ParameterValueSpecificationContext\n" +
-                    "                                                    functionExpression(Property):\n" +
-                    "                                                        [_] Anonymous_StripedId instance SimpleFunctionExpression\n" +
-                    "                                                    offset(Property):\n" +
-                    "                                                        1 instance Integer\n" +
-                    "                                            values(Property):\n" +
-                    "                                                10 instance Integer\n" +
-                    "                                    usageContext(Property):\n" +
-                    "                                        Anonymous_StripedId instance ExpressionSequenceValueSpecificationContext\n" +
-                    "                                            functionDefinition(Property):\n" +
-                    "                                                [X] go__Nil_0_ instance ConcreteFunctionDefinition\n" +
-                    "                                            offset(Property):\n" +
-                    "                                                0 instance Integer\n" +
-                    "                            offset(Property):\n" +
-                    "                                0 instance Integer\n" +
-                    "                    values(Property):\n" +
-                    "                        [~>] sourceFunction__String_1_ instance ConcreteFunctionDefinition\n" +
-                    "            propertyName(Property):\n" +
-                    "                values instance String", functionExecution.getConsole().getLine(0));
+            Assertions.assertEquals("""
+                    sourceFunction__String_1_ instance ConcreteFunctionDefinition
+                        classifierGenericType(Property):
+                            Anonymous_StripedId instance GenericType
+                                rawType(Property):
+                                    [X] ConcreteFunctionDefinition instance Class
+                                typeArguments(Property):
+                                    Anonymous_StripedId instance GenericType
+                                        rawType(Property):
+                                            Anonymous_StripedId instance FunctionType
+                                                function(Property):
+                                                    [X] sourceFunction__String_1_ instance ConcreteFunctionDefinition
+                                                returnMultiplicity(Property):
+                                                    [X] PureOne instance PackageableMultiplicity
+                                                returnType(Property):
+                                                    Anonymous_StripedId instance GenericType
+                                                        rawType(Property):
+                                                            [X] String instance PrimitiveType
+                                                        referenceUsages(Property):
+                                                            Anonymous_StripedId instance ReferenceUsage
+                                                                offset(Property):
+                                                                    0 instance Integer
+                                                                owner(Property):
+                                                                    [_] Anonymous_StripedId instance FunctionType
+                                                                propertyName(Property):
+                                                                    returnType instance String
+                        expressionSequence(Property):
+                            Anonymous_StripedId instance InstanceValue
+                                genericType(Property):
+                                    Anonymous_StripedId instance GenericType
+                                        rawType(Property):
+                                            [X] String instance PrimitiveType
+                                multiplicity(Property):
+                                    [X] PureOne instance PackageableMultiplicity
+                                usageContext(Property):
+                                    Anonymous_StripedId instance ExpressionSequenceValueSpecificationContext
+                                        functionDefinition(Property):
+                                            [X] sourceFunction__String_1_ instance ConcreteFunctionDefinition
+                                        offset(Property):
+                                            0 instance Integer
+                                values(Property):
+                                    beuh! instance String
+                        functionName(Property):
+                            sourceFunction instance String
+                        name(Property):
+                            sourceFunction__String_1_ instance String
+                        package(Property):
+                            [X] Root instance Package
+                        referenceUsages(Property):
+                            Anonymous_StripedId instance ReferenceUsage
+                                offset(Property):
+                                    0 instance Integer
+                                owner(Property):
+                                    Anonymous_StripedId instance InstanceValue
+                                        genericType(Property):
+                                            Anonymous_StripedId instance GenericType
+                                                rawType(Property):
+                                                    [X] ConcreteFunctionDefinition instance Class
+                                                typeArguments(Property):
+                                                    Anonymous_StripedId instance GenericType
+                                                        rawType(Property):
+                                                            Anonymous_StripedId instance FunctionType
+                                                                returnMultiplicity(Property):
+                                                                    [X] PureOne instance PackageableMultiplicity
+                                                                returnType(Property):
+                                                                    Anonymous_StripedId instance GenericType
+                                                                        rawType(Property):
+                                                                            [X] String instance PrimitiveType
+                                        multiplicity(Property):
+                                            [X] PureOne instance PackageableMultiplicity
+                                        usageContext(Property):
+                                            Anonymous_StripedId instance ParameterValueSpecificationContext
+                                                functionExpression(Property):
+                                                    Anonymous_StripedId instance SimpleFunctionExpression
+                                                        func(Property):
+                                                            [X] print_Any_MANY__Integer_1__Nil_0_ instance NativeFunction
+                                                        functionName(Property):
+                                                            print instance String
+                                                        genericType(Property):
+                                                            Anonymous_StripedId instance InferredGenericType
+                                                                rawType(Property):
+                                                                    [~>] Nil instance Class
+                                                        importGroup(Property):
+                                                            [X] import_userId_pure_1 instance ImportGroup
+                                                        multiplicity(Property):
+                                                            [X] PureZero instance PackageableMultiplicity
+                                                        parametersValues(Property):
+                                                            [_] Anonymous_StripedId instance InstanceValue
+                                                            Anonymous_StripedId instance InstanceValue
+                                                                genericType(Property):
+                                                                    Anonymous_StripedId instance GenericType
+                                                                        rawType(Property):
+                                                                            [X] Integer instance PrimitiveType
+                                                                multiplicity(Property):
+                                                                    [X] PureOne instance PackageableMultiplicity
+                                                                usageContext(Property):
+                                                                    Anonymous_StripedId instance ParameterValueSpecificationContext
+                                                                        functionExpression(Property):
+                                                                            [_] Anonymous_StripedId instance SimpleFunctionExpression
+                                                                        offset(Property):
+                                                                            1 instance Integer
+                                                                values(Property):
+                                                                    10 instance Integer
+                                                        usageContext(Property):
+                                                            Anonymous_StripedId instance ExpressionSequenceValueSpecificationContext
+                                                                functionDefinition(Property):
+                                                                    [X] go__Nil_0_ instance ConcreteFunctionDefinition
+                                                                offset(Property):
+                                                                    0 instance Integer
+                                                offset(Property):
+                                                    0 instance Integer
+                                        values(Property):
+                                            [~>] sourceFunction__String_1_ instance ConcreteFunctionDefinition
+                                propertyName(Property):
+                                    values instance String\
+                    """, functionExecution.getConsole().getLine(0));
         }
 
         runtime.delete("sourceId.pure");
         runtime.createInMemorySource("sourceId.pure", "function sourceFunction():String[1]{'theFunc'}");
         runtime.compile();
-        Assert.assertEquals("Graph size mismatch", size, repository.serialize().length);
+        Assertions.assertEquals(size, repository.serialize().length, "Graph size mismatch");
     }
 
     @Test
@@ -313,7 +317,7 @@ public class TestPureRuntimeFunction_AsPointer extends AbstractPureTestWithCoreC
             {
                 runtime.createInMemorySource("sourceId.pure", "function sourceFunction():Integer[1]{1}");
                 runtime.compile();
-                Assert.fail();
+                Assertions.fail();
             }
             catch (Exception e)
             {
@@ -322,7 +326,7 @@ public class TestPureRuntimeFunction_AsPointer extends AbstractPureTestWithCoreC
         }
         runtime.modify("sourceId.pure", "function sourceFunction():String[1]{'theFunc'}");
         runtime.compile();
-        Assert.assertEquals("Graph size mismatch", size, repository.serialize().length);
+        Assertions.assertEquals(size, repository.serialize().length, "Graph size mismatch");
     }
 
 
@@ -341,7 +345,7 @@ public class TestPureRuntimeFunction_AsPointer extends AbstractPureTestWithCoreC
             try
             {
                 runtime.compile();
-                Assert.fail();
+                Assertions.fail();
             }
             catch (Exception e)
             {
@@ -350,7 +354,7 @@ public class TestPureRuntimeFunction_AsPointer extends AbstractPureTestWithCoreC
 
             runtime.createInMemorySource("sourceId.pure", "Class A{}");
             runtime.compile();
-            Assert.assertEquals("Graph size mismatch", size, repository.serialize().length);
+            Assertions.assertEquals(size, repository.serialize().length, "Graph size mismatch");
         }
     }
 
@@ -370,7 +374,7 @@ public class TestPureRuntimeFunction_AsPointer extends AbstractPureTestWithCoreC
             try
             {
                 runtime.compile();
-                Assert.fail();
+                Assertions.fail();
             }
             catch (Exception e)
             {
@@ -381,16 +385,16 @@ public class TestPureRuntimeFunction_AsPointer extends AbstractPureTestWithCoreC
             {
                 runtime.createInMemorySource("sourceId.pure", "Class B{}");
                 runtime.compile();
-                Assert.fail();
+                Assertions.fail();
             }
             catch (Exception e)
             {
-                Assert.assertTrue("Compilation error at (resource:other.pure line:1 column:28), \"A has not been defined!\"".equals(e.getMessage()) || "Compilation error at (resource:userId.pure line:1 column:40), \"A has not been defined!\"".equals(e.getMessage()));
+                Assertions.assertTrue("Compilation error at (resource:other.pure line:1 column:28), \"A has not been defined!\"".equals(e.getMessage()) || "Compilation error at (resource:userId.pure line:1 column:40), \"A has not been defined!\"".equals(e.getMessage()));
             }
 
             runtime.modify("sourceId.pure", "Class A{}");
             runtime.compile();
-            Assert.assertEquals("Graph size mismatch", size, repository.serialize().length);
+            Assertions.assertEquals(size, repository.serialize().length, "Graph size mismatch");
         }
     }
 

@@ -134,7 +134,7 @@ public abstract class AbstractNativeFunctionGeneric extends AbstractNative
             this.parameterTypes.forEachWithIndex(0, paramCount - 1, (type, index) ->
             {
                 String typeName = getClassName(type);
-                String parameterType = type instanceof Class && ((Class<?>) type).isArray() ? "ListIterable<" + typeName + ">" : typeName;
+                String parameterType = type instanceof Class c && c.isArray() ? "ListIterable<" + typeName + ">" : typeName;
                 parameterAccessStrings.add("(" + parameterType + ")vars.get(" + index + ")");
             });
         }
@@ -197,14 +197,14 @@ public abstract class AbstractNativeFunctionGeneric extends AbstractNative
 
     private String getClassName(Object obj)
     {
-        if (obj instanceof Class)
+        if (obj instanceof Class class1)
         {
-            return getClassName((Class<?>) obj);
+            return getClassName(class1);
         }
 
-        if (obj instanceof String)
+        if (obj instanceof String string)
         {
-            return (String) obj;
+            return string;
         }
 
         throw new IllegalArgumentException("type must be a Class or String");

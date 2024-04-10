@@ -102,9 +102,9 @@ public class EnumerationMappingProcessor extends Processor<EnumerationMapping<?>
         {
             for (CoreInstance sourceValue : enumValueMapping._sourceValuesCoreInstance())
             {
-                if (sourceValue instanceof EnumStub)
+                if (sourceValue instanceof EnumStub stub)
                 {
-                    result.add(((EnumStub)sourceValue)._enumerationCoreInstance());
+                    result.add(stub._enumerationCoreInstance());
                 }
             }
         }

@@ -17,12 +17,12 @@ package org.finos.legend.pure.m3.tests.function.base.meta;
 import org.eclipse.collections.api.factory.Lists;
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 public abstract class AbstractTestNewAssociation extends AbstractPureTestWithCoreCompiled
 {
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("StandardCall.pure");
@@ -32,19 +32,21 @@ public abstract class AbstractTestNewAssociation extends AbstractPureTestWithCor
     @Test
     public void standardCall()
     {
-        String source = "function go():Any[*]\n" +
-                "{\n" +
-                "    let classA = 'meta::pure::functions::meta::A'->newClass();\n" +
-                "    let classB = 'meta::pure::functions::meta::B'->newClass();\n" +
-                "    let propertyA = newProperty('a', ^GenericType(rawType=$classB), ^GenericType(rawType=$classA), PureOne);\n" +
-                "    let propertyB = newProperty('b', ^GenericType(rawType=$classA), ^GenericType(rawType=$classB), ZeroMany);\n" +
-                "    let newAssociation = 'meta::pure::functions::meta::A_B'->newAssociation($propertyA, $propertyB);\n" +
-                "    assertEquals('A_B', $newAssociation.name);\n" +
-                "    assertEquals('meta', $newAssociation.package.name);\n" +
-                "    assertEquals('meta::pure::functions::meta::A_B', $newAssociation->elementToPath());\n" +
-                "    assertEquals('a', $newAssociation.properties->at(0).name);\n" +
-                "    assertEquals('b', $newAssociation.properties->at(1).name);\n" +
-                "}\n";
+        String source = """
+                function go():Any[*]
+                {
+                    let classA = 'meta::pure::functions::meta::A'->newClass();
+                    let classB = 'meta::pure::functions::meta::B'->newClass();
+                    let propertyA = newProperty('a', ^GenericType(rawType=$classB), ^GenericType(rawType=$classA), PureOne);
+                    let propertyB = newProperty('b', ^GenericType(rawType=$classA), ^GenericType(rawType=$classB), ZeroMany);
+                    let newAssociation = 'meta::pure::functions::meta::A_B'->newAssociation($propertyA, $propertyB);
+                    assertEquals('A_B', $newAssociation.name);
+                    assertEquals('meta', $newAssociation.package.name);
+                    assertEquals('meta::pure::functions::meta::A_B', $newAssociation->elementToPath());
+                    assertEquals('a', $newAssociation.properties->at(0).name);
+                    assertEquals('b', $newAssociation.properties->at(1).name);
+                }
+                """;
 
         compileTestSource("StandardCall.pure", source);
         CoreInstance func = runtime.getFunction("go():Any[*]");
@@ -54,16 +56,18 @@ public abstract class AbstractTestNewAssociation extends AbstractPureTestWithCor
     @Test
     public void callWithEmptyPackage()
     {
-        String source = "function go():Any[*]\n" +
-                "{\n" +
-                "    let classA = 'A'->newClass();\n" +
-                "    let classB = 'B'->newClass();\n" +
-                "    let propertyA = newProperty('a', ^GenericType(rawType=$classB), ^GenericType(rawType=$classA), PureOne);\n" +
-                "    let propertyB = newProperty('b', ^GenericType(rawType=$classA), ^GenericType(rawType=$classB), ZeroMany);\n" +
-                "    let newAssociation = 'A_B'->newAssociation($propertyA, $propertyB);\n" +
-                "    assertEquals('A_B', $newAssociation.name);\n" +
-                "    assertEquals('A_B', $newAssociation->elementToPath());\n" +
-                "}";
+        String source = """
+                function go():Any[*]
+                {
+                    let classA = 'A'->newClass();
+                    let classB = 'B'->newClass();
+                    let propertyA = newProperty('a', ^GenericType(rawType=$classB), ^GenericType(rawType=$classA), PureOne);
+                    let propertyB = newProperty('b', ^GenericType(rawType=$classA), ^GenericType(rawType=$classB), ZeroMany);
+                    let newAssociation = 'A_B'->newAssociation($propertyA, $propertyB);
+                    assertEquals('A_B', $newAssociation.name);
+                    assertEquals('A_B', $newAssociation->elementToPath());
+                }\
+                """;
 
         compileTestSource("StandardCall.pure", source);
         CoreInstance func = runtime.getFunction("go():Any[*]");
@@ -73,16 +77,18 @@ public abstract class AbstractTestNewAssociation extends AbstractPureTestWithCor
     @Test
     public void callWithEmpty()
     {
-        String source = "function go():Any[*]\n" +
-                "{\n" +
-                "    let classA = 'A'->newClass();\n" +
-                "    let classB = 'B'->newClass();\n" +
-                "    let propertyA = newProperty('a', ^GenericType(rawType=$classB), ^GenericType(rawType=$classA), PureOne);\n" +
-                "    let propertyB = newProperty('b', ^GenericType(rawType=$classA), ^GenericType(rawType=$classB), ZeroMany);\n" +
-                "    let newAssociation = ''->newAssociation($propertyA, $propertyB);\n" +
-                "    assertEquals('', $newAssociation.name);\n" +
-                "    assertEquals('', $newAssociation->elementToPath());\n" +
-                "}";
+        String source = """
+                function go():Any[*]
+                {
+                    let classA = 'A'->newClass();
+                    let classB = 'B'->newClass();
+                    let propertyA = newProperty('a', ^GenericType(rawType=$classB), ^GenericType(rawType=$classA), PureOne);
+                    let propertyB = newProperty('b', ^GenericType(rawType=$classA), ^GenericType(rawType=$classB), ZeroMany);
+                    let newAssociation = ''->newAssociation($propertyA, $propertyB);
+                    assertEquals('', $newAssociation.name);
+                    assertEquals('', $newAssociation->elementToPath());
+                }\
+                """;
 
         compileTestSource("StandardCall.pure", source);
         CoreInstance func = runtime.getFunction("go():Any[*]");
@@ -92,15 +98,17 @@ public abstract class AbstractTestNewAssociation extends AbstractPureTestWithCor
     @Test
     public void newPackage()
     {
-        String source = "function go():Any[*]\n" +
-                "{\n" +
-                "    let classA = 'A'->newClass();\n" +
-                "    let classB = 'B'->newClass();\n" +
-                "    let propertyA = newProperty('a', ^GenericType(rawType=$classB), ^GenericType(rawType=$classA), PureOne);\n" +
-                "    let propertyB = newProperty('b', ^GenericType(rawType=$classA), ^GenericType(rawType=$classB), ZeroMany);\n" +
-                "    let newAssociation = 'foo::bar::A_B'->newAssociation($propertyA, $propertyB);\n" +
-                "    assertEquals('foo::bar::A_B', $newAssociation->elementToPath());\n" +
-                "}";
+        String source = """
+                function go():Any[*]
+                {
+                    let classA = 'A'->newClass();
+                    let classB = 'B'->newClass();
+                    let propertyA = newProperty('a', ^GenericType(rawType=$classB), ^GenericType(rawType=$classA), PureOne);
+                    let propertyB = newProperty('b', ^GenericType(rawType=$classA), ^GenericType(rawType=$classB), ZeroMany);
+                    let newAssociation = 'foo::bar::A_B'->newAssociation($propertyA, $propertyB);
+                    assertEquals('foo::bar::A_B', $newAssociation->elementToPath());
+                }\
+                """;
 
         compileTestSource("StandardCall.pure", source);
         CoreInstance func = runtime.getFunction("go():Any[*]");

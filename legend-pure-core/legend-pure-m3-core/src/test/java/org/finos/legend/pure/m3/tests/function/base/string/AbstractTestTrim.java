@@ -15,7 +15,7 @@
 package org.finos.legend.pure.m3.tests.function.base.string;
 
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public abstract class AbstractTestTrim extends AbstractPureTestWithCoreCompiled
 {
@@ -23,10 +23,12 @@ public abstract class AbstractTestTrim extends AbstractPureTestWithCoreCompiled
     public void testBasicParse()
     {
             compileTestSource("fromString.pure",
-                    "function test():Boolean[1]\n" +
-                            "{\n" +
-                            "   assert('hello' == ' hello '->trim(), |'');\n" +
-                            "}\n");
+                    """
+                    function test():Boolean[1]
+                    {
+                       assert('hello' == ' hello '->trim(), |'');
+                    }
+                    """);
             this.execute("test():Boolean[1]");
     }
 
@@ -34,10 +36,12 @@ public abstract class AbstractTestTrim extends AbstractPureTestWithCoreCompiled
     public void testEvalParse()
     {
         compileTestSource("fromString.pure",
-                "function test():Boolean[1]\n" +
-                        "{\n" +
-                        "   assert('hello' == trim_String_1__String_1_->eval(' hello '), |'');\n" +
-                        "}\n");
+                """
+                function test():Boolean[1]
+                {
+                   assert('hello' == trim_String_1__String_1_->eval(' hello '), |'');
+                }
+                """);
         this.execute("test():Boolean[1]");
     }
 }

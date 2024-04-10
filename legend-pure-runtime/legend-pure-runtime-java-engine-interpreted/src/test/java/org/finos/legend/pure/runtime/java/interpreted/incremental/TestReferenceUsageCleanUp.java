@@ -20,20 +20,20 @@ import org.finos.legend.pure.m3.navigation.ValueSpecificationBootstrap;
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
 import org.finos.legend.pure.runtime.java.interpreted.FunctionExecutionInterpreted;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestReferenceUsageCleanUp extends AbstractPureTestWithCoreCompiled
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getFunctionExecution());
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("sourceId.pure");
@@ -44,10 +44,12 @@ public class TestReferenceUsageCleanUp extends AbstractPureTestWithCoreCompiled
     public void testPureRuntimePackageAsPointer() throws Exception
     {
         runtime.createInMemorySource("otherId.pure", "Class okForTestPackage::A{}");
-        runtime.createInMemorySource("sourceId.pure", "function test():Boolean[1]\n" +
-                "{   \n" +
-                "   assert(1 == okForTestPackage.referenceUsages->size(), |'');\n" +
-                "}");
+        runtime.createInMemorySource("sourceId.pure", """
+                function test():Boolean[1]
+                {  \s
+                   assert(1 == okForTestPackage.referenceUsages->size(), |'');
+                }\
+                """);
 
         this.compileAndExecute("test():Boolean[1]");
 
@@ -57,17 +59,19 @@ public class TestReferenceUsageCleanUp extends AbstractPureTestWithCoreCompiled
             try
             {
                 this.compileAndExecute("test():Boolean[1]");
-                Assert.fail();
+                Assertions.fail();
             }
             catch (Exception e)
             {
-                Assert.assertEquals("The function 'test():Boolean[1]' can't be found", e.getMessage());
+                Assertions.assertEquals("The function 'test():Boolean[1]' can't be found", e.getMessage());
             }
 
-            runtime.createInMemorySource("sourceId.pure", "function test():Boolean[1]\n" +
-                    "{   \n" +
-                    "   assert(1 == okForTestPackage.referenceUsages->size(), |'');\n" +
-                    "}");
+            runtime.createInMemorySource("sourceId.pure", """
+                    function test():Boolean[1]
+                    {  \s
+                       assert(1 == okForTestPackage.referenceUsages->size(), |'');
+                    }\
+                    """);
             this.compileAndExecute("test():Boolean[1]");
         }
     }
@@ -77,11 +81,13 @@ public class TestReferenceUsageCleanUp extends AbstractPureTestWithCoreCompiled
     public void testPureRuntimeFunctionAsPointer() throws Exception
     {
         runtime.createInMemorySource("otherId.pure", "function f():Nil[0]{[];}");
-        runtime.createInMemorySource("sourceId.pure", "Class okForTestPackage::A{}" +
-                "function test():Boolean[1]\n" +
-                "{   \n" +
-                "   assert(1 == f__Nil_0_.referenceUsages->size(), |'');\n" +
-                "}");
+        runtime.createInMemorySource("sourceId.pure", """
+                Class okForTestPackage::A{}\
+                function test():Boolean[1]
+                {  \s
+                   assert(1 == f__Nil_0_.referenceUsages->size(), |'');
+                }\
+                """);
 
         this.compileAndExecute("test():Boolean[1]");
 
@@ -91,18 +97,20 @@ public class TestReferenceUsageCleanUp extends AbstractPureTestWithCoreCompiled
             try
             {
                 this.compileAndExecute("test():Boolean[1]");
-                Assert.fail();
+                Assertions.fail();
             }
             catch (Exception e)
             {
-                Assert.assertEquals("The function 'test():Boolean[1]' can't be found", e.getMessage());
+                Assertions.assertEquals("The function 'test():Boolean[1]' can't be found", e.getMessage());
             }
 
-            runtime.createInMemorySource("sourceId.pure", "Class okForTestPackage::A{}" +
-                    "function test():Boolean[1]\n" +
-                    "{   \n" +
-                    "   assert(1 == okForTestPackage.referenceUsages->size(), |'');\n" +
-                    "}");
+            runtime.createInMemorySource("sourceId.pure", """
+                    Class okForTestPackage::A{}\
+                    function test():Boolean[1]
+                    {  \s
+                       assert(1 == okForTestPackage.referenceUsages->size(), |'');
+                    }\
+                    """);
             this.compileAndExecute("test():Boolean[1]");
         }
     }
@@ -112,18 +120,22 @@ public class TestReferenceUsageCleanUp extends AbstractPureTestWithCoreCompiled
     public void testPureRuntimeClassAFunctionReturn() throws Exception
     {
         runtime.createInMemorySource("otherId.pure", "Class A{}");
-        runtime.createInMemorySource("sourceId.pure", "function test():A[0]\n" +
-                "{" +
-                "   [];\n" +
-                "}");
+        runtime.createInMemorySource("sourceId.pure", """
+                function test():A[0]
+                {\
+                   [];
+                }\
+                """);
         for (int i = 0; i < 10; i++)
         {
             runtime.delete("sourceId.pure");
-            runtime.createInMemorySource("sourceId.pure", "function test():A[0]\n" +
-                    "{   \n" +
-                    "   assert(2 == A.referenceUsages->size(), |'');" +
-                    "   [];\n" +
-                    "}");
+            runtime.createInMemorySource("sourceId.pure", """
+                    function test():A[0]
+                    {  \s
+                       assert(2 == A.referenceUsages->size(), |'');\
+                       [];
+                    }\
+                    """);
             this.compileAndExecute("test():A[0]");
         }
     }
@@ -132,17 +144,21 @@ public class TestReferenceUsageCleanUp extends AbstractPureTestWithCoreCompiled
     public void testPureRuntimeClassAFunctionParameter() throws Exception
     {
         runtime.createInMemorySource("otherId.pure", "Class A{}");
-        runtime.createInMemorySource("sourceId.pure", "function test(a:A[1]):Nil[0]\n" +
-                "{" +
-                "   [];\n" +
-                "}");
+        runtime.createInMemorySource("sourceId.pure", """
+                function test(a:A[1]):Nil[0]
+                {\
+                   [];
+                }\
+                """);
         for (int i = 0; i < 10; i++)
         {
             runtime.delete("sourceId.pure");
-            runtime.createInMemorySource("sourceId.pure", "function test(a:A[0]):Boolean[1]\n" +
-                    "{" +
-                    "   assert(2 == A.referenceUsages->size(), |'');\n" +
-                    "}");
+            runtime.createInMemorySource("sourceId.pure", """
+                    function test(a:A[0]):Boolean[1]
+                    {\
+                       assert(2 == A.referenceUsages->size(), |'');
+                    }\
+                    """);
             this.compileAndExecute("test(A[0]):Boolean[1]", ValueSpecificationBootstrap.wrapValueSpecification(Lists.immutable.<CoreInstance>with(), true, processorSupport));
         }
     }
@@ -152,31 +168,35 @@ public class TestReferenceUsageCleanUp extends AbstractPureTestWithCoreCompiled
     public void testPureRuntimeFunctionWithLambdaUsedInExpression() throws Exception
     {
         runtime.createInMemorySource("otherId.pure", "Class ABCD{ok:String[1];}");
-        runtime.createInMemorySource("sourceId.pure", "function test():Nil[0]\n" +
-                "{\n" +
-                "   ABCD.all()->filter(a|$a.ok=='eee');\n" +
-                "   [];\n" +
-                "}\n" +
-                "\n" +
-                "function go():Boolean[1]\n" +
-                "{   \n" +
-                "   assert(4 == ABCD.referenceUsages->size(), |'');\n" +
-                "}");
+        runtime.createInMemorySource("sourceId.pure", """
+                function test():Nil[0]
+                {
+                   ABCD.all()->filter(a|$a.ok=='eee');
+                   [];
+                }
+                
+                function go():Boolean[1]
+                {  \s
+                   assert(4 == ABCD.referenceUsages->size(), |'');
+                }\
+                """);
         this.compileAndExecute("go():Boolean[1]");
 
         for (int i = 0; i < 10; i++)
         {
             runtime.delete("sourceId.pure");
-            runtime.createInMemorySource("sourceId.pure", "function test():Nil[0]\n" +
-                    "{\n" +
-                    "   ABCD.all()->filter(a|$a.ok=='eee');\n" +
-                    "   [];\n" +
-                    "}\n" +
-                    "\n" +
-                    "function go():Boolean[1]\n" +
-                    "{   \n" +
-                    "   assert(4 == ABCD.referenceUsages->size(), |'');\n" +
-                    "}");
+            runtime.createInMemorySource("sourceId.pure", """
+                    function test():Nil[0]
+                    {
+                       ABCD.all()->filter(a|$a.ok=='eee');
+                       [];
+                    }
+                    
+                    function go():Boolean[1]
+                    {  \s
+                       assert(4 == ABCD.referenceUsages->size(), |'');
+                    }\
+                    """);
             this.compileAndExecute("go():Boolean[1]");
         }
     }

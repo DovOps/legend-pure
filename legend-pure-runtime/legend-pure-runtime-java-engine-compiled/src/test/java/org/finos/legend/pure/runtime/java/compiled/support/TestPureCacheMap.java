@@ -27,8 +27,8 @@ import org.finos.legend.pure.m4.coreinstance.SourceInformation;
 import org.finos.legend.pure.runtime.java.compiled.generation.processors.support.map.PureCacheMap;
 import org.finos.legend.pure.runtime.java.compiled.generation.processors.support.map.PureCacheMapGetException;
 import org.finos.legend.pure.runtime.java.compiled.generation.processors.support.map.PureMap;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -51,8 +51,8 @@ public class TestPureCacheMap
             accessIntegerCacheKeys(cacheMap, 10);
         }
 
-        Assert.assertEquals(10, cacheMap.getCache().stats().missCount());
-        Assert.assertEquals(20, cacheMap.getCache().stats().hitCount());
+        Assertions.assertEquals(10, cacheMap.getCache().stats().missCount());
+        Assertions.assertEquals(20, cacheMap.getCache().stats().hitCount());
     }
 
     @Test
@@ -64,8 +64,8 @@ public class TestPureCacheMap
             accessIntegerCacheKeys(cacheMap, 10);
         }
 
-        Assert.assertEquals(10, cacheMap.getCache().stats().missCount());
-        Assert.assertEquals(20, cacheMap.getCache().stats().hitCount());
+        Assertions.assertEquals(10, cacheMap.getCache().stats().missCount());
+        Assertions.assertEquals(20, cacheMap.getCache().stats().hitCount());
     }
 
     @Test
@@ -76,7 +76,7 @@ public class TestPureCacheMap
         PureMap pureMap = new PureMap(cacheMap);
         String result = pureMap.toString();
 
-        Assert.assertNotNull(result);
+        Assertions.assertNotNull(result);
     }
 
     @Test
@@ -89,12 +89,12 @@ public class TestPureCacheMap
         try
         {
             exec.invokeAll(FastList.newListWith(getAccessIntegerCacheKeysCallable(cacheMap, 10), getAccessIntegerCacheKeysCallable(cacheMap, 10)));
-            Assert.assertEquals(10, cacheMap.getCache().stats().missCount());
-            Assert.assertEquals(20, cacheMap.getCache().stats().hitCount());
+            Assertions.assertEquals(10, cacheMap.getCache().stats().missCount());
+            Assertions.assertEquals(20, cacheMap.getCache().stats().hitCount());
         }
         catch (InterruptedException e)
         {
-            Assert.fail(e.getMessage());
+            Assertions.fail(e.getMessage());
         }
         finally
         {
@@ -111,26 +111,26 @@ public class TestPureCacheMap
         {
             String expected = Integer.toString(i);
 
-            Assert.assertNull(cacheMap.get(i)); // miss
+            Assertions.assertNull(cacheMap.get(i)); // miss
 
-            Assert.assertEquals(expected, cacheMap.getIfAbsentPutWithKey(i, Functions.getToString())); // miss
-            Assert.assertEquals(expected, cacheMap.get(i)); // hit
-            Assert.assertEquals(expected, cacheMap.getIfAbsentPutWithKey(i, Functions.getToString())); // hit
+            Assertions.assertEquals(expected, cacheMap.getIfAbsentPutWithKey(i, Functions.getToString())); // miss
+            Assertions.assertEquals(expected, cacheMap.get(i)); // hit
+            Assertions.assertEquals(expected, cacheMap.getIfAbsentPutWithKey(i, Functions.getToString())); // hit
 
             cacheMap.invalidate(i);
-            Assert.assertNull(cacheMap.get(i)); // miss
+            Assertions.assertNull(cacheMap.get(i)); // miss
 
-            Assert.assertEquals(expected, cacheMap.getIfAbsentPutWithKey(i, Functions.getToString())); // miss
-            Assert.assertEquals(expected, cacheMap.get(i)); // hit
-            Assert.assertEquals(expected, cacheMap.getIfAbsentPutWithKey(i, Functions.getToString())); // hit
+            Assertions.assertEquals(expected, cacheMap.getIfAbsentPutWithKey(i, Functions.getToString())); // miss
+            Assertions.assertEquals(expected, cacheMap.get(i)); // hit
+            Assertions.assertEquals(expected, cacheMap.getIfAbsentPutWithKey(i, Functions.getToString())); // hit
         }
 
-        Assert.assertEquals(4 * count, cacheMap.getCache().stats().missCount());
-        Assert.assertEquals(4 * count, cacheMap.getCache().stats().hitCount());
+        Assertions.assertEquals(4 * count, cacheMap.getCache().stats().missCount());
+        Assertions.assertEquals(4 * count, cacheMap.getCache().stats().hitCount());
 
-        Assert.assertEquals(count, cacheMap.size());
+        Assertions.assertEquals(count, cacheMap.size());
         cacheMap.clear();
-        Assert.assertEquals(0, cacheMap.size());
+        Assertions.assertEquals(0, cacheMap.size());
     }
 
     @Test
@@ -156,17 +156,17 @@ public class TestPureCacheMap
                     throw exception;
                 }
             });
-            Assert.fail("Expected exception: " + exception);
+            Assertions.fail("Expected exception: " + exception);
         }
         catch (PureCacheMapGetException e)
         {
-            Assert.assertSame(key, e.getKey());
-            Assert.assertSame(exception, e.getCause());
-            Assert.assertEquals(expectedInfo, e.getInfo());
+            Assertions.assertSame(key, e.getKey());
+            Assertions.assertSame(exception, e.getCause());
+            Assertions.assertEquals(expectedInfo, e.getInfo());
         }
         catch (Exception e)
         {
-            Assert.fail("Expected PureCacheMapGetException, got: " + e);
+            Assertions.fail("Expected PureCacheMapGetException, got: " + e);
         }
     }
 

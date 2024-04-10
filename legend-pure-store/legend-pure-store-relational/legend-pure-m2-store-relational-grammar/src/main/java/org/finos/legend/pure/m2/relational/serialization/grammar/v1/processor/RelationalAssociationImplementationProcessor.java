@@ -95,13 +95,13 @@ public class RelationalAssociationImplementationProcessor extends Processor<Rela
     private TableAlias findMainTableAlias(CoreInstance setImplementation, Matcher matcher, ProcessorState state, ProcessorSupport processorSupport)
     {
         PostProcessor.processElement(matcher, setImplementation, state, processorSupport);
-        if (setImplementation instanceof RootRelationalInstanceSetImplementation)
+        if (setImplementation instanceof RootRelationalInstanceSetImplementation implementation)
         {
-            return ((RootRelationalInstanceSetImplementation)setImplementation)._mainTableAlias();
+            return implementation._mainTableAlias();
         }
-        if (setImplementation instanceof EmbeddedRelationalInstanceSetImplementation)
+        if (setImplementation instanceof EmbeddedRelationalInstanceSetImplementation implementation)
         {
-            RootRelationalInstanceSetImplementation owner = ((EmbeddedRelationalInstanceSetImplementation)setImplementation)._setMappingOwner();
+            RootRelationalInstanceSetImplementation owner = implementation._setMappingOwner();
             return findMainTableAlias(owner, matcher, state, processorSupport);
         }
         throw new RuntimeException("Unhandled set implementation type: " + PackageableElement.getUserPathForPackageableElement(setImplementation.getClassifier()));

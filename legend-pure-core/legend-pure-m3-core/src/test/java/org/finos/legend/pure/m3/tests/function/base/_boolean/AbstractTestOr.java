@@ -15,12 +15,12 @@
 package org.finos.legend.pure.m3.tests.function.base._boolean;
 
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 public abstract class AbstractTestOr extends AbstractPureTestWithCoreCompiled
 {
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("fromString.pure");
@@ -31,13 +31,15 @@ public abstract class AbstractTestOr extends AbstractPureTestWithCoreCompiled
     public void testBasicParse()
     {
         compileTestSource("fromString.pure",
-                "function test():Boolean[1]\n" +
-                        "{\n" +
-                        "   assert(true == or(true, true), |'');\n" +
-                        "   assert(true == or(false, true), |'');\n" +
-                        "   assert(true == or(true, false), |'');\n" +
-                        "   assert(false == or(false, false), |'');\n" +
-                        "}\n");
+                """
+                function test():Boolean[1]
+                {
+                   assert(true == or(true, true), |'');
+                   assert(true == or(false, true), |'');
+                   assert(true == or(true, false), |'');
+                   assert(false == or(false, false), |'');
+                }
+                """);
         execute("test():Boolean[1]");
     }
 
@@ -45,13 +47,15 @@ public abstract class AbstractTestOr extends AbstractPureTestWithCoreCompiled
     public void testEvalParse()
     {
         compileTestSource("fromString.pure",
-                "function test():Boolean[1]\n" +
-                        "{\n" +
-                        "   assert(true == or_Boolean_1__Boolean_1__Boolean_1_->eval(true, true), |'');\n" +
-                        "   assert(true == or_Boolean_1__Boolean_1__Boolean_1_->eval(false, true), |'');\n" +
-                        "   assert(true == or_Boolean_1__Boolean_1__Boolean_1_->eval(true, false), |'');\n" +
-                        "   assert(false == or_Boolean_1__Boolean_1__Boolean_1_->eval(false, false), |'');\n" +
-                        "}\n");
+                """
+                function test():Boolean[1]
+                {
+                   assert(true == or_Boolean_1__Boolean_1__Boolean_1_->eval(true, true), |'');
+                   assert(true == or_Boolean_1__Boolean_1__Boolean_1_->eval(false, true), |'');
+                   assert(true == or_Boolean_1__Boolean_1__Boolean_1_->eval(true, false), |'');
+                   assert(false == or_Boolean_1__Boolean_1__Boolean_1_->eval(false, false), |'');
+                }
+                """);
         execute("test():Boolean[1]");
     }
 
@@ -59,23 +63,25 @@ public abstract class AbstractTestOr extends AbstractPureTestWithCoreCompiled
     public void testShortCircuit()
     {
         compileTestSource("fromString.pure",
-                "Class A\n" +
-                        "{\n" +
-                        "    value:Any[1];\n" +
-                        "}\n" +
-                        "\n" +
-                        "Class B\n" +
-                        "{\n" +
-                        "    name:String[1];\n" +
-                        "}\n" +
-                        "\n" +
-                        "function test():Boolean[1]\n" +
-                        "{\n" +
-                        "   let a1 = ^A(value=^B(name='Claudius Ptolemy'));\n" +
-                        "   let a2 = ^A(value=1);\n" +
-                        "   assertFalse(!$a1.value->instanceOf(B) || ($a1.value->cast(@B).name != 'Claudius Ptolemy'));\n" +
-                        "   assert(!$a2.value->instanceOf(B) || ($a2.value->cast(@B).name != 'Claudius Ptolemy'));\n" +
-                        "}\n");
+                """
+                Class A
+                {
+                    value:Any[1];
+                }
+                
+                Class B
+                {
+                    name:String[1];
+                }
+                
+                function test():Boolean[1]
+                {
+                   let a1 = ^A(value=^B(name='Claudius Ptolemy'));
+                   let a2 = ^A(value=1);
+                   assertFalse(!$a1.value->instanceOf(B) || ($a1.value->cast(@B).name != 'Claudius Ptolemy'));
+                   assert(!$a2.value->instanceOf(B) || ($a2.value->cast(@B).name != 'Claudius Ptolemy'));
+                }
+                """);
         execute("test():Boolean[1]");
     }
 
@@ -83,27 +89,29 @@ public abstract class AbstractTestOr extends AbstractPureTestWithCoreCompiled
     public void testShortCircuitInDynamicEvaluation()
     {
         compileTestSource("fromString.pure",
-                "Class A\n" +
-                        "{\n" +
-                        "    value:Any[1];\n" +
-                        "}\n" +
-                        "\n" +
-                        "Class B\n" +
-                        "{\n" +
-                        "    name:String[1];\n" +
-                        "}\n" +
-                        "\n" +
-                        "function test():Boolean[1]\n" +
-                        "{\n" +
-                        "   let fn1 = {|let a = ^A(value=^B(name='Claudius Ptolemy'));\n" +
-                        "               !$a.value->instanceOf(B) || ($a.value->cast(@B).name != 'Claudius Ptolemy');};\n" +
-                        "   let lambda1 = ^LambdaFunction<{->Boolean[1]}>(expressionSequence = $fn1.expressionSequence);\n" +
-                        "   assertEquals(false, $lambda1->evaluate([]));\n" +
-                        "   let fn2 = {|let a = ^A(value=1);\n" +
-                        "               !$a.value->instanceOf(B) || ($a.value->cast(@B).name != 'Claudius Ptolemy');};\n" +
-                        "   let lambda2 = ^LambdaFunction<{->Boolean[1]}>(expressionSequence = $fn2.expressionSequence);\n" +
-                        "   assertEquals(true, $lambda2->evaluate([]));\n" +
-                        "}\n");
+                """
+                Class A
+                {
+                    value:Any[1];
+                }
+                
+                Class B
+                {
+                    name:String[1];
+                }
+                
+                function test():Boolean[1]
+                {
+                   let fn1 = {|let a = ^A(value=^B(name='Claudius Ptolemy'));
+                               !$a.value->instanceOf(B) || ($a.value->cast(@B).name != 'Claudius Ptolemy');};
+                   let lambda1 = ^LambdaFunction<{->Boolean[1]}>(expressionSequence = $fn1.expressionSequence);
+                   assertEquals(false, $lambda1->evaluate([]));
+                   let fn2 = {|let a = ^A(value=1);
+                               !$a.value->instanceOf(B) || ($a.value->cast(@B).name != 'Claudius Ptolemy');};
+                   let lambda2 = ^LambdaFunction<{->Boolean[1]}>(expressionSequence = $fn2.expressionSequence);
+                   assertEquals(true, $lambda2->evaluate([]));
+                }
+                """);
         execute("test():Boolean[1]");
     }
 }

@@ -16,13 +16,13 @@ package org.finos.legend.pure.m3.tests.elements.valueSpec.literal;
 
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiledPlatform;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestLiteral extends AbstractPureTestWithCoreCompiledPlatform
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getExtra());
@@ -32,109 +32,113 @@ public class TestLiteral extends AbstractPureTestWithCoreCompiledPlatform
     public void testLiteralList()
     {
         compileTestSource("fromString.pure",
-                "function testMany():String[*]\n" +
-                        "{\n" +
-                        "    let a = ['z','k']\n" +
-                        "}\n");
+                """
+                function testMany():String[*]
+                {
+                    let a = ['z','k']
+                }
+                """);
         CoreInstance func = runtime.getFunction("testMany():String[*]");
-        Assert.assertEquals("testMany__String_MANY_ instance ConcreteFunctionDefinition\n" +
-                            "    classifierGenericType(Property):\n" +
-                            "        Anonymous_StripedId instance GenericType\n" +
-                            "            rawType(Property):\n" +
-                            "                ConcreteFunctionDefinition instance Class\n" +
-                            "            typeArguments(Property):\n" +
-                            "                Anonymous_StripedId instance GenericType\n" +
-                            "                    rawType(Property):\n" +
-                            "                        Anonymous_StripedId instance FunctionType\n" +
-                            "                            function(Property):\n" +
-                            "                                testMany__String_MANY_ instance ConcreteFunctionDefinition\n" +
-                            "                            returnMultiplicity(Property):\n" +
-                            "                                ZeroMany instance PackageableMultiplicity\n" +
-                            "                            returnType(Property):\n" +
-                            "                                Anonymous_StripedId instance GenericType\n" +
-                            "                                    rawType(Property):\n" +
-                            "                                        String instance PrimitiveType\n" +
-                            "                                    referenceUsages(Property):\n" +
-                            "                                        Anonymous_StripedId instance ReferenceUsage\n" +
-                            "                                            offset(Property):\n" +
-                            "                                                0 instance Integer\n" +
-                            "                                            owner(Property):\n" +
-                            "                                                Anonymous_StripedId instance FunctionType\n" +
-                            "                                            propertyName(Property):\n" +
-                            "                                                returnType instance String\n" +
-                            "    expressionSequence(Property):\n" +
-                            "        Anonymous_StripedId instance SimpleFunctionExpression\n" +
-                            "            func(Property):\n" +
-                            "                letFunction_String_1__T_m__T_m_ instance NativeFunction\n" +
-                            "            functionName(Property):\n" +
-                            "                letFunction instance String\n" +
-                            "            genericType(Property):\n" +
-                            "                Anonymous_StripedId instance InferredGenericType\n" +
-                            "                    rawType(Property):\n" +
-                            "                        String instance PrimitiveType\n" +
-                            "            importGroup(Property):\n" +
-                            "                import_fromString_pure_1 instance ImportGroup\n" +
-                            "            multiplicity(Property):\n" +
-                            "                Anonymous_StripedId instance Multiplicity\n" +
-                            "                    lowerBound(Property):\n" +
-                            "                        Anonymous_StripedId instance MultiplicityValue\n" +
-                            "                            value(Property):\n" +
-                            "                                2 instance Integer\n" +
-                            "                    upperBound(Property):\n" +
-                            "                        Anonymous_StripedId instance MultiplicityValue\n" +
-                            "                            value(Property):\n" +
-                            "                                2 instance Integer\n" +
-                            "            parametersValues(Property):\n" +
-                            "                Anonymous_StripedId instance InstanceValue\n" +
-                            "                    genericType(Property):\n" +
-                            "                        Anonymous_StripedId instance GenericType\n" +
-                            "                            rawType(Property):\n" +
-                            "                                String instance PrimitiveType\n" +
-                            "                    multiplicity(Property):\n" +
-                            "                        PureOne instance PackageableMultiplicity\n" +
-                            "                    usageContext(Property):\n" +
-                            "                        Anonymous_StripedId instance ParameterValueSpecificationContext\n" +
-                            "                            functionExpression(Property):\n" +
-                            "                                Anonymous_StripedId instance SimpleFunctionExpression\n" +
-                            "                            offset(Property):\n" +
-                            "                                0 instance Integer\n" +
-                            "                    values(Property):\n" +
-                            "                        a instance String\n" +
-                            "                Anonymous_StripedId instance InstanceValue\n" +
-                            "                    genericType(Property):\n" +
-                            "                        Anonymous_StripedId instance GenericType\n" +
-                            "                            rawType(Property):\n" +
-                            "                                String instance PrimitiveType\n" +
-                            "                    multiplicity(Property):\n" +
-                            "                        Anonymous_StripedId instance Multiplicity\n" +
-                            "                            lowerBound(Property):\n" +
-                            "                                Anonymous_StripedId instance MultiplicityValue\n" +
-                            "                                    value(Property):\n" +
-                            "                                        2 instance Integer\n" +
-                            "                            upperBound(Property):\n" +
-                            "                                Anonymous_StripedId instance MultiplicityValue\n" +
-                            "                                    value(Property):\n" +
-                            "                                        2 instance Integer\n" +
-                            "                    usageContext(Property):\n" +
-                            "                        Anonymous_StripedId instance ParameterValueSpecificationContext\n" +
-                            "                            functionExpression(Property):\n" +
-                            "                                Anonymous_StripedId instance SimpleFunctionExpression\n" +
-                            "                            offset(Property):\n" +
-                            "                                1 instance Integer\n" +
-                            "                    values(Property):\n" +
-                            "                        z instance String\n" +
-                            "                        k instance String\n" +
-                            "            usageContext(Property):\n" +
-                            "                Anonymous_StripedId instance ExpressionSequenceValueSpecificationContext\n" +
-                            "                    functionDefinition(Property):\n" +
-                            "                        testMany__String_MANY_ instance ConcreteFunctionDefinition\n" +
-                            "                    offset(Property):\n" +
-                            "                        0 instance Integer\n" +
-                            "    functionName(Property):\n" +
-                            "        testMany instance String\n" +
-                            "    name(Property):\n" +
-                            "        testMany__String_MANY_ instance String\n" +
-                            "    package(Property):\n" +
-                            "        Root instance Package", func.printWithoutDebug("", 10));
+        Assertions.assertEquals("""
+                            testMany__String_MANY_ instance ConcreteFunctionDefinition
+                                classifierGenericType(Property):
+                                    Anonymous_StripedId instance GenericType
+                                        rawType(Property):
+                                            ConcreteFunctionDefinition instance Class
+                                        typeArguments(Property):
+                                            Anonymous_StripedId instance GenericType
+                                                rawType(Property):
+                                                    Anonymous_StripedId instance FunctionType
+                                                        function(Property):
+                                                            testMany__String_MANY_ instance ConcreteFunctionDefinition
+                                                        returnMultiplicity(Property):
+                                                            ZeroMany instance PackageableMultiplicity
+                                                        returnType(Property):
+                                                            Anonymous_StripedId instance GenericType
+                                                                rawType(Property):
+                                                                    String instance PrimitiveType
+                                                                referenceUsages(Property):
+                                                                    Anonymous_StripedId instance ReferenceUsage
+                                                                        offset(Property):
+                                                                            0 instance Integer
+                                                                        owner(Property):
+                                                                            Anonymous_StripedId instance FunctionType
+                                                                        propertyName(Property):
+                                                                            returnType instance String
+                                expressionSequence(Property):
+                                    Anonymous_StripedId instance SimpleFunctionExpression
+                                        func(Property):
+                                            letFunction_String_1__T_m__T_m_ instance NativeFunction
+                                        functionName(Property):
+                                            letFunction instance String
+                                        genericType(Property):
+                                            Anonymous_StripedId instance InferredGenericType
+                                                rawType(Property):
+                                                    String instance PrimitiveType
+                                        importGroup(Property):
+                                            import_fromString_pure_1 instance ImportGroup
+                                        multiplicity(Property):
+                                            Anonymous_StripedId instance Multiplicity
+                                                lowerBound(Property):
+                                                    Anonymous_StripedId instance MultiplicityValue
+                                                        value(Property):
+                                                            2 instance Integer
+                                                upperBound(Property):
+                                                    Anonymous_StripedId instance MultiplicityValue
+                                                        value(Property):
+                                                            2 instance Integer
+                                        parametersValues(Property):
+                                            Anonymous_StripedId instance InstanceValue
+                                                genericType(Property):
+                                                    Anonymous_StripedId instance GenericType
+                                                        rawType(Property):
+                                                            String instance PrimitiveType
+                                                multiplicity(Property):
+                                                    PureOne instance PackageableMultiplicity
+                                                usageContext(Property):
+                                                    Anonymous_StripedId instance ParameterValueSpecificationContext
+                                                        functionExpression(Property):
+                                                            Anonymous_StripedId instance SimpleFunctionExpression
+                                                        offset(Property):
+                                                            0 instance Integer
+                                                values(Property):
+                                                    a instance String
+                                            Anonymous_StripedId instance InstanceValue
+                                                genericType(Property):
+                                                    Anonymous_StripedId instance GenericType
+                                                        rawType(Property):
+                                                            String instance PrimitiveType
+                                                multiplicity(Property):
+                                                    Anonymous_StripedId instance Multiplicity
+                                                        lowerBound(Property):
+                                                            Anonymous_StripedId instance MultiplicityValue
+                                                                value(Property):
+                                                                    2 instance Integer
+                                                        upperBound(Property):
+                                                            Anonymous_StripedId instance MultiplicityValue
+                                                                value(Property):
+                                                                    2 instance Integer
+                                                usageContext(Property):
+                                                    Anonymous_StripedId instance ParameterValueSpecificationContext
+                                                        functionExpression(Property):
+                                                            Anonymous_StripedId instance SimpleFunctionExpression
+                                                        offset(Property):
+                                                            1 instance Integer
+                                                values(Property):
+                                                    z instance String
+                                                    k instance String
+                                        usageContext(Property):
+                                            Anonymous_StripedId instance ExpressionSequenceValueSpecificationContext
+                                                functionDefinition(Property):
+                                                    testMany__String_MANY_ instance ConcreteFunctionDefinition
+                                                offset(Property):
+                                                    0 instance Integer
+                                functionName(Property):
+                                    testMany instance String
+                                name(Property):
+                                    testMany__String_MANY_ instance String
+                                package(Property):
+                                    Root instance Package\
+                            """, func.printWithoutDebug("", 10));
     }
 }

@@ -18,20 +18,20 @@ import org.finos.legend.pure.m3.execution.FunctionExecution;
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
 import org.finos.legend.pure.m4.exception.PureCompilationException;
 import org.finos.legend.pure.runtime.java.interpreted.FunctionExecutionInterpreted;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestTop extends AbstractPureTestWithCoreCompiled
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getFunctionExecution());
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("fromString.pure");
@@ -40,20 +40,22 @@ public class TestTop extends AbstractPureTestWithCoreCompiled
     @Test
     public void testSimplePure()
     {
-        compileTestSource("fromString.pure", "###Pure\n" +
-                "   Class Employee\n" +
-                "   {\n" +
-                "       s:String[1];\n" +
-                "   }\n" +
-                "\n" +
-                "\n" +
-                "###Pure\n" +
-                "   function go():Nil[0]\n" +
-                "   {\n" +
-                "       print('yeah!', 1);\n" +
-                "   }\n");
+        compileTestSource("fromString.pure", """
+                ###Pure
+                   Class Employee
+                   {
+                       s:String[1];
+                   }
+                
+                
+                ###Pure
+                   function go():Nil[0]
+                   {
+                       print('yeah!', 1);
+                   }
+                """);
         this.execute("go():Nil[0]");
-        Assert.assertEquals("'yeah!'", functionExecution.getConsole().getLine(0));
+        Assertions.assertEquals("'yeah!'", functionExecution.getConsole().getLine(0));
     }
 
     @Test
@@ -61,19 +63,21 @@ public class TestTop extends AbstractPureTestWithCoreCompiled
     {
         try
         {
-            compileTestSource("fromString.pure", "###Pure\n" +
-                    "   Class Employee\n" +
-                    "   {\n" +
-                    "       s:String[1];\n" +
-                    "   }\n" +
-                    "\n" +
-                    "\n" +
-                    "###Pure\n" +
-                    "   function go():Nil[0]\n" +
-                    "   {\n" +
-                    "       printNotWorking('yeah!');\n" +
-                    "   }\n");
-            Assert.fail("Expected compilation exception");
+            compileTestSource("fromString.pure", """
+                    ###Pure
+                       Class Employee
+                       {
+                           s:String[1];
+                       }
+                    
+                    
+                    ###Pure
+                       function go():Nil[0]
+                       {
+                           printNotWorking('yeah!');
+                       }
+                    """);
+            Assertions.fail("Expected compilation exception");
         }
         catch (Exception e)
         {

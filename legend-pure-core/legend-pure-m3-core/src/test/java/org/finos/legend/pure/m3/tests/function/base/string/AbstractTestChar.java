@@ -15,7 +15,7 @@
 package org.finos.legend.pure.m3.tests.function.base.string;
 
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public abstract class AbstractTestChar extends AbstractPureTestWithCoreCompiled
 {
@@ -23,10 +23,12 @@ public abstract class AbstractTestChar extends AbstractPureTestWithCoreCompiled
     public void testBasicParse()
     {
         compileTestSource("fromString.pure",
-                "function test():Boolean[1]\n" +
-                        "{\n" +
-                        "   assert('a' == char(97), |'');\n" +
-                        "}\n");
+                """
+                function test():Boolean[1]
+                {
+                   assert('a' == char(97), |'');
+                }
+                """);
         this.execute("test():Boolean[1]");
     }
 
@@ -34,10 +36,12 @@ public abstract class AbstractTestChar extends AbstractPureTestWithCoreCompiled
     public void testEvalParse()
     {
         compileTestSource("fromString.pure",
-                "function test():Boolean[1]\n" +
-                        "{\n" +
-                        "   assert('a' == char_Integer_1__String_1_->eval(97), |'');\n" +
-                        "}\n");
+                """
+                function test():Boolean[1]
+                {
+                   assert('a' == char_Integer_1__String_1_->eval(97), |'');
+                }
+                """);
         this.execute("test():Boolean[1]");
     }
 }

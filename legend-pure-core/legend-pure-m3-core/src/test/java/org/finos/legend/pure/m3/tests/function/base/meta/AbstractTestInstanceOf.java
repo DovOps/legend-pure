@@ -15,16 +15,18 @@
 package org.finos.legend.pure.m3.tests.function.base.meta;
 
 import org.finos.legend.pure.m3.tests.function.base.PureExpressionTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public abstract class AbstractTestInstanceOf extends PureExpressionTest
 {
     @Test
     public void testInstanceOfEnumeration()
     {
-        compileTestSource("fromString.pure","Enum test::Enum1 { VALUE1, VALUE2 }\n" +
-                "Enum test::Enum2 { VALUE3, VALUE4 }\n" +
-                "Class test::MyClass {}\n");
+        compileTestSource("fromString.pure","""
+                Enum test::Enum1 { VALUE1, VALUE2 }
+                Enum test::Enum2 { VALUE3, VALUE4 }
+                Class test::MyClass {}
+                """);
 
         // Enum
         assertExpressionTrue("test::Enum1.VALUE1->instanceOf(test::Enum1)");
@@ -51,13 +53,15 @@ public abstract class AbstractTestInstanceOf extends PureExpressionTest
     @Test
     public void testIndirectInstanceOfEnumeration()
     {
-        compileTestSource("fromString.pure","Enum test::Enum1 { VALUE1, VALUE2 }\n" +
-                "Enum test::Enum2 { VALUE3, VALUE4 }\n" +
-                "Class test::MyClass {}\n" +
-                "function test::indirectInstanceOf(val:Any[1], type:Type[1]):Boolean[1]\n" +
-                "{\n" +
-                "    $val->instanceOf($type);\n" +
-                "}\n");
+        compileTestSource("fromString.pure","""
+                Enum test::Enum1 { VALUE1, VALUE2 }
+                Enum test::Enum2 { VALUE3, VALUE4 }
+                Class test::MyClass {}
+                function test::indirectInstanceOf(val:Any[1], type:Type[1]):Boolean[1]
+                {
+                    $val->instanceOf($type);
+                }
+                """);
 
         // Enum
         assertExpressionTrue("test::Enum1.VALUE1->test::indirectInstanceOf(test::Enum1)");
@@ -84,13 +88,15 @@ public abstract class AbstractTestInstanceOf extends PureExpressionTest
     @Test
     public void testWithCompileValueSpecification()
     {
-        compileTestSource("fromString.pure","Enum test::Enum1 { VALUE1, VALUE2 }\n" +
-                "Enum test::Enum2 { VALUE3, VALUE4 }\n" +
-                "Class test::MyClass {}\n" +
-                "function test::compileAndEval(val : String[1]):Boolean[1]\n" +
-                "{\n" +
-                "    $val->compileValueSpecification().result->toOne()->reactivate()->cast(@Function<{->Boolean[1]}>)->toOne()->eval();\n" +
-                "}\n");
+        compileTestSource("fromString.pure","""
+                Enum test::Enum1 { VALUE1, VALUE2 }
+                Enum test::Enum2 { VALUE3, VALUE4 }
+                Class test::MyClass {}
+                function test::compileAndEval(val : String[1]):Boolean[1]
+                {
+                    $val->compileValueSpecification().result->toOne()->reactivate()->cast(@Function<{->Boolean[1]}>)->toOne()->eval();
+                }
+                """);
 
         assertExpressionTrue("'{| \\'myStr\\'->instanceOf(String)}'->test::compileAndEval()");
         assertExpressionTrue("'{| instanceOf((\\'myStr\\' + \\'other\\'), String)}'->test::compileAndEval()");

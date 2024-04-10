@@ -264,9 +264,9 @@ public abstract class BaseCoreInstance extends AbstractCoreInstance
                     {
                         values.forEach(childElement ->
                         {
-                            if ((!doneList.contains(childElement) || (childElement.getClassifier() == null)) && (childElement instanceof BaseCoreInstance))
+                            if ((!doneList.contains(childElement) || (childElement.getClassifier() == null)) && (childElement instanceof BaseCoreInstance instance))
                             {
-                                stack.push((BaseCoreInstance) childElement);
+                                stack.push(instance);
                             }
                         });
                     }
@@ -432,9 +432,9 @@ public abstract class BaseCoreInstance extends AbstractCoreInstance
                 else
                 {
                     String newTab = tab + "        ";
-                    if (value instanceof BaseCoreInstance)
+                    if (value instanceof BaseCoreInstance instance)
                     {
-                        ((BaseCoreInstance) value).print(appendable, newTab, stack, full, addDebug, max);
+                        instance.print(appendable, newTab, stack, full, addDebug, max);
                     }
                     else if (full)
                     {

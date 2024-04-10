@@ -35,13 +35,15 @@ public class Reactivate extends AbstractNative
     @Override
     public String buildBody()
     {
-        return "new DefendedPureFunction2<org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.valuespecification.ValueSpecification, org.finos.legend.pure.runtime.java.compiled.generation.processors.support.map.PureMap, Object>()\n" +
-                "        {\n" +
-                "            @Override\n" +
-                "            public Object value(org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.valuespecification.ValueSpecification input0, org.finos.legend.pure.runtime.java.compiled.generation.processors.support.map.PureMap input1, final ExecutionSupport es)\n" +
-                "            {\n" +
-                "                return CompiledSupport.toPureCollection(FunctionsGen.reactivate(input0, input1, es));\n" +
-                "            }\n" +
-                "        }";
+        return """
+                new DefendedPureFunction2<org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.valuespecification.ValueSpecification, org.finos.legend.pure.runtime.java.compiled.generation.processors.support.map.PureMap, Object>()
+                        {
+                            @Override
+                            public Object value(org.finos.legend.pure.m3.coreinstance.meta.pure.metamodel.valuespecification.ValueSpecification input0, org.finos.legend.pure.runtime.java.compiled.generation.processors.support.map.PureMap input1, final ExecutionSupport es)
+                            {
+                                return CompiledSupport.toPureCollection(FunctionsGen.reactivate(input0, input1, es));
+                            }
+                        }\
+                """;
     }
 }

@@ -18,41 +18,43 @@ import org.finos.legend.pure.m3.execution.FunctionExecution;
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiled;
 import org.finos.legend.pure.m3.tools.test.ToFix;
 import org.finos.legend.pure.runtime.java.interpreted.FunctionExecutionInterpreted;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
-@Ignore
+@Disabled
 public class TestFunctionAsAResult extends AbstractPureTestWithCoreCompiled
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getFunctionExecution());
     }
 
     @Test
-    @Ignore
+    @Disabled
     @ToFix
     public void testLambda()
     {
-        compileTestSource("Class Person\n" +
-                "{\n" +
-                "    name:String[1];\n" +
-                "}\n" +
-                "\n" +
-                "function ascend<T,V>(p:Property<T,V|1>[1]):Function<{T[1],T[1]->Integer[1]}>[1]\n" +
-                "{\n" +
-                "   {a,b|$p->eval($a)->compare($p->eval($b))}\n" +
-                "}\n" +
-                "\n" +
-                "function test():Nil[0]\n" +
-                "{\n" +
-                "    print(ascend(Person.property('name')->toOne()->cast(@Property<Person,String|1>)));\n" +
-                "}\n");
+        compileTestSource("""
+                Class Person
+                {
+                    name:String[1];
+                }
+                
+                function ascend<T,V>(p:Property<T,V|1>[1]):Function<{T[1],T[1]->Integer[1]}>[1]
+                {
+                   {a,b|$p->eval($a)->compare($p->eval($b))}
+                }
+                
+                function test():Nil[0]
+                {
+                    print(ascend(Person.property('name')->toOne()->cast(@Property<Person,String|1>)));
+                }
+                """);
         this.execute("test():Nil[0]");
-        Assert.assertEquals("okeee", functionExecution.getConsole().getLine(0));
+        Assertions.assertEquals("okeee", functionExecution.getConsole().getLine(0));
     }
 
     protected static FunctionExecution getFunctionExecution()

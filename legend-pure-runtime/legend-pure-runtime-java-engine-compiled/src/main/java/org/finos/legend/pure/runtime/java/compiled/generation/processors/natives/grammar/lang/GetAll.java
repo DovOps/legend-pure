@@ -57,14 +57,16 @@ public class GetAll extends AbstractNative
     @Override
     public String buildBody()
     {
-        return "new DefendedPureFunction1<Object, Object>()\n" +
-                "        {\n" +
-                "            @Override\n" +
-                "            public Object value(Object o, final ExecutionSupport es)\n" +
-                "            {\n" +
-                "                String name = org.finos.legend.pure.runtime.java.compiled.generation.processors.type.MetadataJavaPaths.buildMetadataKeyFromType((org.finos.legend.pure.m4.coreinstance.CoreInstance)o);\n" +
-                "                return ((RichIterable)Lists.mutable.ofAll(((CompiledExecutionSupport)es).getMetadata(name).valuesView()));\n" +
-                "            }\n" +
-                "        }";
+        return """
+                new DefendedPureFunction1<Object, Object>()
+                        {
+                            @Override
+                            public Object value(Object o, final ExecutionSupport es)
+                            {
+                                String name = org.finos.legend.pure.runtime.java.compiled.generation.processors.type.MetadataJavaPaths.buildMetadataKeyFromType((org.finos.legend.pure.m4.coreinstance.CoreInstance)o);
+                                return ((RichIterable)Lists.mutable.ofAll(((CompiledExecutionSupport)es).getMetadata(name).valuesView()));
+                            }
+                        }\
+                """;
     }
 }

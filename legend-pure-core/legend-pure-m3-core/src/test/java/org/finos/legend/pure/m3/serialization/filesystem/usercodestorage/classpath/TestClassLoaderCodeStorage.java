@@ -21,9 +21,9 @@ import org.finos.legend.pure.m3.serialization.filesystem.repository.CodeReposito
 import org.finos.legend.pure.m3.serialization.filesystem.repository.CodeRepositoryProviderHelper;
 import org.finos.legend.pure.m3.serialization.filesystem.repository.GenericCodeRepository;
 import org.finos.legend.pure.m3.serialization.filesystem.usercodestorage.CodeStorageNode;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -38,7 +38,7 @@ public class TestClassLoaderCodeStorage
     private ClassLoaderCodeStorage platformCodeStorage;
     private ClassLoaderCodeStorage combinedCodeStorage;
 
-    @Before
+    @BeforeEach
     public void setUp()
     {
         this.testCodeStorage = new ClassLoaderCodeStorage(new GenericCodeRepository("test", null, "platform"));
@@ -50,18 +50,18 @@ public class TestClassLoaderCodeStorage
     public void testGetFileOrFiles()
     {
         Verify.assertContainsAll(
-                "unable to find all files under /platform",
                 this.platformCodeStorage.getFileOrFiles("/platform"),
                 "/platform/pure/grammar/m3.pure",
-                "/platform/pure/anonymousCollections.pure");
+                "/platform/pure/anonymousCollections.pure",
+                "unable to find all files under /platform");
 
         Verify.assertSetsEqual(
-                "unable to find all files under /test",
                 Sets.mutable.with(
                         "/test/codestorage/fake.pure",
                         "/test/org/finos/legend/pure/m3/serialization/filesystem/test/level1/level1.pure",
                         "/test/org/finos/legend/pure/m3/serialization/filesystem/test/level1/level2/level2.pure"),
-                this.testCodeStorage.getFileOrFiles("/test").toSet());
+                this.testCodeStorage.getFileOrFiles("/test").toSet(),
+                "unable to find all files under /test");
 
         Verify.assertSetsEqual(
                 this.platformCodeStorage.getFileOrFiles("/platform").toSet(),
@@ -71,29 +71,29 @@ public class TestClassLoaderCodeStorage
                 this.combinedCodeStorage.getFileOrFiles("/test").toSet());
 
         Verify.assertSetsEqual(
-                "unable to find all files for a non-directory path",
                 Sets.mutable.with("/test/org/finos/legend/pure/m3/serialization/filesystem/test/level1/level1.pure"),
-                this.testCodeStorage.getFileOrFiles("/test/org/finos/legend/pure/m3/serialization/filesystem/test/level1/level1.pure").toSet());
+                this.testCodeStorage.getFileOrFiles("/test/org/finos/legend/pure/m3/serialization/filesystem/test/level1/level1.pure").toSet(),
+                "unable to find all files for a non-directory path");
 
         Verify.assertSetsEqual(
-                "unable to find all files under /test/com",
                 Sets.mutable.with(
                         "/test/org/finos/legend/pure/m3/serialization/filesystem/test/level1/level1.pure",
                         "/test/org/finos/legend/pure/m3/serialization/filesystem/test/level1/level2/level2.pure"),
-                this.testCodeStorage.getFileOrFiles("/test/org").toSet());
+                this.testCodeStorage.getFileOrFiles("/test/org").toSet(),
+                "unable to find all files under /test/com");
     }
 
     @Test
     public void testGetFiles()
     {
         Verify.assertSetsEqual(
-                "unable to find all files immediately under /test",
                 Sets.mutable.with("codestorage", "org"),
-                this.testCodeStorage.getFiles("/test").collect(CodeStorageNode.GET_NAME).toSet());
+                this.testCodeStorage.getFiles("/test").collect(CodeStorageNode.GET_NAME).toSet(),
+                "unable to find all files immediately under /test");
         Verify.assertSetsEqual(
-                "unable to find all files immediately under /test",
                 Sets.mutable.with("codestorage", "org"),
-                this.combinedCodeStorage.getFiles("/test").collect(CodeStorageNode.GET_NAME).toSet());
+                this.combinedCodeStorage.getFiles("/test").collect(CodeStorageNode.GET_NAME).toSet(),
+                "unable to find all files immediately under /test");
     }
 
     @Test
@@ -102,7 +102,7 @@ public class TestClassLoaderCodeStorage
         Verify.assertSetsEqual(
                 Sets.mutable.with("/test/codestorage/fake.pure", "/test/org/finos/legend/pure/m3/serialization/filesystem/test/level1/level1.pure", "/test/org/finos/legend/pure/m3/serialization/filesystem/test/level1/level2/level2.pure"),
                 this.testCodeStorage.getUserFiles().toSet());
-        Verify.assertEquals(112, this.combinedCodeStorage.getUserFiles().toSet().size());
+        Assertions.assertEquals(112, this.combinedCodeStorage.getUserFiles().toSet().size());
     }
 
     @Test
@@ -110,9 +110,9 @@ public class TestClassLoaderCodeStorage
     {
         String level1_pure = readResource("test/org/finos/legend/pure/m3/serialization/filesystem/test/level1/level1.pure");
         String m3_pure = readResource("platform/pure/grammar/m3.pure");
-        Assert.assertEquals(level1_pure, this.testCodeStorage.getContentAsText("/test/org/finos/legend/pure/m3/serialization/filesystem/test/level1/level1.pure"));
-        Assert.assertEquals(m3_pure, this.platformCodeStorage.getContentAsText("/platform/pure/grammar/m3.pure"));
-        Assert.assertEquals(level1_pure, this.combinedCodeStorage.getContentAsText("/test/org/finos/legend/pure/m3/serialization/filesystem/test/level1/level1.pure"));
+        Assertions.assertEquals(level1_pure, this.testCodeStorage.getContentAsText("/test/org/finos/legend/pure/m3/serialization/filesystem/test/level1/level1.pure"));
+        Assertions.assertEquals(m3_pure, this.platformCodeStorage.getContentAsText("/platform/pure/grammar/m3.pure"));
+        Assertions.assertEquals(level1_pure, this.combinedCodeStorage.getContentAsText("/test/org/finos/legend/pure/m3/serialization/filesystem/test/level1/level1.pure"));
     }
 
     private String readResource(String resourceName)
@@ -145,14 +145,14 @@ public class TestClassLoaderCodeStorage
     @Test
     public void testInvalidNode()
     {
-        RuntimeException e = Assert.assertThrows(RuntimeException.class, () -> this.testCodeStorage.getFiles("/made/up/invalid/path"));
-        Assert.assertEquals("Cannot find path '/made/up/invalid/path'", e.getMessage());
+        RuntimeException e = Assertions.assertThrows(RuntimeException.class, () -> this.testCodeStorage.getFiles("/made/up/invalid/path"));
+        Assertions.assertEquals("Cannot find path '/made/up/invalid/path'", e.getMessage());
     }
 
     @Test
     public void testInvalidNodeContent()
     {
-        RuntimeException e = Assert.assertThrows(RuntimeException.class, () -> this.testCodeStorage.getFileOrFiles("/made/up/invalid/path"));
-        Assert.assertEquals("Cannot find path '/made/up/invalid/path'", e.getMessage());
+        RuntimeException e = Assertions.assertThrows(RuntimeException.class, () -> this.testCodeStorage.getFileOrFiles("/made/up/invalid/path"));
+        Assertions.assertEquals("Cannot find path '/made/up/invalid/path'", e.getMessage());
     }
 }

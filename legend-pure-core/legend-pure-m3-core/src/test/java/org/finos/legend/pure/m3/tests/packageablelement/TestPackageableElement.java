@@ -21,13 +21,13 @@ import org.finos.legend.pure.m3.navigation.M3Paths;
 import org.finos.legend.pure.m3.navigation.PackageableElement.PackageableElement;
 import org.finos.legend.pure.m3.navigation._package._Package;
 import org.finos.legend.pure.m4.coreinstance.CoreInstance;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestPackageableElement extends AbstractPureTestWithCoreCompiled
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getFunctionExecution(), getFactoryRegistryOverride());
@@ -36,9 +36,9 @@ public class TestPackageableElement extends AbstractPureTestWithCoreCompiled
     @Test
     public void testSplitUserPath()
     {
-        Assert.assertEquals(Lists.immutable.with(), PackageableElement.splitUserPath("::"));
-        Assert.assertEquals(Lists.immutable.with("meta"), PackageableElement.splitUserPath("meta"));
-        Assert.assertEquals(Lists.immutable.with("meta", "pure", "tests", "model", "simple", "Person"), PackageableElement.splitUserPath("meta::pure::tests::model::simple::Person"));
+        Assertions.assertEquals(Lists.immutable.with(), PackageableElement.splitUserPath("::"));
+        Assertions.assertEquals(Lists.immutable.with("meta"), PackageableElement.splitUserPath("meta"));
+        Assertions.assertEquals(Lists.immutable.with("meta", "pure", "tests", "model", "simple", "Person"), PackageableElement.splitUserPath("meta::pure::tests::model::simple::Person"));
     }
 
     @Test
@@ -61,7 +61,7 @@ public class TestPackageableElement extends AbstractPureTestWithCoreCompiled
 
     private void assertUserPath(String expectedPath, String lookupPath)
     {
-        Assert.assertEquals(expectedPath, PackageableElement.getUserPathForPackageableElement(lookUpInstance(lookupPath)));
+        Assertions.assertEquals(expectedPath, PackageableElement.getUserPathForPackageableElement(lookUpInstance(lookupPath)));
     }
 
     @Test
@@ -95,13 +95,13 @@ public class TestPackageableElement extends AbstractPureTestWithCoreCompiled
     private void assertUserPathAsList(String expectedPath, String lookupPath, boolean includeRoot)
     {
         ListIterable<String> expectedList = PackageableElement.splitUserPath(expectedPath);
-        Assert.assertEquals(expectedPath, expectedList, PackageableElement.getUserObjectPathForPackageableElementAsList(lookUpInstance(lookupPath), includeRoot));
+        Assertions.assertEquals(expectedList, PackageableElement.getUserObjectPathForPackageableElementAsList(lookUpInstance(lookupPath), includeRoot), expectedPath);
     }
 
     private CoreInstance lookUpInstance(String path)
     {
         CoreInstance instance = runtime.getCoreInstance(path);
-        Assert.assertNotNull(path, instance);
+        Assertions.assertNotNull(instance, path);
         return instance;
     }
 
@@ -120,7 +120,7 @@ public class TestPackageableElement extends AbstractPureTestWithCoreCompiled
 
     private void assertSystemPath(String expectedPath, String lookupPath)
     {
-        Assert.assertEquals(expectedPath, PackageableElement.getSystemPathForPackageableElement(lookUpInstance(lookupPath)));
+        Assertions.assertEquals(expectedPath, PackageableElement.getSystemPathForPackageableElement(lookUpInstance(lookupPath)));
     }
 
     @Test
@@ -135,7 +135,7 @@ public class TestPackageableElement extends AbstractPureTestWithCoreCompiled
 
     private void assertM4UserPath(String expectedPath, String lookupPath)
     {
-        Assert.assertEquals(expectedPath, PackageableElement.getM4UserPathForPackageableElement(lookUpInstance(lookupPath)));
+        Assertions.assertEquals(expectedPath, PackageableElement.getM4UserPathForPackageableElement(lookUpInstance(lookupPath)));
     }
 
     @Test
@@ -149,7 +149,7 @@ public class TestPackageableElement extends AbstractPureTestWithCoreCompiled
 
     private void assertUserObjectPath(ListIterable<String> expectedLookupPaths, String lookupPath)
     {
-        Assert.assertEquals(
+        Assertions.assertEquals(
                 expectedLookupPaths.collect(this::lookUpInstance),
                 PackageableElement.getUserObjectPathForPackageableElement(lookUpInstance(lookupPath))
         );

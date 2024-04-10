@@ -23,9 +23,9 @@ public class CompiledJsonExtraTypeProcessor implements JsonExtraTypeProcessor
     @Override
     public Object process(Object pureObject, JsonSerializationContext jsonSerializationContext)
     {
-        if (pureObject instanceof PureMap)
+        if (pureObject instanceof PureMap map)
         {
-            return PureMapSerializer.toJson((PureMap) pureObject, jsonSerializationContext);
+            return PureMapSerializer.toJson(map, jsonSerializationContext);
         }
         return null;
     }

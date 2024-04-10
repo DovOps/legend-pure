@@ -16,20 +16,20 @@ package org.finos.legend.pure.m3.tests.validation;
 
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiledPlatform;
 import org.finos.legend.pure.m4.exception.PureCompilationException;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestSubType extends AbstractPureTestWithCoreCompiledPlatform
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getExtra());
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("src.pure");
@@ -41,17 +41,19 @@ public class TestSubType extends AbstractPureTestWithCoreCompiledPlatform
         try
         {
             compileTestSource("src.pure",
-                    "Class A{}\n" +
-                            "Class B extends A{}\n" +
-                            "Class C{}\n" +
-                            "native function meta::pure::functions::lang::subType<T|m>(source:Any[m], object:T[1]):T[m];\n" +
-                            "function testFunc():C[1]\n" +
-                            "{\n" +
-                            "   let a = ^B()->subType(@C);" +
-                            "}");
+                    """
+                    Class A{}
+                    Class B extends A{}
+                    Class C{}
+                    native function meta::pure::functions::lang::subType<T|m>(source:Any[m], object:T[1]):T[m];
+                    function testFunc():C[1]
+                    {
+                       let a = ^B()->subType(@C);\
+                    }\
+                    """);
 
             runtime.compile();
-            Assert.fail("Expected compilation exception");
+            Assertions.fail("Expected compilation exception");
         }
         catch (Exception e)
         {
@@ -65,17 +67,19 @@ public class TestSubType extends AbstractPureTestWithCoreCompiledPlatform
         try
         {
             compileTestSource("src.pure",
-                    "Class A{}\n" +
-                            "Class B extends A{}\n" +
-                            "Class C{}\n" +
-                            "native function meta::pure::functions::lang::subType<T|m>(source:Any[m], object:T[1]):T[m];\n" +
-                            "function testFunc():A[1]\n" +
-                            "{\n" +
-                            "   let a = ^B()->subType(@A);" +
-                            "}");
+                    """
+                    Class A{}
+                    Class B extends A{}
+                    Class C{}
+                    native function meta::pure::functions::lang::subType<T|m>(source:Any[m], object:T[1]):T[m];
+                    function testFunc():A[1]
+                    {
+                       let a = ^B()->subType(@A);\
+                    }\
+                    """);
 
             runtime.compile();
-            Assert.fail("Expected compilation exception");
+            Assertions.fail("Expected compilation exception");
         }
         catch (Exception e)
         {
@@ -87,14 +91,16 @@ public class TestSubType extends AbstractPureTestWithCoreCompiledPlatform
     public void testSubTypeOk()
     {
         compileTestSource("src.pure",
-                "Class A{}\n" +
-                        "Class B extends A{}\n" +
-                        "Class C{}\n" +
-                        "native function meta::pure::functions::lang::subType<T|m>(source:Any[m], object:T[1]):T[m];\n" +
-                        "function testFunc():A[1]\n" +
-                        "{\n" +
-                        "   let a = ^A()->subType(@B);" +
-                        "}");
+                """
+                Class A{}
+                Class B extends A{}
+                Class C{}
+                native function meta::pure::functions::lang::subType<T|m>(source:Any[m], object:T[1]):T[m];
+                function testFunc():A[1]
+                {
+                   let a = ^A()->subType(@B);\
+                }\
+                """);
 
         runtime.compile();
     }

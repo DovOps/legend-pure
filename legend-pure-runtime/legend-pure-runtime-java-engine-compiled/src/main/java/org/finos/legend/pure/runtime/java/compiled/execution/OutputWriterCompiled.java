@@ -29,9 +29,8 @@ public class OutputWriterCompiled implements OutputWriter<Object>
     @Override
     public void write(Object result, OutputStream outputStream) throws IOException
     {
-        if (result instanceof RichIterable)
+        if (result instanceof RichIterable list)
         {
-            RichIterable list = (RichIterable)result;
             for (Object object : list)
             {
                 this.write(object, outputStream);

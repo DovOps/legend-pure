@@ -17,19 +17,19 @@ package org.finos.legend.pure.m3.tests.incremental.measure;
 import org.finos.legend.pure.m3.tests.AbstractPureTestWithCoreCompiledPlatform;
 import org.finos.legend.pure.m3.tests.RuntimeTestScriptBuilder;
 import org.finos.legend.pure.m3.tests.RuntimeVerifier;
-import org.junit.After;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TestPureRuntimeMeasure extends AbstractPureTestWithCoreCompiledPlatform
 {
-    @BeforeClass
+    @BeforeAll
     public static void setUp()
     {
         setUpRuntime(getExtra());
     }
 
-    @After
+    @AfterEach
     public void cleanRuntime()
     {
         runtime.delete("userId.pure");
@@ -39,31 +39,39 @@ public class TestPureRuntimeMeasure extends AbstractPureTestWithCoreCompiledPlat
     }
 
 
-    private final String measureSource = "Measure pkg::Mass \n" +
-            "{\n" +
-            "   *Gram: x -> $x; \n" +
-            "   Kilogram: x -> $x*1000;\n" +
-            "   Pound: x -> $x*453.59;\n" +
-            "}\n";
+    private final String measureSource = """
+            Measure pkg::Mass\s
+            {
+               *Gram: x -> $x;\s
+               Kilogram: x -> $x*1000;
+               Pound: x -> $x*453.59;
+            }
+            """;
 
-    private final String updatedMeasure = "Measure pkg::Mass \n" +
-            "{\n" +
-            "   *Gram: x -> $x; \n" +
-            "   Pound: x -> $x*453.59;\n" +
-            "}\n";
+    private final String updatedMeasure = """
+            Measure pkg::Mass\s
+            {
+               *Gram: x -> $x;\s
+               Pound: x -> $x*453.59;
+            }
+            """;
 
-    private final String nonConvertibleMeasure = "Measure pkg::Currency\n" +
-            "{\n" +
-            "   USD;\n" +
-            "   GBP;\n" +
-            "   EUR;\n" +
-            "}\n";
+    private final String nonConvertibleMeasure = """
+            Measure pkg::Currency
+            {
+               USD;
+               GBP;
+               EUR;
+            }
+            """;
 
-    private final String updatedNonConvertibleMeasure = "Measure pkg::Currency\n" +
-            "{\n" +
-            "   USD;\n" +
-            "   EUR;\n" +
-            "}\n";
+    private final String updatedNonConvertibleMeasure = """
+            Measure pkg::Currency
+            {
+               USD;
+               EUR;
+            }
+            """;
 
     @Test
     public void testMeasureAsFunctionParameterTypeIncremental() throws Exception
@@ -130,14 +138,18 @@ public class TestPureRuntimeMeasure extends AbstractPureTestWithCoreCompiledPlat
     @Test
     public void testCanUpdateIncremental() throws Exception
     {
-        String testFunc1 = "function testFunc():Any[0..1]\n" +
-                "{\n" +
-                "   let a = 10 pkg::Mass~Pound;\n" +
-                "}";
-        String testFunc2 = "function testFunc():Any[0..1]\n" +
-                "{\n" +
-                "   let a = 10 pkg::Mass~Pound;\n" +
-                "}";
+        String testFunc1 = """
+                function testFunc():Any[0..1]
+                {
+                   let a = 10 pkg::Mass~Pound;
+                }\
+                """;
+        String testFunc2 = """
+                function testFunc():Any[0..1]
+                {
+                   let a = 10 pkg::Mass~Pound;
+                }\
+                """;
 
         String source1 = this.measureSource + "\n" + testFunc1;
         String source2 = this.measureSource + "\n" + testFunc2;
@@ -153,16 +165,20 @@ public class TestPureRuntimeMeasure extends AbstractPureTestWithCoreCompiledPlat
     @Test
     public void testUpdateMeasureAsParameterMultiplicityManyIncremental() throws Exception
     {
-        String updatedConversionFunc = "Measure pkg::Mass \n" +
-                "{\n" +
-                "   *Gram: x -> $x; \n" +
-                "   Kilogram: x -> $x*100;\n" +
-                "   Pound: x -> $x*400;\n" +
-                "}\n";
-        String testerFunc = "function testerFunc(masses: pkg::Mass[*]):pkg::Mass~Gram[1]\n" +
-                "{\n" +
-                "   10 pkg::Mass~Gram;\n" +
-                "}";
+        String updatedConversionFunc = """
+                Measure pkg::Mass\s
+                {
+                   *Gram: x -> $x;\s
+                   Kilogram: x -> $x*100;
+                   Pound: x -> $x*400;
+                }
+                """;
+        String testerFunc = """
+                function testerFunc(masses: pkg::Mass[*]):pkg::Mass~Gram[1]
+                {
+                   10 pkg::Mass~Gram;
+                }\
+                """;
         String testFunc = "function runTest():String[1]{let a  = 10 pkg::Mass~Pound; let b = 5 pkg::Mass~Gram; testerFunc([$a, $b]); 'ok';}";
         RuntimeVerifier.verifyOperationIsStable(new RuntimeTestScriptBuilder().createInMemorySource("sourceId.pure", this.measureSource)
                         .createInMemorySource("testFunc.pure", testFunc + testerFunc)

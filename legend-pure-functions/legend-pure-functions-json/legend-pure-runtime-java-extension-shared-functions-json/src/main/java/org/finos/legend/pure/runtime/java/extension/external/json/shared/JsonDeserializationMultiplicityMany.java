@@ -37,9 +37,9 @@ public class JsonDeserializationMultiplicityMany<T> extends JsonPropertyDeserial
         {
             return Lists.immutable.empty();
         }
-        if (jsonValue instanceof JSONArray)
+        if (jsonValue instanceof JSONArray array)
         {
-            return applyConversion((JSONArray) jsonValue, jsonDeserializationContext);
+            return applyConversion(array, jsonDeserializationContext);
         }
         return applyConversion(jsonValue, jsonDeserializationContext);
     }
